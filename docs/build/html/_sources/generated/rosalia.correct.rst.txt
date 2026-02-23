@@ -13,6 +13,7 @@ rosalia.correct
       download_mast
       estimate_straylight_in_detector_locations
       main_offender
+      rosalia_psf
       rosalia_stray
       rosalia_zody
       subtract_stars

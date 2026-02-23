@@ -26,8 +26,7 @@ Check out the :doc:`usage` section for further information how to use ROSALIA to
 
 .. note::
 
-   Space is hard, and this project is under active development. We will be including more functions and tutorials in the very near future. **ROSALIA** is a Roman Wide Field Science project that needs your help to improve! If you find a useful capability that could be added, a problem to be resolved, or any other idea, :doc:`contact us <whoarewe>`.  
-
+   Space is hard, and this project is under active development. The predicted sky background levels by ROSALIA might not be exact and it is not recommended to use it blindly. But we keep pushing everyday to make it better, and our team is happy to assist with your particular project. We will be including more functions and tutorials in the very near future. **ROSALIA** is a Roman Wide Field Science project that needs your help to improve! If you find a useful capability that could be added, a problem to be resolved, or any other idea, :doc:`contact us <whoarewe>`.
 
 .. autosummary::
    :toctree: _autosummary
@@ -42,6 +41,7 @@ Contents
 
     mission
     installation
+    tutorials
     usage
     whoarewe
     rosalia

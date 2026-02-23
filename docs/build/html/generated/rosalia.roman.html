@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>rosalia.roman &mdash; ROSALIA 0.81 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/dark_mode_css/general.css?v=c0a7eb24" />
       <link rel="stylesheet" type="text/css" href="../_static/dark_mode_css/dark.css?v=70edf1c7" />
 
@@ -16,8 +16,8 @@
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=fc3f49b1"></script>
-      <script src="../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/dark_mode_js/default_light.js?v=c2e647ce"></script>
       <script src="../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
     <script src="../_static/js/theme.js"></script>
@@ -50,12 +50,12 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../mission.html">What is ROSALIA?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../usage.html">How to use</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../whoarewe.html">Who is ROSALIA?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../rosalia.html">ROSALIA package</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="rosalia.html">rosalia</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="rosalia.CORE.html">rosalia.CORE</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.albedo.html">rosalia.albedo</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.astrometry.html">rosalia.astrometry</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.bootima.html">rosalia.bootima</a></li>
@@ -119,8 +119,20 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.roman.create_roman_dummy" title="rosalia.roman.create_roman_dummy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_roman_dummy</span></code></a>(point, date, band[, PA, ...])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.roman.get_subarray_locations" title="rosalia.roman.get_subarray_locations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_subarray_locations</span></code></a>(SCA[, verbose])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.roman.fe2mag" title="rosalia.roman.fe2mag"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fe2mag</span></code></a>(fe, bandpass, sca)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.roman.get_subarray_locations" title="rosalia.roman.get_subarray_locations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_subarray_locations</span></code></a>(SCA[, verbose])</p></td>
 <td><p>This program estimates the locations on the SCA detector of the different subarrays used for NDI estimation.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.roman.mag2fe" title="rosalia.roman.mag2fe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mag2fe</span></code></a>(mag, bandpass, sca)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.roman.make_average_ndi_maps" title="rosalia.roman.make_average_ndi_maps"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_average_ndi_maps</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.roman.make_romanisim_dummy" title="rosalia.roman.make_romanisim_dummy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_romanisim_dummy</span></code></a>(name, ra, dec, pa, ...)</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.roman.roman_WFI_NDI_estimator_direct" title="rosalia.roman.roman_WFI_NDI_estimator_direct"><code class="xref py py-obj docutils literal notranslate"><span class="pre">roman_WFI_NDI_estimator_direct</span></code></a>(ra_stars, ...)</p></td>
 <td><p></p></td>

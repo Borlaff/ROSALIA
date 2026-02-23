@@ -1,14 +1,6 @@
 ROSALIA package
 ===============
 
-Subpackages
------------
-
-.. toctree::
-   :maxdepth: 4
-
-   rosalia.CORE
-
 Submodules
 ----------
 

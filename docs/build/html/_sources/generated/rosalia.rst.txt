@@ -10,7 +10,6 @@
    :toctree:
    :recursive:
 
-   CORE
    albedo
    astrometry
    bootima

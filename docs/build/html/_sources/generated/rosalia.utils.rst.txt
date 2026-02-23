@@ -11,8 +11,10 @@ rosalia.utils
       MJysr_to_jyarcsec2
       angular_distance
       check_file_integrity
+      check_fits_integrity
       check_number_of_extensions
       circle_around_position
+      circular_hist
       convert_ASDF_to_FITS
       create_angle_mask
       create_custom_wcs
@@ -21,12 +23,15 @@ rosalia.utils
       create_radial_mask
       delta_angular_separation
       detect_sci_extensions
+      divide_array_in_chunks
       download_file
       ds9tomask
+      erwinspacing
       execute_cmd
       exposure_inspector
       exposure_inspector_asdf
       exposure_inspector_fits
+      exposure_inspector_single
       find_SCA_EXTNAME
       find_max_angular_size_of_image
       find_nearest_index
@@ -35,6 +40,7 @@ rosalia.utils
       fnu_to_flambda
       generate_image_interpolator
       get_data_and_wcs
+      get_keys_from_header
       get_parameters_list
       get_pixscale
       great_circle_ra_dec_shift
@@ -56,6 +62,7 @@ rosalia.utils
       save_dict
       save_fits
       separation_and_position_angle
+      sort_hst_flcs_by_filter
       sphere_dist
       thetaphi_2_radec
       xy_to_radec

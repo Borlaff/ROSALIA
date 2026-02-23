@@ -41,6 +41,7 @@ Contents
 
     mission
     installation
+    tutorials
     usage
     whoarewe
     rosalia

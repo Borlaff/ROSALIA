@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>rosalia.utils &mdash; ROSALIA 0.81 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/dark_mode_css/general.css?v=c0a7eb24" />
       <link rel="stylesheet" type="text/css" href="../_static/dark_mode_css/dark.css?v=70edf1c7" />
 
@@ -16,8 +16,8 @@
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=fc3f49b1"></script>
-      <script src="../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/dark_mode_js/default_light.js?v=c2e647ce"></script>
       <script src="../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
     <script src="../_static/js/theme.js"></script>
@@ -49,12 +49,12 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../mission.html">What is ROSALIA?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../usage.html">How to use</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../whoarewe.html">Who is ROSALIA?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../rosalia.html">ROSALIA package</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="rosalia.html">rosalia</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="rosalia.CORE.html">rosalia.CORE</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.albedo.html">rosalia.albedo</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.astrometry.html">rosalia.astrometry</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.bootima.html">rosalia.bootima</a></li>
@@ -124,11 +124,17 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.check_file_integrity" title="rosalia.utils.check_file_integrity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_file_integrity</span></code></a>(filenames)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.check_number_of_extensions" title="rosalia.utils.check_number_of_extensions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_number_of_extensions</span></code></a>(input_name, ...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.check_fits_integrity" title="rosalia.utils.check_fits_integrity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_fits_integrity</span></code></a>(input)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.circle_around_position" title="rosalia.utils.circle_around_position"><code class="xref py py-obj docutils literal notranslate"><span class="pre">circle_around_position</span></code></a>(ra, dec, radius[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.check_number_of_extensions" title="rosalia.utils.check_number_of_extensions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_number_of_extensions</span></code></a>(input_name, ...)</p></td>
 <td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.circle_around_position" title="rosalia.utils.circle_around_position"><code class="xref py py-obj docutils literal notranslate"><span class="pre">circle_around_position</span></code></a>(ra, dec, radius[, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.circular_hist" title="rosalia.utils.circular_hist"><code class="xref py py-obj docutils literal notranslate"><span class="pre">circular_hist</span></code></a>(ax, x[, bins, density, ...])</p></td>
+<td><p>Produce a circular histogram of angles on ax.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.convert_ASDF_to_FITS" title="rosalia.utils.convert_ASDF_to_FITS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_ASDF_to_FITS</span></code></a>(asdf_list, output)</p></td>
 <td><p></p></td>
@@ -154,47 +160,59 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.detect_sci_extensions" title="rosalia.utils.detect_sci_extensions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">detect_sci_extensions</span></code></a>(input_name)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.download_file" title="rosalia.utils.download_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">download_file</span></code></a>(url)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.divide_array_in_chunks" title="rosalia.utils.divide_array_in_chunks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">divide_array_in_chunks</span></code></a>(array, chunk_size)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.download_file" title="rosalia.utils.download_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">download_file</span></code></a>(url)</p></td>
 <td><p>Downloads the file described as an url address.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.ds9tomask" title="rosalia.utils.ds9tomask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ds9tomask</span></code></a>(fname, nx, ny, outname)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.ds9tomask" title="rosalia.utils.ds9tomask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ds9tomask</span></code></a>(fname, nx, ny, outname)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.erwinspacing" title="rosalia.utils.erwinspacing"><code class="xref py py-obj docutils literal notranslate"><span class="pre">erwinspacing</span></code></a>(minimum, number[, rate, mode])</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.execute_cmd" title="rosalia.utils.execute_cmd"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute_cmd</span></code></a>(cmd[, verbose])</p></td>
 <td><p>Executes a shell command line.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.exposure_inspector" title="rosalia.utils.exposure_inspector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">exposure_inspector</span></code></a>(input_name[, verbose])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.exposure_inspector" title="rosalia.utils.exposure_inspector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">exposure_inspector</span></code></a>(input_name[, verbose, lite])</p></td>
+<td><p>List wrapper for exposure_inspector_single</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.exposure_inspector_asdf" title="rosalia.utils.exposure_inspector_asdf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">exposure_inspector_asdf</span></code></a>(input_name[, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.exposure_inspector_fits" title="rosalia.utils.exposure_inspector_fits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">exposure_inspector_fits</span></code></a>(input_name[, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.exposure_inspector_single" title="rosalia.utils.exposure_inspector_single"><code class="xref py py-obj docutils literal notranslate"><span class="pre">exposure_inspector_single</span></code></a>(input_name[, ...])</p></td>
 <td><p>Inspects and returns critical information about the contents of a telescope exposure, stored as a FITS or ADSF file.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.exposure_inspector_asdf" title="rosalia.utils.exposure_inspector_asdf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">exposure_inspector_asdf</span></code></a>(input_name[, verbose])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.find_SCA_EXTNAME" title="rosalia.utils.find_SCA_EXTNAME"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_SCA_EXTNAME</span></code></a>(EXTNAME)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.exposure_inspector_fits" title="rosalia.utils.exposure_inspector_fits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">exposure_inspector_fits</span></code></a>(input_name[, verbose])</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.find_SCA_EXTNAME" title="rosalia.utils.find_SCA_EXTNAME"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_SCA_EXTNAME</span></code></a>(EXTNAME)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.find_max_angular_size_of_image" title="rosalia.utils.find_max_angular_size_of_image"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_max_angular_size_of_image</span></code></a>(data, wcs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.find_max_angular_size_of_image" title="rosalia.utils.find_max_angular_size_of_image"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_max_angular_size_of_image</span></code></a>(data, wcs)</p></td>
 <td><p>Returns the maximum angular extension of an image.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.find_nearest_index" title="rosalia.utils.find_nearest_index"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_nearest_index</span></code></a>(array, value)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.find_nearest_index" title="rosalia.utils.find_nearest_index"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_nearest_index</span></code></a>(array, value)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.find_subposition_EXTNAME" title="rosalia.utils.find_subposition_EXTNAME"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_subposition_EXTNAME</span></code></a>(EXTNAME)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.find_subposition_EXTNAME" title="rosalia.utils.find_subposition_EXTNAME"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_subposition_EXTNAME</span></code></a>(EXTNAME)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.flambda_to_fnu" title="rosalia.utils.flambda_to_fnu"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flambda_to_fnu</span></code></a>(flambda, wavelength)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.flambda_to_fnu" title="rosalia.utils.flambda_to_fnu"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flambda_to_fnu</span></code></a>(flambda, wavelength)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.fnu_to_flambda" title="rosalia.utils.fnu_to_flambda"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fnu_to_flambda</span></code></a>(fnu, wavelength)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.fnu_to_flambda" title="rosalia.utils.fnu_to_flambda"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fnu_to_flambda</span></code></a>(fnu, wavelength)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.generate_image_interpolator" title="rosalia.utils.generate_image_interpolator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_image_interpolator</span></code></a>(data[, x, y])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.generate_image_interpolator" title="rosalia.utils.generate_image_interpolator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_image_interpolator</span></code></a>(data[, x, y])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.get_data_and_wcs" title="rosalia.utils.get_data_and_wcs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_data_and_wcs</span></code></a>(input_name, ext)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.get_data_and_wcs" title="rosalia.utils.get_data_and_wcs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_data_and_wcs</span></code></a>(input_name, ext)</p></td>
 <td><p>Opens a fits file and returns the data and wcs at a certain extension.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.get_keys_from_header" title="rosalia.utils.get_keys_from_header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_keys_from_header</span></code></a>(fits_list, index[, ext])</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.get_parameters_list" title="rosalia.utils.get_parameters_list"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_parameters_list</span></code></a>(fits_list, index[, ext])</p></td>
 <td><p></p></td>
@@ -247,7 +265,7 @@
 <tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.run_basic_noisechisel" title="rosalia.utils.run_basic_noisechisel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_basic_noisechisel</span></code></a>(file_name, ext)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.run_swarp" title="rosalia.utils.run_swarp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_swarp</span></code></a>(pattern, outname)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.run_swarp" title="rosalia.utils.run_swarp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_swarp</span></code></a>(pattern, outname[, coveredfrac, ...])</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.save_dict" title="rosalia.utils.save_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_dict</span></code></a>(dictionary, input_name[, verbose])</p></td>
@@ -259,13 +277,16 @@
 <tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.separation_and_position_angle" title="rosalia.utils.separation_and_position_angle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">separation_and_position_angle</span></code></a>(ra1, dec1, ...)</p></td>
 <td><p>Einsum version of the angular separation function by Astropy einsum_angular_distance_harversine v1: October 17, 2024 - Fastest version compared against numba, or astropy.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.sphere_dist" title="rosalia.utils.sphere_dist"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sphere_dist</span></code></a>(ra1, dec1, ra2, dec2)</p></td>
-<td><p>A faster separation calculator than astropy solution.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.thetaphi_2_radec" title="rosalia.utils.thetaphi_2_radec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">thetaphi_2_radec</span></code></a>(theta, phi)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.sort_hst_flcs_by_filter" title="rosalia.utils.sort_hst_flcs_by_filter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sort_hst_flcs_by_filter</span></code></a>(filelist)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.xy_to_radec" title="rosalia.utils.xy_to_radec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xy_to_radec</span></code></a>(x, y, fits_name, ext)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.sphere_dist" title="rosalia.utils.sphere_dist"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sphere_dist</span></code></a>(ra1, dec1, ra2, dec2)</p></td>
+<td><p>A faster separation calculator than astropy solution.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.thetaphi_2_radec" title="rosalia.utils.thetaphi_2_radec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">thetaphi_2_radec</span></code></a>(theta, phi)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.xy_to_radec" title="rosalia.utils.xy_to_radec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xy_to_radec</span></code></a>(x, y, fits_name, ext)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>

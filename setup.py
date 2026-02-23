@@ -22,7 +22,7 @@ setup(
     install_requires=['multiprocess', 'bottleneck', 'xmltodict',
                       'romanisim @ git+https://github.com/spacetelescope/romanisim.git', 'asdf',
                       'cartopy',
-                      'healpy', 'regions', 'LSSTDESC.Coord',  'numpy',#  'numpy==1.26.4',
+                      'healpy', 'regions', 'reproject', 'LSSTDESC.Coord',  'numpy',#  'numpy==1.26.4',
                       'galsim', 'skyfield', 'tqdm', 'pybind11>=2.12', 'pandas',
                       'requests', 'numexpr', 'astroquery', 'scipy', 'matplotlib',
                       'astropy_healpix', 'pytest', 'celluloid', 'ipython', 'pysynphot',

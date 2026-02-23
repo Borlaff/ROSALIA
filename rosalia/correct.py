@@ -1,17 +1,12 @@
 # Alejandro S. Borlaff. NASA Ames Research Center. a.s.borlaff@nasa.gov / asborlaff@gmail.com
 # June 27, 2023.
 #
-# STRAYCOR main module
+# ROSALIA main module
 # This module will hold all the general programs to be interacting with the user
 #
 # Version log:
 # v.1.0 - 27 June 2023. First loading of programs inherited from former straycor.
-#
-##########################################################
-#  Required Packages
-#  pip install sep
-#
-#
+# v.2.0 - 29 Feb 2024. First working version in a public release. The main_offender program is now fully working and tested with Roman Dummy images. The main program to run is rosalia_stray, which calls main_offender internally.
 ##########################################################
 
 # General modules
@@ -34,15 +29,38 @@ from astropy.time import Time
 from astropy import constants as const
 from astropy.coordinates import ICRS, Angle, SkyCoord
 
-# from rosalia.utils import exposure_inspector
-# from rosalia.utils import convert_ASDF_to_FITS
-
 ###########################
 
 def rosalia_stray(ra, dec, PA, date, bandpass, exptime, radius=1,
                   g_mag_max=15, sun_block=False, verbose=False, catalog=None):
 
+    '''
+    rosalia_stray: Alejandro S. Borlaff. NASA/Ames STA. a.s.borlaff@nasa.gov    
 
+    The objective of this program is to identify and estimate the straylight from stars outside the field of view for Roman Space Telescope Wide Field Instrument observations.
+    As input the rosalia_stray function takes the pointing coordinates (ra, dec), position angle (PA), date, bandpass, and exposure time.
+    The output is an image with the estimated straylight per pixel and a dictionary with metadata about the straylight estimation. 
+
+    History: 
+    v1 - 29 Feb 2024. First working version in a public release. 
+
+    Input parameters:
+    ra: Right ascension of the pointing, in degrees.
+    dec: Declination of the pointing, in degrees.
+    PA: Position angle of the observation, in degrees.
+    date: Date of the observation, in Astropy Time YYYY-MM-DDTHH:MM:SS format.
+    bandpass: Bandpass of the observation, in Roman WFI filter names (e.g. F062, F087, F106, F129, F158, F184, F213).
+    exptime: Exposure time of the observation, in seconds.
+    radius: Radius around the pointing to search for stars, in degrees. Default is 1 degree.
+    g_mag_max: Maximum g magnitude of the stars to consider in the straylight estimation. Default is 15.
+    sun_block: If True, the Sun will be removed from the catalog of stars. Default is False.
+    verbose: If True, the program will print more information about the progress. Default is False.
+    catalog: If the user already has a catalog of stars around the pointing, they can input it here as a pandas DataFrame. The catalog must have the following columns: "ra", "dec", "source_id", "cat_id", "mag_lambda". If the catalog is provided, the program will skip the step of querying the Gaia/2MASS/WISE catalogs.
+
+    Output:
+    main_offender_db: A pandas DataFrame with the estimated straylight from each star outside the field of view, and the metadata about the estimation. The columns are: "source_id", "cat_id", "ra", "dec", "mag_lambda", "straylevel", "main_offender", "mosaic_name", "mosaic_name_scaled".
+    
+    '''
     from tqdm import tqdm
     import logging
     logger = logging.getLogger()

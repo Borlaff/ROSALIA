@@ -9,5 +9,7 @@ rosalia.skywalker
    .. autosummary::
    
       download_query
+      download_url
       skywalker
+      sort_hst_flcs_by_filter
    

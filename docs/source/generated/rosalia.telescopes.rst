@@ -8,6 +8,7 @@ rosalia.telescopes
 
    .. autosummary::
    
+      find_closest_TLE
       find_filter_in_svo
       get_filter
       ndi_estimator
