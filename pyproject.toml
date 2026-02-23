@@ -3,8 +3,8 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ROSALIA"
-version = "0.9.5"
+name = "rosalia-wfi"
+version = "0.9.6"
 description = "A software to calibrate the sky background of Space Telescope images"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -30,7 +30,7 @@ dependencies = [
     "multiprocess",
     "bottleneck",
     "xmltodict",
-    "romanisim @ git+https://github.com/spacetelescope/romanisim.git",
+    "romanisim",
     "asdf",
     "cartopy",
     "healpy",

@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: ROSALIA
-Version: 0.9.4
+Version: 0.9.5
 Summary: A software to calibrate the sky background of Space Telescope images
 Home-page: https://github.com/Borlaff/ROSALIA
 Author: Alejandro S. Borlaff
@@ -25,11 +25,12 @@ License-File: LICENSE.txt
 Requires-Dist: multiprocess
 Requires-Dist: bottleneck
 Requires-Dist: xmltodict
-Requires-Dist: romanisim @ git+https://github.com/spacetelescope/romanisim.git
+Requires-Dist: romanisim
 Requires-Dist: asdf
 Requires-Dist: cartopy
 Requires-Dist: healpy
 Requires-Dist: regions
+Requires-Dist: reproject
 Requires-Dist: LSSTDESC.Coord
 Requires-Dist: numpy
 Requires-Dist: galsim

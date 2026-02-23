@@ -1,3 +1,60 @@
+Metadata-Version: 2.4
+Name: ROSALIA-wfi
+Version: 0.9.5
+Summary: A software to calibrate the sky background of Space Telescope images
+Home-page: https://github.com/Borlaff/ROSALIA
+Author: Alejandro S. Borlaff
+Author-email: "Alejandro S. Borlaff" <a.s.borlaff@nasa.gov>
+License: BSD
+Project-URL: Homepage, https://github.com/Borlaff/ROSALIA
+Project-URL: Repository, https://github.com/Borlaff/ROSALIA
+Keywords: Hubble,Roman,LSB,sky-background
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Science/Research
+Classifier: Topic :: Utilities
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE.txt
+Requires-Dist: multiprocess
+Requires-Dist: bottleneck
+Requires-Dist: xmltodict
+Requires-Dist: romanisim
+Requires-Dist: asdf
+Requires-Dist: cartopy
+Requires-Dist: healpy
+Requires-Dist: regions
+Requires-Dist: reproject
+Requires-Dist: LSSTDESC.Coord
+Requires-Dist: numpy
+Requires-Dist: galsim
+Requires-Dist: skyfield
+Requires-Dist: tqdm
+Requires-Dist: pybind11>=2.12
+Requires-Dist: pandas
+Requires-Dist: requests
+Requires-Dist: numexpr
+Requires-Dist: astroquery
+Requires-Dist: scipy
+Requires-Dist: matplotlib
+Requires-Dist: astropy_healpix
+Requires-Dist: pytest
+Requires-Dist: celluloid
+Requires-Dist: ipython
+Requires-Dist: pysynphot
+Requires-Dist: sphericalpolygon
+Requires-Dist: psutil
+Requires-Dist: zodipy
+Dynamic: author
+Dynamic: home-page
+Dynamic: license-file
+
 <!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
 <a id="readme-top"></a>
 <!--
@@ -128,7 +185,7 @@ Once in a clean conda environment, we need to download the ROSALIA package from 
 
 
 
-#### For general users
+#### For general users (not yet available!)
 Create a clean environment for ROSALIA
 ```sh
 conda create -n rosalia python=3.12 conda-forge::astromatic-swarp
@@ -141,7 +198,7 @@ conda activate rosalia
 Once in a clean conda environment, we can install ROSALIA. The preferred method to install it is through pip.
 
 ```sh
-pip install rosalia-wfi
+pip install rosalia
    ```
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -150,7 +207,7 @@ That is it! We are ready to start analyzing Space Telescope images.
 <!-- USAGE EXAMPLES -->
 ## Minimal use example
 
-ROSALIA estimates the amount of stray-light from Roman Space Telescope images. To do that, it calculates how many photons reach the focal plane array from secondary optical paths, based on a function called Normalized Detector Irradiance (NDI, https://link.springer.com/book/10.1007/b97612). Those photons represent a source of contamination and typically, they must be modeled and removed before the images are ready for science. ROSALIA calculates the flux of photons for each pixel of the focal plane array. For Roman/WFI, that is a total of 300,811,392 pixels! (18 4088x4088 H4RG-10 detectors). While Nancy Grace Roman Space Telescope is scheduled to be launched no earlier than September 2026, we can start simulating the observations that this magnificent telescope will provide humanity with using another Roman software, romanisim (https://romanisim.readthedocs.io/en/latest/).
+ROSALIA estimates the amount of stray-light from Roman Space Telescope images. To do that, it calculates how many photons reach the focal plane array from secondary optical paths, based on a function called Normalized Detector Irradiance (NDI, https://link.springer.com/book/10.1007/b97612). Those photons represent a source of contamination and typically, they must be modeled and removed before the images are ready for science. ROSALIA calculates the flux of photons for each pixel of the focal plane array. For Roman/WFI, that is a total of 300,811,392 pixels! (18 4088x4088 H4RG-10 detectors). While Nancy Grace Roman Space Telescope is scheduled to be launched in May 2027, we can start simulating the observations that this magnificent telescope will provide humanity with using another Roman software, romanisim (https://romanisim.readthedocs.io/en/latest/).
 
 ### Generating some mock Roman / WFI observations
 1. Install [romanisim](https://romanisim.readthedocs.io/en/latest/) and generate a Roman/WFI example image. For our experiment -- and to maximize the visualization of stray-light -- we will simulate an exposure nearby the Orion's Belt.
