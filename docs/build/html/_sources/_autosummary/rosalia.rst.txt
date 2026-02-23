@@ -1,0 +1,6 @@
+﻿rosalia
+=======
+
+.. currentmodule:: rosalia
+
+.. automodule:: rosalia

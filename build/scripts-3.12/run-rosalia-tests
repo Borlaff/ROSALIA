@@ -1,0 +1,39 @@
+#!python
+
+import rosalia as rs
+
+# Run all tests
+result_test_photometry_superstars = rs.tests.test_photometry_superstars()
+result_test_fe2mu_mu2fe = rs.tests.test_fe2mu_mu2fe()
+result_test_magnitude_conversion_gaia = rs.tests.test_magnitude_conversion_gaia()
+
+if result_test_photometry_superstars and result_test_fe2mu_mu2fe and result_test_magnitude_conversion_gaia:
+    print(r'                                                               ')
+    print(r'                                                               ')
+    print(r'       ____    ____    _____   ___     __     ____  ___        ')
+    print(r'      / __ \  / __ \  / ___/  /   |   / /    /  _/ /   |       ')
+    print(r' ####/ /#/ /#/ /#/ /##\__ \##/ /| |##/ /#####/ /##/ /| |####>  ')
+    print(r'    / _, _/ / /_/ /  ___/ / / ___ | / /___ _/ /  / ___ |       ')
+    print(r'   /_/ |_|  \____/  /____/ /_/  |_|/_____//___/ /_/  |_|       ')
+    print(r'                                                               ')
+    print(r'                                                               ')
+    print(r'                                                               ')
+    print(r'                                                               ')
+    print(r'                                                               ')
+    print(r'                                                               ')
+    print(r'                                                               ')
+    print(r'                                                               ')
+    print(r'                                                               ')
+    print(r'                                                               ')
+    print(r'                                                               ')
+    print(r'                                                               ')
+    print(r'                                                               ')
+    print(r'                                                               ')
+    print("ROSALIA: ROman Sky Analyst for Low surface brightness Imaging & Astronomy")
+    print("National Aeronautics and Space Administration - NASA Ames Research Center")
+    print("                                                               ")
+    print(" All tests run successfully. The system is ready ")
+    print("                                                               ")
+    print("Contact: ")
+    print("Science PI: Alejandro S. Borlaff - a.s.borlaff@nasa.gov")
+    print("Admin PI: Pamela M. Marcum - pamela.m.marcum@nasa.gov")

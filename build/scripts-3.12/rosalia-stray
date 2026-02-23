@@ -1,0 +1,36 @@
+#!python
+
+from rosalia.correct import rosalia_stray
+import argparse
+import yaml
+import glob
+
+
+
+def go(args):
+    if args.input is not None:
+        rosalia_stray_db = rosalia_stray(input_pattern=args.input,
+                                         output_name=args.output,
+                                         radius=args.radius,
+                                         g_mag_max=args.g_mag_max,
+                                         verbose=args.verbose)
+        #print(exposure_identity)
+    else:
+        print('ROSALIA / rosalia-stray: Calculate stray-light level in Roman/WFI exposures')
+        print('EXAMPLE: rosalia-stray input_image.asdf')
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description='ROSALIA / rosalia-stray: Calculate stray-light level in Roman/WFI exposures',
+        epilog='EXAMPLE: %(prog)s input_image*.asdf',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('input', type=str, help='Input pattern that all asdf files share. Example: input_pattern = RST_WFI_SCA_*.asdf if your files are RST_WFI_SCA_01.asdf, RST_WFI_SCA_02.asdf, RST_WFI_SCA_03.asdf [...] RST_WFI_SCA_18.asdf.')
+    parser.add_argument('--output', type=str, default="default_rosalia-stray_output.fits", help='Name of the output FITS file containing the stray-light level. Default: "rosalia_stray_output.fits"')
+    parser.add_argument('--radius', type=float, default=0.1, help='Maximum radius up to where all stars are considered individually. The lower the value, the faster the processing. Default: 0.1 degree.')
+    parser.add_argument('--g_mag_max', type=float, default=15, help='Maximum magnitude for stars considered in the calculated. The lower the value, the faster the processing. Default: 15 mag.')
+    parser.add_argument('--verbose', type=bool, default=False, help='Verbose option. Set True to see all the information.')
+
+    args = parser.parse_args()
+
+    go(args)

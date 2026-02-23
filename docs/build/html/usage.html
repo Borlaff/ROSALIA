@@ -1,0 +1,190 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How to use &mdash; ROSALIA 0.81 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=fc3f49b1"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/dark_mode_js/default_light.js?v=c2e647ce"></script>
+      <script src="_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Who is ROSALIA?" href="whoarewe.html" />
+    <link rel="prev" title="Installation" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            ROSALIA
+              <img src="_static/rosalia_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="mission.html">What is ROSALIA?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">How to use</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#rosalia-from-the-command-line">ROSALIA - From the command line</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#rosalia-from-python">ROSALIA - From Python</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="whoarewe.html">Who is ROSALIA?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rosalia.html">ROSALIA package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ROSALIA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">How to use</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/usage.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="how-to-use">
+<h1>How to use<a class="headerlink" href="#how-to-use" title="Link to this heading"></a></h1>
+<section id="rosalia-from-the-command-line">
+<h2>ROSALIA - From the command line<a class="headerlink" href="#rosalia-from-the-command-line" title="Link to this heading"></a></h2>
+<p>Most users will utilize <em>ROSALIA</em> to generate sky-background models for images obtained with space telescopes. To make these tasks easier, we have developed a series of executables to analyze images directly from shell. Here we show the most common tools that will be used.</p>
+<p>The primary tool is <code class="docutils literal notranslate"><span class="pre">rosalia-sky</span></code>. <code class="docutils literal notranslate"><span class="pre">rosalia-sky</span></code> accepts a FITS or ASDF exposure image file and generates another image containing the expected background level per pixel. This program analyzes four different components of the sky background present for space telescopes, these are:</p>
+<ol class="arabic simple">
+<li><p>Zodiacal light</p></li>
+<li><p>External stray light (i.e., stars, planets)</p></li>
+<li><p>Diffracted light (PSF from bright stars)</p></li>
+<li><p>Thermal self emission (also called internal stray light)</p></li>
+</ol>
+<p>The expected brightness of these components vary with wavelength and observational conditions. Observations nearby a bright star might be dominated by stray-light, while in less crowded fields Zodiacal light will be the dominant contributor to the background flux. <a class="reference external" href="https://roman.gsfc.nasa.gov/science/WFI_technical.html">Thermal self emission</a> from the spacecraft starts to be comparable to the Zodiacal light the more we get into the infrared region of the electromagnetic spectrum. <code class="docutils literal notranslate"><span class="pre">rosalia-sky</span></code> generates one image per layer, allowing the user to combine them or subtract them from the real observed background.</p>
+<p>Here is an example of how <code class="docutils literal notranslate"><span class="pre">rosalia-sky</span></code> works.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rosalia</span><span class="o">-</span><span class="n">sky</span> <span class="o">--</span><span class="nb">all</span> <span class="n">RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI01</span><span class="o">.</span><span class="n">asdf</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">rosalia-sky</span></code> extracts all the necessary information from the exposure file metadata, finds the location of all-sky sources (stars, planets, Earth, Sun, the Moon), predicts the flux of stray-light that those sources will produce in the focal plane array, and finally, generates a series of ASDF and FITS files with the pixel-to-pixel flux (electrons per second) level expected for this particular exposure.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">rosalia-sky</span></code> command line interface (CLI) has a number of arguments to support this functionality:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rosalia</span><span class="o">-</span><span class="n">sky</span> <span class="o">-</span><span class="n">h</span>
+<span class="n">usage</span><span class="p">:</span> <span class="n">rosalia</span><span class="o">-</span><span class="n">sky</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">output</span> <span class="n">OUTPUT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">radius</span> <span class="n">RADIUS</span><span class="p">]</span>
+                     <span class="p">[</span><span class="o">--</span><span class="n">g_mag_max</span> <span class="n">G_MAG_MAX</span><span class="p">]</span>
+                     <span class="p">[</span><span class="o">--</span><span class="n">verbose</span> <span class="n">VERBOSE</span><span class="p">]</span>
+                     <span class="nb">input</span>
+
+<span class="n">ROSALIA</span> <span class="o">/</span> <span class="n">rosalia</span><span class="o">-</span><span class="n">sky</span><span class="p">:</span> <span class="n">Calculate</span> <span class="n">stray</span><span class="o">-</span><span class="n">light</span> <span class="n">level</span> <span class="ow">in</span>
+<span class="n">Roman</span><span class="o">/</span><span class="n">WFI</span> <span class="n">exposures</span>
+
+<span class="n">positional</span> <span class="n">arguments</span><span class="p">:</span>
+  <span class="nb">input</span>                 <span class="n">Input</span> <span class="n">pattern</span> <span class="n">that</span> <span class="nb">all</span> <span class="n">asdf</span> <span class="n">files</span>
+                        <span class="n">share</span><span class="o">.</span> <span class="n">Example</span><span class="p">:</span> <span class="n">input_pattern</span> <span class="o">=</span>
+                        <span class="n">RST_WFI_SCA_</span><span class="o">*.</span><span class="n">asdf</span> <span class="k">if</span> <span class="n">your</span> <span class="n">files</span> <span class="n">are</span>
+                        <span class="n">RST_WFI_SCA_01</span><span class="o">.</span><span class="n">asdf</span><span class="p">,</span>
+                        <span class="n">RST_WFI_SCA_02</span><span class="o">.</span><span class="n">asdf</span><span class="p">,</span>
+                        <span class="n">RST_WFI_SCA_03</span><span class="o">.</span><span class="n">asdf</span> <span class="p">[</span><span class="o">...</span><span class="p">]</span>
+                        <span class="n">RST_WFI_SCA_18</span><span class="o">.</span><span class="n">asdf</span><span class="o">.</span>
+
+<span class="n">options</span><span class="p">:</span>
+  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>            <span class="n">show</span> <span class="n">this</span> <span class="n">help</span> <span class="n">message</span> <span class="ow">and</span> <span class="n">exit</span>
+  <span class="o">--</span><span class="n">output</span> <span class="n">OUTPUT</span>       <span class="n">Name</span> <span class="n">of</span> <span class="n">the</span> <span class="n">output</span> <span class="n">FITS</span> <span class="n">file</span>
+                        <span class="n">containing</span> <span class="n">the</span> <span class="n">stray</span><span class="o">-</span><span class="n">light</span> <span class="n">level</span><span class="o">.</span>
+                        <span class="n">Default</span><span class="p">:</span> <span class="s2">&quot;rosalia_stray_output.fits&quot;</span>
+                        <span class="p">(</span><span class="n">default</span><span class="p">:</span> <span class="n">default_rosalia</span><span class="o">-</span>
+                        <span class="n">stray_output</span><span class="o">.</span><span class="n">fits</span><span class="p">)</span>
+  <span class="o">--</span><span class="n">radius</span> <span class="n">RADIUS</span>       <span class="n">Maximum</span> <span class="n">radius</span> <span class="n">up</span> <span class="n">to</span> <span class="n">where</span> <span class="nb">all</span> <span class="n">stars</span>
+                        <span class="n">are</span> <span class="n">considered</span> <span class="n">individually</span><span class="o">.</span> <span class="n">The</span> <span class="n">lower</span>
+                        <span class="n">the</span> <span class="n">value</span><span class="p">,</span> <span class="n">the</span> <span class="n">faster</span> <span class="n">the</span> <span class="n">processing</span><span class="o">.</span>
+                        <span class="n">Default</span><span class="p">:</span> <span class="mf">0.1</span> <span class="n">degree</span><span class="o">.</span> <span class="p">(</span><span class="n">default</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">)</span>
+  <span class="o">--</span><span class="n">g_mag_max</span> <span class="n">G_MAG_MAX</span>
+                        <span class="n">Maximum</span> <span class="n">magnitude</span> <span class="k">for</span> <span class="n">stars</span> <span class="n">considered</span>
+                        <span class="ow">in</span> <span class="n">the</span> <span class="n">calculated</span><span class="o">.</span> <span class="n">The</span> <span class="n">lower</span> <span class="n">the</span>
+                        <span class="n">value</span><span class="p">,</span> <span class="n">the</span> <span class="n">faster</span> <span class="n">the</span> <span class="n">processing</span><span class="o">.</span>
+                        <span class="n">Default</span><span class="p">:</span> <span class="mi">15</span> <span class="n">mag</span><span class="o">.</span> <span class="p">(</span><span class="n">default</span><span class="p">:</span> <span class="mi">15</span><span class="p">)</span>
+  <span class="o">--</span><span class="n">verbose</span> <span class="n">VERBOSE</span>     <span class="n">Verbose</span> <span class="n">option</span><span class="o">.</span> <span class="n">Set</span> <span class="kc">True</span> <span class="n">to</span> <span class="n">see</span> <span class="nb">all</span>
+                        <span class="n">the</span> <span class="n">information</span><span class="o">.</span> <span class="p">(</span><span class="n">default</span><span class="p">:</span> <span class="kc">False</span><span class="p">)</span>
+
+<span class="n">EXAMPLE</span><span class="p">:</span> <span class="n">rosalia</span><span class="o">-</span><span class="n">stray</span> <span class="n">input_image</span><span class="o">*.</span><span class="n">asdf</span>
+</pre></div>
+</div>
+<p>The mandatory input argument is the image filename. As of April 2025, Roman/WFI exposures are expected to be stored in individual ASDF files per detector (SCAs). To facilitate the analysis of complete exposures composed of multiple SCA images, <code class="docutils literal notranslate"><span class="pre">rosalia-stray</span></code> accepts <a class="reference external" href="https://www.gnu.org/software/findutils/manual/html_node/find_html/Shell-Pattern-Matching.html">GNU shell patterns</a>,   (i.e., <code class="docutils literal notranslate"><span class="pre">example_image_SCA*.asdf</span></code>). <em>ROSALIA</em> will identify and analyze all the files that correspond to the input pattern.</p>
+<p><strong>Optional parameters</strong>:</p>
+<p><code class="docutils literal notranslate"><span class="pre">--output</span></code>: [type: string] Use it to set a custom name for the sky background model.</p>
+<p><code class="docutils literal notranslate"><span class="pre">--radius</span></code>: [unit: degrees] <em>ROSALIA</em> automatically queries the Gaia, 2MASS, and WISE catalogs to construct an all-sky map of every single source in space, aiming to generate a stray-light model as precise as possible. However, for computational efficiency, <em>ROSALIA</em> assumes that stars at longer distances than <strong>–radius</strong> from the center of each detector do not need to be treated individually, and can be grouped together into <em>superstars</em> of 30 arcsec in size. Stars brighter than magnitude 6 (a total of 230) are not included in Gaia, so they are treated individually using <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2016SPIE.9904E..2ES/abstract">Hipparcos photometry</a>. The higher the <code class="docutils literal notranslate"><span class="pre">--radius</span></code> value, the more stars are treated individually. Generally, 0.1 degrees is a minimum reasonable value. Higher quality models close to high stray-light contamination (i.e., an observation close to a bright group of stars) may require to set <code class="docutils literal notranslate"><span class="pre">--radius</span></code> to 1 degree or higher.</p>
+<p><code class="docutils literal notranslate"><span class="pre">--g_mag_max</span></code>: [unit: magnitudes] For efficiency, <em>ROSALIA</em> searches for stars up to a certain Gaia <em>g-band</em> magnitude. Stars with lower magnitudes than <code class="docutils literal notranslate"><span class="pre">--g_mag_max</span></code> are not considered in the stray-light analysis. The default value is <em>m=15</em> in the Gaia <em>g-band</em> AB system.</p>
+<p><code class="docutils literal notranslate"><span class="pre">--verbose</span></code>: [bool] Set True to return all the information about the internal steps made by <em>ROSALIA</em>. Useful for debugging.</p>
+</section>
+<section id="rosalia-from-python">
+<h2>ROSALIA - From Python<a class="headerlink" href="#rosalia-from-python" title="Link to this heading"></a></h2>
+<p>To retrieve a list of random ingredients, you can use the <code class="docutils literal notranslate"><span class="pre">rosalia.utils.sphere_dist()</span></code> function:</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="whoarewe.html" class="btn btn-neutral float-right" title="Who is ROSALIA?" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, NASA Ames Research Center / Code S / Alejandro S. Borlaff.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

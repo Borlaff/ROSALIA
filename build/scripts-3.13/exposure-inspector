@@ -1,0 +1,33 @@
+#!python
+
+from rosalia.utils import exposure_inspector
+
+#!/usr/bin/env python
+
+import argparse
+import yaml
+
+from astropy.coordinates import SkyCoord
+from astropy import units as u
+import galsim
+from copy import copy
+
+
+def go(args):
+    if args.input is not None:
+        exposure_identity = exposure_inspector(args.input)
+        print(exposure_identity)
+    else:
+        print('ROSALIA / exposure-inspector: Inspect basic information in Roman/WFI ASDF files')
+        print('EXAMPLE: exposure-inspector input_image.asdf')
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description='ROSALIA / exposure-inspector: Inspect basic information in Roman/WFI ASDF files',
+        epilog='EXAMPLE: %(prog)s input_image.asdf',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('input', type=str, help='Input image (asdf)')
+    args = parser.parse_args()
+
+    go(args)

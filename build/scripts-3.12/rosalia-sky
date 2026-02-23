@@ -1,0 +1,91 @@
+#!python
+
+import os
+import glob
+import yaml
+import argparse
+from rosalia.correct import rosalia_stray, rosalia_zody
+from rosalia.utils import convert_ASDF_to_FITS
+
+
+def go(args):
+    if args.input is not None:
+        print(args)
+
+        # If the input is a pattern, that means that multiple files are incoming.
+        # If the input is ASDF, then we must convert it to the FITS format.
+        filename, file_extension = os.path.splitext(args.input)
+        if file_extension == ".asdf":
+            convert_ASDF_to_FITS(asdf_list=glob.glob(args.input), output=args.output + ".fits")
+
+        # If any layer is called in particular, then all is False.
+        if args.zody or args.stray or args.psf or args.thermal:
+            args.all = False
+
+        # If args.all is True, then enable all layers.
+        if args.all:
+            args.zody = True
+            args.stray = True
+            args.psf = True
+            args.thermal = True
+
+
+        #####################
+        # Start processing. #
+        #####################
+
+        if args.zody:
+            print("ROSALIA Zodiacal light mode")
+            output_name = args.output + "_zody.fits"
+            rosalia_zody_db = rosalia_zody(input_name=args.output + ".fits",
+                                           output_name=output_name)
+
+        if args.stray:
+            print("ROSALIA Stray light mode")
+            output_name = args.output + "_stray.fits"
+            rosalia_stray_db = rosalia_stray(input_name=args.output + ".fits",
+                                             output_name=output_name,
+                                             radius=args.radius,
+                                             g_mag_max=args.g_mag_max,
+                                             verbose=args.verbose)
+
+
+        if args.thermal:
+            print("ROSALIA Thermal background mode")
+            output_name = args.output + "_thermal.fits"
+            print("Not implemented yet. Work in progress...")
+
+
+        if args.psf:
+            print("ROSALIA Diffracted light mode")
+            output_name = args.output + "_psf.fits"
+            print("Not implemented yet. Work in progress...")
+
+
+    else:
+        print('ROSALIA / rosalia-sky: Estimate sky-background in space telescope exposures')
+        print('EXAMPLE: rosalia-sky input_image.asdf')
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description='ROSALIA / rosalia-sky: Estimate sky-background in space telescope exposures',
+        epilog='EXAMPLE: %(prog)s input_image*.asdf',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+    parser.add_argument('input', type=str, help='Input pattern that all asdf files share. Example: input_pattern = RST_WFI_SCA_*.asdf if your files are RST_WFI_SCA_01.asdf, RST_WFI_SCA_02.asdf, RST_WFI_SCA_03.asdf [...] RST_WFI_SCA_18.asdf.')
+
+    parser.add_argument('--all', default=True, action='store_true', help='Run rosalia-sky with all sky-background layers')
+    parser.add_argument('--zody', action='store_true', help='Estimate Zodiacal background only')
+    parser.add_argument('--stray', action='store_true', help='Estimate stray-light background only')
+    parser.add_argument('--thermal', action='store_true', help='Estimate thermal background only')
+    parser.add_argument('--psf', action='store_true', help='Estimate diffraction background only')
+
+    parser.add_argument('--output', type=str, default="rosalia_sky_output", help='Root name for the output FITS files containing the background levels. Default: "rosalia_sky_output"')
+    parser.add_argument('--radius', type=float, default=0.1, help='Maximum radius up to where all stars are considered individually. The lower the value, the faster the processing. Default: 0.1 degree.')
+    parser.add_argument('--g_mag_max', type=float, default=15, help='Maximum magnitude for stars considered in the calculated. The lower the value, the faster the processing. Default: 15 mag.')
+    parser.add_argument('--verbose', type=bool, default=False, help='Verbose option. Set True to see all the information.')
+
+    args = parser.parse_args()
+
+    go(args)

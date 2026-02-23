@@ -1,0 +1,172 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rosalia.bootima &mdash; ROSALIA 0.81 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="../_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=fc3f49b1"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/dark_mode_js/default_light.js?v=c2e647ce"></script>
+      <script src="../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="rosalia.constants" href="rosalia.constants.html" />
+    <link rel="prev" title="rosalia.astrometry" href="rosalia.astrometry.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            ROSALIA
+              <img src="../_static/rosalia_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../mission.html">What is ROSALIA?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">How to use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../whoarewe.html">Who is ROSALIA?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rosalia.html">ROSALIA package</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="rosalia.html">rosalia</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="rosalia.CORE.html">rosalia.CORE</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.albedo.html">rosalia.albedo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.astrometry.html">rosalia.astrometry</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">rosalia.bootima</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.constants.html">rosalia.constants</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.correct.html">rosalia.correct</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.detectors.html">rosalia.detectors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.gaia.html">rosalia.gaia</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.gnu.html">rosalia.gnu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.horizons.html">rosalia.horizons</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.irsa.html">rosalia.irsa</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.mast.html">rosalia.mast</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.ndi.html">rosalia.ndi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.plots.html">rosalia.plots</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.psf.html">rosalia.psf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.render.html">rosalia.render</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.roman.html">rosalia.roman</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.sky.html">rosalia.sky</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.skysurf.html">rosalia.skysurf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.skywalker.html">rosalia.skywalker</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.sso.html">rosalia.sso</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.telescopes.html">rosalia.telescopes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.tests.html">rosalia.tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.utils.html">rosalia.utils</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ROSALIA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API</a></li>
+          <li class="breadcrumb-item"><a href="rosalia.html">rosalia</a></li>
+      <li class="breadcrumb-item active">rosalia.bootima</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/generated/rosalia.bootima.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-rosalia.bootima">
+<span id="rosalia-bootima"></span><h1>rosalia.bootima<a class="headerlink" href="#module-rosalia.bootima" title="Link to this heading"></a></h1>
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">astheader</span></code>(fits_list, ext, key[, verbose])</p></td>
+<td><p>Writes keywords on fits files using astfits from GnuAstro</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">bootima</span></code>(fits_list, ext, nsimul, outname[, ...])</p></td>
+<td><p>A program to calculate median of large amount of images stored in fits files.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">bootima_slice</span></code>(fits_list, ext, nsimul, outname)</p></td>
+<td><p>A program to calculate median of large amount of images stored in fits files.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">does_it_fit_in_RAM</span></code>(fits_list, ext[, verbose])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reconstruct_slices</span></code>(slice_list, ext, outname)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">slice_fits</span></code>(fits_list, ext, nslices)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="rosalia.astrometry.html" class="btn btn-neutral float-left" title="rosalia.astrometry" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="rosalia.constants.html" class="btn btn-neutral float-right" title="rosalia.constants" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, NASA Ames Research Center / Code S / Alejandro S. Borlaff.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

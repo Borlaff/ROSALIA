@@ -1,0 +1,12 @@
+astrobox==1.6.0
+astropy==5.2
+astroquery==0.4.6
+Bottleneck==1.3.5
+detector==3.0
+drizzlepac==3.5.0
+matplotlib==3.6.2
+miniutils==1.0.3
+numpy==1.23.5
+pandas==1.5.2
+scipy==1.10.0
+tqdm==4.64.1

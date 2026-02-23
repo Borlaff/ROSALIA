@@ -1,0 +1,314 @@
+<!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
+<a id="readme-top"></a>
+<!--
+*** Thanks for checking out the Best-README-Template. If you have a suggestion
+*** that would make this better, please fork the repo and create a pull request
+*** or simply open an issue with the tag "enhancement".
+*** Don't forget to give the project a star!
+*** Thanks again! Now go create something AMAZING! :D
+-->
+
+
+
+<!-- PROJECT SHIELDS -->
+<!--
+*** I'm using markdown "reference style" links for readability.
+*** Reference links are enclosed in brackets [ ] instead of parentheses ( ).
+*** See the bottom of this document for the declaration of the reference variables
+*** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
+*** https://www.markdownguide.org/basic-syntax/#reference-style-links
+-->
+[![Contributors][contributors-shield]][contributors-url]
+[![Forks][forks-shield]][forks-url]
+[![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url]
+[![MIT License][license-shield]][license-url]
+[![LinkedIn][linkedin-shield]][linkedin-url]
+
+
+
+<!-- PROJECT LOGO -->
+<br />
+<div align="center">
+  <a href="https://github.com/Borlaff/ROSALIA">
+    <img src="images/rosalia_logo.png" alt="ROSALIA_logo" width="710" height="437">
+  </a>
+
+  <p align="center">
+    <h2 align="center">ROSALIA: ROman Sky Analyst for Low surface brightness Imaging & Astronomy</h2>
+    <br />
+    <a href="https://github.com/Borlaff/ROSALIA"><strong>Explore the docs »</strong></a>
+    <br />
+    <br />
+    <a href="https://github.com/Borlaff/ROSALIA">View Demo</a>
+    ·
+    <a href="https://github.com/Borlaff/ROSALIA/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
+    ·
+    <a href="https://github.com/Borlaff/ROSALIA/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
+  </p>
+</div>
+
+
+
+<!-- TABLE OF CONTENTS -->
+<details>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li>
+      <a href="#about-the-project">About The Project</a>
+      <ul>
+        <li><a href="#built-with">Built With</a></li>
+      </ul>
+    </li>
+    <li>
+      <a href="#getting-started">Getting Started</a>
+      <ul>
+        <li><a href="#prerequisites">Prerequisites</a></li>
+        <li><a href="#installation">Installation</a></li>
+      </ul>
+    </li>
+    <li><a href="#usage">Usage</a></li>
+    <li><a href="#roadmap">Roadmap</a></li>
+    <li><a href="#contributing">Contributing</a></li>
+    <li><a href="#license">License</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="#acknowledgments">Acknowledgments</a></li>
+  </ol>
+</details>
+
+
+
+<!-- ABOUT THE PROJECT -->
+## About The Project
+
+[![Product Name Screen Shot][product-screenshot]](https://example.com)
+
+ROSALIA (Roman Sky Analyst for Low surface brightness Imaging & Astronomy) is a pipeline to model the sky background level on astronomical images obtained with [NASA/Nancy Grace Roman Space Telescope](https://roman.gsfc.nasa.gov) and its direct predecessor, the legendary [NASA/Hubble Space Telescope](https://science.nasa.gov/mission/hubble/). In particular ROSALIA is focused on the prediction and calibration of *stray-light* in the [Roman Wide Field Instrument](https://roman-docs.stsci.edu/roman-instruments-home/wfi-imaging-mode-user-guide/introduction-to-wfi), one of the main contaminants in ultra deep low surface brightness observations, and the main source of gradients of parasitic light for space telescopes. ROSALIA combines the information from existing photometric catalogs (Gaia, 2MASS, WISE) with precise optical and payload ray-tracing models of the Roman Space Telescope, allowing to generate images of stray-light and other components of the sky-background for user-defined observational conditions.
+
+ROSALIA is funded through a NASA Grant (D.14 Roman 2022), ROSES/Nancy Grace Roman Space Telescope Research and Support Participation Opportunities.
+
+Sci-PI: Alejandro S. Borlaff (NASA ARC). Admin-PI: Pamela M. Marcum (NASA ARC)
+
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+<!--
+### Built With
+
+* [![Next][Next.js]][Next-url]
+* [![React][React.js]][React-url]
+* [![Vue][Vue.js]][Vue-url]
+* [![Angular][Angular.io]][Angular-url]
+* [![Svelte][Svelte.dev]][Svelte-url]
+* [![Laravel][Laravel.com]][Laravel-url]
+* [![Bootstrap][Bootstrap.com]][Bootstrap-url]
+* [![JQuery][JQuery.com]][JQuery-url]
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+ -->
+
+## Installation
+### Managing dependencies
+ROSALIA is based on multiple packages, including [Astropy](https://www.astropy.org/), [Astroquery](https://astroquery.readthedocs.io/en/latest/), and [Romanisim](https://romanisim.readthedocs.io/en/latest/), [NumPy](https://numpy.org/), [SciPy](https://scipy.org/), and [Matplotlib](https://matplotlib.org/) among many others. The easiest way to install all the dependencies is through a package manager like [Conda](https://anaconda.org/anaconda/conda) or [Mamba](https://github.com/mamba-org/mamba). If you have a Conda/Mamba package manager already installed in your system, skip to the following section. If you do not have a package manager, follow the Conda installation instructions at the [Space Telescope stenv environment webpage](https://stenv.readthedocs.io/en/latest/getting_started.html).
+
+### Installing ROSALIA
+#### For developers
+Create a clean environment for ROSALIA
+```sh
+conda create -n rosalia python=3.12 conda-forge::astromatic-swarp
+```
+
+After the new environment is created, we can activate it.
+```sh
+conda activate rosalia
+   ```
+Once in a clean conda environment, we need to download the ROSALIA package from GitHub. 
+
+
+
+
+#### For general users (not yet available!)
+Create a clean environment for ROSALIA
+```sh
+conda create -n rosalia python=3.12 conda-forge::astromatic-swarp
+```
+
+After the new environment is created, we can activate it.
+```sh
+conda activate rosalia
+   ```
+Once in a clean conda environment, we can install ROSALIA. The preferred method to install it is through pip.
+
+```sh
+pip install rosalia
+   ```
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+That is it! We are ready to start analyzing Space Telescope images.
+
+<!-- USAGE EXAMPLES -->
+## Minimal use example
+
+ROSALIA estimates the amount of stray-light from Roman Space Telescope images. To do that, it calculates how many photons reach the focal plane array from secondary optical paths, based on a function called Normalized Detector Irradiance (NDI, https://link.springer.com/book/10.1007/b97612). Those photons represent a source of contamination and typically, they must be modeled and removed before the images are ready for science. ROSALIA calculates the flux of photons for each pixel of the focal plane array. For Roman/WFI, that is a total of 300,811,392 pixels! (18 4088x4088 H4RG-10 detectors). While Nancy Grace Roman Space Telescope is scheduled to be launched in May 2027, we can start simulating the observations that this magnificent telescope will provide humanity with using another Roman software, romanisim (https://romanisim.readthedocs.io/en/latest/).
+
+### Generating some mock Roman / WFI observations
+1. Install [romanisim](https://romanisim.readthedocs.io/en/latest/) and generate a Roman/WFI example image. For our experiment -- and to maximize the visualization of stray-light -- we will simulate an exposure nearby the Orion's Belt.
+```sh
+   pip install romanisim
+   romanisim-make-image --radec 83.3419927 -1.9665163 RST_WFI_ROSALIA_test_Orion_Belt_SCA{}.asdf --roll -45 --sca -1 --bandpass F158 --level 2 --usecrds
+   ```
+Note: [romanisim](https://romanisim.readthedocs.io/en/latest/) is a package in active development. Please visit the official webpage for more information on usage.
+
+The result from the previous command will be a series of files (18 in total, one ASDF file per Roman WFI detector, or SCA) in the local directory.
+
+```sh
+ls -lah
+
+-rw-r--r--   1 user  staff   391M Nov 26 16:02 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI01.asdf
+-rw-r--r--   1 user  staff   391M Nov 26 15:39 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI02.asdf
+-rw-r--r--   1 user  staff   391M Nov 26 15:42 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI03.asdf
+-rw-r--r--   1 user  staff   391M Nov 26 15:46 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI04.asdf
+-rw-r--r--   1 user  staff   391M Nov 26 15:49 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI05.asdf
+-rw-r--r--   1 user  staff   391M Nov 26 15:53 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI06.asdf
+-rw-r--r--   1 user  staff   391M Nov 26 15:56 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI07.asdf
+-rw-r--r--   1 user  staff   391M Nov 26 15:59 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI08.asdf
+-rw-r--r--   1 user  staff   391M Nov 26 16:03 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI09.asdf
+-rw-r--r--   1 user  staff   391M Nov 26 16:06 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI10.asdf
+-rw-r--r--   1 user  staff   391M Nov 26 16:10 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI11.asdf
+-rw-r--r--   1 user  staff   391M Nov 26 16:13 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI12.asdf
+-rw-r--r--   1 user  staff   391M Nov 26 16:22 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI13.asdf
+-rw-r--r--   1 user  staff   391M Nov 27 07:14 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI14.asdf
+-rw-r--r--   1 user  staff   391M Nov 27 08:53 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI15.asdf
+-rw-r--r--   1 user  staff   391M Nov 27 08:56 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI16.asdf
+-rw-r--r--   1 user  staff   391M Nov 27 09:00 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI17.asdf
+-rw-r--r--   1 user  staff   391M Nov 27 09:04 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI18.asdf
+```
+These 18 files represent a single Roman/WFI level 2 (calibrated, non-combined) exposure.
+
+### Analyze the stray-light level of the Roman/WFI exposures
+2. Let's analyze the Roman/WFI example image with ROSALIA. The script rosalia-stray will extract all the necessary information from the Roman/WFI exposure file metadata, and generate a series of ASDF and FITS files with the pixel-to-pixel flux level expected for this particular exposure.
+```sh
+   rosalia-sky RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI01.asdf
+   ```
+
+
+_For more examples, please refer to the [Documentation](https://example.com)_
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- ASDF -->
+## What is ASDF? Where are the FITS files?
+[ASDF](https://asdf.readthedocs.io/en/latest/) is the successor of [FITS](https://www.stsci.edu/hst/wfpc2/Wfpc2_dhb/intro_ch23.html) format and has been adopted since JWST . While GUI visualizers like [SAODS9 are not yet compatible with ASDF](https://www.stsci.edu/files/live/sites/www/files/home/jwst/science-planning/user-committees/jwst-users-committee/_documents/jstuc-0919-data-analysis-tool-ferguson.pdf), ROSALIA provides an easy way to extract most useful information from the ASDF files through `exposure-inspector`:
+```sh
+   exposure-inspector RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI01.asdf
+```
+`exposure-inspector` will print a series of fields containing basic information from the ASDF tree, including the name of the telescope, instrument, detector, and filter, pointing information like right ascension and declination, transmission curve of the filter, and the WCS of the header.
+
+
+<!-- ROADMAP -->
+## Roadmap
+- [x] Automatic queries of catalogs of bright sources.
+    - [x] Gaia, 2MASS, WISE
+    - [x] Horizons/JPL Solar System Objects
+- [x] Retrieval of stray-light blocking efficiency from ray-tracing models
+- [x] Ingestion of ASDF Roman/WFI simulated files (i.e., https://romanisim.readthedocs.io/en/latest/)
+- [ ] Add diffraction modelling to Roman/WFI.
+- [ ] Add thermal emission model (internal stray-light).
+- [ ] Complete support for Hubble Space Telescope ACS & WFC3/IR.
+- [ ] Automatic identification of SSOs in Roman/WFI observations.
+
+See the [open issues](https://github.com/github_username/repo_name/issues) for a full list of proposed features (and known issues).
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+<!-- CONTRIBUTING -->
+## Contributing
+Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+If you have a suggestion that would make ROSALIA better, there are two options.
+1. You can also simply open an issue with the tag "enhancement" (see below).
+2. Fork the repo and create a pull request.
+3. Email the PI's of the project (a.s.borlaff@nasa.gov) with your ideas.
+
+Instructions for fork/pull contributions.
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+### Top contributors:
+<a href="https://github.com/Borlaff">
+  <img src="https://contrib.rocks/image?repo=Borlaff/Elbow" />
+</a>
+<a href="https://github.com/pmarcum">
+  <img src="https://contrib.rocks/image?repo=pmarcum/Bibman" />
+</a>
+<a href="https://github.com/ScottRohrbach">
+  <img src="https://avatars.githubusercontent.com/u/190406686?v=4" />
+</a>
+
+
+<!-- LICENSE -->
+## License
+
+ROSALIA © 2025 by Alejandro S. Borlaff is licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- CONTACT -->
+## Contact
+
+Alejandro S. Borlaff - [@asborlaff](https://bsky.app/profile/asborlaff.bsky.social) - a.s.borlaff@nasa.gov
+
+Project Link: [https://github.com/Borlaff/ROSALIA](https://github.com/Borlaff/ROSALIA)
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+<!-- ACKNOWLEDGMENTS -->
+## Acknowledgments
+
+* []()
+* []()
+* []()
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- MARKDOWN LINKS & IMAGES -->
+<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+[contributors-shield]: https://img.shields.io/github/contributors/github_username/repo_name.svg?style=for-the-badge
+[contributors-url]: https://github.com/Borlaff/ROSALIA/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/github_username/repo_name.svg?style=for-the-badge
+[forks-url]: https://github.com/Borlaff/ROSALIA/network/members
+[stars-shield]: https://img.shields.io/github/stars/github_username/repo_name.svg?style=for-the-badge
+[stars-url]: https://github.com/Borlaff/ROSALIA/stargazers
+[issues-shield]: https://img.shields.io/github/issues/github_username/repo_name.svg?style=for-the-badge
+[issues-url]: https://github.com/Borlaff/ROSALIA/issues
+[license-shield]: https://img.shields.io/github/license/github_username/repo_name.svg?style=for-the-badge
+[license-url]: https://github.com/Borlaff/ROSALIA/blob/main/LICENSE.txt
+[linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
+[linkedin-url]: https://www.linkedin.com/in/alejandro-borlaff/
+[product-screenshot]: images/moving_star_v3.gif
+[Next.js]: https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white
+[Next-url]: https://nextjs.org/
+[React.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
+[React-url]: https://reactjs.org/
+[Vue.js]: https://img.shields.io/badge/Vue.js-35495E?style=for-the-badge&logo=vuedotjs&logoColor=4FC08D
+[Vue-url]: https://vuejs.org/
+[Angular.io]: https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white
+[Angular-url]: https://angular.io/
+[Svelte.dev]: https://img.shields.io/badge/Svelte-4A4A55?style=for-the-badge&logo=svelte&logoColor=FF3E00
+[Svelte-url]: https://svelte.dev/
+[Laravel.com]: https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white
+[Laravel-url]: https://laravel.com
+[Bootstrap.com]: https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white
+[Bootstrap-url]: https://getbootstrap.com
+[JQuery.com]: https://img.shields.io/badge/jQuery-0769AD?style=for-the-badge&logo=jquery&logoColor=white
+[JQuery-url]: https://jquery.com
