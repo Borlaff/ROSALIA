@@ -14,7 +14,7 @@ import rosalia as rs
 import skyfield as sf
 from skyfield import api as sf_api
 from astropy.convolution import Gaussian2DKernel
-import sparkles as sp
+
 #####################
 # TELESCOPE OBJECTS #
 #####################
@@ -22,7 +22,7 @@ import sparkles as sp
 def ndi_estimator(theta, phi=None, wavelength=None, mode="legacy"):
     if mode == "legacy":
         #print("DEMO WARNING: Using legacy values of Bely 2003 for the HST NDI")
-        ndi_db = pd.read_csv(os.path.dirname(rs.ndi.__file__) + "/CORE/ndi_HST_legacy_bely2003.csv")
+        ndi_db = pd.read_csv(os.environ["ROSALIACACHE"] + "/CORE/ndi_HST_legacy_bely2003.csv")
         ndi_theta_dummy = ndi_db["theta"]
         ndi_dummy = ndi_db["NDI"]
     if mode == "euclid":
@@ -247,6 +247,24 @@ class Passbands:
 ################### TELESCOPE OBJECTS  ##########################
 #################################################################
 
+def find_closest_TLE(epoch, TLE_history):
+    # This has to go under class telescopes. Same function but different list of TLEs
+    ts = sf_api.load.timescale()
+    TLE_mjd_list = np.zeros((len(TLE_history),))
+    for i in range(len(TLE_history)):
+        TLE_mjd_list[i] = TLE_history[i].epoch.to_astropy().mjd
+
+    closest_TLE_index = rs.utils.find_nearest_index(array=TLE_mjd_list, value=epoch)
+    closest_TLE = TLE_history[closest_TLE_index]
+
+    return(closest_TLE)
+
+
+#################################################################
+#################################################################
+#################################################################
+
+
 class Hubble:
     """Hubble Space Telescope properties class"""
     TELESCOP = "HST"
@@ -254,7 +272,7 @@ class Hubble:
     mirror_radius = 1.2*u.meter
 
     def f(self):
-        return 'STRAYCOR Hubble Space Telescope class'
+        return 'ROSALIA Hubble Space Telescope class'
 
     ndi_estimator = ndi_estimator
 
@@ -266,14 +284,14 @@ class Hubble:
         """
         ts = sf_api.load.timescale()
 
-        with sf_api.load.open(os.path.dirname(rs.ndi.__file__) + "/CORE/HST_TLE_history_sat000020580.txt") as f:
+        with sf_api.load.open(os.environ["ROSALIACACHE"] + "/CORE/HST_TLE_history_sat000020580.txt") as f:
             satellites = list(sf.iokit.parse_tle_file(f, ts))
         if verbose: print('Loaded', len(satellites), ' TLEs of Hubble')
         return(satellites)
 
 
     def TLE_exposure(epoch):
-        return(sp.satellites.find_closest_TLE(epoch=epoch, TLE_history=Hubble.load_HST_TLEs()))
+        return(find_closest_TLE(epoch=epoch, TLE_history=Hubble.load_HST_TLEs()))
 
 
     def get_physical_pixelsize(instrument):
@@ -341,11 +359,12 @@ class Hubble:
                                             crota=[-pa,-pa])
         rs.utils.save_fits(canvas, outname, header)
         return(outname)
-    def mu2fe(mu):
-        return(rs.detectors.mu2fe(mu=mu, instrument="ACS", filter_name="F814W", telescope="Hubble", verbose=False))
 
-    def fe2mu(fe):
-        return(rs.detectors.fe2mu(fe=fe, instrument="ACS", filter_name="F814W", telescope="Hubble",verbose=False))
+    #def mu2fe(mu):
+    #    return(rs.detectors.mu2fe(mu=mu, instrument="ACS", filter_name="F814W", telescope="Hubble", verbose=False))
+
+    #def fe2mu(fe):
+    #    return(rs.detectors.fe2mu(fe=fe, instrument="ACS", filter_name="F814W", telescope="Hubble",verbose=False))
 
     def get_HST_ACS_psf(wavelength, chip="WFC1", xy=[2000, 1000], output=None, verbose=1):
         # from focus_diverse_epsfs import interp_epsf, psf_retriever
@@ -373,7 +392,6 @@ class Hubble:
 
         return([output, psf_hdu])
 
-
     def get_PSF():
         #output, psf_hdu = rs.telescopes.Hubble.get_HST_ACS_psf(wavelength="F814W", chip="WFC1", xy=[2000, 1000], output=None, verbose=1)
         psf_hdu = fits.open("/Users/aborlaff/NASA/SPARKLES/notebooks/SATELLITES/psf_tinytim00_psf_scaled_cropped.fits")
@@ -393,8 +411,9 @@ class Roman:
 
     mirror_radius = 1.2*u.meter
 
+
     def f(self):
-        return 'STRAYCOR Roman Space Telescope class'
+        return 'ROSALIA Roman Space Telescope class'
 
     ndi_estimator = ndi_estimator
 
@@ -415,12 +434,53 @@ class Roman:
         return(rs.telescopes.get_filter(telescope="Roman", instrument=instrument, detector=instrument, filter_name=filter_name, verbose=False))
 
     def get_location(mjd, pov="@sun"):
-        print("WARNING: Nancy Grace Roman Space Telescope has not been launched yet.")
-        print("Approximating the location by using JWST's location in JPL/Horizons.")
         query = rs.horizons.horizons_query(mjd=mjd, source="@jwst", location=pov)
         vectors = query["jpl_horizons_query"].vectors()
         return(np.array([vectors["x"].value, vectors["y"].value, vectors["z"].value])*u.AU)
 
+    def stpsf_get_psf(detector_position, detector, filter_name, fov_pixels=1024, oversample=1):
+        # This is just a wrapper for the stpsf wfi module to generate Roman's PSF.
+        # import stpsf
+        wfi = stpsf.roman.WFI()
+        wfi.filter = filter_name
+        wfi.detector = 'WFI' + str(detector).zfill(2)
+        wfi.detector_position = detector_position
+        psf_wfi = wfi.calc_psf(fov_pixels = fov_pixels, oversample=oversample)
+        return(psf_wfi[0])
+
+    def get_psf(detector_position, detector, filter_name):
+        SCA = detector
+        from romanisim.bandpass import roman2galsim_bandpass
+        import galsim
+        import galsim.roman as galsim_roman
+
+        # Get the filter identity
+        FILTER_IDENTITY = rs.telescopes.find_filter_in_svo(wavelength=filter_name,
+                                                           telescope="Roman",
+                                                           instrument="WFI",
+                                                           detector="WFI",
+                                                           verbose=False)
+
+        bandpass = roman2galsim_bandpass[filter_name]
+        gsparams = galsim.GSParams(maximum_fft_size=2**16, maxk_threshold=1.e-10, folding_threshold=1.e-6)
+
+        class SCA_pos:
+            x = detector_position[0]
+            y = detector_position[1]
+
+        psf = galsim_roman.getPSF(SCA, bandpass, SCA_pos=SCA_pos, pupil_bin=1, wcs=None,
+                                  n_waves=10, extra_aberrations=None,
+                                  wavelength=FILTER_IDENTITY["filter_lambda_ref"].to("nm").value,
+                                  gsparams=gsparams, logger=None,
+                                  high_accuracy=None, approximate_struts=None)
+
+
+        img = psf.drawImage()
+        outname = 'temp_psf_' + filter_name + '_SCA' + str(SCA).zfill(2) + '.fits'
+        img.write(outname)
+        psf_wfi = fits.open(outname)
+        os.system("rm " + outname)
+        return(psf_wfi[0])
 
 #################################################################
 
@@ -449,8 +509,13 @@ class CSST:
     def load_example_TLE_CSST():
         from skyfield.api import EarthSatellite
         ts = sf_api.load.timescale()
-        line1 = '1 48274U 21035A   24256.37834760  .00034232  00000+0  35663-3 0  9992'
-        line2 = '2 48274  41.4685 271.5842 0001543 118.6675 241.4320 15.63835774192738'
+        # CSS (TIANHE) 9 Feb 2026
+        # 1 48274U 21035A   26040.41958422  .00018345  00000+0  22932-3 0  9994
+        # 2 48274  41.4684  20.0103 0004697  39.0740 321.0437 15.59384169273192
+        #
+        #
+        line1 = '1 48274U 21035A   26040.41958422  .00018345  00000+0  22932-3 0  9994'
+        line2 = '2 48274  41.4684  20.0103 0004697  39.0740 321.0437 15.59384169273192'
         satellite = EarthSatellite(line1, line2, 'CSST', ts)
         return(satellite)
 
@@ -588,8 +653,10 @@ class SPHEREx:
         ts = sf_api.load.timescale()
         #line1 = '1 44874U 19092B   24260.76087593  .00001534  00000+0  32292-3 0  9990'
         #line2 = '2 44874  98.1547  87.1562 0009664 302.2867  57.7397 14.60891889252646'
-        line1 = '1 99999U          24153.00000000  .00000000  00000-0  00000-0 0 00003'
-        line2 = '2 99999 097.9960 339.9709 0011528 246.2443 113.7557 14.75451568000015'
+        #line1 = '1 99999U          24153.00000000  .00000000  00000-0  00000-0 0 00003'
+        #line2 = '2 99999 097.9960 339.9709 0011528 246.2443 113.7557 14.75451568000015'
+        line1 = '1 63182U 25047E   26040.49042002  .00001639  00000+0  25830-3 0  9990'
+        line2 = '2 63182  97.9549 227.6915 0009366 239.5726 120.4558 14.73753633 49230'
         satellite = EarthSatellite(line1, line2, 'SPHEREx', ts)
         return(satellite)
 
@@ -672,7 +739,7 @@ class SPHEREx:
 
     def get_PSF():
         # /Users/aborlaff/NASA/ROSALIA/rosalia/CORE/PSF_ARCHIVE/SPHEREx_psf.fits
-        psf = fits.open(os.path.dirname(rs.ndi.__file__) + "/CORE/PSF_ARCHIVE/SPHEREx_psf.fits")
+        psf = fits.open(os.environ["ROSALIACACHE"] + "/CORE/PSF_ARCHIVE/SPHEREx_psf.fits")
         return(psf[0].data)
 
 
@@ -725,6 +792,18 @@ class ARRAKIHS:
                                             crota=[-pa,-pa])
         rs.utils.save_fits(canvas, outname, header)
         return(outname)
+
+    def modified_make_dummy_exposure(ra, dec, pa, outname):
+        canvas_shape = [4001, 4001] # rs.telescopes.ARRAKIHS.get_canvas_shape(instrument="ARRAKIHS")
+        canvas = np.zeros(canvas_shape)
+        header = rs.utils.create_custom_wcs(crpix=[int(canvas_shape[1]/2), int(canvas_shape[0]/2)],
+                                            crval=[ra,dec],
+                                            cdelt=[-rs.telescopes.ARRAKIHS.get_pixscale(instrument="ARRAKIHS").to("degree").value,
+                                                    rs.telescopes.ARRAKIHS.get_pixscale(instrument="ARRAKIHS").to("degree").value],
+                                            crota=[-pa,-pa])
+        rs.utils.save_fits(canvas, outname, header)
+        return(outname)
+
 
     def make_dummy_exposure(ra, dec, pa, outname):
         exp_name = "/Users/aborlaff/NASA/SPARKLES/notebooks/SATELLITES/ARRAKIHS_mock_es.fits"

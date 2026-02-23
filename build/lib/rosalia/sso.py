@@ -140,7 +140,7 @@ def get_SS0s_loc_magnitude(observer, MJD, lambda_ref, verbose=False):
 
 
     # Load the spectra of the Sun
-    mag_sun_db = pd.read_csv(os.path.dirname(rs.utils.__file__) + "/CORE/magnitude_sun.txt", sep="\t")
+    mag_sun_db = pd.read_csv(os.environ["ROSALIACACHE"] + "/CORE/magnitude_sun.txt", sep="\t")
 
     if verbose: print("Wavelengths to estimate apparent Magnitude of the Sun in UV / Optical / IR:")
     if verbose: print(mag_sun_db["lambda_mum"]*10**4)

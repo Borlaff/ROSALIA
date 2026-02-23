@@ -3,7 +3,7 @@ import numpy as np
 from tqdm import tqdm
 import rosalia as rs
 import coord
-
+import pandas as pd
 from astropy.time import Time
 from astropy.io import fits
 from astropy.coordinates import SkyCoord  # High-level coordinates
@@ -14,10 +14,18 @@ from astropy import constants as const
 from datetime import datetime
 
 
+
 # --------------------- #
 def create_roman_dummy(point, date, band, PA=None, exptime=500, output="default_roman_dummy.fits"):
     # create_roman_dummy:
+    # Alejandro S. Borlaff - NASA/STA a.s.borlaff@nasa.gov
+    #
     # Uses GalSim subroutines to generate a dummy empty Roman/WFI FITS file with the right WCS and array sizes.
+    #
+    # Update: Jan 15, 2026. Switching to use romanisim.get_wcs(...). Galsim WCS uses different conventions.
+    # https://github.com/spacetelescope/romanisim/issues/302#issuecomment-3756578230
+    #
+    #
     # Input:
     # pointing = Astropy coord object with ra, dec.
     #            Example c = SkyCoord(1, -30, frame="icrs", unit="deg")
@@ -32,49 +40,65 @@ def create_roman_dummy(point, date, band, PA=None, exptime=500, output="default_
     #      PA for the telescope on that date.
     #
     # output = Name of the output image.
+    #
     # --------------------------------------------- #
-    import galsim
-    import galsim.roman as roman
+
+    #import galsim
+    #import galsim.roman as roman
 
     # Setting up the parameters in GalSim format
-    ra_targ = coord.Angle(point.ra.degree*coord.degrees)
-    dec_targ = coord.Angle(point.dec.degree*coord.degrees)
-    targ_pos = galsim.CelestialCoord(ra=ra_targ, dec=dec_targ)
+    #ra_targ = coord.Angle(point.ra.degree*coord.degrees)
+    #dec_targ = coord.Angle(point.dec.degree*coord.degrees)
+    #targ_pos = galsim.CelestialCoord(ra=ra_targ, dec=dec_targ)
 
-    if PA is not None:
-        WFI_PA = galsim.Angle(PA, coord.degrees)
-    else:
-        WFI_PA = None
+    #if PA is not None:
+    #    WFI_PA = galsim.Angle(PA, coord.degrees)
+    #else:
+    #    WFI_PA = None
+    from romanisim import ris_make_utils as ris
+    from romanisim import wcs as ris_wcs
 
     # Starting the loop for the 18 SCAs
-
     temp_out_sca_filename_list = []
     temp_array_list = []
     temp_header_list = []
     temp_sca_name_list = []
 
     for SCA_i in range(18):
-
         SCA_name = str(SCA_i+1).zfill(3)
-        #print(SCA_name)
 
         temp_sca_name_list.append(SCA_name)
         out_sca_filename = output.replace(".fits", "_sca" + SCA_name + ".fits")
         temp_out_sca_filename_list.append(out_sca_filename)
 
-        wcs_dict = roman.getWCS(world_pos=targ_pos, PA=WFI_PA, SCAs=SCA_i+1, date=date.tt.datetime) # world_pos, PA=None, date=None, SCAs=None, PA_is_FPA=False)
-        wcs = wcs_dict[SCA_i+1]
+        #wcs_dict = roman.getWCS(world_pos=targ_pos, PA=WFI_PA, SCAs=SCA_i+1, date=date.tt.datetime) # world_pos, PA=None, date=None, SCAs=None, PA_is_FPA=False)
+        #wcs = wcs_dict[SCA_i+1]
 
         # Set up the full image for the galaxies
-        full_image = galsim.ImageF(roman.n_pix, roman.n_pix, wcs=wcs)
-        full_image.write(out_sca_filename)
+        #full_image = galsim.ImageF(roman.n_pix, roman.n_pix, wcs=wcs)
+        #full_image.write(out_sca_filename)
+
+        # Romanisim procedure>
+        metadata = ris.set_metadata(date=date,
+                            bandpass=band,
+                            sca=SCA_i+1,
+                            ma_table_number=4,
+                            usecrds=True,
+                            truncate=None,
+                            scale_factor=1)
+
+        ris_wcs.fill_in_parameters(metadata, point, boresight=False, pa_aper=PA)
+        sca_gwcs = ris_wcs.get_wcs(image=metadata, usecrds=True, distortion=None)
+        sca_astropy_wcs = sca_gwcs.wcs.to_fits()[0]
+        sca_dummy = np.zeros((4088, 4088))
+        rs.utils.save_fits(array=sca_dummy, name=out_sca_filename, header=sca_astropy_wcs)
 
         # Open the temporary SCA image
         temp_sca = fits.open(out_sca_filename)
-
         temp_array_list.append(temp_sca[0].data)
 
         temp_sca[0].header["EXTNAME"] = "SCA" + SCA_name
+        temp_sca[0].header["SCA"] = SCA_i+1
 
 
         os.remove(out_sca_filename)
@@ -86,6 +110,7 @@ def create_roman_dummy(point, date, band, PA=None, exptime=500, output="default_
         temp_sca[0].header["RA_TARG"] = point.ra.degree
         temp_sca[0].header["DEC_TARG"] = point.dec.degree
         temp_sca[0].header["PA_V3"] = PA
+        temp_sca[0].header["PA"] = PA
         temp_sca[0].header["EXPSTART"] = date.mjd
         temp_sca[0].header["EXTNAME"] = 'SCI     '
         temp_sca[0].header["EXTVER"] = SCA_i + 1
@@ -98,10 +123,9 @@ def create_roman_dummy(point, date, band, PA=None, exptime=500, output="default_
 
         temp_header_list.append(temp_sca[0].header)
 
-    utils.save_fits(array=temp_array_list, name=output, header=temp_header_list)
+    rs.utils.save_fits(array=temp_array_list, name=output, header=temp_header_list)
 
     # We might need to add info on the first extension. Load the multifits, modify and save again.
-
     final_fits = fits.open(output)
     final_fits[0].header["RA_TARG"] = final_fits[1].header["RA_TARG"]
     final_fits[0].header["DEC_TARG"] = final_fits[1].header["DEC_TARG"]
@@ -114,16 +138,10 @@ def create_roman_dummy(point, date, band, PA=None, exptime=500, output="default_
     final_fits[0].header["FILTER2"] = final_fits[1].header["FILTER2"]
 
     final_fits[0].header["PA_V3"] = final_fits[1].header["PA_V3"]
-    #final_fits[0].header["TELESCOP"] = final_fits[1].header["TELESCOP"]
+    final_fits[0].header["PA"] = final_fits[1].header["PA_V3"]
 
     final_fits.verify("silentfix")
     final_fits.writeto(output, overwrite=True)
-
-    #    if i>0:
-    #        roman_dummy[i].header["NGOODPIX"] = np.sum(np.isfinite(roman_dummy[i].data))
-    #        print(i)
-    #        print(roman_dummy[i].header["NGOODPIX"])
-
 
     return(output)
 
@@ -134,11 +152,9 @@ def get_subarray_locations(SCA, verbose=False):
     This program estimates the locations on the SCA detector of the different subarrays used for NDI estimation.
     Since some SCAS are flipped, and the number of subarrays used for might be variable, it is better to estimate
     it case by case.
-
+    """
     # Scott R. : SCA 3, 6, 9, 12, 15, 18 are flipped 180 deg.
     # 17.5, -17.5 mm correspond to the upper right corner points in each SCA.
-
-    """
 
     ##############################################################################
     # Each SCA is divided in 8 x 8 subarrays.                                    #
@@ -217,11 +233,18 @@ def _test_run_rosalia_asdf(catalog, exposure_name_list, outname="TEST_rosalia_",
 
         irradiance_stars = const.c*(exposure_identity["FILTER_IDENTITY"]["filter_lambda_max"]-exposure_identity["FILTER_IDENTITY"]["filter_lambda_min"])/(exposure_identity["FILTER_IDENTITY"]["filter_lambda_ref"]**2)*((10**(-0.4*(catalog["mag"]+56.1)))*u.W/u.meter**2/u.Hz)
 
-        test_stray = roman_estimate_straylight_SCA(data=exposure_identity["DATA"][0], wcs=exposure_identity["ASTROPYWCS"][0], SCA=exposure_identity["SCA"],
+        # Reset the Roman / WFI loading bar:
+        rs.plots.ascii_progress_focal_plane.canvas = rs.plots.ascii_progress_focal_plane.canvas_zero
+        test_stray = roman_estimate_straylight_SCA(data=exposure_identity["DATA"][0],
+                                                   wcs=exposure_identity["ASTROPYWCS"][0],
+                                                   SCA=exposure_identity["SCA"],
                                                    filter_identity=exposure_identity["FILTER_IDENTITY"],
                                                    ra_point=exposure_identity["RA_TARG"],
-                                                   dec_point=exposure_identity["DEC_TARG"], pa_point=exposure_identity["PA"],
-                                                   ra_stars=catalog["ra"], dec_stars=catalog["dec"], source_id = catalog["source_id"],
+                                                   dec_point=exposure_identity["DEC_TARG"],
+                                                   pa_point=exposure_identity["PA"],
+                                                   ra_stars=catalog["ra"],
+                                                   dec_stars=catalog["dec"],
+                                                   source_id = catalog["source_id"],
                                                    irradiance_stars=irradiance_stars,
                                                    verbose=verbose, dry_mode=dry_mode)
 
@@ -250,9 +273,7 @@ def roman_WFI_NDI_estimator_direct(ra_stars, dec_stars, ra_point, dec_point, pa_
     # Identify NDI calibration file
 
     if (level == 1) or (level == 2):
-        ndi_name = os.path.dirname(rs.__file__) + "/CORE/NDI/RST/ndi_lvl" + str(level) + "/" + "lvl" + str(level) + "_SCA_" + str(SCA)+ "_SUB_X" + str(X_label) + "_Y" + str(Y_label) + "_TAN.fits"
-        #if (level == 1): ndi_name = os.path.dirname(rs.__file__) + "/CORE/NDI/RST/ndi_lvl" + str(level) + "/" + "lvl" + str(level) + "_SCA_" + str(SCA)+ "_SUB_X" + str(X_label) + "_Y" + str(Y_label) + "_TAN.fits"
-        #if (level == 2): ndi_name = os.path.dirname(rs.__file__) + "/CORE/NDI/RST/ndi_lvl" + str(level) + "/" + "lvl" + str(level) + "_SCA_" + str(SCA)+ "_TAN.fits"
+        ndi_name = os.environ['ROSALIACACHE'] + "/CORE/NDI/RST/ndi_lvl" + str(level) + "/" + "lvl" + str(level) + "_SCA_" + str(SCA) + "_SUB_X" + str(X_label) + "_Y" + str(Y_label) + "_TAN.fits"
 
         ndi_fits = fits.open(ndi_name)
 
@@ -260,10 +281,17 @@ def roman_WFI_NDI_estimator_direct(ra_stars, dec_stars, ra_point, dec_point, pa_
         w.wcs.crota = -pa_point,-pa_point
         w.wcs.crval = ra_point,dec_point
 
-        if verbose:
-            ndi_fits[0].header = w.to_header()
-            ndi_fits.verify("silentfix")
-            ndi_fits.writeto(ndi_name.replace(".fits", "_temp_aligned.fits"), overwrite=True)
+        #if level == 1:
+        #    w.wcs.crpix = [727.51801, 767.21764]
+
+        #if level == 2:
+        #    w.wcs.crpix = [636.5015, 639.8098]
+        ndi_fits[0].header = w.to_header()
+        # rs.utils.save_fits(array=[], name = ndi_name.replace(".fits", "_temp_aligned_hlet.fits"), header=ndi_fits[0].header, output_verify="ignore")
+        rs.utils.save_fits(array=ndi_fits[0].data, name = ndi_name.replace(".fits", "_temp_aligned_hlet.fits"), header=ndi_fits[0].header, output_verify="ignore")
+
+            #ndi_fits.verify("silentfix")
+            # ndi_fits.writeto(, overwrite=True)
         #w = astropy_wcs.WCS(header=ndi_fits[0].header, fobj=ndi_fits, naxis=2)
         x_stars, y_stars = w.wcs_world2pix(ra_stars, dec_stars, 0)
 
@@ -280,7 +308,7 @@ def roman_WFI_NDI_estimator_direct(ra_stars, dec_stars, ra_point, dec_point, pa_
     if (level==3):
         import healpy as hp
 
-        ndi_name = os.path.dirname(rs.__file__) + "/CORE/NDI/RST/ndi_lvl" + str(level) + "/" + "lvl" + str(level) + "_SCA_" + str(SCA) + "_HP.fits"
+        ndi_name = os.environ['ROSALIACACHE'] + "/CORE/NDI/RST/ndi_lvl" + str(level) + "/" + "lvl" + str(level) + "_SCA_" + str(SCA) + "_SUB_X" + str(X_label) + "_Y" + str(Y_label) + "_HP.fits"
         NDI_map_hp = hp.read_map(ndi_name)
 
         nside = hp.pixelfunc.get_nside(NDI_map_hp)
@@ -289,22 +317,72 @@ def roman_WFI_NDI_estimator_direct(ra_stars, dec_stars, ra_point, dec_point, pa_
         position_angle = -pa_point*u.deg
 
         rot_custom = hp.Rotator(rot=[longitude.to_value(u.deg), latitude.to_value(u.deg), position_angle.to_value(u.deg)], inv=True)
+
+        # rot_custom.rotate_map_pixel is relatively slow. We must find an alternative solution.
+        # Perhaps there is a way to not rotate the map at all.
         NDI_map_hp_rotated = rot_custom.rotate_map_pixel(NDI_map_hp) # The use of rotate_map_pixel from healpy introduces artifacts at low SNR.
+
+        #print("Saving file: " + str(datetime.now() - zero_time))
+        #zero_time = datetime.now()
         # This is relatively contradictory to what the documentation claims. https://healpy.readthedocs.io/en/latest/generated/healpy.rotator.Rotator.rotate_map_pixel.html#healpy.rotator.Rotator.rotate_map_pixel
 
-        if verbose:
-            hp.write_map(filename=ndi_name.replace(".fits", "_temp_aligned.fits"), m=NDI_map_hp_rotated, overwrite=True)
+        # hp.write_map(filename=ndi_name.replace(".fits", "_temp_aligned.fits"), m=NDI_map_hp_rotated, overwrite=True)
 
         pix = hp.ang2pix(nside=hp.pixelfunc.get_nside(NDI_map_hp), theta=ra_stars, phi=dec_stars, lonlat=True)
-
+        #print("Done: " + str(datetime.now() - zero_time))
+        #zero_time = datetime.now()
         return(NDI_map_hp_rotated[pix])
 
 #################################################
 
+############################
+def mag2fe(mag, bandpass, sca):
+    from romanisim.bandpass import compute_count_rate
 
+    back_single = 0
+    if not isinstance(mag, (list, pd.core.series.Series, np.ndarray)):
+        mag = np.array([mag])
+        back_single = 1
+
+    if isinstance(mag, (list)): mag = np.array(mag)
+
+
+    # Zeropoint flux AB -> 0 = -2.5 log10(fzpAB) + zp
+    # zp = 2.5*np.log10(fzpAB)
+    flux = 10**(-0.4*(mag + 48.60))*u.erg/u.s/u.hertz/u.cm**2
+    flux_e_s = np.zeros(len(mag))
+    for i in range(len(mag)):
+        flux_e_s[i] = compute_count_rate(flux[i],bandpass,sca,
+                                         filename=None, effarea=None, wavedist=None)
+    if back_single: flux_e_s = flux_e_s[0]
+    return(flux_e_s/u.s)
+
+
+def fe2mag(fe, bandpass, sca):
+    from romanisim.bandpass import compute_count_rate
+    back_single = 0
+    if not isinstance(fe, (list, pd.core.series.Series, np.ndarray)):
+        fe = np.array([fe])
+        back_single = 1
+
+    if isinstance(fe, (list)): fe = np.array(fe)
+
+    # Zeropoint flux AB -> 0 = -2.5 log10(fzpAB) + zp
+    # zp = 2.5*np.log10(fzpAB)
+
+    zp = 2.5*np.log10(compute_abflux(sca, effarea=None)["SCA"+str(sca).zfill(2)][bandpass])
+
+    mag = -2.5*np.log10(fe.value) + zp
+    if back_single: mag = mag[0]
+    return(mag)
+
+#######################################
 #################################################
 
-def roman_estimate_straylight_SCA(data, wcs, SCA, filter_identity, ra_stars, dec_stars, irradiance_stars, cat_id, source_id, ra_point, dec_point, pa_point, verbose=False, dry_mode=False):
+def roman_estimate_straylight_SCA(data, wcs, SCA, filter_identity, ra_stars,
+                                  dec_stars, irradiance_stars, cat_id,
+                                  source_id, ra_point, dec_point, pa_point,
+                                  verbose=False, dry_mode=False):
 
     from tqdm import tqdm
     import numexpr
@@ -321,26 +399,26 @@ def roman_estimate_straylight_SCA(data, wcs, SCA, filter_identity, ra_stars, dec
     pixsize = rs.telescopes.Roman.get_physical_pixelsize(instrument="WFI") # Physical pixel size, in meters
 
     # Find the coordinates of each pixel in the sky.
-    if verbose: print(datetime.now().isoformat() + ": Finding coordinates of SCA pixels in the Sky...")
+    if verbose > 1: print(datetime.now().isoformat() + ": Finding coordinates of SCA pixels in the Sky...")
     SCA_pixel_radec = wcs.pixel_to_world(int(data_shape[0])/2,int(data_shape[1])/2)
     ra_SCA = SCA_pixel_radec.ra.value   # Right ascension of the center of the SCA
     dec_SCA = SCA_pixel_radec.dec.value # Declination of the center of the SCA
-    if verbose: print(datetime.now().isoformat() + ": Done")
+    if verbose > 1: print(datetime.now().isoformat() + ": Done")
 
     radec_stars =  SkyCoord(ra_stars, dec_stars, frame="icrs", unit="deg")
     ra_stars     = radec_stars.ra.value.astype("float32")
     dec_stars    = radec_stars.dec.value.astype("float32")
-
+    n_stars = len(ra_stars)
 
     # Identify those at distances > 1 degrees (~100 times the size of the subarray).
     # For stars at those distances, we will only estimate one NDI and assume the straylight is flat across
     # the subarray (we will still have gradients!).
-    if verbose: print(datetime.now().isoformat() + ": Estimating the relative coordinates of the SCA to the stars...")
+    if verbose > 1: print(datetime.now().isoformat() + ": Estimating the relative coordinates of the SCA to the stars...")
     theta_phi_center_FPA = rs.utils.angular_distance(ra1=np.array([ra_point]), dec1=np.array([dec_point]),
                                                      ra2=ra_stars, dec2=dec_stars)
-    if verbose: print(datetime.now().isoformat() + ": Done")
+    if verbose > 1: print(datetime.now().isoformat() + ": Done")
 
-    if verbose:
+    if verbose > 1:
         print("Stars - RA: " + str(radec_stars.ra) + " - DEC: " + str(radec_stars.dec))
         print("Irradiance: " + str(irradiance_stars))
         print("SCA - RA: " + str(ra_point) + " - DEC: " + str(dec_point))
@@ -351,11 +429,16 @@ def roman_estimate_straylight_SCA(data, wcs, SCA, filter_identity, ra_stars, dec
     bool_is_the_star_level_2 = np.array((theta_phi_center_FPA[0] >= level_1_critical_distance_to_star) & (theta_phi_center_FPA[0] < level_2_critical_distance_to_star))
     bool_is_the_star_level_3 = np.array(theta_phi_center_FPA[0] >= level_2_critical_distance_to_star)
 
+    star_level = np.zeros(n_stars)
+    star_level[bool_is_the_star_level_1] = 1
+    star_level[bool_is_the_star_level_2] = 2
+    star_level[bool_is_the_star_level_3] = 3
+
     radec_level_1_stars = radec_stars[bool_is_the_star_level_1]
     radec_level_2_stars = radec_stars[bool_is_the_star_level_2]
     radec_level_3_stars = radec_stars[bool_is_the_star_level_3]
 
-    id_stars = np.linspace(0, len(ra_stars)-1, len(ra_stars), dtype="int64") # np.array(cat_id)
+    id_stars = cat_id # np.linspace(0, n_stars-1, n_stars, dtype="int64")
 
     ra_level_1_stars   = radec_level_1_stars.ra.value
     dec_level_1_stars  = radec_level_1_stars.dec.value
@@ -387,7 +470,7 @@ def roman_estimate_straylight_SCA(data, wcs, SCA, filter_identity, ra_stars, dec
     n_level_3_stars = len(ra_level_3_stars)
 
 
-    if verbose:
+    if verbose > 1:
         print(datetime.now().isoformat() + ": Sources identified.")
         print("Number of stars at R < " + str(level_1_critical_distance_to_star) + " degrees - " + str(n_level_1_stars))
         print("Number of stars at " + str(level_1_critical_distance_to_star) + " < R < " + str(level_2_critical_distance_to_star) + " degrees - " + str(n_level_2_stars))
@@ -408,37 +491,16 @@ def roman_estimate_straylight_SCA(data, wcs, SCA, filter_identity, ra_stars, dec
         DEC_mid_subarrays =      SCA_pixel_radec.dec.value#[ymid, xmid]
         mid_subarrays_Skycoord = SkyCoord(RA_mid_subarrays, DEC_mid_subarrays, frame="icrs", unit="deg")
 
-        if verbose: print(datetime.now().isoformat() + ": Done")
-        if verbose: print(datetime.now().isoformat() + ": Finding the NDI at the estimated angles...")
+        if verbose > 1: print(datetime.now().isoformat() + ": Done")
+        if verbose > 1: print(datetime.now().isoformat() + ": Finding the NDI at the estimated angles...")
 
-
+        n_subarrays = len(subarray_locations_db["NDI_labels"])
         ##############################################################################
-        #  Level 3 stars only have one subarray.
-        # So there is no need to make this pass through the subarray loop.
-        #
+        # Initialize storage arrays for xmid, ymid, NDI, stray-light, main_offender
         ##############################################################################
 
-
-        # Level 3
-        if len(ra_level_3_stars) > 0:
-            NDI_level_3 = roman_WFI_NDI_estimator_direct(ra_stars=ra_level_3_stars, dec_stars=dec_level_3_stars,
-                                                     ra_point=ra_point, dec_point=dec_point, pa_point=pa_point,
-                                                     SCA=SCA, level=3, verbose=True)
-            straylight_level_3 = (NDI_level_3*(pixsize**2)*filter_identity["filter_transmission_ref"]*filter_identity["filter_lambda_ref"]*irradiance_level_3_stars/const.c/const.h).decompose()
-            where_max_stray = np.where(straylight_level_3.value == bn.nanmax(straylight_level_3))[0][0]
-            id_main_offender_level_3 = id_level_3_stars[where_max_stray]
-            source_id_main_offender_level_3 = source_id_level_3[where_max_stray]
-            stray_main_offender_level_3 = bn.nanmax(straylight_level_3)
-            max_NDI_level_3 = NDI_level_3[where_max_stray]
-
-        else:
-            straylight_level_3 = 0/u.s#
-            id_main_offender_level_3 = 0
-            stray_main_offender_level_3 = 0
-            max_NDI_level_3 = 0
-            source_id_main_offender_level_3 = None
-        straylight_SCA = straylight_SCA + bn.nansum(straylight_level_3)
-
+        col_stray = np.zeros((n_subarrays))*np.nan
+        col_main_off_id = np.zeros((n_subarrays))*np.nan
 
         ##############################################################################
         # Level 1 - The closest to the focal plane array.
@@ -448,13 +510,16 @@ def roman_estimate_straylight_SCA(data, wcs, SCA, filter_identity, ra_stars, dec
         # Second - We measure the straylight at the center of the subarray for stars at closer distances.
         #
         ################################################################################
-        for i in range(len(subarray_locations_db["NDI_labels"])):
+        # for i in tqdm(range(n_subarrays), disable=not verbose):
+        for i in range(n_subarrays): # Replaced by Roman / WFI loading bar
             X_label = subarray_locations_db["xlabel"][i]
             Y_label = subarray_locations_db["ylabel"][i]
             xmin    = subarray_locations_db["xmin"][i]
             xmax    = subarray_locations_db["xmax"][i]
             ymin    = subarray_locations_db["ymin"][i]
             ymax    = subarray_locations_db["ymax"][i]
+            xmid    = subarray_locations_db["xmid"][i]
+            ymid    = subarray_locations_db["ymid"][i]
 
 
             # -------------------------------------------------------------------------- #
@@ -462,8 +527,8 @@ def roman_estimate_straylight_SCA(data, wcs, SCA, filter_identity, ra_stars, dec
             # -------------------------------------------------------------------------- #
             if len(ra_level_1_stars) > 0:
                 NDI_level_1 = roman_WFI_NDI_estimator_direct(ra_stars=ra_level_1_stars, dec_stars=dec_level_1_stars,
-                                                           ra_point=ra_point, dec_point=dec_point, pa_point=pa_point,
-                                                           SCA=SCA, X_label=X_label, Y_label=Y_label, level=1, verbose=True)
+                                                             ra_point=ra_point, dec_point=dec_point, pa_point=pa_point,
+                                                             SCA=SCA, X_label=X_label, Y_label=Y_label, level=1, verbose=True)
                 straylight_level_1 = (NDI_level_1*(pixsize**2)*filter_identity["filter_transmission_ref"]*filter_identity["filter_lambda_ref"]*irradiance_level_1_stars/const.c/const.h).decompose()
                 #id_main_offender_level_1 = id_level_1_stars[np.where(straylight_level_1.value == bn.nanmax(straylight_level_1))[0][0]]
                 where_max_stray = np.where(straylight_level_1.value == bn.nanmax(straylight_level_1))[0][0]
@@ -477,13 +542,16 @@ def roman_estimate_straylight_SCA(data, wcs, SCA, filter_identity, ra_stars, dec
                 id_main_offender_level_1 = 0
                 max_NDI_level_1 = 0
                 source_id_main_offender_level_1 = None
+
             # -------------------------------------------------------------------------- #
             # 3 - Combine all the values                                                 #
             # -------------------------------------------------------------------------- #
             stray_main_offender_level_1 = bn.nanmax(straylight_level_1)
             straylight_SCA[ymin:ymax, xmin:xmax] = straylight_SCA[ymin:ymax, xmin:xmax] + bn.nansum(straylight_level_1)
 
-            # Level 2
+            # -------------------------------------------------------------------------- #
+            # 2 - Estimate the stray-light at the SCA level for mid-distance stars     #
+            # -------------------------------------------------------------------------- #
             if len(ra_level_2_stars) > 0:
                 NDI_level_2 = roman_WFI_NDI_estimator_direct(ra_stars=ra_level_2_stars, dec_stars=dec_level_2_stars,
                                                      ra_point=ra_point, dec_point=dec_point, pa_point=pa_point,
@@ -504,6 +572,30 @@ def roman_estimate_straylight_SCA(data, wcs, SCA, filter_identity, ra_stars, dec
             stray_main_offender_level_2 = bn.nanmax(straylight_level_2)
             straylight_SCA[ymin:ymax, xmin:xmax] = straylight_SCA[ymin:ymax, xmin:xmax] + bn.nansum(straylight_level_2)
 
+            # -------------------------------------------------------------------------- #
+            # 3 - Estimate the stray-light at the SCA level for long-distance stars      #
+            # -------------------------------------------------------------------------- #
+
+            if len(ra_level_3_stars) > 0:
+                NDI_level_3 = roman_WFI_NDI_estimator_direct(ra_stars=ra_level_3_stars, dec_stars=dec_level_3_stars,
+                                                     ra_point=ra_point, dec_point=dec_point, pa_point=pa_point,
+                                                     SCA=SCA, X_label=X_label, Y_label=Y_label, level=3, verbose=True)
+                straylight_level_3 =     (NDI_level_3*(pixsize**2)*filter_identity["filter_transmission_ref"]*filter_identity["filter_lambda_ref"]*irradiance_level_3_stars/const.c/    const.h).decompose()
+                where_max_stray = np.where(straylight_level_3.value == bn.nanmax(straylight_level_3))[0][0]
+                id_main_offender_level_3 = id_level_3_stars[where_max_stray]
+                source_id_main_offender_level_3 = source_id_level_3[where_max_stray]
+                stray_main_offender_level_3 = bn.nanmax(straylight_level_3)
+                max_NDI_level_3 = NDI_level_3[where_max_stray]
+
+            else:
+                straylight_level_3 = 0/u.s#
+                id_main_offender_level_3 = 0
+                stray_main_offender_level_3 = 0
+                max_NDI_level_3 = 0
+                source_id_main_offender_level_3 = None
+            stray_main_offender_level_3 = bn.nanmax(straylight_level_3)
+            straylight_SCA[ymin:ymax, xmin:xmax] = straylight_SCA[ymin:ymax, xmin:xmax] + bn.nansum(straylight_level_3)
+
 
             main_offender_level_123 = np.array([stray_main_offender_level_1,
                                                 stray_main_offender_level_2,
@@ -513,10 +605,12 @@ def roman_estimate_straylight_SCA(data, wcs, SCA, filter_identity, ra_stars, dec
                                                    id_main_offender_level_2,
                                                    id_main_offender_level_3])
 
-            source_name_main_offence_level_123 = np.array([source_id_main_offender_level_1, source_id_main_offender_level_2,source_id_main_offender_level_3])
+            source_name_main_offence_level_123 = np.array([source_id_main_offender_level_1,
+                                                           source_id_main_offender_level_2,
+                                                           source_id_main_offender_level_3])
 
 
-            if verbose:
+            if verbose > 2:
                 print("Main offender - RA :" +  str(ra_stars[id_main_offender_level_123]) + " DEC: " + str(dec_stars[id_main_offender_level_123]))
                 print("ID :" +  str(id_main_offender_level_123))
                 print("Source name :" +  str(source_name_main_offence_level_123))
@@ -525,10 +619,24 @@ def roman_estimate_straylight_SCA(data, wcs, SCA, filter_identity, ra_stars, dec
                 print("NDI " + str([max_NDI_level_1, max_NDI_level_2, max_NDI_level_3]))
 
 
-            main_offender_SCA[ymin:ymax, xmin:xmax] = id_main_offender_level_123[main_offender_level_123 == bn.nanmax(main_offender_level_123)]
+            main_offender_SCA[ymin:ymax, xmin:xmax] = id_main_offender_level_123[main_offender_level_123 == bn.nanmax(main_offender_level_123)][0]
+            col_stray[i] = straylight_SCA[ymid, xmid]
+            col_main_off_id[i] = main_offender_SCA[ymid, xmid]
+
+            # Plot the Roman/WFI loading bar
+            os.system('clear')
+            print(rs.plots.style.CYAN + " ROSALIA Stray-light Mapper: Scanning ... " + rs.plots.style.RESET)
+            canvas = rs.plots.print_ascii_focal_plane(x=X_label, y=Y_label, SCA=SCA)
+            print(rs.plots.style.CYAN + 'SCA ' + str(SCA) + " - Subarray X=" + str(X_label) + " - Subarray Y=" + str(Y_label))
+            print('SCA ' + str(SCA) + " out of 18: " + str(np.round(100*i/n_subarrays,2)) + '% completed' + rs.plots.style.RESET)
             #######################################################################
 
 
+        main_offender_db = pd.DataFrame({"xmid": xmid, "ymid": ymid,
+                                        "xmin": xmin, "ymin": ymin,
+                                        "xmax": xmax, "ymid": ymax,
+                                        "RA_mid": RA_mid_subarrays, "DEC_mid": DEC_mid_subarrays,
+                                        "stray": col_stray, "main_off_id": col_main_off_id})
         # -------------------------------------------------------------------------- #
         # 4 - TO-DO - Interpolate the values across the SCA to smooth it out         #
         # -------------------------------------------------------------------------- #
@@ -536,7 +644,70 @@ def roman_estimate_straylight_SCA(data, wcs, SCA, filter_identity, ra_stars, dec
         # from scipy.interpolate import RegularGridInterpolator
         #f = RegularGridInterpolator((x_grid, y_grid), np.flip(ndi_fits[0].data, axis=1).T, bounds_error=False, fill_value=0)
 
-    if verbose: print(datetime.now().isoformat() + ": Done")
-    return({"straylight_SCA": straylight_SCA, "main_offender_SCA": main_offender_SCA})
+    if verbose > 1: print(datetime.now().isoformat() + ": Done")
+    return({"straylight_SCA": straylight_SCA, "main_offender_SCA": main_offender_SCA, "main_offender_db": main_offender_db})
 
 #################################################
+
+
+def make_average_ndi_maps():
+    import glob
+    ndi_lvl_1_list = glob.glob(os.environ["ROSALIACACHE"] + "/CORE/NDI/RST/ndi_lvl1/lvl1_SCA_*_SUB_X*_Y*_TAN.fits")
+    ndi_lvl_2_list = glob.glob(os.environ["ROSALIACACHE"] + "/CORE/NDI/RST/ndi_lvl2/lvl2_SCA_*_SUB_X*_Y*_TAN.fits")
+    ndi_lvl_3_list = glob.glob(os.environ["ROSALIACACHE"] + "/CORE/NDI/RST/ndi_lvl3/lvl3_SCA_*_SUB_X*_Y*_HP.fits")
+
+
+    product_name_list = []
+    for i, ndi_list in zip([1,2,3], [ndi_lvl_1_list, ndi_lvl_2_list, ndi_lvl_3_list]):
+
+        # Check if the average maps are already there.
+        name_average_ndi = os.path.dirname(os.environ["ROSALIACACHE"]) + "/CORE/NDI/RST/ndi_lvl" + str(i) + "_mean.fits"
+
+        if os.path.exists(name_average_ndi):
+            print("Average map found! " + name_average_ndi + " - Skipping")
+            continue
+
+        n_frames = len(ndi_list)
+        if (i < 3):
+            ndi_fits = fits.open(ndi_list[0])
+
+        else:
+            import healpy as hp
+            ndi_fits = hp.read_map(ndi_list[0])
+
+        canvas = np.zeros((ndi_fits[0].data.shape))
+        for j in tqdm(range(n_frames)):
+            if (i < 3):
+                ndi_fits = fits.open(ndi_list[j])
+                canvas  = canvas  + ndi_fits[0].data/n_frames
+            else:
+                ndi_fits = hp.read_map(ndi_list[0])
+                canvas  = canvas  + ndi_fits/n_frames
+
+
+        if (i < 3):
+            rs.utils.save_fits(array = canvas, header=ndi_fits[0].header, name = name_average_ndi)
+
+        else:
+            hp.write_map(filename=name_average_ndi, m=canvas, overwrite=True)
+
+        product_name_list.append(name_average_ndi)
+
+    print("Average NDI maps completed! ")
+    print(product_name_list)
+
+
+###############
+
+def make_romanisim_dummy(name, ra, dec, pa, bandpass, date, catalog=None):
+    import glob
+    previous_run = glob.glob(name + "*.asdf")
+
+    if len(previous_run) == 0:
+        os.system("romanisim-make-image --radec " + str(ra) + " " + str(dec) + " " + name + "{}.asdf --roll " + str(pa) + " --date " + date + "  --sca -1 --bandpass " + bandpass + " --level 2 --nobj 0 --usecrds --")
+    else:
+        print("ASDF exposures with same name already in place! Check local files")
+        print(previous_run)
+
+    current_run = glob.glob(name + "*.asdf")
+    return(current_run)

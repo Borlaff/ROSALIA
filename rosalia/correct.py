@@ -39,8 +39,32 @@ from astropy.coordinates import ICRS, Angle, SkyCoord
 
 ###########################
 
-def rosalia_stray(input_name=None, exposure_dict = None, output_name="rosalia_stray_output.fits", radius=1,
+def rosalia_stray(ra, dec, PA, date, bandpass, exptime, radius=1,
                   g_mag_max=15, sun_block=False, verbose=False, catalog=None):
+
+
+    from tqdm import tqdm
+    import logging
+    logger = logging.getLogger()
+    logger.setLevel(logging.CRITICAL)
+
+    # Make the Roman Dummy image
+    roman_dummy_name = os.getcwd() + "/WFI_" + bandpass +\
+                                     "_RA_" + '{:07.3f}'.format(ra) +\
+                                     "_DEC_" + '{:07.3f}'.format(dec) +\
+                                     "_MJD_" + '{:07.5f}'.format(date.mjd) +\
+                                     "_PA_" + '{:06.2f}'.format(PA) + ".fits"
+    output_name = roman_dummy_name.replace(".fits","_stray.fits")
+    central_coords = SkyCoord(ra, dec, frame="icrs", unit="deg")
+
+    input_name = rs.roman.create_roman_dummy(point=central_coords, date=date,
+                                               band=bandpass, PA=PA, exptime=exptime,
+                                               output=roman_dummy_name)
+    print(input_name)
+
+    # Get the image identity
+    image_identity = rs.utils.exposure_inspector(input_name=input_name, verbose=verbose, lite=True)
+    
 
     if input_name is None:
         input_name = rs.roman.create_roman_dummy(point=exposure_dict["point"],

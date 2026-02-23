@@ -48,11 +48,14 @@ def remove_zodiacal_light_acs(input_name, verbose=False):
     return({"input": input_name, "zody": zody_name, "zody_cor": zody_cor_name})
 
 
-def correct_flat_sky(input_name, ext, clean=True, verbose=False):
+def correct_flat_sky(input_name, ext, overwrite=True, clean=True, verbose=False):
     # So, lets write a program that does a flat sky background correction for us.
     # Run noisechisel with the default parameters
-    rs.utils.execute_cmd("astnoisechisel -K -h" + str(ext) + " " + input_name)
+    stdout = rs.utils.execute_cmd("astnoisechisel --outliernumngb=5 -K -h" + str(ext) + " " + input_name)
     detected_name = input_name.replace(".fits", "_detected.fits")
+
+    if not os.path.exists(detected_name):
+        return({"skylvl": np.nan, "input_name": input_name, "ext": ext})
 
     # Open the detected fits file
     input_fits = fits.open(input_name)
@@ -65,14 +68,15 @@ def correct_flat_sky(input_name, ext, clean=True, verbose=False):
         print("Subtracting from " + input_name + "[" + str(ext) + "]")
         print("Storing in header KEYWORD SKYLVL1")
 
-    input_fits[ext].data = input_fits[ext].data - sky_level
-    try:
-        input_fits[ext].header["SKYLVL1"] = input_fits[ext].header["SKYLVL1"] + sky_level
-    except:
-        input_fits[ext].header["SKYLVL1"] = sky_level
 
-    input_fits.verify("silentfix")
-    input_fits.writeto(input_name, overwrite=True)
+    if overwrite:
+        try:
+            input_fits[ext].header["SKYLVL1"] = input_fits[ext].header["SKYLVL1"] + sky_level
+        except:
+            input_fits[ext].header["SKYLVL1"] = sky_level
+        input_fits[ext].data = input_fits[ext].data - sky_level
+        input_fits.verify("silentfix")
+        input_fits.writeto(input_name, overwrite=True)
 
     input_fits.close()
     detected_fits.close()
@@ -80,7 +84,7 @@ def correct_flat_sky(input_name, ext, clean=True, verbose=False):
     if clean:
         rs.utils.execute_cmd("rm " + detected_name)
 
-    return({"skylvl": input_fits[ext].header["SKYLVL1"] + sky_level, "input_name": input_name, "ext": ext})
+    return({"skylvl": sky_level, "input_name": input_name, "ext": ext})
 
 
 #####################################################
@@ -167,7 +171,11 @@ def rebin_transmission_curve(filter_transmission_curve, nbins, verbose=False):
 
 
 
-def get_zodiacal_background(input_name, ext, wavelength=None, telescope=None, instrument=None, detector=None, expstart=None, step=1000, zody_mode="zodipy", nbins_wavelength=20, obslocin=3, grid_method="random", output_units=None, verbose=False):
+def get_zodiacal_background(input_name, ext, wavelength=None, telescope=None, instrument=None,
+                            detector=None, expstart=None, step=1000, zody_mode="zodipy",
+                            nbins_wavelength=20, obslocin=3, grid_method="random",
+                            output_units=None, verbose=False, interpolate=True):
+
     from scipy import interpolate
     # Keywords for IRSA background query:
     # Check: https://irsa.ipac.caltech.edu/applications/BackgroundModel/docs/dustProgramInterface.html
@@ -183,8 +191,8 @@ def get_zodiacal_background(input_name, ext, wavelength=None, telescope=None, in
 
     switch_filter_curve = 0
 
-    if (wavelength == None) or (expstart == None) or (output_units == None):
-        exposure_identity = rs.utils.exposure_inspector(input_name)
+    if (wavelength == None) or (expstart == None) or (output_units == None) or (zody_mode=="zodipy"):
+        exposure_identity = rs.utils.exposure_inspector(input_name, lite=True)
 
     if wavelength == None:
         wavelength = exposure_identity["FILTER"]
@@ -201,6 +209,7 @@ def get_zodiacal_background(input_name, ext, wavelength=None, telescope=None, in
     if expstart == None:
         expstart = exposure_identity["EXPSTART"]
 
+    # print(exposure_identity)
     #if output_units == None:
     #    output_units = exposure_identity["BUNIT"]
 
@@ -258,6 +267,7 @@ def get_zodiacal_background(input_name, ext, wavelength=None, telescope=None, in
 
             db_irsa[:,i] = np.array(db["zody"])
 
+    """
     if zody_mode == "gunagala":
         #gunagala_zody(ra, dec, wavelength, year, day)
         if verbose:
@@ -285,7 +295,7 @@ def get_zodiacal_background(input_name, ext, wavelength=None, telescope=None, in
 
         for i in range(npoints_grid):
             zodiacal_flux_convolved_by_filter[i] = np.sum(db_irsa[i,:]*evdv)/np.sum(evdv)
-
+    """
 
     if zody_mode == "zodipy":
         #gunagala_zody(ra, dec, wavelength, year, day)
@@ -297,14 +307,16 @@ def get_zodiacal_background(input_name, ext, wavelength=None, telescope=None, in
                            exposure_identity["XYZ_HELIO_POS"][1][0].value,
                            exposure_identity["XYZ_HELIO_POS"][2][0].value])*u.AU
 
-        print(obspos)
+        if verbose:
+            print("Heliocentric position of telescope:")
+            print(obspos)
         zody_MJysr = zodipy_zody(ra=detector_grid["grid_world"][0],
                          dec=detector_grid["grid_world"][1],
                          wavelength=rebinned_wavelength.to("um").value,
                          weights=rebinned_transmission,
                          expstart=expstart,
                          obspos=obspos)
-        zodiacal_flux_convolved_by_filter = rs.utils.MJysr_to_jyarcsec2(zody_MJysr)
+        zodiacal_flux_convolved_by_filter = zody_MJysr*(u.MJy * u.steradian**-1) # rs.utils.MJysr_to_jyarcsec2(zody_MJysr)
 
         #db_irsa[:,i] = np.array(db["zody"])
 
@@ -318,26 +330,35 @@ def get_zodiacal_background(input_name, ext, wavelength=None, telescope=None, in
     xv, yv = np.meshgrid(y_lin, x_lin, indexing='ij')
     points = [(x[i], y[i]) for i in range(len(x))]
 
+    if interpolate:
+        zody_interp =  interpolate.griddata(points, zodiacal_flux_convolved_by_filter, (xv, yv), method="cubic")
+    else:
+        zody_interp = zodiacal_flux_convolved_by_filter
 
-    zody_interp =  interpolate.griddata(points, zodiacal_flux_convolved_by_filter, (xv, yv), method="cubic")
 
-    if output_units == "ELECTRONS":
-        if verbose:
-            print("Output units:" + output_units)
+    if output_units == "e/s":
+        if verbose: print("Output units:" + output_units)
         #  HST_ACS_jy_to_counts(flux_ACS, photflam, photplam):
-        zody_interp = rs.detectors.HST_ACS_jy_to_counts(flux_jy = zody_interp,
+        if telescope == "Hubble" or telescope == "HST":
+            zody_interp = rs.detectors.HST_ACS_jy_to_counts(flux_jy = zody_interp,
                                            photflam = exposure_identity["PHOTFLAM"],
                                            photplam = exposure_identity["PHOTPLAM"])
+
+        if telescope == "Roman" or telescope == "RST":
+            from romanisim import bandpass as ris_bandpass
+            es_to_MJysr = ris_bandpass.etomjysr(bandpass=wavelength, sca=ext)*u.MJy * u.steradian**-1 * u.s # The factor F such that MJy / sr = F * DN/s
+            zody_interp = zody_interp/es_to_MJysr
+        if verbose: print("Output units: e/s")
+
     else:
-        if verbose:
-            print("Output units: Jy/arcsec2")
+        if verbose: print("Output units: Jy/arcsec2")
 
     return(zody_interp.T)
 
 ########################################################
-
+"""
 def find_filter_curve_file(wavelength):
-    straycor_path = os.path.dirname(rs.detectors.__file__)
+    straycor_path = os.path.dirname(os.environ["ROSALIACACHE"])
     filters_path = straycor_path + "/FILTERS/"
     filters_list = glob.glob(filters_path + "*")
 
@@ -357,8 +378,7 @@ def find_filter_curve_file(wavelength):
         print("Filter found: " + filter_match)
 
     return(filter_match)
-
-
+"""
 
 #########################################
 
@@ -487,3 +507,70 @@ def zodipy_zody(ra, dec, wavelength, weights, expstart, obspos="earth"):
     emission = model.evaluate(skycoord, obspos=obspos) # , nprocesses=multiprocessing.cpu_count()
 
     return(emission)
+
+
+def measure_sky_level_HST_ACS(exposure_name, verbose=False):
+    # Open the fits file
+    from astropy.io import fits
+
+    exposure_fits = fits.open(exposure_name) # We open the fits file with astropy
+
+    # Try to retrieve a previous analysis that was performed in this exposure
+    try:
+        return({"zody": exposure_fits[1].header["ZODY"],
+                "sky":  exposure_fits[1].header["SKYLVL"]})
+
+    except:
+        if verbose: print("No previous sky-zody analysis available in this header.")
+
+
+    # Get the basic parameters
+    PHOTPLAM =  exposure_fits[1].header["PHOTPLAM"] # / Pivot wavelength (Angstroms)   <---- This is the observation wavelength. We will use this to estimate the Zodiacal light.
+    PHOTFLAM =  exposure_fits[1].header["PHOTFLAM"] # / inverse sensitivity, ergs/cm2/Ang/electron   <---- This is the transformation between electrons to flux. We will use this to turn the e/s/px to Jy/arcsec2.
+    RA_TARG  = exposure_fits[0].header["RA_TARG"]    #  Right ascension of the observation target .
+    DEC_TARG = exposure_fits[0].header["DEC_TARG"]  #  Declination of the observation target
+    EXPSTART = exposure_fits[0].header["EXPSTART"]  #  Time of the observation, in Modified Julian Date
+    # Get the right filter
+    filter_1 = exposure_fits[0].header["FILTER1"]
+    filter_2 = exposure_fits[0].header["FILTER2"]
+
+    if "CLEAR" in filter_1:
+        filter_name = filter_2
+    else:
+        filter_name = filter_1
+
+
+    # Lets import some more astropy packages to deal with the time, units, and coordinates.
+    import astropy.units as u
+    from astropy.time import Time
+    from astropy.coordinates import SkyCoord  # High-level coordinates
+
+    # -------------------------------------- #
+    # MODEL ZODIACAL LIGHT                   #
+    # -------------------------------------- #
+    # Initialize a zodiacal light model at a wavelength/frequency or over a bandpass
+    zody_background_sci1 = rs.sky.get_zodiacal_background(input_name=exposure_name, ext=1,
+                                                          wavelength=filter_name,
+                                                          telescope="HST",
+                                                          instrument="ACS",
+                                                          detector="WFC",
+                                                          expstart=EXPSTART,
+                                                          step=4000, zody_mode="zodipy",
+                                                          nbins_wavelength=20, obslocin=3,
+                                                          grid_method="random", verbose=False, interpolate=False)
+    import bottleneck as bn
+    median_zody_jy_arcsec2 = bn.nanmedian(zody_background_sci1)
+
+    sky_sci1 = rs.sky.correct_flat_sky(input_name=exposure_name, ext=1, overwrite=False, clean=True, verbose=False)
+    median_sky_es = sky_sci1["skylvl"]
+    # print(median_sky_es)
+    median_sky_jy_arcsec2 = rs.detectors.HST_ACS_counts_to_jy(flux_ACS=median_sky_es, photflam=PHOTFLAM, photplam=PHOTPLAM)
+
+    if not np.isnan(median_sky_jy_arcsec2):    exposure_fits[1].header["SKYLVL"] = median_sky_jy_arcsec2
+    if not np.isnan(median_zody_jy_arcsec2):    exposure_fits[1].header["ZODY"]   = median_zody_jy_arcsec2
+
+    exposure_fits.verify("silentfix")
+    exposure_fits.writeto(exposure_name, overwrite=True)
+    exposure_fits.close()
+
+    return({"zody": median_zody_jy_arcsec2, "sky": median_sky_jy_arcsec2})

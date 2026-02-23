@@ -1,20 +1,31 @@
 Metadata-Version: 2.4
 Name: ROSALIA
-Version: 0.9.3
+Version: 0.9.4
 Summary: A software to calibrate the sky background of Space Telescope images
 Home-page: https://github.com/Borlaff/ROSALIA
 Author: Alejandro S. Borlaff
-Author-email: a.s.borlaff@nasa.gov
+Author-email: "Alejandro S. Borlaff" <a.s.borlaff@nasa.gov>
 License: BSD
-Keywords: Hubble / Roman LSB sky-background
+Project-URL: Homepage, https://github.com/Borlaff/ROSALIA
+Project-URL: Repository, https://github.com/Borlaff/ROSALIA
+Keywords: Hubble,Roman,LSB,sky-background
 Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Science/Research
 Classifier: Topic :: Utilities
 Classifier: License :: OSI Approved :: BSD License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
 License-File: LICENSE.txt
 Requires-Dist: multiprocess
 Requires-Dist: bottleneck
 Requires-Dist: xmltodict
-Requires-Dist: romanisim@ git+https://github.com/spacetelescope/romanisim.git
+Requires-Dist: romanisim @ git+https://github.com/spacetelescope/romanisim.git
 Requires-Dist: asdf
 Requires-Dist: cartopy
 Requires-Dist: healpy
@@ -38,16 +49,10 @@ Requires-Dist: ipython
 Requires-Dist: pysynphot
 Requires-Dist: sphericalpolygon
 Requires-Dist: psutil
+Requires-Dist: zodipy
 Dynamic: author
-Dynamic: author-email
-Dynamic: classifier
-Dynamic: description
 Dynamic: home-page
-Dynamic: keywords
-Dynamic: license
 Dynamic: license-file
-Dynamic: requires-dist
-Dynamic: summary
 
 <!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
 <a id="readme-top"></a>
@@ -164,6 +169,22 @@ Sci-PI: Alejandro S. Borlaff (NASA ARC). Admin-PI: Pamela M. Marcum (NASA ARC)
 ROSALIA is based on multiple packages, including [Astropy](https://www.astropy.org/), [Astroquery](https://astroquery.readthedocs.io/en/latest/), and [Romanisim](https://romanisim.readthedocs.io/en/latest/), [NumPy](https://numpy.org/), [SciPy](https://scipy.org/), and [Matplotlib](https://matplotlib.org/) among many others. The easiest way to install all the dependencies is through a package manager like [Conda](https://anaconda.org/anaconda/conda) or [Mamba](https://github.com/mamba-org/mamba). If you have a Conda/Mamba package manager already installed in your system, skip to the following section. If you do not have a package manager, follow the Conda installation instructions at the [Space Telescope stenv environment webpage](https://stenv.readthedocs.io/en/latest/getting_started.html).
 
 ### Installing ROSALIA
+#### For developers
+Create a clean environment for ROSALIA
+```sh
+conda create -n rosalia python=3.12 conda-forge::astromatic-swarp
+```
+
+After the new environment is created, we can activate it.
+```sh
+conda activate rosalia
+   ```
+Once in a clean conda environment, we need to download the ROSALIA package from GitHub. 
+
+
+
+
+#### For general users (not yet available!)
 Create a clean environment for ROSALIA
 ```sh
 conda create -n rosalia python=3.12 conda-forge::astromatic-swarp

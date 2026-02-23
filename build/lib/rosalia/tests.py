@@ -13,7 +13,7 @@ from astroquery.gaia import Gaia
 
 import rosalia as rs
 
-psf_archive = os.path.dirname(rs.__file__) + "/../PSF_ARCHIVE/"
+psf_archive = os.environ["ROSALIACACHE"] + "/PSF_ARCHIVE/"
 
 def test_fe2mu_mu2fe():
     input_flux = 40
@@ -25,7 +25,7 @@ def test_fe2mu_mu2fe():
     assert_allclose(B.value, input_flux, rtol=0.1)
     print("> test_fe2mu_mu2fe: PASS")
     return(True)
-    
+
 def test_magnitude_conversion_gaia():
     # Reference guide for the Gaia photometric zeropoints
     # https://gea.esac.esa.int/archive/documentation/GDR2/Data_processing/chap_cu5pho/sec_cu5pho_calibr/ssec_cu5pho_calibr_extern.html

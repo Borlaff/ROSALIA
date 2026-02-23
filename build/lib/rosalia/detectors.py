@@ -123,7 +123,7 @@ def fe2mu(fe, instrument, filter_name, telescope, verbose=False):
     # mu = -2.5*np.log10(electrons/evp.e_adu/evp.exptime/evp.pixsize**2) + zp
     return(mu)
 
-
+"""
 def mag2fe(mag, instrument, filter_name, telescope, verbose=False):
     ################################################
     # mu2electrons:
@@ -154,7 +154,7 @@ def mag2fe(mag, instrument, filter_name, telescope, verbose=False):
         teles = rs.telescopes.Hubble
 
     # For Hubble Space Telescope
-    if telescope == "Roman" or telescope == "RST":
+    if telescope == "Roman" or telescope == "RST" or telescope == "ROMAN":
         teles = rs.telescopes.Roman
 
     if telescope == "ARRAKIHS":
@@ -221,16 +221,16 @@ def fe2mag(fe, instrument, filter_name, telescope, verbose=False):
     mag = -2.5*np.log10(fe.value/zeropoint.value)
     # mu = -2.5*np.log10(electrons/evp.e_adu/evp.exptime/evp.pixsize**2) + zp
     return(mag)
+"""
 
-
-def get_detector_corners(data, wcs):
+def get_detector_corners(data_shape, wcs):
     #input_fits = fits.open(input_name)
     #w = wcs.WCS(header=input_fits[ext].header, fobj=input_fits, naxis=2)
     w = wcs
     x_min = 0
-    x_max = data.shape[1]
+    x_max = data_shape[1]
     y_min = 0
-    y_max = data.shape[0]
+    y_max = data_shape[0]
 
     corners_pix = np.array([[x_min, y_min], [x_max, y_min], [x_max, y_max], [x_min, y_max]])
     #print(corners_pix)
@@ -242,8 +242,8 @@ def get_detector_corners(data, wcs):
 
     # Fix RA if needed
     for i in range(4):
-        if corners_world[i,0] >= 180: corners_world[i,0] = corners_world[i,0] - 360
-        if corners_world[i,0] < -180: corners_world[i,0] = corners_world[i,0] + 360
+        corners_world[i,0] = corners_world[i,0] % 360
+        # if corners_world[i,0] < -180: corners_world[i,0] = corners_world[i,0] + 360
 
     return({"corners_pix": corners_pix, "corners_world": corners_world})
 

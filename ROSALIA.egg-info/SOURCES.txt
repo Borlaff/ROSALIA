@@ -1,9 +1,11 @@
 LICENSE.txt
 README.md
+pyproject.toml
 setup.py
 ROSALIA.egg-info/PKG-INFO
 ROSALIA.egg-info/SOURCES.txt
 ROSALIA.egg-info/dependency_links.txt
+ROSALIA.egg-info/entry_points.txt
 ROSALIA.egg-info/requires.txt
 ROSALIA.egg-info/top_level.txt
 bin/exposure-inspector
@@ -35,11 +37,4 @@ rosalia/sso.py
 rosalia/telescopes.py
 rosalia/tests.py
 rosalia/utils.py
-rosalia/CORE/HST_TLE_history_sat000020580.txt
-rosalia/CORE/__init__.py
-rosalia/CORE/gaia_2mass_wise_healpix_5_cat.csv
-rosalia/CORE/gaia_2mass_wise_healpix_7_cat.csv
-rosalia/CORE/gaia_naked_eye_stars.csv
-rosalia/CORE/magnitude_sun.txt
-rosalia/CORE/obs_near_stars_hst.csv
-rosalia/CORE/presi_style.mplstyle
+rosalia/images/raccoon3_logo.png

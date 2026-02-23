@@ -9,23 +9,23 @@
 # v.1.0 - 1 February 2023. First loading of programs inherited from former
 #                        Euclid project - EuclidStrayVIS.py
 #
-"""
-A source at a certain position (x1,y1) in the focal plane coordinate
-system creates a flux of straylight at a diffent location (x2,y2) of the
-focal plane of a telescope defined by the NDI function. This light reaches
-(x2,y2) due to non-primary optical paths, such as scattering, difraction,
-secondary reflections and other unwanted optical effects.
+# """
+# A source at a certain position (x1,y1) in the focal plane coordinate
+# system creates a flux of straylight at a diffent location (x2,y2) of the
+# focal plane of a telescope defined by the NDI function. This light reaches
+# (x2,y2) due to non-primary optical paths, such as scattering, difraction,
+# secondary reflections and other unwanted optical effects.
 
-From Euclid Mission Straylight Analysis: Impact on performance at Mission Level
-Ref: EUCL-SAP-TN-1-003
+# From Euclid Mission Straylight Analysis: Impact on performance at Mission Level
+# Ref: EUCL-SAP-TN-1-003
 
-"Assuming the entrance of the telescope is illuminated by a distant point
-source (collimated light), then the NDI is defined as the ratio of
-light irradiance (power per unit area) on the image plane to the source
-irradiance in object space at the entrance of the telescope. More basically
-the NDI describes the profile of the scattered light in the telescope
-focal plane for a point-like source at given position in the field of view."
-"""
+# "Assuming the entrance of the telescope is illuminated by a distant point
+# source (collimated light), then the NDI is defined as the ratio of
+# light irradiance (power per unit area) on the image plane to the source
+# irradiance in object space at the entrance of the telescope. More basically
+# the NDI describes the profile of the scattered light in the telescope
+# focal plane for a point-like source at given position in the field of view."
+# """
 ##########################################################
 
 import numpy as np
@@ -35,6 +35,7 @@ import astropy.units as u
 import rosalia as rs
 from tqdm import tqdm
 import bottleneck as bn
+from scipy.interpolate import LinearNDInterpolator
 
 def straylight_flux(mag, theta, phi, filter_name, instrument, telescope, exptime, mu_mode=False, verbose=False, ndi_mode="legacy"):
     # For Hubble Space Telescope
@@ -99,40 +100,33 @@ def straylight_flux(mag, theta, phi, filter_name, instrument, telescope, exptime
 ############### LEGACY EUCLID CLASS FUNCTIONS ###################
 class ndi_euclid():
     """
-    #
-    # This class contains the methods to calculate the NDI at different distances and orientations
-    # as a function of the NDI model (numeric envelope or non-axisymmetric ray-tracing model).
-    #
-    # Numeric envelope NDI and non-axisymmetric ray-tracing are defined in:
-    # EUCL-EST-TN-3-008_v2.0 Assessment e2e straylight performance
-    #
-    # The constants of the numeric envelope NDI model are available at:
-    # http://euclid.esac.esa.int/epdb/db/Trunk/ SpaceSegment.PLM.PLMAsDesigned.PLMNDIA
-    #
-
-    To calculate the number of photons in a single pixel created by a source of magnitude m
-
-    Flux_photons = Flux_W / (h*c/lambda_ref)
-    where: h = Planck constant h = 6.62607004E-34 m2 kg / s
-           c = Speed of light cs = 299792458 m/s
-           lambda_ref: Reference (mean) wavelength for VIS = 725E-9 m
-
-    Flux_W = Irradiance_focal_plane * pixel_area
-    where: pixel_area = (12E-6)**2 # Area in m2 of a single pixel
-           Irradiance_focal_plane = NDI * Irradiance_entrance * median Transmission
-
-    Irradiance of the source at the entrance of the optical system (W m⁻²):
-
-    Irradiance_entrance(lambda) = 10⁻³ * c * 10^(-0.4*(mAB + 48.6)) * (lambda_max - lambda_min)/(lambda_max*lambda_min)
-
-    And the NDI is calculated using one of the two methods described in this class.
-
-
-    # Update: 01/02/2020 - So far, we have been assuming that Transmission = 1.
-                           We have to assume a realistic transmission - Calculate the median of the
-                           transmission curve between lambda_min and lambda_max
-
+    This class contains the methods to calculate the NDI at different distances and orientations as a function of the Euclid NDI model (numeric envelope or non-axisymmetric ray-tracing model) as defined in EUCL-EST-TN-3-008_v2.0 Assessment e2e straylight performance.
     """
+    #Numeric envelope NDI and non-axisymmetric ray-tracing are defined in EUCL-EST-TN-3-008_v2.0 Assessment e2e #straylight performance
+
+    #To calculate the number of photons in a single pixel created by a source of magnitude m
+
+    #Flux_photons = Flux_W / (h*c/lambda_ref)
+    #where: h = Planck constant h = 6.62607004E-34 m2 kg / s
+    #           c = Speed of light cs = 299792458 m/s
+    #       lambda_ref: Reference (mean) wavelength for VIS = 725E-9 m
+
+    #Flux_W = Irradiance_focal_plane * pixel_area
+    #where: pixel_area = (12E-6)**2 # Area in m2 of a single pixel
+    #       Irradiance_focal_plane = NDI * Irradiance_entrance * median Transmission
+    #
+    #Irradiance of the source at the entrance of the optical system (W m⁻²):
+
+    #Irradiance_entrance(lambda) = 10⁻³ * c * 10^(-0.4*(mAB + 48.6)) * (lambda_max - lambda_min)/(lambda_max*lambda_min)
+    #
+    #And the NDI is calculated using one of the two methods described in this class.
+    #
+    #
+    #Update: 01/02/2020 - So far, we have been assuming that Transmission = 1.
+    #                     We have to assume a realistic transmission - Calculate the median of the
+    #                     transmission curve between lambda_min and lambda_max
+
+    # """
 
     # Here we will interpolate the values of A550,0 and theta1s.
     # Constant values to interpolate the envelope NDI model.
@@ -203,19 +197,15 @@ class ndi_euclid():
     #A0550_interp   = interpolate.interp2d(NDI_x, NDI_y, NDI_A0550, kind='linear')
     #theta1s_interp = interpolate.interp2d(NDI_x, NDI_y, NDI_theta1s, kind='linear')
 
-    from scipy.interpolate import LinearNDInterpolator
-    NDI_interp_xy = np.c_[NDI_x, NDI_y]
-    A0550_interp = LinearNDInterpolator(NDI_interp_xy, NDI_A0550)
-    theta1s_interp = LinearNDInterpolator(NDI_interp_xy, NDI_theta1s)
 
     #A0550_interp   = interpolate.interp2d(NDI_x, NDI_y, NDI_A0550, kind='linear')
     #theta1s_interp = interpolate.interp2d(NDI_x, NDI_y, NDI_theta1s, kind='linear')
 
     def n_ndi(theta):
         """
-        # This method calculates n as a function of theta = distance from the straylight source.
-        # Required by the method ndi_envelope to calculate the NDI profile
-        # n(θ_DEG) = n(0)*1/((1+[(θ_DEG/θ_wd1 )]^0.75 ) )*1/((1+[(θ_DEG/θ_wd2 )]^20 ) )
+        This method calculates n as a function of theta = distance from the straylight source.
+        Required by the method ndi_envelope to calculate the NDI profile
+        n(θ_DEG) = n(0)*1/((1+[(θ_DEG/θ_wd1 )]^0.75 ) )*1/((1+[(θ_DEG/θ_wd2 )]^20 ) )
         """
         # A = n(0)
         A = ndi_euclid.ntheta0
@@ -228,29 +218,34 @@ class ndi_euclid():
 
     def a_ndi(x, y, theta, n_lambda):
         """
-        # This method calculates a as a function the position on the detector x,y
-        # the theta = distance from the straylight source and the n_lambda (wavelength in nm)
-        # Required by the method ndi_envelope to calculate the NDI profile
-        # A(θ_DEG, λ_nm ) = A(0, 550) *([λ_nm/550)]^(n(θ_DEG))
+        This method calculates a as a function the position on the detector x,y
+        the theta = distance from the straylight source and the n_lambda (wavelength in nm)
+        Required by the method ndi_envelope to calculate the NDI profile
+        A(θ_DEG, λ_nm ) = A(0, 550) *([λ_nm/550)]^(n(θ_DEG))
         """
         lenx = len(x)
         leny = len(y)
         if lenx != leny:
             return("Error! X and Y not the same length. Check your input")
+        NDI_interp_xy = np.c_[NDI_x, NDI_y]
+        A0550_interp = LinearNDInterpolator(NDI_interp_xy, NDI_A0550)
 
         A0550_interpolated_for_x_y = np.zeros(lenx)
         for i in range(lenx):
-            A0550_interpolated_for_x_y[i] = ndi_euclid.A0550_interp(x[i],y[i])
+            A0550_interpolated_for_x_y[i] = A0550_interp(x[i],y[i])
 
         return(A0550_interpolated_for_x_y*(n_lambda/550)**(ndi_euclid.n_ndi(theta)))
 
 
     def ndi_envelope(x, y, theta, n_lambda):
         """
-        # This method calculates the NDI profile as a function the position on the detector x,y
-        # the theta = distance from the straylight source and the n_lambda (wavelength in nm)
-        # NDI (θ_DEG,λ_nm) = A(θ_DEG,λ_nm)*1/((1+[(θ_DEG/θ_1s )]^2))*((1+[(θ_DEG/θ_2e )]^4 ))/((1+[(θ_DEG/θ_2s )]^4))
+        This method calculates the NDI profile as a function the position on the detector x,y
+        the theta = distance from the straylight source and the n_lambda (wavelength in nm)
+        NDI (θ_DEG,λ_nm) = A(θ_DEG,λ_nm)*1/((1+[(θ_DEG/θ_1s )]^2))*((1+[(θ_DEG/θ_2e )]^4 ))/((1+[(θ_DEG/θ_2s )]^4))
         """
+        NDI_interp_xy = np.c_[NDI_x, NDI_y]
+        theta1s_interp = LinearNDInterpolator(NDI_interp_xy, NDI_theta1s)
+
         if isinstance(x, (int, float, complex)):
             x = np.array([x])
 
@@ -269,7 +264,7 @@ class ndi_euclid():
 
         theta1s_interpolated_for_x_y = np.zeros(lenx)
         for i in range(lenx):
-            theta1s_interpolated_for_x_y[i] = ndi_euclid.theta1s_interp(x[i],y[i])
+            theta1s_interpolated_for_x_y[i] = theta1s_interp(x[i],y[i])
 
         B = 1/((1 + (theta/theta1s_interpolated_for_x_y)**2))
         # C = ((1+[(θ_DEG/θ_2e )]^4 ))/((1+[(θ_DEG/θ_2s )]^4))

@@ -1,7 +1,7 @@
 multiprocess
 bottleneck
 xmltodict
-romanisim@ git+https://github.com/spacetelescope/romanisim.git
+romanisim @ git+https://github.com/spacetelescope/romanisim.git
 asdf
 cartopy
 healpy
@@ -25,3 +25,4 @@ ipython
 pysynphot
 sphericalpolygon
 psutil
+zodipy

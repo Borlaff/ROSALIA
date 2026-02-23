@@ -24,6 +24,7 @@ import bottleneck as bn
 import rosalia as rs
 import dill as pickle
 import requests
+from matplotlib.path import Path
 
 # print("CHECK THE FLUX OF THE ZODIACAL LIGHT IN A NORMAL IMAGE!!!!!")
 
@@ -122,7 +123,6 @@ def load_dict(input_name, verbose=False):
         dictionary = pickle.load(f)
     return(dictionary)
 
-
 def save_dict(dictionary, input_name, verbose=False):
     """
     Save a python object using pickle.
@@ -172,7 +172,9 @@ def execute_cmd(cmd, verbose=False):
     if verbose:
         print(cmd)
     try:
-        result = subprocess.check_output([cmd], shell=True, text=True)
+        print(rs.plots.style.YELLOW)
+        result = subprocess.check_output([cmd], shell=True, text=True, stderr=subprocess.STDOUT)
+        print(rs.plots.style.RESET)
         return(result)
 
     except subprocess.CalledProcessError as e:
@@ -181,9 +183,32 @@ def execute_cmd(cmd, verbose=False):
         return(None)
 
 ############################
+def exposure_inspector(input_name, verbose=False, lite=False):
+    """
+    List wrapper for exposure_inspector_single
+    """
+
+    if isinstance(input_name, (str,)):
+        exposure_identity = exposure_inspector_single(input_name, verbose=verbose, lite=lite)
+        return(exposure_identity)
 
 
-def exposure_inspector(input_name, verbose=False):
+    if isinstance(input_name, (list,)):
+        exposure_identities = []
+        for i in tqdm(range(len(input_name))):
+            exposure_identity = rs.utils.exposure_inspector(input_name[i], lite=lite)
+            exposure_identities.append(exposure_identity)
+
+        if exposure_identity["TELESCOP"] == "ROMAN":
+            print(rs.plots.style.YELLOW)
+            print("WARNING: Nancy Grace Roman Space Telescope has not been launched yet.")
+            print("Approximating the location by using JWST's location in JPL/Horizons.")
+            print(rs.plots.style.RESET)
+
+        return(pd.DataFrame(exposure_identities))
+
+
+def exposure_inspector_single(input_name, verbose=False, lite=False):
     """
     Inspects and returns critical information about the contents of a telescope
     exposure, stored as a FITS or ADSF file.
@@ -194,17 +219,16 @@ def exposure_inspector(input_name, verbose=False):
     :rtype: dict
     """
     # Extract input file extension
-
     filename, file_extension = os.path.splitext(input_name)
 
     # If the input image is a FITS file, then use astropy.io.fits.open
     if file_extension == ".fits":
-        exposure_identity = exposure_inspector_fits(input_name, verbose=verbose)
+        exposure_identity = exposure_inspector_fits(input_name, verbose=verbose, lite=lite)
         exposure_identity["FILETYPE"] = "FITS"
 
     # If the input image is a ASDF file, then use asdf.open
     if file_extension == ".asdf":
-        exposure_identity = exposure_inspector_asdf(input_name, verbose=verbose)
+        exposure_identity = exposure_inspector_asdf(input_name, verbose=verbose, lite=lite)
         exposure_identity["FILETYPE"] = "ASDF"
         exposure_identity["SCIEXTS"] = np.array([0])
 
@@ -215,8 +239,7 @@ def exposure_inspector(input_name, verbose=False):
     return(exposure_identity)
 
 
-
-def exposure_inspector_asdf(input_name, verbose=False):
+def exposure_inspector_asdf(input_name, verbose=False, lite=False):
     import asdf
     input_asdf = asdf.open(input_name)
 
@@ -289,14 +312,14 @@ def exposure_inspector_asdf(input_name, verbose=False):
     return(exposure_identity)
 
 
-
-def exposure_inspector_fits(input_name, verbose=False):
+def exposure_inspector_fits(input_name, verbose=False, lite=False):
     exposure_identity = {}
 
     # Setting up keywords to store the info from the file
     exposure_identity["FILENAME"] = input_name
 
-    keywords_ext0 = ["TELESCOP", "INSTRUME", "DETECTOR", "RA_TARG", "DEC_TARG", "SUNANGLE", "BUNIT",
+    keywords_ext0 = ["TELESCOP", "INSTRUME", "DETECTOR", "RA_TARG", "DEC_TARG", "SUNANGLE",
+                     "SUN_ALT", "BUNIT",
                      "EXPSTART", "EXPEND", "EXPTIME", "MOONANGL", "DRIZCORR",
                      "PHOTCORR"]
 
@@ -308,15 +331,15 @@ def exposure_inspector_fits(input_name, verbose=False):
         try:
             exposure_identity[keyword_i] = input_fits[0].header[keyword_i]
         except:
-            if verbose: print("Warning: KEYWORD " + keyword_i + " not found in ext 0")
-            if verbose: print("Setting to None")
+            if verbose: print(rs.plots.style.YELLOW + "WARNING: KEYWORD " + keyword_i + " not found in ext 0" + rs.plots.style.RESET)
+            if verbose: print(rs.plots.style.YELLOW + "Setting to None" + rs.plots.style.RESET)
 
     for keyword_i in keywords_ext1:
         try:
             exposure_identity[keyword_i] = input_fits[1].header[keyword_i]
         except:
-            if verbose: print("Warning: KEYWORD " + keyword_i + " not found in ext 1")
-            if verbose: print("Setting to None")
+            if verbose: print(rs.plots.style.YELLOW + "WARNING: KEYWORD " + keyword_i + " not found in ext 1" + rs.plots.style.RESET)
+            if verbose: print(rs.plots.style.YELLOW + "Setting to None" + rs.plots.style.RESET)
 
     # Get the exposure time EXPSTART
     t = Time(exposure_identity["EXPSTART"], format='mjd', scale='utc')
@@ -325,6 +348,7 @@ def exposure_inspector_fits(input_name, verbose=False):
     if exposure_identity["TELESCOP"] == "HST" or exposure_identity["TELESCOP"]=="Hubble":
         telescope_class = rs.telescopes.Hubble
         exposure_identity["PA"] = input_fits[1].header["PA_APER"]
+
 
     if exposure_identity["TELESCOP"] == "Roman" or exposure_identity["TELESCOP"] == "ROMAN" or exposure_identity["TELESCOP"]=="RST" or exposure_identity["TELESCOP"]=="NGRST":
         telescope_class = rs.telescopes.Roman
@@ -358,7 +382,7 @@ def exposure_inspector_fits(input_name, verbose=False):
             exposure_identity["HST_TYPE"] = "DRZ"
 
     except:
-        if verbose: print("BUNIT not found!")
+        if verbose>1: print(rs.plots.style.YELLOW + "BUNIT not found!" + rs.plots.style.RESET)
         if (exposure_identity["HST_TYPE"] != "DRZ") or (exposure_identity["HST_TYPE"] != "FLT"):
             exposure_identity["HST_TYPE"] = "GEN"
 
@@ -382,7 +406,6 @@ def exposure_inspector_fits(input_name, verbose=False):
                                                               verbose=False)
 
     # Get pixel size
-
     exposure_identity["PHYSPIX"] = telescope_class.get_physical_pixelsize(instrument=exposure_identity["INSTRUME"])
     exposure_identity["PIXSCALE"] = telescope_class.get_pixscale(instrument=exposure_identity["INSTRUME"])
 
@@ -393,51 +416,81 @@ def exposure_inspector_fits(input_name, verbose=False):
     # Find the central coordinates of the Multiextension fits.
 
     data = []
+    data_shape = []
     astropywcs = []
     science_extension_hdulist = []
-    for sci_ext_i in exposure_identity["SCIEXTS"]:
-        science_extension_hdulist.append(input_fits[sci_ext_i])
-        data.append(input_fits[sci_ext_i].data)
-        astropywcs.append(astropy_wcs.WCS(input_fits[sci_ext_i].header, input_fits))
 
-    exposure_identity["DATA"] = data
+    # If LITE, fill this anyways.
+    for sci_ext_i in exposure_identity["SCIEXTS"]:
+        data_shape.append(input_fits[sci_ext_i].data.shape)
+        astropywcs.append(astropy_wcs.WCS(input_fits[sci_ext_i].header, input_fits))
+    exposure_identity["DATA_SHAPE"] = data_shape
     exposure_identity["ASTROPYWCS"] = astropywcs
 
-    try:
-        from reproject.mosaicking import find_optimal_celestial_wcs
-        wcs_out, shape_out = find_optimal_celestial_wcs(input_data=input_fits, hdu_in=exposure_identity["SCIEXTS"])
-        reference_header = wcs_out.to_header()
-
-    except:
-        #print("WARNING: The input WCS has distortion. find_optimal_celestial_wcs does not currently support this mode.")
-        #print("ROSALIA will apply a temporary solution with SWARP // Jul 29 2024.")
-
-        os.system("swarp -dd > swarp.conf")
-
-        swarp_cmd_str = "swarp -c swarp.conf "
-
+    # If not lite, do one more loop with the data to make a swarp coadd.
+    if not lite: # Avoid generating the mosaic header.
         for sci_ext_i in exposure_identity["SCIEXTS"]:
-            swarp_cmd_str = swarp_cmd_str + '"' + input_name+"["+str(sci_ext_i)  + ']" '
+            #data_shape.append(input_fits[sci_ext_i].data.shape)
+            science_extension_hdulist.append(input_fits[sci_ext_i])
+            data.append(input_fits[sci_ext_i].data)
+            #astropywcs.append(astropy_wcs.WCS(input_fits[sci_ext_i].header, input_fits))
 
-        swarp_coadd_name = input_name.replace(".fits", "_swarp_coadd.fits")
-        swarp_cmd_str = swarp_cmd_str + ' -SUBTRACT_BACK N -BLANK_BADPIXELS Y -VERBOSE_TYPE QUIET -IMAGEOUT_NAME "' + input_name.replace(".fits", "_swarp_coadd.fits") + '"'
+        exposure_identity["DATA"] = data
+        #exposure_identity["DATA_SHAPE"] = data_shape
+        #exposure_identity["ASTROPYWCS"] = astropywcs
 
-        if verbose: print(swarp_cmd_str)
-        execute_cmd(swarp_cmd_str)
+        try:
+            from reproject.mosaicking import find_optimal_celestial_wcs
+            wcs_out, shape_out = find_optimal_celestial_wcs(input_data=input_fits, hdu_in=exposure_identity["SCIEXTS"])
+            reference_header = wcs_out.to_header()
 
-        swarp_coadd = fits.open(swarp_coadd_name)
-        reference_header = swarp_coadd[0].header
+        except:
+            #print("WARNING: The input WCS has distortion. find_optimal_celestial_wcs does not currently support this mode.")
+            #print("ROSALIA will apply a temporary solution with SWARP // Jul 29 2024.")
+
+            os.system("swarp -dd > swarp.conf")
+            swarp_cmd_str = ""
+
+            for sci_ext_i in exposure_identity["SCIEXTS"]:
+                swarp_cmd_str = swarp_cmd_str + '"' + input_name+"["+str(sci_ext_i)  + ']" '
+
+            outname, outname_scaled = run_swarp(pattern=swarp_cmd_str,
+                                                outname=input_name.replace(".fits", "_swarp_coadd.fits"),
+                                                coveredfrac=1)
+            #swarp_coadd_name =
+            #swarp_cmd_str = swarp_cmd_str + ' -SUBTRACT_BACK N -BLANK_BADPIXELS Y -VERBOSE_TYPE QUIET -IMAGEOUT_NAME "' + input_name.replace(".fits", "_swarp_coadd.fits") + '"'
+
+            #if verbose: print(swarp_cmd_str)
+            #execute_cmd(swarp_cmd_str)
+
+            swarp_coadd = fits.open(outname)
+            reference_header = swarp_coadd[0].header
 
 
-    exposure_identity["RA_PNT"]  = reference_header["CRVAL1"]
-    exposure_identity["DEC_PNT"] = reference_header["CRVAL2"]
-
-    exposure_identity["X_PNT"]  = reference_header["CRPIX1"]
-    exposure_identity["Y_PNT"]  = reference_header["CRPIX2"]
+        exposure_identity["RA_PNT"]  = reference_header["CRVAL1"]
+        exposure_identity["DEC_PNT"] = reference_header["CRVAL2"]
+        exposure_identity["X_PNT"]  = reference_header["CRPIX1"]
+        exposure_identity["Y_PNT"]  = reference_header["CRPIX2"]
     ################
 
     return(exposure_identity)
 
+
+
+def run_swarp(pattern, outname, coveredfrac=1, verbose=False):
+    rs.utils.execute_cmd("swarp -d > swarp.conf", verbose=verbose) # Generate a default config file for swarp
+    rs.utils.execute_cmd("swarp -c swarp.conf -SUBTRACT_BACK N -BLANK_BADPIXELS Y -VERBOSE_TYPE QUIET " + pattern, verbose=verbose) # Run swarp on all the SCAs
+    rs.utils.execute_cmd("mv coadd.fits " + outname, verbose=verbose) # Make a compressed version, for easiest visualization.
+    outname_warped = outname.replace(".fits", "_warped.fits")
+    rs.utils.execute_cmd("astwarp " + outname +" -h0 --coveredfrac=" + str(coveredfrac) + " --scale=0.1,0.1 --output=" + outname_warped, verbose=verbose) # Make a compressed version, for easiest visualization.
+    outname_scaled = outname.replace(".fits", "_scaled.fits")
+    rs.utils.execute_cmd("astarithmetic -h1 " + outname_warped + " 0.01 x --output=" + outname_scaled, verbose=verbose) # Make a compressed version, for easiest visualization.
+    rs.utils.execute_cmd("rm " + outname_warped, verbose=verbose)
+    print("Result in " + outname + " & " + outname_scaled)
+    return([outname, outname_scaled])
+
+
+#####################################################################
 
 ############################
 def check_number_of_extensions(input_name, expected_next, verbose=False):
@@ -455,9 +508,7 @@ def check_number_of_extensions(input_name, expected_next, verbose=False):
     else:
         if verbose:
             print(input_name + " " + str(nextensions) + " # extensions OK")
-############################
 
-#######################################
 
 def get_parameters_list(fits_list, index, ext=0):
     # Check that fits_list are in array
@@ -537,7 +588,7 @@ def check_file_integrity(filenames):
                 was_any_file_removed = 1
 
         except:
-            print("WARNING! File " + filename + " not found.")
+            print(rs.plots.style.YELLOW + "WARNING: File " + filename + " not found." + rs.plots.style.RESET)
             was_any_file_removed = 1
 
     if was_any_file_removed:
@@ -594,8 +645,6 @@ def save_fits(array, name, header=None, extname=None, overwrite=True, output_ver
     return(name)
 ############################
 
-
-
 ############################
 def modify_keyword_hdr(input_name, ext, keyword, mode, verbose=True):
     # This program modifies header keywords using Gnuastro astfits.
@@ -605,10 +654,7 @@ def modify_keyword_hdr(input_name, ext, keyword, mode, verbose=True):
         cmd = cmd + " >/dev/null 2>&1"
     execute_cmd(cmd)
 
-
-
 ###############################
-
 
 def flambda_to_fnu(flambda, wavelength):
     # https://en.wikipedia.org/wiki/AB_magnitude#Expression_in_terms_of_f%CE%BB
@@ -619,7 +665,6 @@ def flambda_to_fnu(flambda, wavelength):
     # Output: Jy
     fnu = (flambda*u.erg / u.cm**2 / u.s / u.AA).to(u.Jy, equivalencies=u.spectral_density(wavelength * u.AA)).value # (3.34E+4)*(wavelength)**2*flambda
     return(fnu)
-
 
 def fnu_to_flambda(fnu, wavelength):
     # https://en.wikipedia.org/wiki/AB_magnitude#Expression_in_terms_of_f%CE%BB
@@ -650,8 +695,6 @@ def get_pixscale(fits_name, ext):
 
     return(pixsize)
 
-
-
 #################################
 
 def radec_to_xy(ra, dec, fits_name, ext):
@@ -671,7 +714,6 @@ def xy_to_radec(x, y, fits_name, ext):
     return([ra, dec])
 
 
-
 def get_pixscale(fits_name, ext):
     # We look for the pixsize in the ext 0, if it doesnt work, go to ext 1.
     input_fits = fits.open(fits_name)
@@ -684,8 +726,6 @@ def get_pixscale(fits_name, ext):
     #    pixsize = np.abs(input_fits[ext].header["CDELT2"])*60*60
 
     return(pixsize)
-
-
 
 ###########################################
 
@@ -751,7 +791,7 @@ def create_angle_mask(xsize, ysize, q, theta, center=None, radius=None, pitch=90
 #####################################
 
 
-def make_profile(image, radial_mask=None, ext=None, ra_cen=None, dec_cen=None, xcen=None, ycen=None, rbins=None, nbins=100, nsimul=100, q=1, theta=0):
+def make_profile(image, radial_mask=None, ext=None, ra_cen=None, dec_cen=None, xcen=None, ycen=None, rbins=None, pixscale = 1, nbins=100, nsimul=100, q=1, theta=0):
 
     if isinstance(image, str):
         print("Input image:" + image)
@@ -776,7 +816,15 @@ def make_profile(image, radial_mask=None, ext=None, ra_cen=None, dec_cen=None, x
             print("WARNING: No ext was specified")
         print("X" + str(xcen) + " - Y: " + str(ycen))
 
-        shape_image = image.shape
+
+    shape_image = image.shape
+
+    if xcen is None:
+        xcen = int(shape_image[0]/2)
+
+    if ycen is None:
+        ycen = int(shape_image[1]/2)
+
 
     if radial_mask is None:
         radial_mask = create_radial_mask(xsize=shape_image[1], ysize=shape_image[0],
@@ -880,8 +928,6 @@ def run_basic_astrodrizzle(file_name):
 
 #################
 
-
-
 def mask_sources(file_name, ext):
     input_fits = fits.open(file_name)
     detected_name = run_basic_noisechisel(file_name, ext)
@@ -942,7 +988,6 @@ def create_dummy_image_with_wcs(ra_cen, dec_cen, ra_size, dec_size, pixscale, ou
 
     return(outname)
 
-
 def detect_sci_extensions(input_name):
     # detect_sci_extensions: It finds which extensions have the SCI id in
     # the FITS header.
@@ -960,7 +1005,6 @@ def detect_sci_extensions(input_name):
 
     return(sci_ext_list)
 
-
 #########################
 def find_nearest_index(array, value):
     array = np.asarray(array)
@@ -970,7 +1014,6 @@ def find_nearest_index(array, value):
 
 # Set the WCS information manually by setting properties of the WCS
 # object.
-
 
 def create_dummy_exposure(telescope, instrument, detector, exposure_params, binning=1, dummy_name="dummy.fits"):
 
@@ -1014,7 +1057,6 @@ def create_dummy_exposure(telescope, instrument, detector, exposure_params, binn
     save_fits(image_data, dummy_name, header)
     return(dummy_name)
 
-
 ########################################################
 
 def delta_angular_separation(ra, dec):
@@ -1028,9 +1070,7 @@ def delta_angular_separation(ra, dec):
     delta_separation[0] = delta_separation[1]
     return(delta_separation)
 
-
 ######################################################
-
 
 def great_circle_ra_dec_shift(theta, phi):
     """
@@ -1057,8 +1097,6 @@ def great_circle_ra_dec_shift(theta, phi):
     print(ra_2, dec_2, np.sqrt(ra_2**2 + dec_2**2))
 
     return({"ra": ra_2, "dec": dec_2})
-
-
 
 def sphere_dist(ra1, dec1, ra2, dec2):
     """
@@ -1089,15 +1127,15 @@ def sphere_dist(ra1, dec1, ra2, dec2):
     dists = numexpr.evaluate('2 * arctan2(numerator ** 0.5, (1 - numerator) ** 0.5)')
     return np.degrees(dists)
 
-
 #########################
-import numexpr
 def angular_distance(ra1, dec1, ra2, dec2):
     """
     Einsum version of the angular separation function by Astropy einsum_angular_distance_harversine
     v1: October 17, 2024 - Fastest version compared against numba, or astropy.
 
     """
+    import numexpr
+
     pi = np.pi
     ra1_rad  = numexpr.evaluate('ra1*pi/180')
     ra2_rad  = numexpr.evaluate('ra2*pi/180')
@@ -1122,6 +1160,8 @@ def position_angle(ra1, dec1, ra2, dec2):
     #radec1_to_radians = np.radians([ra1, dec1])
     #radec2_to_radians = np.radians([ra2, dec2])
     pi = np.pi
+    import numexpr
+
     ra1_rad = numexpr.evaluate('ra1*pi/180')
     ra2_rad = numexpr.evaluate('ra2*pi/180')
     dec1_rad = numexpr.evaluate('dec1*pi/180')
@@ -1148,6 +1188,7 @@ def separation_and_position_angle(ra1, dec1, ra2, dec2):
 
     """
     pi = np.pi
+    import numexpr
     ra1_rad = numexpr.evaluate('ra1*pi/180')
     ra2_rad = numexpr.evaluate('ra2*pi/180')
     dec1_rad = numexpr.evaluate('dec1*pi/180')
@@ -1274,25 +1315,26 @@ def convert_ASDF_to_FITS(asdf_list, output):
 
     output_fits[0].header["RA_PNT"]= output_fits[1].header["RA_PNT"]
     output_fits[0].header["DEC_PNT"]= output_fits[1].header["DEC_PNT"]
+    output_fits[0].header["RA_TARG"]= output_fits[1].header["RA_TARG"]
+    output_fits[0].header["DEC_TARG"]= output_fits[1].header["DEC_TARG"]
     output_fits[0].header["PA"]= output_fits[1].header["PA"]
     output_fits.verify("silentfix")
     output_fits.writeto(output, overwrite=True)
     return(output)
 
-
-#######################s
-
-# A program to transform ds9 polygon vertice files to fits masks
-# Alejandro Serrano Borlaff
-# PhD Student - Instituto de Astrofisica de Canarias
-# v.1.0 - First version (31/07/2017)
-#####################################################################
-
-# The main idea was taken from
-# http://xingxinghuang.blogspot.fi/2014/05/imagebad-pixel-mask-using-ds9-region.html
-# And https://stackoverflow.com/questions/3654289/scipy-create-2d-polygon-mask
-
 def read_ds9reg(fname):
+    #######################s
+
+    # A program to transform ds9 polygon vertice files to fits masks
+    # Alejandro Serrano Borlaff
+    # PhD Student - Instituto de Astrofisica de Canarias
+    # v.1.0 - First version (31/07/2017)
+    #####################################################################
+
+    # The main idea was taken from
+    # http://xingxinghuang.blogspot.fi/2014/05/imagebad-pixel-mask-using-ds9-region.html
+    # And https://stackoverflow.com/questions/3654289/scipy-create-2d-polygon-mask
+
     with open(fname) as f:
         content = f.readlines()
     # you may also want to remove whitespace characters like `\n` at the end of each line
@@ -1311,6 +1353,7 @@ def read_ds9reg(fname):
         polygons.append(polygon_unit)
     return(polygons)
 
+#####################################################################
 
 def ds9tomask(fname, nx, ny, outname):
     polygons = read_ds9reg(fname)
@@ -1327,13 +1370,45 @@ def ds9tomask(fname, nx, ny, outname):
         mask[grid] = 1
 
     hdu = fits.PrimaryHDU(mask)
-    stout, sterr, stcode = execute_cmd("rm "+outname)
+    stout = execute_cmd("rm "+outname)
     hdu.writeto(outname)
     print("File saved:"+ outname)
     print("Note: 1 is masked. 0 is not masked")
     return(outname)
 
+#####################################################################
+def erwinspacing(minimum, number, rate=1.03, mode="int"):
 
+    # A tool to make log-like spacing arrays.
+    # Inspired on Peter Erwin's
+    # THE OUTER DISKS OF EARLY-TYPE GALAXIES. I. SURFACE-BRIGHTNESS PROFILES OF BARRED GALAXIES
+    # https://iopscience.iop.org/article/10.1088/0004-6256/135/1/20/pdf
+    # Erwin et al. 2008. ApJ
+    ###########################################
+    bins = []
+    bins.append(minimum)
+
+    last = minimum
+    for i in range(number-1):
+        new = rate*last
+
+        if mode=="int":
+            new = np.round(new,0)
+            if last == new:
+                new = new + 1
+
+        bins.append(new)
+
+        last = new
+
+    if mode=="int":
+        bins = np.array(bins, dtype="int")
+    else:
+        bins = np.array(bins)
+
+    return(bins)
+
+#####################################################################
 
 def get_data_and_wcs(input_name, ext):
     """
@@ -1350,6 +1425,52 @@ def get_data_and_wcs(input_name, ext):
     wcs = astropy_wcs.WCS(input_fits[ext].header, input_fits)
     return([input_fits[ext].data, wcs])
 
+#####################################################################
+
+def get_keys_from_header(fits_list, index, ext=0):
+    PARAM = []
+    for j in range(len(index)):
+        PARAM.append([])
+    for raw_name in fits_list:
+        # print(raw_name)
+        raw_fits = fits.open(raw_name)
+        for j in range(len(index)):
+            try:
+                PARAM[j].append(raw_fits[ext].header[index[j]])
+            except KeyError:
+                print("KeyError: Header keyword not found")
+                PARAM[j].append("NONE")
+    return(list(PARAM))
+
+#####################################################################
+
+def sort_hst_flcs_by_filter(filelist):
+    #print(filelist)
+    filters_list_keywords = rs.utils.get_keys_from_header(filelist, ["FILTER1", "FILTER2"], ext=0)
+    filters = []
+    for i in tqdm(range(len(filelist))):
+        if not "CLEAR" in filters_list_keywords[0][i]:
+            exposure_filter = filters_list_keywords[0][i]
+        elif not "CLEAR" in filters_list_keywords[1][i]:
+            exposure_filter = filters_list_keywords[1][i]
+        else:
+            exposure_filter = "None"
+        filters.append(exposure_filter)
+
+    list_of_filters = np.array(list(set(filters)))
+    filters = np.array(filters)
+
+    for filter_name in tqdm(list_of_filters):
+        os.system("mkdir " + filter_name)
+        exposures_with_that_filter = np.array(filelist)[np.where(filters == filter_name)[0]]
+
+        if filter_name != "None":
+            for selected_exposure in exposures_with_that_filter:
+                os.system("mv " + selected_exposure + " " + filter_name)
+
+
+    return(list_of_filters)
+#####################################################################
 
 def find_max_angular_size_of_image(data, wcs):
     """
@@ -1369,10 +1490,117 @@ def find_max_angular_size_of_image(data, wcs):
     return(np.nanmax(distance))
 
 
-def run_swarp(pattern, outname):
-    rs.utils.execute_cmd("swarp -d > swarp.conf") # Generate a default config file for swarp
-    rs.utils.execute_cmd("swarp -c swarp.conf -SUBTRACT_BACK N -BLANK_BADPIXELS Y -VERBOSE_TYPE QUIET " + pattern) # Run swarp on all the SCAs
-    rs.utils.execute_cmd("mv coadd.fits " + outname) # Make a compressed version, for easiest visualization.
-    rs.utils.execute_cmd("astwarp " + outname +" -h0 --scale=0.1,0.1") # Make a compressed version, for easiest visualization.
-    print("Result in " + outname + " & " + outname.replace(".fits", "_scaled.fits"))
-    return(outname)
+
+def check_fits_integrity(input):
+    rs.utils.execute_cmd("mkdir CORRUPT")
+    if isinstance(input, (str,)):
+        input_list = [input]
+    else:
+        input_list = input
+
+    clean_list = []
+    for input_name in tqdm(input_list):
+        try:
+            dummy_open = fits.open(input_name)
+            dummy_open.close()
+            clean_list.append(input_name)
+        except:
+            print("FITS file " + input_name + " seems to be corrupted. Moving to CORRUPT folder")
+            rs.utils.execute_cmd("mv " + input_name + " CORRUPT/")
+
+    return(clean_list)
+
+
+def circular_hist(ax, x, bins=16, density=True, offset=0, gaps=True, color="dodgerblue", edgecolor='C0'):
+    """
+    Produce a circular histogram of angles on ax.
+
+    Parameters
+    ----------
+    ax : matplotlib.axes._subplots.PolarAxesSubplot
+        axis instance created with subplot_kw=dict(projection='polar').
+
+    x : array
+        Angles to plot, expected in units of radians.
+
+    bins : int, optional
+        Defines the number of equal-width bins in the range. The default is 16.
+
+    density : bool, optional
+        If True plot frequency proportional to area. If False plot frequency
+        proportional to radius. The default is True.
+
+    offset : float, optional
+        Sets the offset for the location of the 0 direction in units of
+        radians. The default is 0.
+
+    gaps : bool, optional
+        Whether to allow gaps between bins. When gaps = False the bins are
+        forced to partition the entire [-pi, pi] range. The default is True.
+
+    Returns
+    -------
+    n : array or list of arrays
+        The number of values in each bin.
+
+    bins : array
+        The edges of the bins.
+
+    patches : `.BarContainer` or list of a single `.Polygon`
+        Container of individual artists used to create the histogram
+        or list of such containers if there are multiple input datasets.
+    """
+    # Wrap angles to [-pi, pi)
+    x = (x+np.pi) % (2*np.pi) - np.pi
+
+    # Force bins to partition entire circle
+    if not gaps:
+        bins = np.linspace(-np.pi, np.pi, num=bins+1)
+
+    # Bin data and record counts
+    n, bins = np.histogram(x, bins=bins)
+
+    # Compute width of each bin
+    widths = np.diff(bins)
+
+    # By default plot frequency proportional to area
+    if density:
+        # Area to assign each bin
+        area = n / x.size
+        # Calculate corresponding bin radius
+        radius = (area/np.pi) ** .5
+    # Otherwise plot frequency proportional to radius
+    else:
+        radius = n
+
+    # Plot data on ax
+    patches = ax.bar(bins[:-1], radius, zorder=1, align='edge', width=widths, color=color,
+                     edgecolor=edgecolor, fill=True, alpha=0.75, linewidth=1)
+
+    # Set the direction of the zero angle
+    ax.set_theta_offset(offset)
+
+    # Remove ylabels for area plots (they are mostly obstructive)
+    if density:
+        ax.set_yticks([])
+
+    return n, bins, patches
+
+
+def divide_array_in_chunks(array, chunk_size):
+    tail_size = len(array) % chunk_size
+    n_chunks = int(np.floor(len(array)/chunk_size) + 1)
+    counter = 0
+    chunks = []
+    start_i = 0
+    end_i = 0
+    while counter < (n_chunks - 1):
+        end_i = end_i + chunk_size
+        chunks.append(array[start_i:end_i])
+        counter = counter + 1
+        start_i = end_i
+
+    if tail_size > 0:
+        chunks.append(array[end_i:])
+
+    return(chunks)

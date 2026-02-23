@@ -184,7 +184,7 @@ def astheader(fits_list, ext, key, verbose=False):
         try:
             output = float(out)
         except ValueError:
-            output = out.decode("utf-8").replace("'" , "").replace("\n" , "")
+            output = out.decode("utf-8").replace("'" , "").replace("\n" , "").replace("/","")
         output_list.append(output)
     return(output_list)
 
@@ -310,6 +310,9 @@ def bootima_slice(fits_list, ext, nsimul, outname, clean=True, verbose=False, mo
     rs.utils.execute_cmd(cmd = "astfits -h2 " + median_output_name + " --update=EXTNAME,STD", verbose=verbose)
     if (clean and os.path.exists(median_output_name)):
         print("Cleaning temp files...")
+
+        rs.utils.execute_cmd("rm -r tmp_bootima")
+
         for k in simul_names:
             if os.path.exists(k):
                 os.remove(k)

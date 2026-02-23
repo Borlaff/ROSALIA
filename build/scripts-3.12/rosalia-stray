@@ -9,7 +9,15 @@ import glob
 
 def go(args):
     if args.input is not None:
-        rosalia_stray_db = rosalia_stray(input_pattern=args.input,
+        if "*" in args.input:
+            import glob
+            args.input = sorted(glob.glob(args.input))
+
+        if args.verbose > 0:
+            from rosalia.plots import plot_rosalia_logo
+            plot_rosalia_logo()
+
+        rosalia_stray_db = rosalia_stray(input_name=args.input,
                                          output_name=args.output,
                                          radius=args.radius,
                                          g_mag_max=args.g_mag_max,

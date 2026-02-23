@@ -17,28 +17,51 @@
 # General modules
 import os
 import glob
-import pandas as pd
 import numpy as np
+import pandas as pd
+import rosalia as rs
 import bottleneck as bn
 import astropy.units as u
+
 from tqdm import tqdm
+from scipy import interpolate
+import matplotlib.pyplot as plt
 from astropy import coordinates
 from astroquery.mast import Observations
 from astropy.io import fits
 import astropy.wcs as wcs
 from astropy.time import Time
-from scipy import interpolate
-import matplotlib.pyplot as plt
 from astropy import constants as const
-import rosalia as rs
+from astropy.coordinates import ICRS, Angle, SkyCoord
 
 # from rosalia.utils import exposure_inspector
 # from rosalia.utils import convert_ASDF_to_FITS
 
 ###########################
 
-def rosalia_stray(input_name, output_name="rosalia_stray_output.fits", radius=1, g_mag_max=15, sun_block=False, verbose=False, catalog=None):
-    main_offender_db = main_offender(input_name=input_name,
+def rosalia_stray(input_name=None, exposure_dict = None, output_name="rosalia_stray_output.fits", radius=1,
+                  g_mag_max=15, sun_block=False, verbose=False, catalog=None):
+
+    if input_name is None:
+        input_name = rs.roman.create_roman_dummy(point=exposure_dict["point"],
+                                                 date=exposure_dict["date"],
+                                                 band=exposure_dict["band"],
+                                                 PA=exposure_dict["PA"],
+                                                 exptime=exposure_dict["exptime"],
+                                                 output=output_name.replace(".fits", "_dummy.fits"))
+
+    # If the input name is an ASDF, transform it to a compiled FITS.
+    if isinstance(input_name, (list, np.ndarray, pd.Series)):
+        if input_name[0].split(".")[-1] == "asdf":
+            fits_input_name = input_name[0].replace(".asdf",".fits")
+            if verbose:
+                print(input_name)
+            rs.utils.convert_ASDF_to_FITS(asdf_list = input_name, output=fits_input_name)
+
+    else:
+        fits_input_name = input_name
+
+    main_offender_db = main_offender(input_name=fits_input_name,
                                      radius=radius,
                                      g_mag_max=g_mag_max,
                                      verbose=verbose,
@@ -46,16 +69,50 @@ def rosalia_stray(input_name, output_name="rosalia_stray_output.fits", radius=1,
                                      match_inside_stars=False,
                                      sun_block = sun_block,
                                      output_name = output_name)
+
+    # Make a 0.1 x 0.1 scaled version for inspection ease.
+    outname = output_name.replace(".fits", "_scaled.fits")
+    outname, outname_scaled = rs.utils.run_swarp(pattern=output_name, outname=outname, coveredfrac=1)
+    main_offender_db["mosaic_name"] = outname
+    main_offender_db["mosaic_name_scaled"] = outname_scaled
+
     return(main_offender_db)
 
 ###########################
 
-def rosalia_zody(input_name, output_name="rosalia_zody_output.fits"):
-    exposure_identity = rs.utils.exposure_inspector(input_name)
+def rosalia_zody(ra, dec, PA, date, bandpass, exptime, verbose=False, output_name=None, output_units=None):
+
+    from tqdm import tqdm
+    import logging
+    logger = logging.getLogger()
+    logger.setLevel(logging.CRITICAL)
+
+    # Make the Roman Dummy image
+    roman_dummy_name = os.getcwd() + "/WFI_" + bandpass +\
+                                     "_RA_" + '{:07.3f}'.format(ra) +\
+                                     "_DEC_" + '{:07.3f}'.format(dec) +\
+                                     "_MJD_" + '{:07.5f}'.format(date.mjd) +\
+                                     "_PA_" + '{:06.2f}'.format(PA) + ".fits"
+
+    central_coords = SkyCoord(ra, dec, frame="icrs", unit="deg")
+
+    roman_dummy_name = rs.roman.create_roman_dummy(point=central_coords, date=date,
+                                               band=bandpass, PA=PA, exptime=exptime,
+                                               output=roman_dummy_name)
+    print(roman_dummy_name)
+
+    # Get the image identity
+    exposure_identity = rs.utils.exposure_inspector(input_name=roman_dummy_name, verbose=verbose, lite=True)
+
+
+
     zodiacal_background_list = []
+    zodiacal_background_unit_list = []
+    if output_name is None:
+        output_name = roman_dummy_name.replace(".fits", "_zody.fits")
 
     for i in tqdm(range(len(exposure_identity["SCIEXTS"]))):
-        zodiacal_background = rs.sky.get_zodiacal_background(input_name=input_name,
+        zodiacal_background = rs.sky.get_zodiacal_background(input_name=roman_dummy_name,
                                                       ext=exposure_identity["SCIEXTS"][i],
                                                       wavelength=exposure_identity["FILTER"],
                                                       telescope=exposure_identity["TELESCOP"],
@@ -64,17 +121,21 @@ def rosalia_zody(input_name, output_name="rosalia_zody_output.fits"):
                                                       expstart=exposure_identity["EXPSTART"],
                                                       step=1000, zody_mode="zodipy",
                                                       nbins_wavelength=20, obslocin=3,
-                                                      grid_method="random", output_units=None, verbose=False)
-        zodiacal_background_list.append(zodiacal_background)
+                                                      grid_method="random", output_units=output_units,
+                                                      verbose=False)
+        zodiacal_background_list.append(zodiacal_background.value)
+        zodiacal_background_unit_list.append(zodiacal_background.unit.to_string())
 
     ########################################
     # Save the results to a fits file.
     ########################################
     data_output = []
     header_output = []
-    for SCIEXT_i, zodiacal_background_i in tqdm(zip(exposure_identity["SCIEXTS"], zodiacal_background_list)):
+    for i, SCIEXT_i, zodiacal_background_i in tqdm(zip(range(len(zodiacal_background_list)), exposure_identity["SCIEXTS"], zodiacal_background_list)):
         data_output.append(zodiacal_background_i)
-        header_output.append(exposure_identity["ASTROPYWCS"][SCIEXT_i-1].to_header())
+        temp_header = exposure_identity["ASTROPYWCS"][i].to_header()
+        temp_header["UNITS"] = zodiacal_background_unit_list[i]
+        header_output.append(temp_header)
 
     rs.utils.save_fits(array=data_output, name=output_name, header=header_output,
                        extname=None, overwrite=True, output_verify='silentfix')
@@ -84,6 +145,111 @@ def rosalia_zody(input_name, output_name="rosalia_zody_output.fits"):
     return({"image_identity":exposure_identity,
             "zodi_list": zodiacal_background_i,
             "output_name": output_name})
+
+
+###########################
+
+
+def rosalia_psf(ra, dec, PA, g_mag_max, date, bandpass, exptime, verbose=False):
+    #######################################
+    # rosalia_psf: Alejandro S. Borlaff. NASA/Ames STA. a.s.borlaff@nasa.gov
+    # -------------------------------
+    # The objective of this program is to make a model of the stars inside a Roman WFI image
+    # --------------------------------
+    # History:
+    # v1 - 22 January 2026. First working version.
+    #
+    #######################################
+
+    from tqdm import tqdm
+    import logging
+    logger = logging.getLogger()
+    logger.setLevel(logging.CRITICAL)
+
+    # Make the Roman Dummy image
+    roman_dummy_name = os.getcwd() + "/WFI_" + bandpass +\
+                                     "_RA_" + '{:07.3f}'.format(ra) +\
+                                     "_DEC_" + '{:07.3f}'.format(dec) +\
+                                     "_MJD_" + '{:07.5f}'.format(date.mjd) +\
+                                     "_PA_" + '{:06.2f}'.format(PA) + ".fits"
+
+    central_coords = SkyCoord(ra, dec, frame="icrs", unit="deg")
+
+    roman_dummy_name = rs.roman.create_roman_dummy(point=central_coords, date=date,
+                                               band=bandpass, PA=PA, exptime=exptime,
+                                               output=roman_dummy_name)
+    print(roman_dummy_name)
+
+    # Get the image identity
+    image_identity = rs.utils.exposure_inspector(input_name=roman_dummy_name, verbose=verbose, lite=True)
+
+
+    # Get the catalog of the stars around the FOV
+    # hybrid_catalog = rs.psf.find_stars_inside_detector(input_name=roman_dummy_name, g_mag_max=g_mag_max, verbose=verbose)
+    #hybrid_catalog = rs.psf.find_gaia_stars_around_image(lambda_ref=lambda_ref, input_name=input_name, ext=ext,
+                                                          # ra=ra, dec=dec, MJD=MJD, radius=radius, g_mag_max=g_mag_max, verbose=verbose)
+    #hybrid_catalog = gaia_query_dict["gaia_query"]
+
+    hybrid_catalog = rs.psf.get_hybrid_catalog(ra=ra,
+                                               dec=dec,
+                                               radius=1,
+                                               lambda_ref=image_identity["FILTER_IDENTITY"]["filter_lambda_ref"],
+                                               MJD=date.mjd,
+                                               observer=image_identity["TELESCOP"],
+                                               g_mag_max=g_mag_max, verbose=verbose)
+
+    # def rosalia_stray(input_name, output_name="rosalia_stray_output.fits", radius=1, g_mag_max=15, sun_block=False, verbose=False, catalog=None):
+
+    # input_name = "/Users/aborlaff/NASA/ROSALIA/notebooks/DEVEL/default_roman_dummy.fits"
+    # verbose=1
+    # g_mag_max=15
+    #
+
+
+    # Generate the star stamps (PSFs)
+    print("TO DO: Make stamps with a more reasonable size. Dim stars can have smaller PSFs.")
+    print("To do this, make a profile of the Roman / PSF, and find out when would it be essentially 0.")
+    star_stamps = rs.psf.generate_star_stamps(hybrid_catalog=hybrid_catalog, image_identity=image_identity)
+
+
+    # Now combine all the stamps in the mosaiced frame and blot back to the single SCAs.
+    # This is more efficient than reprojecting each star into all SCAs.
+    # Flattening the list of lists.
+    star_stamps_flat = []
+    for i in range(len(star_stamps)):
+        star_stamps_flat = star_stamps_flat + star_stamps[i]
+
+    # Making the combined frame.
+    os.system("swarp -dd > swarp.conf")
+    swarp_cmd_str = ""
+    for star_stamp in star_stamps_flat:
+        swarp_cmd_str = swarp_cmd_str + '"' + star_stamp +'" '
+
+    if verbose > 1: print("Combining star stamps into WCS frame...")
+    cmd = "swarp -c swarp.conf -SUBTRACT_BACK N -BLANK_BADPIXELS Y -COMBINE_TYPE SUM -VERBOSE_TYPE QUIET " + swarp_cmd_str
+    if verbose > 2: print(cmd)
+    rs.utils.execute_cmd(cmd)  # Run swarp on all the SCAs
+    star_swarp_name = roman_dummy_name.replace(".fits", "_stars_drz.fits")
+    rs.utils.execute_cmd("mv coadd.fits " + star_swarp_name) # Make a compressed version, for easiest visualization.
+
+    # Now blot back to the dummy SCA per SCA frame
+    from reproject import reproject_interp
+    # Let's make a dummy copy to reproject the stars into
+    roman_dummy = fits.open(roman_dummy_name)
+    star_model = fits.open(star_swarp_name)
+
+    if verbose > 1: print("Storing stars in each SCA")
+    for SCIEXT_i in tqdm(image_identity["SCIEXTS"]):
+        # Open the star fits
+        star_reprojected, footprint = reproject_interp(star_model[0], roman_dummy[SCIEXT_i].header, parallel=True)
+        star_reprojected[np.isnan(star_reprojected)] = 0
+        roman_dummy[SCIEXT_i].data = roman_dummy[SCIEXT_i].data + star_reprojected
+
+    roman_dummy.verify("silentfix")
+    star_output_name = roman_dummy_name.replace(".fits", "_stars.fits")
+    roman_dummy.writeto(star_output_name, overwrite=True)
+    if verbose > 1: print("In-field stray-light model completed: " + star_output_name)
+    return(star_output_name)
 
 
 ###########################
@@ -141,10 +307,9 @@ def subtract_stars(input_name, clean=True, verbose=False):
             sci_exts = [1]
 
         # Select the right PSF
-        #
-        print("WARNING: For testing purposes the PSF is fixed")
-        psf_name = os.path.dirname(rs.utils.__file__) + "/../PSF_ARCHIVE/f814w00_arith.fits"
-        print("PSF: " + psf_name)
+        if verbose > 0: print(rs.plots.styles.YELLOW + "WARNING: For testing purposes the PSF is fixed" + rs.plots.styles.RESET)
+        psf_name = os.environ["ROSALIACACHE"] + "/CORE/PSF_ARCHIVE/f814w00_arith.fits"
+        if verbose > 0: print("PSF: " + psf_name)
 
         output = rs.psf.scale_and_subtract_stars(input_name=input_name_i, ext=sci_exts,
                                               psf_name=psf_name, clean=clean, verbose=verbose)
@@ -155,7 +320,6 @@ def subtract_stars(input_name, clean=True, verbose=False):
             rs.utils.execute_cmd("rm " + input_name_i.replace(".fits", "*_ext*.fits"))
 
     return(output_list)
-
 
 ##########################################
 
@@ -176,9 +340,6 @@ def correct_zody(input_name, verbose=False):
 
         output_list.append(corrected_image)
     return(output_list)
-
-
-
 
 def main_offender(input_name=None, ext=None, ra=None, dec=None, phi=0,
                   filter_name=None, instrument=None, telescope=None, detector=None,
@@ -206,7 +367,10 @@ def main_offender(input_name=None, ext=None, ra=None, dec=None, phi=0,
     #######################################
 
     # Gathering info about the scene
-    if input_name is not None:
+    # Resetting the Roman / WFI Loading bar
+    rs.plots.ascii_progress_focal_plane.canvas = np.copy(rs.plots.ascii_progress_focal_plane.canvas_zero)
+
+    if input_name is not None: # If the input is an image, use exposure inspector to get the arguments to the following programs.
         if verbose: print("> Image mode:" + input_name)
         bool_image_mode = True
 
@@ -224,8 +388,10 @@ def main_offender(input_name=None, ext=None, ra=None, dec=None, phi=0,
         instrument  = image_identity["INSTRUME"]
         telescope   = image_identity["TELESCOP"]
         lambda_ref  = image_identity["FILTER_IDENTITY"]["filter_lambda_ref"]
-        RA_PNT      = image_identity["RA_PNT"]
-        DEC_PNT     = image_identity["DEC_PNT"]
+        # Find the central coordinates of the image - If there are more than one science extensions,
+        # then find the center of them all. <--- exposure_inspector does this for us
+        RA_PNT      = image_identity["RA_TARG"]
+        DEC_PNT     = image_identity["DEC_TARG"]
         PA_PNT      = image_identity["PA"]
 
     # If the user does not input an image, just a set of coordinates, then bool_image_mode is False
@@ -238,14 +404,14 @@ def main_offender(input_name=None, ext=None, ra=None, dec=None, phi=0,
         MJD        = expstart
         RA_PNT     = ra
         DEC_PNT    = dec
-    # Find the central coordinates of the image - If there are more than one science extensions,
-    # then find the center of them all. <--- This goes into exposure_inspector
 
-
-    # Find the stars around the central coordinate of the scene.
-    # Save the stellar catalog into a catalog object, and run main_offender as if input_catalog was set by the User.
 
     #print("Demo warning: ADD FEATURE planets: https://github.com/skyfielders/python-skyfield/tree/master")
+    existing_catalog_name = output_name.replace(".fits", "_catalog.csv")
+    if os.path.exists(existing_catalog_name):
+        print("WARNING: Loading existing catalog! Remove " + existing_catalog_name + " if this is a mistake.")
+        input_catalog = pd.read_csv(existing_catalog_name)
+
 
     if input_catalog is None:
         if verbose: print("> Querying stars in the surroundings using ESA/Gaia Archive")
@@ -254,23 +420,41 @@ def main_offender(input_name=None, ext=None, ra=None, dec=None, phi=0,
             print("INFO: radius parameter (minimum distance to search for individual stars) is > 0.5 degrees.")
             print("Gaia/2MASS/WISE query database can take several minutes to process. Please be patient.")
 
+        # Find the stars around the central coordinate of the scene.
+        # Save the stellar catalog into a catalog object, and run main_offender as if input_catalog was set by the User.
         loader = rs.plots.Loader("Querying Gaia/2MASS/WISE/JPL Horizons databases. This might take a few minutes...",
                                  "All-sky source map constructed.", 0.05).start()
-        gaia_query = rs.psf.find_gaia_stars_around_image(lambda_ref=lambda_ref,
-                                                         observer=telescope,
-                                                         input_name=None,
-                                                         ext=None,
-                                                         ra=RA_PNT, dec=DEC_PNT, MJD=MJD,
-                                                         radius=radius,
-                                                         g_mag_max=g_mag_max, verbose=verbose)["gaia_query"]
+        #gaia_query = rs.psf.find_sources_around(lambda_ref=lambda_ref,
+        #                                        observer=telescope,
+        #                                        input_name=None,
+        #                                        ext=None,
+        #                                        ra=RA_PNT, dec=DEC_PNT, MJD=MJD,
+        #                                        radius=radius,
+        #                                        g_mag_max=g_mag_max, verbose=verbose)["gaia_query"]
+
+        if input_name is None:
+            source_catalog_filename = str(RA_PNT) + "_" + str(DEC_PNT) + "_source_catalog.csv"
+        else:
+            source_catalog_filename = input_name.replace(".fits", "_source_catalog.csv")
+        hybrid_catalog = rs.psf.get_hybrid_catalog(ra=RA_PNT, dec=DEC_PNT,
+                                                   radius=radius,
+                                                   lambda_ref=lambda_ref,
+                                                   MJD=MJD,
+                                                   observer=telescope,
+                                                   g_mag_max = g_mag_max,
+                                                   verbose=verbose,
+                                                   query_filename=source_catalog_filename)
         loader.stop()
     else:
-        gaia_query = input_catalog
+        hybrid_catalog = input_catalog
+
+    hybrid_catalog.to_csv(output_name.replace(".fits", "_catalog.csv"))
+
 
     # If sun_block is True, then remove the Sun from the catalog.
     if sun_block:
-        gaia_query = gaia_query[~(gaia_query["source_id"] == "Sun")]
-        gaia_query = gaia_query[~(gaia_query["source_id"] == "Earth")]
+        hybrid_catalog = hybrid_catalog[~(hybrid_catalog["source_id"] == "Sun")]
+        hybrid_catalog = hybrid_catalog[~(hybrid_catalog["source_id"] == "Earth")]
 
     # Find where each star lands (detector ID or outside FOV)
     names_of_bool_columns_if_star_is_inside = []
@@ -280,30 +464,30 @@ def main_offender(input_name=None, ext=None, ra=None, dec=None, phi=0,
     If the input file is a multi-extension fits, then exposure_inspector will scan for extensions with EXTNAME = SCI.
     The extension ID in the FITS file will be stored in SCIEXTS = image_identity["SCIEXTS"].
 
-    In that case, gaia_query, the catalog of stars, will have a set of N columns called in_SCI[i] (boolean), where the catalog
+    In that case, hybrid_catalog, the catalog of stars, will have a set of N columns called in_SCI[i] (boolean), where the catalog
     stores if that particular star is inside each detector or not.
 
     """
 
     for SCIEXT_i in tqdm(SCIEXTS):
         if verbose: print("> Identifying which stars are inside the FOV and which are outside...")
-        infield_stars = rs.psf.identify_stars_in_out_field(data=image_identity["DATA"][SCIEXT_i-1],
+        infield_stars = rs.psf.identify_stars_in_out_field(data_shape=image_identity["DATA"][SCIEXT_i-1].shape,
                                                            wcs=image_identity["ASTROPYWCS"][SCIEXT_i-1],
-                                                           catalog=gaia_query,
+                                                           catalog=hybrid_catalog,
                                                            verbose=verbose)
 
         name_column_is_star_inside_this_detector = "in_SCI" + str(SCIEXT_i)
         names_of_bool_columns_if_star_is_inside.append(name_column_is_star_inside_this_detector)
 
-        gaia_query[name_column_is_star_inside_this_detector] = infield_stars["bool_isIn"]
+        hybrid_catalog[name_column_is_star_inside_this_detector] = infield_stars["bool_isIn"]
 
         # If verbose, make a plot of the stars with the footprint.
-        detector_corners = rs.detectors.get_detector_corners(data=image_identity["DATA"][SCIEXT_i-1],
+        detector_corners = rs.detectors.get_detector_corners(data_shape=image_identity["DATA"][SCIEXT_i-1].shape,
                                                              wcs=image_identity["ASTROPYWCS"][SCIEXT_i-1])
         detector_square_list.append(np.concatenate([detector_corners["corners_world"], detector_corners["corners_world"]]))
     # Once you are done checking if the stars are inside each detector,
     # find out which stars are outside ALL detectors.
-    gaia_query["is_inside_FPA"] = gaia_query[names_of_bool_columns_if_star_is_inside].any(axis=1)
+    hybrid_catalog["is_inside_FPA"] = hybrid_catalog[names_of_bool_columns_if_star_is_inside].any(axis=1)
 
     #### TODO: INDEPENDIZE THIS INTO STRAYCOR.PLOTS ##########
     ############# IF VERBOSE, MAKE AN INFIELD - OUTFIELD PLOT ###################
@@ -311,7 +495,7 @@ def main_offender(input_name=None, ext=None, ra=None, dec=None, phi=0,
     if verbose:
 
         plt.figure(figsize=(1.618*10,10))
-        plot_size = rs.plots.plot_stars_around(catalog=gaia_query, max_plot_size=100, min_plot_size=5, alpha=0.2)
+        plot_size = rs.plots.plot_stars_around(catalog=hybrid_catalog, max_plot_size=100, min_plot_size=5, alpha=0.2)
         plot_radec_limits = rs.gaia.find_ra_dec_constraints(ra=RA_PNT, dec=DEC_PNT, radius=2*radius)
         for detector_square in detector_square_list:
             plt.plot(detector_square[:,0], detector_square[:,1], alpha=0.5, color="red")
@@ -326,11 +510,11 @@ def main_offender(input_name=None, ext=None, ra=None, dec=None, phi=0,
 
     ## Prepare the coordinates of the stars that do not fall inside the Focal Plane Array ##
     ## This step is common for all SCI extensions #
-    ra_stars_outside      = np.array(gaia_query["ra"][~gaia_query["is_inside_FPA"]])
-    dec_stars_outside     = np.array(gaia_query["dec"][~gaia_query["is_inside_FPA"]])
-    source_id_outside     = np.array(gaia_query["source_id"][~gaia_query["is_inside_FPA"]])
-    cat_id_outside        = np.array(gaia_query["cat_id"][~gaia_query["is_inside_FPA"]])
-    synthetic_mag_outside = np.array(gaia_query["mag_lambda"][~gaia_query["is_inside_FPA"]])
+    ra_stars_outside      = np.array(hybrid_catalog["ra"][~hybrid_catalog["is_inside_FPA"]])
+    dec_stars_outside     = np.array(hybrid_catalog["dec"][~hybrid_catalog["is_inside_FPA"]])
+    source_id_outside     = np.array(hybrid_catalog["source_id"][~hybrid_catalog["is_inside_FPA"]])
+    cat_id_outside        = np.array(hybrid_catalog["cat_id"][~hybrid_catalog["is_inside_FPA"]])
+    synthetic_mag_outside = np.array(hybrid_catalog["mag_lambda"][~hybrid_catalog["is_inside_FPA"]])
     stars_world_location = coordinates.SkyCoord(ra_stars_outside, dec_stars_outside, frame='icrs', unit="deg")
 
     irradiance_stars = const.c*(image_identity["FILTER_IDENTITY"]["filter_lambda_max"]-image_identity["FILTER_IDENTITY"]["filter_lambda_min"])/(image_identity["FILTER_IDENTITY"]["filter_lambda_ref"]**2)*((10**(-0.4*(synthetic_mag_outside+56.1)))*u.W/u.meter**2/u.Hz)
@@ -338,6 +522,8 @@ def main_offender(input_name=None, ext=None, ra=None, dec=None, phi=0,
     ########################################
     # Here we estimate the stray-light
     ########################################
+    # Reset the Roman / WFI loading bar:
+
     for SCIEXT_i, name_column_is_star_inside_this_detector in tqdm(zip(SCIEXTS, names_of_bool_columns_if_star_is_inside)):
 
 
@@ -353,18 +539,18 @@ def main_offender(input_name=None, ext=None, ra=None, dec=None, phi=0,
                 print(irradiance_stars)
 
 
-
+            #
             straylevel_image_db = rs.roman.roman_estimate_straylight_SCA(data=image_identity["DATA"][SCIEXT_i-1],
-                                                                        wcs=image_identity["ASTROPYWCS"][SCIEXT_i-1],
-                                                                        SCA=image_identity["SCA"][SCIEXT_i-1],
-                                                                        filter_identity=image_identity["FILTER_IDENTITY"],
-                                                                        ra_stars=ra_stars_outside,
-                                                                        dec_stars=dec_stars_outside,
-                                                                        cat_id = cat_id_outside,
-                                                                        source_id=source_id_outside,
-                                                                        irradiance_stars=irradiance_stars,
-                                                                        ra_point=RA_PNT, dec_point=DEC_PNT,
-                                                                        pa_point=PA_PNT, verbose=verbose)
+                                                                         wcs=image_identity["ASTROPYWCS"][SCIEXT_i-1],
+                                                                         SCA=image_identity["SCA"][SCIEXT_i-1],
+                                                                         filter_identity=image_identity["FILTER_IDENTITY"],
+                                                                         ra_stars=ra_stars_outside,
+                                                                         dec_stars=dec_stars_outside,
+                                                                         cat_id = cat_id_outside,
+                                                                         source_id=source_id_outside,
+                                                                         irradiance_stars=irradiance_stars,
+                                                                         ra_point=RA_PNT, dec_point=DEC_PNT,
+                                                                         pa_point=PA_PNT, verbose=verbose)
             straylevel_image_i = straylevel_image_db["straylight_SCA"]
             main_offender_image_i = straylevel_image_db["main_offender_SCA"]
 
@@ -422,7 +608,7 @@ def main_offender(input_name=None, ext=None, ra=None, dec=None, phi=0,
 
     return({"image_identity":image_identity,
             "straylevel_list": straylevel_list,
-            "star_catalog": gaia_query,
+            "star_catalog": hybrid_catalog,
             "output_name": output_name,
             "main_offender_output": main_offender_output_name,
             "detector_square": detector_square_list})

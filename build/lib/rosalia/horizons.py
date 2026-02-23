@@ -7,13 +7,39 @@ from astropy.time import Time
 import astropy.units as u
 import matplotlib.pyplot as plt
 from astropy.coordinates import SkyCoord
-
+from rosalia.utils import divide_array_in_chunks
 
 # ROLO lunar model
 # https://iopscience.iop.org/article/10.1086/430185/pdf
+def horizons_query(mjd, source="301", location="@jwst", chunk_size=50):
+    import pandas as pd
+    if not isinstance(mjd, (list, pd.core.series.Series, np.ndarray)):
+        return(single_horizons_query(mjd, source=source, location=location))
+
+    else:
+        mjd_chunks = divide_array_in_chunks(mjd, chunk_size = chunk_size)
+
+        RA_all = []
+        DEC_all = []
+        V_all = []
+        ang_width_all = []
+
+        datetime_jd_all = []
+        for mjd_chunk_i in mjd_chunks:
+            target_query_chunk_i = single_horizons_query(mjd_chunk_i, source=source, location=location)
+            #print(target_query_chunk_i)
+            RA_all = RA_all + list(target_query_chunk_i["RA"])
+            DEC_all = DEC_all + list(target_query_chunk_i["DEC"])
+            V_all = V_all + list(target_query_chunk_i["V"])
+            ang_width_all = ang_width_all + list(target_query_chunk_i["ang_width"])
+
+            datetime_jd_all = datetime_jd_all + list(target_query_chunk_i["datetime_jd"])
+
+        return({"RA": np.array(RA_all), "DEC": np.array(DEC_all),
+            "V": np.array(V_all),  "ang_width": np.array(ang_width_all), "datetime_jd": np.array(datetime_jd_all)})
 
 
-def horizons_query(mjd, source="301", location="@hst"):
+def single_horizons_query(mjd, source="301", location="@hst"):
     # ----------------------------- #
     # ROLO lunar model
     # https://iopscience.iop.org/article/10.1086/430185/pdf
@@ -46,6 +72,7 @@ def horizons_query(mjd, source="301", location="@hst"):
         V_source = ephemeris_source_from_location["V"].value.data
         datetime_jd = ephemeris_source_from_location["datetime_jd"].value.data
         residual_time = datetime_jd - np.array(mjd) - 2400000.5
+        ang_width = ephemeris_source_from_location["ang_width"]/60/60
 
         #print(residual_time)
 
@@ -58,7 +85,8 @@ def horizons_query(mjd, source="301", location="@hst"):
             time.sleep(5)
 
     return({"RA": RA_source, "DEC": DEC_source,
-            "V": V_source, "datetime_jd": datetime_jd,
+            "V": V_source, "ang_width": ang_width,
+            "datetime_jd": datetime_jd,
             "jpl_horizons_query": jpl_horizons_query})
 
 

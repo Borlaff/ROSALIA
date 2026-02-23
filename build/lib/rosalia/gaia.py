@@ -27,6 +27,8 @@ from astropy.table import Table, join
 import astropy_healpix as astro_hp
 from astroquery.gaia import Gaia
 import rosalia as rs
+from rosalia.plots import style
+import rosalia.constants as rs_constants
 
 # Suppress warnings. Comment this out if you wish to see the warning messages
 import warnings
@@ -50,18 +52,38 @@ def query_gaia_2mass_wise(ra, dec, radius, g_mag_max=False, verbose=False, query
 
 
     # Healpix cells in level 5 containing the stars:
-    hp = astro_hp.HEALPix(nside=32, order='nested', frame=ICRS())
-    healpix_ids_query = hp.cone_search_skycoord(c, radius=radius*u.deg)
-    #print(healpix_ids_bounding_circle)
+    hp = astro_hp.HEALPix(nside=128, order='nested', frame=ICRS())
+    healpix_ids_query_all = hp.cone_search_skycoord(c, radius=radius*u.deg)
+
+
+    # Check if the healpix cells have already been queried.
+    import os
+    cache_gaia_path = os.environ["ROSALIACACHE"]  + '/cache/gaia_queries/'
+
+    healpix_ids_query = []
+    healpix_cached_pds = []
+    for cell_i in healpix_ids_query_all:
+        potential_saved_cell_i_name = cache_gaia_path + 'hp_' + str(cell_i).zfill(12) + '_gmax_' + str(g_mag_max).zfill(3) + '.csv'
+        if os.path.exists(potential_saved_cell_i_name):
+            # print("cell exists!")
+            saved_cell_i_db = pd.read_csv(potential_saved_cell_i_name)
+            healpix_cached_pds.append(saved_cell_i_db)
+        else:
+            healpix_ids_query.append(cell_i)
+
+    # If all the cells have been queried, then open and merge the saved tables:
+    if len(healpix_ids_query) == 0:
+        return(pd.concat(healpix_cached_pds))
+
     healpix_radec_query = hp.healpix_to_skycoord(healpix_ids_query)
-    healpix_level_5_sql_line = "WHERE ("
+    healpix_level_lvl_sql_line = "WHERE ("
     for healpix_cell in healpix_ids_query:
-        healpix_level_5_sql_line = healpix_level_5_sql_line + "sub_level_2.healpix_lvl=" + str(int(healpix_cell)) + " OR "
-    healpix_level_5_sql_line = healpix_level_5_sql_line[:-4]
-    healpix_level_5_sql_line = healpix_level_5_sql_line + ") "
+        healpix_level_lvl_sql_line = healpix_level_lvl_sql_line + "sub_level_2.healpix_lvl=" + str(int(healpix_cell)) + " OR "
+    healpix_level_lvl_sql_line = healpix_level_lvl_sql_line[:-4]
+    healpix_level_lvl_sql_line = healpix_level_lvl_sql_line + ") "
 
     if verbose:
-        print(healpix_level_5_sql_line)
+        print(healpix_level_lvl_sql_line)
 
     if verbose: print("Finding the RA DEC constraints for the Gaia server query...")
     bounding_circle_in_sql_subquery_level_2 = find_ra_dec_constraints(ra=ra, dec=dec, radius=radius)["sql_search_string"]
@@ -94,11 +116,11 @@ def query_gaia_2mass_wise(ra, dec, radius, g_mag_max=False, verbose=False, query
 		sub_level_2.phot_rp_mean_mag,\
 		sub_level_2.parallax\
 	    FROM (\
-			SELECT GAIA_HEALPIX_INDEX(5, source_id) AS healpix_lvl, source_id, ra, dec,    phot_bp_mean_mag,    phot_g_mean_mag,    phot_rp_mean_mag, parallax\
+			SELECT GAIA_HEALPIX_INDEX(7, source_id) AS healpix_lvl, source_id, ra, dec,    phot_bp_mean_mag,    phot_g_mean_mag,    phot_rp_mean_mag, parallax\
 		    FROM gaiadr3.gaia_source_lite AS g\
             " + bounding_circle_in_sql_subquery_level_2 + "\
         OFFSET 0) AS sub_level_2\
-		" + healpix_level_5_sql_line + "\
+		" + healpix_level_lvl_sql_line + "\
         " + g_mag_max_string + "\
     OFFSET 0) AS sub\
     JOIN gaiaedr3.tmass_psc_xsc_best_neighbour AS xmatch USING (source_id)\
@@ -108,12 +130,18 @@ def query_gaia_2mass_wise(ra, dec, radius, g_mag_max=False, verbose=False, query
     INNER JOIN gaiaedr3.allwise_best_neighbour AS wise_x USING (source_id)\
     INNER JOIN gaiadr1.allwise_original_valid AS wise USING(allwise_oid)"
 
-    if verbose:
+    if verbose > 3:
         print("Running Gaia query!")
         print(cmd)
 
     #job = Gaia.launch_job_async(cmd, dump_to_file=False, verbose=verbose)
-    job = Gaia.launch_job_async(cmd, dump_to_file=False, verbose=verbose)
+    print(style.BLUE)
+    if verbose < 2:
+        verbose_gaia = False
+    else:
+        verbose_gaia = True
+    job = Gaia.launch_job_async(cmd, dump_to_file=False, verbose=verbose_gaia)
+    print(style.RESET)
     if verbose: print("> Query to Gaia/2MASS/WISE databases finished.")
     filtered_table = job.get_results().to_pandas()
 
@@ -123,29 +151,29 @@ def query_gaia_2mass_wise(ra, dec, radius, g_mag_max=False, verbose=False, query
 
     # Gaia
 
-    filtered_table["phot_g_mean_flux"] = 10**(0.4*(rs.constants.gaia_g_Vega_zp - filtered_table["phot_g_mean_mag"]))
-    filtered_table["phot_bp_mean_flux"] = 10**(0.4*(rs.constants.gaia_bp_Vega_zp - filtered_table["phot_bp_mean_mag"]))
-    filtered_table["phot_rp_mean_flux"] = 10**(0.4*(rs.constants.gaia_rp_Vega_zp - filtered_table["phot_rp_mean_mag"]))
+    filtered_table["phot_g_mean_flux"] = 10**(0.4*(rs_constants.gaia_g_Vega_zp - filtered_table["phot_g_mean_mag"]))
+    filtered_table["phot_bp_mean_flux"] = 10**(0.4*(rs_constants.gaia_bp_Vega_zp - filtered_table["phot_bp_mean_mag"]))
+    filtered_table["phot_rp_mean_flux"] = 10**(0.4*(rs_constants.gaia_rp_Vega_zp - filtered_table["phot_rp_mean_mag"]))
 
-    filtered_table["phot_g_mean_mag_AB"] = -2.5*np.log10(filtered_table["phot_g_mean_flux"]) + rs.constants.gaia_g_AB_zp
-    filtered_table["phot_bp_mean_mag_AB"] = -2.5*np.log10(filtered_table["phot_bp_mean_flux"]) + rs.constants.gaia_bp_AB_zp
-    filtered_table["phot_rp_mean_mag_AB"] = -2.5*np.log10(filtered_table["phot_rp_mean_flux"]) + rs.constants.gaia_rp_AB_zp
+    filtered_table["phot_g_mean_mag_AB"] = -2.5*np.log10(filtered_table["phot_g_mean_flux"]) + rs_constants.gaia_g_AB_zp
+    filtered_table["phot_bp_mean_mag_AB"] = -2.5*np.log10(filtered_table["phot_bp_mean_flux"]) + rs_constants.gaia_bp_AB_zp
+    filtered_table["phot_rp_mean_mag_AB"] = -2.5*np.log10(filtered_table["phot_rp_mean_flux"]) + rs_constants.gaia_rp_AB_zp
 
     # 2MASS
     #flux_Jy_J = TwoMASS_fnu0_J*10**(-0.4*filtered_table["j_m"])
     #flux_Jy_H = TwoMASS_fnu0_H*10**(-0.4*filtered_table["h_m"])
     #flux_Jy_Ks = TwoMASS_fnu0_Ks*10 **(-0.4*filtered_table["ks_m"])
 
-    filtered_table["phot_j_mean_mag_AB"] = filtered_table["j_m"] + 8.9 - 2.5*np.log10(rs.constants.TwoMASS_fnu0_J) #-2.5*np.log10(flux_Jy_J) + 8.9
-    filtered_table["phot_h_mean_mag_AB"] = filtered_table["h_m"] + 8.9 - 2.5*np.log10(rs.constants.TwoMASS_fnu0_H) #-2.5*np.log10(flux_Jy_H) + 8.9
-    filtered_table["phot_ks_mean_mag_AB"] = filtered_table["ks_m"] + 8.9 - 2.5*np.log10(rs.constants.TwoMASS_fnu0_Ks) #-2.5*np.log10(flux_Jy_Ks) + 8.9
+    filtered_table["phot_j_mean_mag_AB"] = filtered_table["j_m"] + 8.9 - 2.5*np.log10(rs_constants.TwoMASS_fnu0_J) #-2.5*np.log10(flux_Jy_J) + 8.9
+    filtered_table["phot_h_mean_mag_AB"] = filtered_table["h_m"] + 8.9 - 2.5*np.log10(rs_constants.TwoMASS_fnu0_H) #-2.5*np.log10(flux_Jy_H) + 8.9
+    filtered_table["phot_ks_mean_mag_AB"] = filtered_table["ks_m"] + 8.9 - 2.5*np.log10(rs_constants.TwoMASS_fnu0_Ks) #-2.5*np.log10(flux_Jy_Ks) + 8.9
 
     # WISE
 
-    filtered_table["phot_w1_mean_mag_AB"] = filtered_table["w1mpro"] + rs.constants.WISE_W1_delta_mag_Vega_to_AB
-    filtered_table["phot_w2_mean_mag_AB"] = filtered_table["w2mpro"] + rs.constants.WISE_W2_delta_mag_Vega_to_AB
-    filtered_table["phot_w3_mean_mag_AB"] = filtered_table["w3mpro"] + rs.constants.WISE_W3_delta_mag_Vega_to_AB
-    filtered_table["phot_w4_mean_mag_AB"] = filtered_table["w4mpro"] + rs.constants.WISE_W4_delta_mag_Vega_to_AB
+    filtered_table["phot_w1_mean_mag_AB"] = filtered_table["w1mpro"] + rs_constants.WISE_W1_delta_mag_Vega_to_AB
+    filtered_table["phot_w2_mean_mag_AB"] = filtered_table["w2mpro"] + rs_constants.WISE_W2_delta_mag_Vega_to_AB
+    filtered_table["phot_w3_mean_mag_AB"] = filtered_table["w3mpro"] + rs_constants.WISE_W3_delta_mag_Vega_to_AB
+    filtered_table["phot_w4_mean_mag_AB"] = filtered_table["w4mpro"] + rs_constants.WISE_W4_delta_mag_Vega_to_AB
 
 
 
@@ -195,10 +223,27 @@ def query_gaia_2mass_wise(ra, dec, radius, g_mag_max=False, verbose=False, query
     all_stars_coords = SkyCoord(np.array(final_query_table["ra"])*u.deg, np.array(final_query_table["dec"])*u.deg, frame='icrs')
     final_query_table["dist"] = c.separation(all_stars_coords).value
 
+    # Merging the new table with the cached tables
+    if len(healpix_cached_pds) > 0:
+        cached_tables = pd.concat(healpix_cached_pds)
+        final_query_table = pd.concat([cached_tables, final_query_table])
+
     final_query_table.to_csv(query_filename)
 
     if verbose: print(" Gaia Star by star query result:")
     if verbose: print(final_query_table)
+
+    list_of_healpix_cells_queried = list(set(final_query_table["healpix_lvl"]))
+
+    # If the directory does not exist, create it.
+    import os
+    cache_gaia_path =  os.environ["ROSALIACACHE"]  + '/cache/gaia_queries/'
+    if not os.path.isdir(os.environ["ROSALIACACHE"]  + '/cache'): os.system('mkdir ' + os.environ["ROSALIACACHE"] + '/cache')
+    if not os.path.isdir(cache_gaia_path): os.system('mkdir ' + cache_gaia_path)
+
+    for cell_i in list_of_healpix_cells_queried:
+        single_cell_db = final_query_table[final_query_table["healpix_lvl"] == cell_i]
+        single_cell_db.to_csv(cache_gaia_path + 'hp_' + str(cell_i).zfill(12) + '_gmax_' + str(g_mag_max).zfill(3) + '.csv')
 
     return(final_query_table)
 
@@ -267,9 +312,9 @@ def query_healpix_ra_slices(healpix_lvl=7, verbose=False):
     g2w_raw_table = pd.concat(filtered_table_list, axis=0)
 
     # We fix the units in the Gaia table
-    g_mag_AB =  -2.5*np.log10(g2w_raw_table["healpix_phot_g_sum_flux"]) + rs.constants.gaia_g_AB_zp
-    bp_mag_AB =  -2.5*np.log10(g2w_raw_table["healpix_phot_bp_sum_flux"]) + rs.constants.gaia_bp_AB_zp
-    rp_mag_AB =  -2.5*np.log10(g2w_raw_table["healpix_phot_rp_sum_flux"]) + rs.constants.gaia_rp_AB_zp
+    g_mag_AB =  -2.5*np.log10(g2w_raw_table["healpix_phot_g_sum_flux"]) + rs_constants.gaia_g_AB_zp
+    bp_mag_AB =  -2.5*np.log10(g2w_raw_table["healpix_phot_bp_sum_flux"]) + rs_constants.gaia_bp_AB_zp
+    rp_mag_AB =  -2.5*np.log10(g2w_raw_table["healpix_phot_rp_sum_flux"]) + rs_constants.gaia_rp_AB_zp
 
     g2w_raw_table["healpix_phot_g_sum_flux"] = 10**(0.4*(8.9 - g_mag_AB))
     g2w_raw_table["healpix_phot_bp_sum_flux"] = 10**(0.4*(8.9 - bp_mag_AB))

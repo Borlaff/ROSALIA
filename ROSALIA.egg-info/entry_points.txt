@@ -1,0 +1,6 @@
+[console_scripts]
+exposure-inspector = rosalia.bootima:main
+rosalia-sky = rosalia.skywalker:main
+rosalia-stray = rosalia.sso:main
+run-rosalia-tests = rosalia.tests:main
+test-rosalia-parser = rosalia.correct:main

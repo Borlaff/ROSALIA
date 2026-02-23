@@ -36,11 +36,11 @@ warnings.filterwarnings('ignore')
 # STRAYCOR modules
 
 
-psf_archive = os.path.dirname(rs.utils.__file__) + "/../PSF_ARCHIVE/"
-plt.style.use(os.path.dirname(rs.utils.__file__) + "/CORE/presi_style.mplstyle")
+psf_archive = os.environ["ROSALIACACHE"] + "/CORE/PSF_ARCHIVE/"
+plt.style.use(os.environ["ROSALIACACHE"]+ "/CORE/presi_style.mplstyle")
 
 
-def scale_and_subtract_stars(input_name, ext, lambda_ref, psf_name, g_mag_max=False, MJD=None, clean=False, verbose=False):
+def scale_and_subtract_stars(input_name, ext, exposure_identity, g_mag_max=False, clean=False, verbose=False):
     ## TODO: Compute the scale factor for the object at (x,y)=(53,69) for
     ## the PSF (psf.fits). Compute it in the ring 20-30 pixels.
     # $ astscript-psf-scale-factor image.fits --mode=img \
@@ -54,6 +54,11 @@ def scale_and_subtract_stars(input_name, ext, lambda_ref, psf_name, g_mag_max=Fa
     #        --psf=psf.fits \
     #        --center=$ra,$dec --quiet \
     # --normradii=20,30 > scale-"$ra"-"$dec".txt; done
+
+    # Exposure identity properties
+    lambda_ref = exposure_identity["FILTER_IDENTITY"]["filter_lambda_ref"]
+    psf_name = psf_archive + exposure_identity["FILTER"].lower() + "00_tinytim.fits"
+    MJD = exposure_identity["EXPSTART"]
 
     # List of input images: Checking that it is a list.
     if isinstance(input_name, (list, pd.core.series.Series, np.ndarray)):
@@ -102,9 +107,11 @@ def scale_and_subtract_stars(input_name, ext, lambda_ref, psf_name, g_mag_max=Fa
                                                                    lambda_ref=lambda_ref,
                                                                    radius=star_search_radius,
                                                                    g_mag_max=g_mag_max,
-                                                                   MJD=MJD, clean=False,
+                                                                   MJD=MJD, clean=clean,
                                                                    verbose=verbose)
             if verbose: print(matched_stars_in_detector)
+
+            nstars_in_detector = len(matched_stars_in_detector["matched_catalog_image"]["RA_GAIA"])
             # A flat sky background correction is required to fit and subtract the PSF from stars
             # Otherwise it is impossible to scale correctly the PSF to the ring around the identified stars.
             # However, we do not want to do such correction with gradients just yet:
@@ -112,8 +119,40 @@ def scale_and_subtract_stars(input_name, ext, lambda_ref, psf_name, g_mag_max=Fa
 
             #rs.sky.correct_flat_sky(input_name=input_name_i, ext=ext_i, clean=clean)
 
-            ra_list = matched_stars_in_detector["matched_catalog_image"]["RA"]
-            dec_list = matched_stars_in_detector["matched_catalog_image"]["DEC"]
+            # If the telescope is HST ACS/WFC, then the Data Quality extension holds
+            # a mask that marks which pixels are saturated.
+
+            bool_is_saturated = np.zeros((nstars_in_detector), dtype="bool")
+            if (exposure_identity["TELESCOP"] == "HST") & (exposure_identity["INSTRUME"] == "ACS"):
+                # Saturated keyword in HST/ACS == 256. Lucas et al. 2018
+                print(input_fits_i[ext+2].data)
+                saturation_mask = input_fits_i[ext+2].data == 256
+
+            # ------------------------------------------- #
+            # Add here more telescopes to be supported.
+            # ------------------------------------------- #
+
+            ra_list  = np.zeros((nstars_in_detector))*np.nan
+            dec_list = np.zeros((nstars_in_detector))*np.nan
+
+            for i in range(len(ra_list)):
+                x_ima = matched_stars_in_detector["matched_catalog_image"]["X_IMA"][i]
+                y_ima = matched_stars_in_detector["matched_catalog_image"]["Y_IMA"][i]
+                #x_ima, y_ima = rs.utils.radec_to_xy(ra=ra_list[i], dec=dec_list[i], fits_name=input_name_i, ext=ext_i)
+
+                bool_is_saturated = saturation_mask[int(y_ima), int(x_ima)]
+                if bool_is_saturated:
+                    ra_list[i]  = matched_stars_in_detector["matched_catalog_image"]["RA_GAIA"][i]
+                    dec_list[i] = matched_stars_in_detector["matched_catalog_image"]["DEC_GAIA"][i]
+                    if verbose: print("Saturated Star! RA:" + str(ra_list[i]) + " DEC: " + str(dec_list[i]))
+                else:
+                    ra_list[i]  = matched_stars_in_detector["matched_catalog_image"]["RA_IMA"][i]
+                    dec_list[i] = matched_stars_in_detector["matched_catalog_image"]["DEC_IMA"][i]
+
+
+
+            #ra_list = matched_stars_in_detector["matched_catalog_image"]["RA_IMA"]
+            #dec_list = matched_stars_in_detector["matched_catalog_image"]["DEC_IMA"]
 
             ds9_region_filename = input_name_i.replace(".fits", "_ext" + str(ext_i) + "_instars.reg")
             rs.utils.make_ds9_region(ra=ra_list, dec=dec_list,
@@ -121,8 +160,8 @@ def scale_and_subtract_stars(input_name, ext, lambda_ref, psf_name, g_mag_max=Fa
 
             # (input_name, ext, ra, dec, psf_name, clean=True):
             dictionary_with_results_from_star_subtraction = scale_and_subtract_stars_single_image(input_name = input_name_i, ext = ext_i,
-                                                                               ra = ra_list, dec = dec_list,
-                                                                               psf_name = psf_name, clean=False, verbose=verbose)
+                                                                                                  ra = ra_list, dec = dec_list,
+                                                                                                  psf_name = psf_name, clean=False, verbose=verbose)
             subtracted_results.append(dictionary_with_results_from_star_subtraction)
             # Now we modify the extension with the residual image
             nostars_fits = fits.open(dictionary_with_results_from_star_subtraction["residuals"])
@@ -173,7 +212,10 @@ def astscript_psf_scale_factor(input_name, ra, dec, psf_name, clean=False, verbo
     max_size_of_a_star = 600 # pixels
     # Lets gather the max detection radiis for all the stars
 
-    rmax = measure_maxradii(input_name=input_name, ra=ra, dec=dec, rmax=max_size_of_a_star, clean=clean, verbose=verbose)
+    measure_maxradii_result = measure_maxradii(input_name=input_name, ra=ra, dec=dec, rmax=max_size_of_a_star, clean=clean, verbose=verbose)
+
+    rmax = measure_maxradii_result["rlim"]
+
     norm_radii_min = int(rmax/3.)
     norm_radii_max = int(2*rmax/3.)
 
@@ -184,7 +226,7 @@ def astscript_psf_scale_factor(input_name, ra, dec, psf_name, clean=False, verbo
 
     # We construct the cmd to send to shell.
     cmd = "astscript-psf-scale-factor " + input_name +\
-           " --mode=wcs --center=" + str(ra) + "," + str(dec) +\
+           " --mode=wcs --quiet --center=" + str(ra) + "," + str(dec) +\
            " --normradii=" + str(norm_radii_min) +"," + str(norm_radii_max) +\
            " --psf=" + psf_name + "  | tail -1"
 
@@ -345,7 +387,7 @@ def scale_and_subtract_stars_single_image(input_name, ext, ra, dec, psf_name, cl
     input_fits = fits.open(input_name)
     star_model = np.zeros(input_fits[ext].data.shape)
     # First we generate an image with the main WCS, otherwise Noisechisel cannot read the header
-    image_wcs_cleaned_extension_name = rs.mast.make_wcs_clean_extension(input_name, ext)
+    image_wcs_cleaned_extension_name = rs.gnu.make_wcs_clean_extension(input_name, ext)
     # We correct the sky of the extension
     rs.sky.correct_flat_sky(input_name=image_wcs_cleaned_extension_name, ext=1, clean=False)
 
@@ -385,10 +427,12 @@ def scale_and_subtract_stars_single_image(input_name, ext, ra, dec, psf_name, cl
 
 
 ############################
-def find_gaia_stars_around_image(lambda_ref, observer=None, input_name=None,
-                                 ext=None, ra=None, dec=None, MJD=None, radius=1,
-                                 g_mag_max = False,
-                                 verbose=False):
+
+"""
+def find_sources_around(lambda_ref, observer=None, input_name=None,
+                        ext=None, ra=None, dec=None, MJD=None, radius=1,
+                        g_mag_max = False,
+                        verbose=False):
 
     if input_name is not None:
         # First identify where is the image pointing.
@@ -399,17 +443,17 @@ def find_gaia_stars_around_image(lambda_ref, observer=None, input_name=None,
         center = w.all_pix2world(image_shape[0]/2., image_shape[1]/2., 0)
         center_ra = center[0]
         center_dec = center[1]
-        gaia_query_filename = input_name.replace(".fits","_gaia.dat")
-        if verbose: print("Running exposure inspector...")
-        db_inspection_exposure = rs.utils.exposure_inspector(input_name, verbose)
-        MJD = db_inspection_exposure["EXPSTART"]
-        if observer==None:
-            observer = db_inspection_exposure["TELESCOP"]
+        gaia_query_filename = input_name.replace(".fits","_source_catalog.csv")
+        # if verbose: print("Running exposure inspector...")
+        # db_inspection_exposure = rs.utils.exposure_inspector(input_name, verbose)
+        # MJD = db_inspection_exposure["EXPSTART"]
+        # if observer==None:
+        #     observer = db_inspection_exposure["TELESCOP"]
 
     else:
         center_ra = ra
         center_dec = dec
-        gaia_query_filename = str(ra) + "_" + str(dec) + "_gaia.dat"
+        gaia_query_filename = str(ra) + "_" + str(dec) + "_source_catalog.csv"
 
         if observer==None:
             print("> Observer frame has not been set. Default is Hubble")
@@ -424,12 +468,15 @@ def find_gaia_stars_around_image(lambda_ref, observer=None, input_name=None,
     gaia_query = gaia_query.sort_values(by=["mag_lambda"], ascending=False)
     gaia_query["cat_id"] = np.linspace(0, len(gaia_query)-1, len(gaia_query), dtype="int64")
 
+    gaia_query_filename = input_name + "_ext" + str(ext) + "_source_catalog.csv"
+    gaia_query.to_csv(gaia_query_filename)
+
     if verbose:
         print("Query saved in " + gaia_query_filename)
 
 
     return({"gaia_query": gaia_query, "gaia_query_filename": gaia_query_filename})
-
+"""
 
 ############################
 
@@ -448,7 +495,7 @@ def gaia_find_stars_in_and_out(input_name, ext, lambda_ref, ra=None, dec=None, r
     # Now identify which ones are actually inside the detector
     if verbose: print("> Identifying which stars are inside the FOV and which are outside...")
     input_fits = fits.open(input_name)
-    infield_stars = identify_stars_in_out_field(data=input_fits[ext].data,
+    infield_stars = identify_stars_in_out_field(data_shape=input_fits[ext].data.shape(),
                                                 wcs=astropy_wcs.WCS(input_fits[ext].header, input_fits),
                                                 catalog=gaia_query,
                                                 verbose=verbose) # identify_stars_in_out_field(input_name=input_name, ext=ext, catalog=gaia_query, ra=ra, dec=dec, verbose=verbose)
@@ -478,8 +525,8 @@ def gaia_find_stars_in_and_out(input_name, ext, lambda_ref, ra=None, dec=None, r
         gaia_query_out_detector = gaia_query[np.invert(bool_isIn_gaia_stars)]
         gaia_query_out_detector.to_csv(out_query_filename)
         return({"gaia_query_in_detector": gaia_query_in_detector, "in_query_filename": in_query_filename,
-            "gaia_query_out_detector": gaia_query_out_detector, "out_query_filename": out_query_filename,
-            "object_catalog_in_detector": object_catalog_in_detector})
+                "gaia_query_out_detector": gaia_query_out_detector, "out_query_filename": out_query_filename,
+                "object_catalog_in_detector": object_catalog_in_detector})
 
     else:
         out_query_filename = str(ra) + "_" + str(dec) + "_gaia_stars_outside_detector.csv"
@@ -514,7 +561,7 @@ def find_stars_inside_detector(input_name, ext, lambda_ref, radius, g_mag_max=Fa
 
 
     # Run astmatch and generate a new catalog of matched objects.
-    cmd = "astmatch -K  " + inside_star_catalog_name + " -h2 " + object_catalog_in_detector["output_name"] + " --aperture=1/3600 --ccol1=1,2 --ccol2=ra,dec --output " + matched_catalog_name + " --outcols=a1,a2,b1,b2,b3,b4,a3"
+    cmd = "astmatch -K  " + inside_star_catalog_name + " -h2 " + object_catalog_in_detector["output_name"] + " --aperture=1/360 --ccol1=1,2 --ccol2=ra,dec --output " + matched_catalog_name + " --outcols=a1,a2,b1,b2,b3,b4,a3"
     if verbose: print(cmd)
     rs.utils.execute_cmd(cmd)
 
@@ -549,7 +596,7 @@ def append_empty_rows(dataframe, n):
 
 
 
-def identify_stars_in_out_field(data, wcs, catalog, ra=None, dec=None, verbose=False):
+def identify_stars_in_out_field(data_shape, wcs, catalog, ra=None, dec=None, verbose=False):
     # This program identifies the objects that are inside or outside an image in a fits file.
     # input_name: Name of the fits file
     # ext: Extension of the fits file where we are looking for the image.
@@ -573,7 +620,7 @@ def identify_stars_in_out_field(data, wcs, catalog, ra=None, dec=None, verbose=F
                 "catalog_inside": None})
 
 
-    detector_corners = rs.detectors.get_detector_corners(data, wcs)
+    detector_corners = rs.detectors.get_detector_corners(data_shape, wcs)
     corners_pix = detector_corners["corners_pix"]
     corners_world = detector_corners["corners_world"]
 
@@ -620,6 +667,7 @@ def identify_stars_in_out_field(data, wcs, catalog, ra=None, dec=None, verbose=F
 def get_hybrid_catalog(ra, dec, radius, lambda_ref, MJD, observer, g_mag_max=False, verbose=False, query_filename="default_query.dat"):
     from scipy import interpolate
 
+
     # C is the central coordinates of the pointing.
     c = SkyCoord(ra, dec, frame='icrs', unit="deg")
 
@@ -631,7 +679,7 @@ def get_hybrid_catalog(ra, dec, radius, lambda_ref, MJD, observer, g_mag_max=Fal
                                                     verbose=verbose,
                                                     query_filename=query_filename)
     # Load the low resolution catalog.
-    low_resolution_catalog = pd.read_csv(os.path.dirname(rs.utils.__file__) + "/CORE/gaia_2mass_wise_healpix_7_cat.csv")
+    low_resolution_catalog = pd.read_csv(os.environ["ROSALIACACHE"] + "/CORE/gaia_2mass_wise_healpix_7_cat.csv")
 
     # Make a new low_resolution_catalog where the columns will fit.
     # Maybe stick this in the low_res
@@ -666,7 +714,7 @@ def get_hybrid_catalog(ra, dec, radius, lambda_ref, MJD, observer, g_mag_max=Fal
     # Now complement the query with the 230 naked eye stars from Hipparcos
     #
     ######################################################################
-    gaia_naked_eye_stars = pd.read_csv(os.path.dirname(rs.utils.__file__) + "/CORE/gaia_naked_eye_stars.csv", delim_whitespace=True)
+    gaia_naked_eye_stars = pd.read_csv(os.environ["ROSALIACACHE"] + "/CORE/gaia_naked_eye_stars.csv", sep=" ")
 
     # Find which ones are in the query radius.
     ra_stars = np.array(gaia_naked_eye_stars["ra"])*u.deg
@@ -780,7 +828,7 @@ def get_hybrid_catalog(ra, dec, radius, lambda_ref, MJD, observer, g_mag_max=Fal
         good = np.where(np.isfinite(magnitude_array[:,i]))
         #print(magnitude_array[:,i])
         magnitude_interpolator = interpolate.interp1d(x=filters_list_lambda[good], y=magnitude_array[good,i], kind="nearest", fill_value="extrapolate")
-        mag_lambda[i] = magnitude_interpolator(lambda_ref.to("AA").value)
+        mag_lambda[i] = magnitude_interpolator(lambda_ref.to("AA").value)[0]
 
     high_resolution_catalog["mag_lambda"] = mag_lambda
 
@@ -808,6 +856,8 @@ def get_hybrid_catalog(ra, dec, radius, lambda_ref, MJD, observer, g_mag_max=Fal
     star_coords = SkyCoord(ra_stars, dec_stars, frame='icrs')
     sep = c.separation(star_coords)
     high_resolution_catalog["dist"] = sep.deg
+    high_resolution_catalog = high_resolution_catalog.sort_values(by=["mag_lambda"], ascending=True)
+    high_resolution_catalog["cat_id"] = np.linspace(0, len(high_resolution_catalog)-1, len(high_resolution_catalog), dtype="int64")
 
     high_resolution_catalog.to_csv(query_filename)
 
@@ -836,16 +886,23 @@ def psf_harvester_single_exposure(input_name, clean=True, verbose=False):
 
 
     max_size_of_a_star = 501
-    g_mag_max = 30
+    g_mag_max = 19
 
 
     main_folder = os.getcwd() # os.path.dirname(input_name)
 
     sci_exts = exposure_identity["SCIEXTS"] # To be detected automatically with exposure inspector
 
+    # If the header 0 contains PSFHARVS, then the image has already been analyzed, and we should jump it.
+    input_fits = fits.open(input_name)
+    try:
+        print(input_fits[0].header["PSFHARVS"])
+        print(input_name + " has been PSF Harvested. Jumping.")
+        return()
+    except:
+        print("Analyzing " + input_name + "...")
+
     # For each SCIENCE extension we run the following loop.
-
-
     for ext in sci_exts:
         ###########################
         # Fundamental estimations #
@@ -1004,3 +1061,177 @@ def psf_harvester_single_exposure(input_name, clean=True, verbose=False):
             rs.utils.execute_cmd("rm " + input_directory + "/*_ext*.fits")
             rs.utils.execute_cmd("rm " + input_directory + "/*_gaia.dat")
             rs.utils.execute_cmd("rm " + input_directory + "/*_swarp_coadd.fits")
+
+    # Save in the header a new keyword, to indicate that this image has been analyzed already.
+    cmd = "astfits -h0  " + input_name + " --update=PSFHARVS,1"
+    stdout = rs.utils.execute_cmd(cmd)
+
+
+##########################
+
+def find_stars_inside_detector(input_name, g_mag_max=15, verbose=False):
+
+    import os
+    radius = 1 # To find the stars inside the detector, we do not need more than 1 degree.
+
+    # If the input name is an ASDF, transform it to a compiled FITS.
+    if isinstance(input_name, (list, np.ndarray, pd.Series)):
+        if input_name[0].split(".")[-1] == "asdf":
+            fits_input_name = input_name[0].replace(".asdf",".fits")
+            if verbose:
+                print(input_name)
+            fits_input_name = rs.utils.convert_ASDF_to_FITS(asdf_list = input_name, output=fits_input_name)
+
+    else:
+        fits_input_name = input_name
+
+
+    # Get the image identity
+    image_identity = rs.utils.exposure_inspector(input_name=fits_input_name, verbose=verbose, lite=True)
+
+
+    # Get the star catalog:
+    source_catalog_filename = fits_input_name.replace(".fits", "_source_catalog.csv")
+
+    #if not os.path.exists(source_catalog_filename):
+    hybrid_catalog = rs.psf.get_hybrid_catalog(ra=image_identity["RA_TARG"],
+                                               dec=image_identity["DEC_TARG"],
+                                               radius=radius,
+                                               lambda_ref=image_identity["FILTER_IDENTITY"]["filter_lambda_ref"],
+                                               MJD=image_identity["EXPSTART"],
+                                               observer=image_identity["TELESCOP"],
+                                               g_mag_max = g_mag_max,
+                                               verbose=verbose,
+                                               query_filename=source_catalog_filename)
+    #else:
+    #    hybrid_catalog = pd.read_csv(source_catalog_filename)
+
+    from tqdm import tqdm
+    names_of_bool_columns_if_star_is_inside = []
+    for SCIEXT_i in tqdm(image_identity["SCIEXTS"]):
+        if verbose: print("> Identifying which stars are inside the FOV and which are outside...")
+        infield_stars = rs.psf.identify_stars_in_out_field(data_shape=image_identity["DATA_SHAPE"][SCIEXT_i-1],
+                                                           wcs=image_identity["ASTROPYWCS"][SCIEXT_i-1],
+                                                           catalog=hybrid_catalog,
+                                                           verbose=verbose)
+
+        name_column_is_star_inside_this_detector = "in_SCI" + str(SCIEXT_i)
+        names_of_bool_columns_if_star_is_inside.append(name_column_is_star_inside_this_detector)
+
+        hybrid_catalog[name_column_is_star_inside_this_detector] = infield_stars["bool_isIn"]
+    # Once you are done checking if the stars are inside each detector,
+    # find out which stars are outside ALL detectors.
+    hybrid_catalog["is_inside_FPA"] = hybrid_catalog[names_of_bool_columns_if_star_is_inside].any(axis=1)
+
+    return(hybrid_catalog)
+
+
+
+##########################
+
+def getWCS_galsim_dict_style(file_name):
+    # This program takes the wcs in the galsim fashion, to be used by
+    # galsim.roman.findSCA
+    import galsim
+    galsim_wcs_dict = {}
+    for i in range(18):
+        galsim_wcs_dict[i+1] = galsim.GSFitsWCS(file_name=file_name, hdu=i+1)
+    return(galsim_wcs_dict)
+
+
+##########################
+
+
+def find_SCA_for_a_target(file_name, ra, dec, include_border=True):
+    # This program returns the SCA ID for a target. If not in the detector, is nan.
+    import coord
+    import galsim
+    import galsim.roman as galsim_roman
+
+    wcs_dict = getWCS_galsim_dict_style(file_name=file_name)
+    nstars = len(ra)
+    IN_SCA = np.zeros(nstars)
+    from tqdm import tqdm
+
+    ra1 = np.array([wcs_dict[1].center.ra.deg])
+    dec1 = np.array([wcs_dict[1].center.dec.deg])
+    # Measure the distance to the target. If it is too far off, it is a NAN.
+    distance = rs.utils.angular_distance(ra1=ra1, dec1=dec1, ra2=ra, dec2=dec)
+    too_far_off = distance > 1.2
+    too_far_off = too_far_off[0,:]
+    print(too_far_off.shape)
+    for i in tqdm(range(nstars)):
+        if too_far_off[i]:
+            IN_SCA[i] = np.nan
+        else:
+            star_pos = galsim.CelestialCoord(ra=ra[i]*coord.degrees,
+                                         dec=dec[i]*coord.degrees)
+            IN_SCA[i] = galsim_roman.findSCA(wcs_dict=wcs_dict,
+                                         world_pos=star_pos,
+                                         include_border=include_border)
+    return(IN_SCA)
+##########################
+
+def generate_star_stamps(hybrid_catalog, image_identity, verbose=False):
+    # For each SCIEXT.
+    os.system("rm -r temp_rosalia_stars")
+    os.system("mkdir temp_rosalia_stars")
+
+    stars_outnames = []
+    from tqdm import tqdm
+    import romanisim
+    #  Find the telescope class for the get_psf function
+    telescope_class = rs.telescopes.telescope_class_finder(telescope=image_identity["TELESCOP"])
+
+    if verbose > 0: print("Generating stamps for infield stars...")
+
+    print("We might need to get rid of stars very far away.")
+    print(np.array(hybrid_catalog["ra"])) #
+    # Find the right SCA for each star.
+    IN_SCA = find_SCA_for_a_target(file_name=image_identity["FILENAME"],
+                                   ra=np.array(hybrid_catalog["ra"]),
+                                   dec=np.array(hybrid_catalog["dec"]),
+                                   include_border=True)
+
+
+
+
+    for SCIEXT_i in tqdm(image_identity["SCIEXTS"]):
+        stars_sciext_outnames = []
+        os.system("mkdir temp_rosalia_stars/SCIEXT_" + str(SCIEXT_i).zfill(2))
+        ra_stars = np.array(hybrid_catalog["ra"][IN_SCA == SCIEXT_i])
+        dec_stars =  np.array(hybrid_catalog["dec"][IN_SCA == SCIEXT_i])
+        mag_stars =  np.array(hybrid_catalog["mag_lambda"][IN_SCA == SCIEXT_i])
+        astropywcs = image_identity["ASTROPYWCS"][SCIEXT_i-1]
+        xcen, ycen = astropywcs.wcs_world2pix(ra_stars, dec_stars, 0)
+
+        # Get the flux of each star in electrons per second
+        fe_stars = rs.roman.mag2fe(mag=mag_stars, bandpass=image_identity["FILTER"], sca=SCIEXT_i)
+
+
+        for i in tqdm(range(len(ra_stars)), disable=(verbose < 2)):
+
+            psf_array = telescope_class.get_psf(detector_position=(xcen[i], ycen[i]),
+                                                detector = SCIEXT_i,
+                                                filter_name = image_identity["FILTER"])
+            norm_psf = np.nansum(psf_array.data)
+
+            pixscale = 0.11/60/60
+            psf_array_shape = psf_array.data.shape
+            header = rs.utils.create_custom_wcs(crpix=[int(psf_array_shape[1]/2), int(psf_array_shape[0]/2)],
+                                                crval=[ra_stars[i], dec_stars[i]],
+                                                cdelt=[-pixscale,pixscale],
+                                                crota=[-image_identity["PA"],-image_identity["PA"]])
+
+            psf_array.data = (psf_array.data/norm_psf)*fe_stars[i]
+
+            outname = "temp_rosalia_stars/SCIEXT_" + str(SCIEXT_i).zfill(2) + "/star_ext" + str(SCIEXT_i).zfill(2) + "_id_" + str(i).zfill(6) + ".fits"
+
+            rs.utils.save_fits(psf_array.data.value, outname, header)
+
+            stars_sciext_outnames.append(outname)
+
+        stars_outnames.append(stars_sciext_outnames)
+    return(stars_outnames)
+
+##########################
