@@ -15,7 +15,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 project = 'ROSALIA'
 copyright = '2025, NASA Ames Research Center / Code S / Alejandro S. Borlaff'
 author = 'Alejandro S. Borlaff'
-release = '0.81'
+release = '0.9.5'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

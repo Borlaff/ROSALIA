@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ROSALIA package &mdash; ROSALIA 0.81 documentation</title>
+  <title>ROSALIA package &mdash; ROSALIA 0.9.5 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/general.css?v=c0a7eb24" />
@@ -15,7 +15,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=fc3f49b1"></script>
+      <script src="_static/documentation_options.js?v=61b282d3"></script>
       <script src="_static/doctools.js?v=fd6eb6e6"></script>
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="_static/dark_mode_js/default_light.js?v=c2e647ce"></script>
@@ -536,7 +536,49 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.correct.rosalia_stray">
 <span class="sig-prename descclassname"><span class="pre">rosalia.correct.</span></span><span class="sig-name descname"><span class="pre">rosalia_stray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PA</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bandpass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exptime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g_mag_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sun_block</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalog</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.correct.rosalia_stray" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Identify and estimate straylight from stars outside the field of view.</p>
+<p>Estimates the straylight from stars outside the field of view for Roman Space
+Telescope Wide Field Instrument observations.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>ra (float): </dt><dd><p>Right ascension of the pointing, in degrees.</p>
+</dd>
+<dt>dec (float): </dt><dd><p>Declination of the pointing, in degrees.</p>
+</dd>
+<dt>PA (float): </dt><dd><p>Position angle of the observation, in degrees.</p>
+</dd>
+<dt>date (astropy.time.Time): </dt><dd><p>Date of the observation in YYYY-MM-DDTHH:MM:SS format.</p>
+</dd>
+<dt>bandpass (str): </dt><dd><p>Bandpass of the observation in Roman WFI filter names (e.g., F062, F087, F106, F129, F158, F184, F213).</p>
+</dd>
+<dt>exptime (float): </dt><dd><p>Exposure time of the observation, in seconds.</p>
+</dd>
+<dt>radius (float, optional): </dt><dd><p>Radius around the pointing to search for stars, in degrees. Default is 1.</p>
+</dd>
+<dt>g_mag_max (float, optional): </dt><dd><p>Maximum g magnitude of the stars to consider in the straylight estimation. Default is 15.</p>
+</dd>
+<dt>sun_block (bool, optional): </dt><dd><p>If True, the Sun will be removed from the star catalog. Default is False.</p>
+</dd>
+<dt>verbose (bool, optional): </dt><dd><p>If True, print more information about progress. Default is False.</p>
+</dd>
+<dt>catalog (pandas.DataFrame, optional): </dt><dd><p>User-provided catalog of stars. Must contain columns: “ra”, “dec”, “source_id”, “cat_id”, “mag_lambda”.
+If provided, skips querying Gaia/2MASS/WISE catalogs. Default is None.</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>pandas.DataFrame: Estimated straylight from each star outside the field</dt><dd><p>of view with metadata. Columns: “source_id”, “cat_id”, “ra”, “dec”,
+“mag_lambda”, “straylevel”, “main_offender”, “mosaic_name”,
+“mosaic_name_scaled”.</p>
+</dd>
+</dl>
+</dd>
+<dt>History:</dt><dd><p>v1 - 29 Feb 2024. First working version in a public release.</p>
+</dd>
+<dt>Author:</dt><dd><p>Alejandro S. Borlaff (NASA Ames Research Center, <a class="reference external" href="mailto:a&#46;s&#46;borlaff&#37;&#52;&#48;nasa&#46;gov">a<span>&#46;</span>s<span>&#46;</span>borlaff<span>&#64;</span>nasa<span>&#46;</span>gov</a>)</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.correct.rosalia_zody">

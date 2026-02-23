@@ -33,34 +33,59 @@ from astropy.coordinates import ICRS, Angle, SkyCoord
 
 def rosalia_stray(ra, dec, PA, date, bandpass, exptime, radius=1,
                   g_mag_max=15, sun_block=False, verbose=False, catalog=None):
+    """
+    Identify and estimate straylight from stars outside the field of view.
 
-    '''
-    rosalia_stray: Alejandro S. Borlaff. NASA/Ames STA. a.s.borlaff@nasa.gov    
+    Estimates the straylight from stars outside the field of view for Roman Space
+    Telescope Wide Field Instrument observations.
 
-    The objective of this program is to identify and estimate the straylight from stars outside the field of view for Roman Space Telescope Wide Field Instrument observations.
-    As input the rosalia_stray function takes the pointing coordinates (ra, dec), position angle (PA), date, bandpass, and exposure time.
-    The output is an image with the estimated straylight per pixel and a dictionary with metadata about the straylight estimation. 
+    Args:
+        ra (float): 
+            Right ascension of the pointing, in degrees.
 
-    History: 
-    v1 - 29 Feb 2024. First working version in a public release. 
+        dec (float): 
+            Declination of the pointing, in degrees.
 
-    Input parameters:
-    ra: Right ascension of the pointing, in degrees.
-    dec: Declination of the pointing, in degrees.
-    PA: Position angle of the observation, in degrees.
-    date: Date of the observation, in Astropy Time YYYY-MM-DDTHH:MM:SS format.
-    bandpass: Bandpass of the observation, in Roman WFI filter names (e.g. F062, F087, F106, F129, F158, F184, F213).
-    exptime: Exposure time of the observation, in seconds.
-    radius: Radius around the pointing to search for stars, in degrees. Default is 1 degree.
-    g_mag_max: Maximum g magnitude of the stars to consider in the straylight estimation. Default is 15.
-    sun_block: If True, the Sun will be removed from the catalog of stars. Default is False.
-    verbose: If True, the program will print more information about the progress. Default is False.
-    catalog: If the user already has a catalog of stars around the pointing, they can input it here as a pandas DataFrame. The catalog must have the following columns: "ra", "dec", "source_id", "cat_id", "mag_lambda". If the catalog is provided, the program will skip the step of querying the Gaia/2MASS/WISE catalogs.
+        PA (float): 
+            Position angle of the observation, in degrees.
+        
+        date (astropy.time.Time): 
+            Date of the observation in YYYY-MM-DDTHH:MM:SS format.
+        
+        bandpass (str): 
+            Bandpass of the observation in Roman WFI filter names (e.g., F062, F087, F106, F129, F158, F184, F213).
+        
+        exptime (float): 
+            Exposure time of the observation, in seconds.
+        
+        radius (float, optional): 
+            Radius around the pointing to search for stars, in degrees. Default is 1.
+        
+        g_mag_max (float, optional): 
+            Maximum g magnitude of the stars to consider in the straylight estimation. Default is 15.
+        
+        sun_block (bool, optional): 
+            If True, the Sun will be removed from the star catalog. Default is False.
+        
+        verbose (bool, optional): 
+            If True, print more information about progress. Default is False.
+        
+        catalog (pandas.DataFrame, optional): 
+            User-provided catalog of stars. Must contain columns: "ra", "dec", "source_id", "cat_id", "mag_lambda".
+            If provided, skips querying Gaia/2MASS/WISE catalogs. Default is None.
 
-    Output:
-    main_offender_db: A pandas DataFrame with the estimated straylight from each star outside the field of view, and the metadata about the estimation. The columns are: "source_id", "cat_id", "ra", "dec", "mag_lambda", "straylevel", "main_offender", "mosaic_name", "mosaic_name_scaled".
-    
-    '''
+    Returns:
+        pandas.DataFrame: Estimated straylight from each star outside the field
+            of view with metadata. Columns: "source_id", "cat_id", "ra", "dec",
+            "mag_lambda", "straylevel", "main_offender", "mosaic_name",
+            "mosaic_name_scaled".
+
+    History:
+        v1 - 29 Feb 2024. First working version in a public release.
+
+    Author:
+        Alejandro S. Borlaff (NASA Ames Research Center, a.s.borlaff@nasa.gov)
+    """
     from tqdm import tqdm
     import logging
     logger = logging.getLogger()
