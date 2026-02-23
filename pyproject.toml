@@ -1,0 +1,88 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ROSALIA"
+version = "0.9.4"
+description = "A software to calibrate the sky background of Space Telescope images"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "BSD"}
+authors = [
+    {name = "Alejandro S. Borlaff", email = "a.s.borlaff@nasa.gov"}
+]
+keywords = ["Hubble", "Roman", "LSB", "sky-background"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Topic :: Utilities",
+    "License :: OSI Approved :: BSD License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+
+dependencies = [
+    "multiprocess",
+    "bottleneck",
+    "xmltodict",
+    "romanisim @ git+https://github.com/spacetelescope/romanisim.git",
+    "asdf",
+    "cartopy",
+    "healpy",
+    "regions",
+    "LSSTDESC.Coord",
+    "numpy",
+    "galsim",
+    "skyfield",
+    "tqdm",
+    "pybind11>=2.12",
+    "pandas",
+    "requests",
+    "numexpr",
+    "astroquery",
+    "scipy",
+    "matplotlib",
+    "astropy_healpix",
+    "pytest",
+    "celluloid",
+    "ipython",
+    "pysynphot",
+    "sphericalpolygon",
+    "psutil",
+    "zodipy",
+]
+
+[project.urls]
+Homepage = "https://github.com/Borlaff/ROSALIA"
+Repository = "https://github.com/Borlaff/ROSALIA"
+
+[project.scripts]
+rosalia-sky = "rosalia.skywalker:main"
+run-rosalia-tests = "rosalia.tests:main"
+exposure-inspector = "rosalia.bootima:main"
+rosalia-stray = "rosalia.sso:main"
+test-rosalia-parser = "rosalia.correct:main"
+
+[tool.setuptools]
+packages = ["rosalia"]
+
+[tool.setuptools.package-data]
+rosalia = ["*.mplstyle", "*.csv", "*.txt", "images/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["rosalia"]
+python_files = ["test_*.py", "*_test.py"]
+addopts = "-v"
+
+[tool.black]
+line-length = 100
+target-version = ["py39", "py310", "py311", "py312", "py313"]
+
+[tool.isort]
+profile = "black"
+line_length = 100
