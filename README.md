@@ -6,7 +6,18 @@
 [![Issues](https://img.shields.io/github/issues/Borlaff/ROSALIA.svg?style=for-the-badge)](https://github.com/Borlaff/ROSALIA/issues)
 [![License](https://img.shields.io/github/license/Borlaff/ROSALIA.svg?style=for-the-badge)](https://github.com/Borlaff/ROSALIA/blob/main/LICENSE.txt)
 
+
+
+<!-- PROJECT LOGO -->
+<br />
+<div align="center">
+  <a href="https://github.com/Borlaff/ROSALIA">
+    <img src="images/rosalia_logo.png" alt="ROSALIA_logo" width="710" height="437">
+  </a>
+
 ## About The Project
+
+
 
 ROSALIA (Roman Sky Analyst for Low surface brightness Imaging & Astronomy) is a pipeline to model the sky background level on astronomical images obtained with [NASA/Nancy Grace Roman Space Telescope](https://roman.gsfc.nasa.gov) and its direct predecessor, the legendary [NASA/Hubble Space Telescope](https://science.nasa.gov/mission/hubble/).
 
