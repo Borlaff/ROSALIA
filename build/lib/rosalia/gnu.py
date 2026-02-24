@@ -5,9 +5,6 @@ import matplotlib.pyplot as plt
 import bottleneck as bn
 import pandas as pd
 from astropy.io import fits
-# Custom modules
-#sys.path.append("/Users/aborlaff/NASA/STRAYCOR/")
-
 import rosalia as rs
 
 def make_saturation_mask(input_name, ext, saturation_level=50000):

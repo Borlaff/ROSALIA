@@ -1,17 +1,12 @@
 # Alejandro S. Borlaff. NASA Ames Research Center. a.s.borlaff@nasa.gov / asborlaff@gmail.com
 # June 27, 2023.
 #
-# STRAYCOR main module
+# ROSALIA main module
 # This module will hold all the general programs to be interacting with the user
 #
 # Version log:
 # v.1.0 - 27 June 2023. First loading of programs inherited from former straycor.
-#
-##########################################################
-#  Required Packages
-#  pip install sep
-#
-#
+# v.2.0 - 29 Feb 2024. First working version in a public release. The main_offender program is now fully working and tested with Roman Dummy images. The main program to run is rosalia_stray, which calls main_offender internally.
 ##########################################################
 
 # General modules
@@ -34,13 +29,85 @@ from astropy.time import Time
 from astropy import constants as const
 from astropy.coordinates import ICRS, Angle, SkyCoord
 
-# from rosalia.utils import exposure_inspector
-# from rosalia.utils import convert_ASDF_to_FITS
-
 ###########################
 
-def rosalia_stray(input_name=None, exposure_dict = None, output_name="rosalia_stray_output.fits", radius=1,
+def rosalia_stray(ra, dec, PA, date, bandpass, exptime, radius=1,
                   g_mag_max=15, sun_block=False, verbose=False, catalog=None):
+    """
+    Identify and estimate straylight from stars outside the field of view.
+
+    Estimates the straylight from stars outside the field of view for Roman Space
+    Telescope Wide Field Instrument observations.
+
+    Args:
+        ra (float): 
+            Right ascension of the pointing, in degrees.
+
+        dec (float): 
+            Declination of the pointing, in degrees.
+
+        PA (float): 
+            Position angle of the observation, in degrees.
+        
+        date (astropy.time.Time): 
+            Date of the observation in YYYY-MM-DDTHH:MM:SS format.
+        
+        bandpass (str): 
+            Bandpass of the observation in Roman WFI filter names (e.g., F062, F087, F106, F129, F158, F184, F213).
+        
+        exptime (float): 
+            Exposure time of the observation, in seconds.
+        
+        radius (float, optional): 
+            Radius around the pointing to search for stars, in degrees. Default is 1.
+        
+        g_mag_max (float, optional): 
+            Maximum g magnitude of the stars to consider in the straylight estimation. Default is 15.
+        
+        sun_block (bool, optional): 
+            If True, the Sun will be removed from the star catalog. Default is False.
+        
+        verbose (bool, optional): 
+            If True, print more information about progress. Default is False.
+        
+        catalog (pandas.DataFrame, optional): 
+            User-provided catalog of stars. Must contain columns: "ra", "dec", "source_id", "cat_id", "mag_lambda".
+            If provided, skips querying Gaia/2MASS/WISE catalogs. Default is None.
+
+    Returns:
+        pandas.DataFrame: Estimated straylight from each star outside the field
+            of view with metadata. Columns: "source_id", "cat_id", "ra", "dec",
+            "mag_lambda", "straylevel", "main_offender", "mosaic_name",
+            "mosaic_name_scaled".
+
+    History:
+        v1 - 29 Feb 2024. First working version in a public release.
+
+    Author:
+        Alejandro S. Borlaff (NASA Ames Research Center, a.s.borlaff@nasa.gov)
+    """
+    from tqdm import tqdm
+    import logging
+    logger = logging.getLogger()
+    logger.setLevel(logging.CRITICAL)
+
+    # Make the Roman Dummy image
+    roman_dummy_name = os.getcwd() + "/WFI_" + bandpass +\
+                                     "_RA_" + '{:07.3f}'.format(ra) +\
+                                     "_DEC_" + '{:07.3f}'.format(dec) +\
+                                     "_MJD_" + '{:07.5f}'.format(date.mjd) +\
+                                     "_PA_" + '{:06.2f}'.format(PA) + ".fits"
+    output_name = roman_dummy_name.replace(".fits","_stray.fits")
+    central_coords = SkyCoord(ra, dec, frame="icrs", unit="deg")
+
+    input_name = rs.roman.create_roman_dummy(point=central_coords, date=date,
+                                               band=bandpass, PA=PA, exptime=exptime,
+                                               output=roman_dummy_name)
+    print(input_name)
+
+    # Get the image identity
+    image_identity = rs.utils.exposure_inspector(input_name=input_name, verbose=verbose, lite=True)
+    
 
     if input_name is None:
         input_name = rs.roman.create_roman_dummy(point=exposure_dict["point"],
@@ -80,7 +147,7 @@ def rosalia_stray(input_name=None, exposure_dict = None, output_name="rosalia_st
 
 ###########################
 
-def rosalia_zody(ra, dec, PA, date, bandpass, exptime, verbose=False, output_name=None, output_units=None):
+def rosalia_zody(ra, dec, PA, date, bandpass, exptime, verbose=False, output_name=None, output_units="e/s"):
 
     from tqdm import tqdm
     import logging
@@ -123,6 +190,7 @@ def rosalia_zody(ra, dec, PA, date, bandpass, exptime, verbose=False, output_nam
                                                       nbins_wavelength=20, obslocin=3,
                                                       grid_method="random", output_units=output_units,
                                                       verbose=False)
+        # print(zodiacal_background)
         zodiacal_background_list.append(zodiacal_background.value)
         zodiacal_background_unit_list.append(zodiacal_background.unit.to_string())
 
@@ -150,7 +218,7 @@ def rosalia_zody(ra, dec, PA, date, bandpass, exptime, verbose=False, output_nam
 ###########################
 
 
-def rosalia_psf(ra, dec, PA, g_mag_max, date, bandpass, exptime, verbose=False):
+def rosalia_psf(ra, dec, PA, g_mag_max, date, bandpass, exptime, input_catalog=None, verbose=False):
     #######################################
     # rosalia_psf: Alejandro S. Borlaff. NASA/Ames STA. a.s.borlaff@nasa.gov
     # -------------------------------
@@ -161,6 +229,40 @@ def rosalia_psf(ra, dec, PA, g_mag_max, date, bandpass, exptime, verbose=False):
     #
     #######################################
 
+    '''
+    rosalia_psf: Alejandro S. Borlaff. NASA Ames Research Center.
+    Model the stars inside a Roman WFI image. This is useful for estimating the straylight from stars 
+    inside the field of view, and for subtracting the stars from the image.
+
+    Args:
+        ra (float): 
+            Right ascension of the pointing, in degrees.
+        
+        dec (float): 
+            Declination of the pointing, in degrees.
+        
+        PA (float): 
+            Position angle of the observation, in degrees.
+        
+        g_mag_max (float):
+            Maximum g magnitude of the stars to consider in the model.
+        
+        date (astropy.time.Time): 
+            Date of the observation in YYYY-MM-DDTHH:MM:SS format.
+        
+        bandpass (str): 
+            Bandpass of the observation in Roman WFI filter names (e.g., F062, F087, F106, F129, F158, F184, F213).
+        
+        exptime (float): 
+            Exposure time of the observation, in seconds.
+
+        input_catalog (pandas.DataFrame, optional): 
+            User-provided catalog of stars. Must contain columns: "ra", "dec", "source_id", "cat_id", "mag_lambda".
+        
+        verbose (bool, optional): 
+            If True, print more information about progress. Default is False.
+
+    '''
     from tqdm import tqdm
     import logging
     logger = logging.getLogger()
@@ -176,8 +278,8 @@ def rosalia_psf(ra, dec, PA, g_mag_max, date, bandpass, exptime, verbose=False):
     central_coords = SkyCoord(ra, dec, frame="icrs", unit="deg")
 
     roman_dummy_name = rs.roman.create_roman_dummy(point=central_coords, date=date,
-                                               band=bandpass, PA=PA, exptime=exptime,
-                                               output=roman_dummy_name)
+                                                   band=bandpass, PA=PA, exptime=exptime,
+                                                   output=roman_dummy_name)
     print(roman_dummy_name)
 
     # Get the image identity
@@ -190,7 +292,11 @@ def rosalia_psf(ra, dec, PA, g_mag_max, date, bandpass, exptime, verbose=False):
                                                           # ra=ra, dec=dec, MJD=MJD, radius=radius, g_mag_max=g_mag_max, verbose=verbose)
     #hybrid_catalog = gaia_query_dict["gaia_query"]
 
-    hybrid_catalog = rs.psf.get_hybrid_catalog(ra=ra,
+    if input_catalog is not None:
+        hybrid_catalog = input_catalog
+    
+    else:
+        hybrid_catalog = rs.psf.get_hybrid_catalog(ra=ra,
                                                dec=dec,
                                                radius=1,
                                                lambda_ref=image_identity["FILTER_IDENTITY"]["filter_lambda_ref"],

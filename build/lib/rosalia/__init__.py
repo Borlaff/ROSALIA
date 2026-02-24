@@ -4,12 +4,13 @@ ROSALIA: ROman Sky Analyst for Low surface brightness Imaging & Astronomy
 """
 
 __name__ = "ROSALIA"
-__version__ = "0.9.3"
+__version__ = "0.9.6"
 __author__ = "Alejandro S. Borlaff"
 __author_email__ = "a.s.borlaff@nasa.gov"
 __description__ = "A software to calibrate the sky background of Space Telescope images"
 __url__ = "https://github.com/Borlaff/STRAYCOR"
 
+import rosalia
 import rosalia.utils
 import rosalia.astrometry
 import rosalia.bootima
@@ -33,4 +34,3 @@ import rosalia.constants
 import rosalia.plots
 import rosalia.albedo
 import rosalia.render
-# print(__name__ + " v" + __version__)

@@ -316,9 +316,6 @@ def get_zodiacal_background(input_name, ext, wavelength=None, telescope=None, in
                          weights=rebinned_transmission,
                          expstart=expstart,
                          obspos=obspos)
-        zodiacal_flux_convolved_by_filter = zody_MJysr*(u.MJy * u.steradian**-1) # rs.utils.MJysr_to_jyarcsec2(zody_MJysr)
-
-        #db_irsa[:,i] = np.array(db["zody"])
 
 
     x = detector_grid["grid_xy"][:,0]
@@ -331,10 +328,12 @@ def get_zodiacal_background(input_name, ext, wavelength=None, telescope=None, in
     points = [(x[i], y[i]) for i in range(len(x))]
 
     if interpolate:
-        zody_interp =  interpolate.griddata(points, zodiacal_flux_convolved_by_filter, (xv, yv), method="cubic")
+        zody_interp =  interpolate.griddata(points, zody_MJysr, (xv, yv), method="cubic")
     else:
-        zody_interp = zodiacal_flux_convolved_by_filter
+        zody_interp = zody_MJysr
 
+    zody_interp = zody_interp*(u.MJy * u.steradian**-1) 
+    print(telescope)
 
     if output_units == "e/s":
         if verbose: print("Output units:" + output_units)

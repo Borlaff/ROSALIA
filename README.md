@@ -142,12 +142,61 @@ That is it! We are ready to start analyzing Space Telescope images.
 <!-- USAGE EXAMPLES -->
 ### Minimal Use Example
 
+**I want to calculate the stray-light background on an image an I want it now!**
+
+Alright, alright! ROSALIA can generate a quick simulation of stray-light background for Roman / WFI, provided the coordinates of the center of WFI, position angle, date, bandpass, and exposure time: 
+
+```python
+import rosalia as rs 
+from astropy.time import Time
+
+# First define a Roman Space Telescope WFI exposure basic parameters.
+ra = 123  # Right ascension at the center of the FOV, in degrees. 
+dec = 45  # Declination at the center of the FOV, in degrees.
+PA = 67   # Position angle, counter-clockwise from North, in degrees.
+date = Time("2026-10-01T00:00:00")  # Date of the observation, in Astropy Time format.
+bandpass = "F129"  # A string with the bandpass name for WFI. See https://roman.gsfc.nasa.gov/science/WFI_technical.html
+exptime = 600  # Exposure time, in seconds.
+
+rosalia_stray = rs.correct.rosalia_stray(ra=ra, dec=dec, PA=PA, date=date, 
+                                         bandpass=bandpass, exptime=exptime)
+```
+
+The estimated background stray-light model will be stored in a new FITS file, named using the input parameters: 
+
+```sh
+
+```
+
+### Not-So-Minimal Use Example
+
 ROSALIA estimates the amount of stray-light from Roman Space Telescope images. To do this, it calculates how many photons reach the focal plane array from secondary optical paths, based on a function called Normalized Detector Irradiance (NDI).
 
 Those photons represent a source of contamination and typically must be modeled and removed before the images are ready for science. ROSALIA calculates the flux of photons for each pixel of the focal plane array. For Roman/WFI, that is a total of 300,811,392 pixels! (18 4088x4088 H4RG-10 detectors).
 
 Let's do a quick example to figure out how many photons do we expect to see on an average Roman / WFI exposure. The main source of background light (under normal conditions) is the Zodiacal light. 
 
+```python
+import rosalia as rs 
+from astropy.time import Time
+
+# First define a Roman Space Telescope WFI exposure basic parameters.
+ra = 123  # Right ascension at the center of the FOV, in degrees. 
+dec = 45  # Declination at the center of the FOV, in degrees.
+PA = 67   # Position angle, counter-clockwise from North, in degrees.
+date = Time("2026-10-01T00:00:00")  # Date of the observation, in Astropy Time format.
+bandpass = "F129"  # A string with the bandpass name for WFI. See https://roman.gsfc.nasa.gov/science/WFI_technical.html
+exptime = 600  # Exposure time, in seconds.
+
+rosalia_zody = rs.correct.rosalia_zody(ra=ra, dec=dec, PA=PA, date=date, 
+                                        bandpass=bandpass, exptime=exptime)
+```
+
+The code above will generate a FITS file containing 18 SCI extensions, each of them with the predicted Zodiacal light flux in electrons per second (e/s). The file will be automatically named following following the input ROSALIA convention, in this case:
+
+```WFI_F129_RA_123.000_DEC_045.000_MJD_61314.00000_PA_067.00_zody.fits```
+
+From the model, we expect to have a Zodiacal light background of ~0.62 e/s.
 
 ROSALIA focuses on modeling three types of backgrounds:
 

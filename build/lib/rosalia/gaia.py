@@ -1,7 +1,7 @@
 # Alejandro S. Borlaff. NASA Ames Research Center. a.s.borlaff@nasa.gov / asborlaff@gmail.com
 # June 14, 2024s.
 #
-# STRAYCOR/GAIA module
+# ROSALIA/GAIA module
 # This module will hold all the programs related to the queries to the Gaia / 2MASS / WISE database
 #
 # Version log:
@@ -34,11 +34,6 @@ import rosalia.constants as rs_constants
 import warnings
 warnings.filterwarnings('ignore')
 
-#from astropy.units import Quantity
-#from astroquery.irsa import Irsa
-#from astroquery.vizier import Vizier
-#from astroquery.mast import Observations
-#from scipy import interpolate
 
 ##############
 def query_gaia_2mass_wise(ra, dec, radius, g_mag_max=False, verbose=False, query_filename="gaia_query.dat"):

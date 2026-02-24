@@ -147,7 +147,7 @@ def rosalia_stray(ra, dec, PA, date, bandpass, exptime, radius=1,
 
 ###########################
 
-def rosalia_zody(ra, dec, PA, date, bandpass, exptime, verbose=False, output_name=None, output_units=None):
+def rosalia_zody(ra, dec, PA, date, bandpass, exptime, verbose=False, output_name=None, output_units="e/s"):
 
     from tqdm import tqdm
     import logging
@@ -190,6 +190,7 @@ def rosalia_zody(ra, dec, PA, date, bandpass, exptime, verbose=False, output_nam
                                                       nbins_wavelength=20, obslocin=3,
                                                       grid_method="random", output_units=output_units,
                                                       verbose=False)
+        # print(zodiacal_background)
         zodiacal_background_list.append(zodiacal_background.value)
         zodiacal_background_unit_list.append(zodiacal_background.unit.to_string())
 
@@ -217,7 +218,7 @@ def rosalia_zody(ra, dec, PA, date, bandpass, exptime, verbose=False, output_nam
 ###########################
 
 
-def rosalia_psf(ra, dec, PA, g_mag_max, date, bandpass, exptime, verbose=False):
+def rosalia_psf(ra, dec, PA, g_mag_max, date, bandpass, exptime, input_catalog=None, verbose=False):
     #######################################
     # rosalia_psf: Alejandro S. Borlaff. NASA/Ames STA. a.s.borlaff@nasa.gov
     # -------------------------------
@@ -228,6 +229,40 @@ def rosalia_psf(ra, dec, PA, g_mag_max, date, bandpass, exptime, verbose=False):
     #
     #######################################
 
+    '''
+    rosalia_psf: Alejandro S. Borlaff. NASA Ames Research Center.
+    Model the stars inside a Roman WFI image. This is useful for estimating the straylight from stars 
+    inside the field of view, and for subtracting the stars from the image.
+
+    Args:
+        ra (float): 
+            Right ascension of the pointing, in degrees.
+        
+        dec (float): 
+            Declination of the pointing, in degrees.
+        
+        PA (float): 
+            Position angle of the observation, in degrees.
+        
+        g_mag_max (float):
+            Maximum g magnitude of the stars to consider in the model.
+        
+        date (astropy.time.Time): 
+            Date of the observation in YYYY-MM-DDTHH:MM:SS format.
+        
+        bandpass (str): 
+            Bandpass of the observation in Roman WFI filter names (e.g., F062, F087, F106, F129, F158, F184, F213).
+        
+        exptime (float): 
+            Exposure time of the observation, in seconds.
+
+        input_catalog (pandas.DataFrame, optional): 
+            User-provided catalog of stars. Must contain columns: "ra", "dec", "source_id", "cat_id", "mag_lambda".
+        
+        verbose (bool, optional): 
+            If True, print more information about progress. Default is False.
+
+    '''
     from tqdm import tqdm
     import logging
     logger = logging.getLogger()
@@ -257,7 +292,11 @@ def rosalia_psf(ra, dec, PA, g_mag_max, date, bandpass, exptime, verbose=False):
                                                           # ra=ra, dec=dec, MJD=MJD, radius=radius, g_mag_max=g_mag_max, verbose=verbose)
     #hybrid_catalog = gaia_query_dict["gaia_query"]
 
-    hybrid_catalog = rs.psf.get_hybrid_catalog(ra=ra,
+    if input_catalog is not None:
+        hybrid_catalog = input_catalog
+    
+    else:
+        hybrid_catalog = rs.psf.get_hybrid_catalog(ra=ra,
                                                dec=dec,
                                                radius=1,
                                                lambda_ref=image_identity["FILTER_IDENTITY"]["filter_lambda_ref"],
@@ -666,8 +705,12 @@ def main_offender(input_name=None, ext=None, ra=None, dec=None, phi=0,
         header_output.append(image_identity["ASTROPYWCS"][SCIEXT_i-1].to_header())
 
     main_offender_output_name = output_name.replace(".fits", "_main_off.fits")
-    rs.utils.save_fits(array=data_output, name=main_offender_output_name, header=header_output,
-                       extname=None, overwrite=True, output_verify='silentfix')
+    rs.utils.save_fits(array=data_output, 
+                       name=main_offender_output_name, 
+                       header=header_output,
+                       extname=None, 
+                       overwrite=True, 
+                       output_verify='silentfix')
 
 
 
