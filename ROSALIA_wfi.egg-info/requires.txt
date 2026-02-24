@@ -9,6 +9,7 @@ regions
 reproject
 LSSTDESC.Coord
 numpy
+jupyterlab
 galsim
 skyfield
 tqdm

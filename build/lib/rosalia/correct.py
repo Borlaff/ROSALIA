@@ -138,10 +138,10 @@ def rosalia_stray(ra, dec, PA, date, bandpass, exptime, radius=1,
                                      output_name = output_name)
 
     # Make a 0.1 x 0.1 scaled version for inspection ease.
-    outname = output_name.replace(".fits", "_scaled.fits")
-    outname, outname_scaled = rs.utils.run_swarp(pattern=output_name, outname=outname, coveredfrac=1)
-    main_offender_db["mosaic_name"] = outname
-    main_offender_db["mosaic_name_scaled"] = outname_scaled
+    # outname = output_name.replace(".fits", "_scaled.fits")
+    # outname, outname_scaled = rs.utils.run_swarp(pattern=output_name, outname=outname, coveredfrac=1)
+    # main_offender_db["mosaic_name"] = outname
+    # main_offender_db["mosaic_name_scaled"] = outname_scaled
 
     return(main_offender_db)
 
@@ -705,8 +705,12 @@ def main_offender(input_name=None, ext=None, ra=None, dec=None, phi=0,
         header_output.append(image_identity["ASTROPYWCS"][SCIEXT_i-1].to_header())
 
     main_offender_output_name = output_name.replace(".fits", "_main_off.fits")
-    rs.utils.save_fits(array=data_output, name=main_offender_output_name, header=header_output,
-                       extname=None, overwrite=True, output_verify='silentfix')
+    rs.utils.save_fits(array=data_output, 
+                       name=main_offender_output_name, 
+                       header=header_output,
+                       extname=None, 
+                       overwrite=True, 
+                       output_verify='silentfix')
 
 
 

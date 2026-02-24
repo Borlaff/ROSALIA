@@ -1,0 +1,7 @@
+.fits
+swarp.conf
+swarp.xml
+subprocess.out
+temp*
+*temp
+*csv

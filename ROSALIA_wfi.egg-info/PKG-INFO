@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: rosalia-wfi
-Version: 0.9.7.4
+Version: 0.9.7.5
 Summary: A software to calibrate the sky background of Space Telescope images
 Author-email: "Alejandro S. Borlaff" <a.s.borlaff@nasa.gov>
 License: BSD
@@ -31,6 +31,7 @@ Requires-Dist: regions
 Requires-Dist: reproject
 Requires-Dist: LSSTDESC.Coord
 Requires-Dist: numpy
+Requires-Dist: jupyterlab
 Requires-Dist: galsim
 Requires-Dist: skyfield
 Requires-Dist: tqdm
@@ -215,7 +216,11 @@ rosalia_stray = rs.correct.rosalia_stray(ra=ra, dec=dec, PA=PA, date=date,
                                          bandpass=bandpass, exptime=exptime)
 ```
 
+The estimated background stray-light model will be stored in a new FITS file, named using the input parameters: 
 
+```sh
+
+```
 
 ### Not-So-Minimal Use Example
 
