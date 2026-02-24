@@ -1,21 +1,32 @@
-# Changelog
+=========
+Changelog
+=========
 
-## v1.1.1
+v1.1.1
+======
 
-### Added or Changed
+Added or Changed
+----------------
+
 - Fixed back to top alignment (revert changes)
 
 
-## v1.1.0
+v1.1.0
+======
 
-### Added or Changed
+Added or Changed
+----------------
+
 - Fixed back to top link alignment deprecated tag, use CSS style instead
 - Added contrib.rocks to show top contributors
 
 
-## v1.0.0
+v1.0.0
+======
 
-### Added or Changed
+Added or Changed
+----------------
+
 - Added this changelog :)
 - Fixed typos in both templates
 - Back to top links
@@ -23,6 +34,7 @@
 - Changed table of contents to start collapsed
 - Added checkboxes for major features on roadmap
 
-### Removed
+Removed
+-------
 
-- Some packages/libraries from acknowledgements I no longer use
+- Some packages/libraries from acknowledgements no longer in use
