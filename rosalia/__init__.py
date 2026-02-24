@@ -10,6 +10,7 @@ __author_email__ = "a.s.borlaff@nasa.gov"
 __description__ = "A software to calibrate the sky background of Space Telescope images"
 __url__ = "https://github.com/Borlaff/STRAYCOR"
 
+import rosalia
 import rosalia.utils
 import rosalia.astrometry
 import rosalia.bootima
@@ -34,4 +35,7 @@ import rosalia.plots
 import rosalia.albedo
 import rosalia.render
 # print(__name__ + " v" + __version__)
-plt.style.use(os.path.join(os.path.dirname(rs.__file__), "style", "presi_style.mplstyle"))
+
+import matplotlib.pyplot as plt
+import os
+plt.style.use(os.path.join(os.path.dirname(rosalia.__file__), "style", "presi_style.mplstyle"))
