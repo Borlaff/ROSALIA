@@ -34,8 +34,3 @@ import rosalia.constants
 import rosalia.plots
 import rosalia.albedo
 import rosalia.render
-# print(__name__ + " v" + __version__)
-
-import matplotlib.pyplot as plt
-import os
-plt.style.use(os.path.join(os.path.dirname(rosalia.__file__), "style", "presi_style.mplstyle"))
