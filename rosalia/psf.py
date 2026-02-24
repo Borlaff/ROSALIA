@@ -29,9 +29,6 @@ import rosalia as rs
 import warnings
 warnings.filterwarnings('ignore')
 
-    
-plt.style.use(rs.__file__ + "/style/presi_style.mplstyle")
-
 
 def scale_and_subtract_stars(input_name, ext, exposure_identity, g_mag_max=False, clean=False, verbose=False):
     ## TODO: Compute the scale factor for the object at (x,y)=(53,69) for

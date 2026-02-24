@@ -243,8 +243,8 @@ def rosalia_psf(ra, dec, PA, g_mag_max, date, bandpass, exptime, verbose=False):
     central_coords = SkyCoord(ra, dec, frame="icrs", unit="deg")
 
     roman_dummy_name = rs.roman.create_roman_dummy(point=central_coords, date=date,
-                                               band=bandpass, PA=PA, exptime=exptime,
-                                               output=roman_dummy_name)
+                                                   band=bandpass, PA=PA, exptime=exptime,
+                                                   output=roman_dummy_name)
     print(roman_dummy_name)
 
     # Get the image identity
