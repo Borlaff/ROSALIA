@@ -1,7 +1,6 @@
 LICENSE.txt
 README.md
 pyproject.toml
-setup.py
 ROSALIA_wfi.egg-info/PKG-INFO
 ROSALIA_wfi.egg-info/SOURCES.txt
 ROSALIA_wfi.egg-info/dependency_links.txt
@@ -38,3 +37,9 @@ rosalia/telescopes.py
 rosalia/tests.py
 rosalia/utils.py
 rosalia/images/raccoon3_logo.png
+rosalia_wfi.egg-info/PKG-INFO
+rosalia_wfi.egg-info/SOURCES.txt
+rosalia_wfi.egg-info/dependency_links.txt
+rosalia_wfi.egg-info/entry_points.txt
+rosalia_wfi.egg-info/requires.txt
+rosalia_wfi.egg-info/top_level.txt

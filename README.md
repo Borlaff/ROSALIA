@@ -31,7 +31,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/Borlaff/ROSALIA">
-    <img src="images/rosalia_logo.png" alt="ROSALIA_logo" width="710" height="437">
+    <img src="https://github.com/Borlaff/ROSALIA/images/rosalia_logo.png" alt="ROSALIA_logo" width="710" height="437">
   </a>
 
   <p align="center">
@@ -81,7 +81,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
+<!--[![Product Name Screen Shot][product-screenshot]](https://example.com) -->
 
 ROSALIA (Roman Sky Analyst for Low surface brightness Imaging & Astronomy) is a pipeline to model the sky background level on astronomical images obtained with [NASA/Nancy Grace Roman Space Telescope](https://roman.gsfc.nasa.gov) and its direct predecessor, the legendary [NASA/Hubble Space Telescope](https://science.nasa.gov/mission/hubble/). In particular ROSALIA is focused on the prediction and calibration of *stray-light* in the [Roman Wide Field Instrument](https://roman-docs.stsci.edu/roman-instruments-home/wfi-imaging-mode-user-guide/introduction-to-wfi), one of the main contaminants in ultra deep low surface brightness observations, and the main source of gradients of parasitic light for space telescopes. ROSALIA combines the information from existing photometric catalogs (Gaia, 2MASS, WISE) with precise optical and payload ray-tracing models of the Roman Space Telescope, allowing to generate images of stray-light and other components of the sky-background for user-defined observational conditions.
 
@@ -150,7 +150,42 @@ That is it! We are ready to start analyzing Space Telescope images.
 <!-- USAGE EXAMPLES -->
 ## Minimal use example
 
-ROSALIA estimates the amount of stray-light from Roman Space Telescope images. To do that, it calculates how many photons reach the focal plane array from secondary optical paths, based on a function called Normalized Detector Irradiance (NDI, https://link.springer.com/book/10.1007/b97612). Those photons represent a source of contamination and typically, they must be modeled and removed before the images are ready for science. ROSALIA calculates the flux of photons for each pixel of the focal plane array. For Roman/WFI, that is a total of 300,811,392 pixels! (18 4088x4088 H4RG-10 detectors). While Nancy Grace Roman Space Telescope is scheduled to be launched no earlier than September 2026, we can start simulating the observations that this magnificent telescope will provide humanity with using another Roman software, romanisim (https://romanisim.readthedocs.io/en/latest/).
+ROSALIA estimates the amount of stray-light from Roman Space Telescope images. To do that, it calculates how many photons reach the focal plane array from secondary optical paths, based on a function called Normalized Detector Irradiance (NDI, https://link.springer.com/book/10.1007/b97612). Those photons represent a source of contamination and typically, they must be modeled and removed before the images are ready for science. ROSALIA calculates the flux of photons for each pixel of the focal plane array. For Roman/WFI, that is a total of 300,811,392 pixels! (18 4088x4088 H4RG-10 detectors). 
+
+ROSALIA focuses on modeling three types of backgrounds: 
+1 - Stray-light from sources outside the field of view (Normalized Detector Irradiance).
+2 - Stray-light from sources inside the field of view (Point Spread Function).
+3 - Zodiacal light. 
+
+Let's do a very quick example to simulate these:
+
+### Out-of-field stray-light
+
+Open a python terminal and type:
+
+.. code-block:: python
+   import rosalia as rs 
+   from astropy.time import Time
+   
+   # First define a Roman Space Telescope WFI exposure basic parameters.
+   ra = 123 # Right ascension at the center of the FOV, in degrees. 
+   dec = 23 # Declination at the center of the FOV, in degrees.
+   PA = 45 # Position angle, counter-clockwise from North, in degrees.
+   date = Time("2024-06-01T00:00:00") # Date of the observation, in Astropy Time format.
+   bandpass = "F129" # A string with the bandpass name for WFI. Check https://roman.gsfc.nasa.gov/science/WFI_technical.html
+   exptime = 600 # Exposure time, in seconds.
+
+   rosalia_stray = rs.correct.rosalia_stray(ra=ra, dec=dec, PA=PA, date=date, bandpass=bandpass, exptime=exptime, radius=1,
+                                         g_mag_max=15, sun_block=False, verbose=False, catalog=None)
+
+   
+
+
+
+
+
+
+While Nancy Grace Roman Space Telescope is scheduled to be launched no earlier than September 2026, we can start simulating the observations that this magnificent telescope will provide humanity with using another Roman software, romanisim (https://romanisim.readthedocs.io/en/latest/).
 
 ### Generating some mock Roman / WFI observations
 1. Install [romanisim](https://romanisim.readthedocs.io/en/latest/) and generate a Roman/WFI example image. For our experiment -- and to maximize the visualization of stray-light -- we will simulate an exposure nearby the Orion's Belt.
