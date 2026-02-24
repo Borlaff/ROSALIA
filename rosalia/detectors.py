@@ -15,12 +15,9 @@ import astropy.wcs as wcs
 import numpy as np
 import astropy.units as u
 
-# STRAYCOR modules
+# ROSALIA modules
 import rosalia as rs
 from astropy import constants as const
-
-
-
 
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-

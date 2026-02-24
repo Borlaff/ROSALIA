@@ -29,15 +29,13 @@ import rosalia as rs
 import warnings
 warnings.filterwarnings('ignore')
 
-# Custom modules
-#sys.path.append("/Users/aborlaff/NASA/STRAYCOR/")
-
-
-# STRAYCOR modules
-
-
-psf_archive = os.environ["ROSALIACACHE"] + "/CORE/PSF_ARCHIVE/"
-plt.style.use(os.environ["ROSALIACACHE"]+ "/CORE/presi_style.mplstyle")
+# Adding cache and style files 
+try: 
+    psf_archive = os.environ["ROSALIACACHE"] + "/CORE/PSF_ARCHIVE/"
+except NameError:
+    print("ROSALIACACHE environment variable not set. Please check your .bashrc or .zshrc file and define it. Example: export ROSALIACACHE=/path/to/rosaliacache/")
+    
+plt.style.use(rs.__file__ + "/style/presi_style.mplstyle")
 
 
 def scale_and_subtract_stars(input_name, ext, exposure_identity, g_mag_max=False, clean=False, verbose=False):
