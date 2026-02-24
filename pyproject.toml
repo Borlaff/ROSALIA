@@ -31,6 +31,7 @@ dependencies = [
     "bottleneck",
     "xmltodict",
     "romanisim",
+    "build",
     "asdf",
     "cartopy",
     "healpy",
@@ -55,6 +56,8 @@ dependencies = [
     "ipython",
     "pysynphot",
     "sphericalpolygon",
+    "sphinx", "sphinx-rtd-dark-mode",
+    "twine",
     "psutil",
     "zodipy",
 ]

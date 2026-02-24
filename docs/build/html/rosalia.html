@@ -530,8 +530,34 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.correct.rosalia_psf">
-<span class="sig-prename descclassname"><span class="pre">rosalia.correct.</span></span><span class="sig-name descname"><span class="pre">rosalia_psf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PA</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g_mag_max</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bandpass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exptime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.correct.rosalia_psf" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">rosalia.correct.</span></span><span class="sig-name descname"><span class="pre">rosalia_psf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PA</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g_mag_max</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bandpass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exptime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_catalog</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.correct.rosalia_psf" title="Link to this definition"></a></dt>
+<dd><p>rosalia_psf: Alejandro S. Borlaff. NASA Ames Research Center.
+Model the stars inside a Roman WFI image. This is useful for estimating the straylight from stars 
+inside the field of view, and for subtracting the stars from the image.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>ra (float): </dt><dd><p>Right ascension of the pointing, in degrees.</p>
+</dd>
+<dt>dec (float): </dt><dd><p>Declination of the pointing, in degrees.</p>
+</dd>
+<dt>PA (float): </dt><dd><p>Position angle of the observation, in degrees.</p>
+</dd>
+<dt>g_mag_max (float):</dt><dd><p>Maximum g magnitude of the stars to consider in the model.</p>
+</dd>
+<dt>date (astropy.time.Time): </dt><dd><p>Date of the observation in YYYY-MM-DDTHH:MM:SS format.</p>
+</dd>
+<dt>bandpass (str): </dt><dd><p>Bandpass of the observation in Roman WFI filter names (e.g., F062, F087, F106, F129, F158, F184, F213).</p>
+</dd>
+<dt>exptime (float): </dt><dd><p>Exposure time of the observation, in seconds.</p>
+</dd>
+<dt>input_catalog (pandas.DataFrame, optional): </dt><dd><p>User-provided catalog of stars. Must contain columns: “ra”, “dec”, “source_id”, “cat_id”, “mag_lambda”.</p>
+</dd>
+<dt>verbose (bool, optional): </dt><dd><p>If True, print more information about progress. Default is False.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.correct.rosalia_stray">
@@ -582,7 +608,7 @@ If provided, skips querying Gaia/2MASS/WISE catalogs. Default is None.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.correct.rosalia_zody">
-<span class="sig-prename descclassname"><span class="pre">rosalia.correct.</span></span><span class="sig-name descname"><span class="pre">rosalia_zody</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PA</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bandpass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exptime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.correct.rosalia_zody" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">rosalia.correct.</span></span><span class="sig-name descname"><span class="pre">rosalia_zody</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PA</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bandpass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exptime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'e/s'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.correct.rosalia_zody" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">

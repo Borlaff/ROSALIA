@@ -24,6 +24,7 @@ Requires-Dist: multiprocess
 Requires-Dist: bottleneck
 Requires-Dist: xmltodict
 Requires-Dist: romanisim
+Requires-Dist: build
 Requires-Dist: asdf
 Requires-Dist: cartopy
 Requires-Dist: healpy
@@ -48,6 +49,9 @@ Requires-Dist: celluloid
 Requires-Dist: ipython
 Requires-Dist: pysynphot
 Requires-Dist: sphericalpolygon
+Requires-Dist: sphinx
+Requires-Dist: sphinx-rtd-dark-mode
+Requires-Dist: twine
 Requires-Dist: psutil
 Requires-Dist: zodipy
 Dynamic: license-file
@@ -160,6 +164,10 @@ Sci-PI: Alejandro S. Borlaff (NASA ARC). Admin-PI: Pamela M. Marcum (NASA ARC)
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
  -->
 
+## Note: 
+
+This package is under active development. Our team is working hard to provide a reliable pipeline that allows to model the sky backgrounds for Roman Space Telescope Wide Field Instrument. However, progress does not come overnight. We are open-source testing code and substantial changes will occur regularly. Use at your own risk. In case of doubt, send an email to Alejandro S. Borlaff, a.s.borlaff@nasa.gov.  
+
 ## Installation
 ### Managing dependencies
 ROSALIA is based on multiple packages, including [Astropy](https://www.astropy.org/), [Astroquery](https://astroquery.readthedocs.io/en/latest/), and [Romanisim](https://romanisim.readthedocs.io/en/latest/), [NumPy](https://numpy.org/), [SciPy](https://scipy.org/), and [Matplotlib](https://matplotlib.org/) among many others. The easiest way to install all the dependencies is through a package manager like [Conda](https://anaconda.org/anaconda/conda) or [Mamba](https://github.com/mamba-org/mamba). If you have a Conda/Mamba package manager already installed in your system, skip to the following section. If you do not have a package manager, follow the Conda installation instructions at the [Space Telescope stenv environment webpage](https://stenv.readthedocs.io/en/latest/getting_started.html).
@@ -194,7 +202,7 @@ Add this line to your .bashrc or .zshrc to set it up by default.
 That is it! We are ready to start analyzing Space Telescope images.
 
 <!-- USAGE EXAMPLES -->
-### Minimal Use Example
+### Minimal Use Example - Simulating stray-light
 
 **I want to calculate the stray-light background on an image an I want it now!**
 
@@ -222,8 +230,9 @@ The estimated background stray-light model will be stored in a new FITS file, na
 
 ```
 
-### Not-So-Minimal Use Example
+## Not-So-Minimal Use Examples
 
+### Simulating Zodiacal light
 ROSALIA estimates the amount of stray-light from Roman Space Telescope images. To do this, it calculates how many photons reach the focal plane array from secondary optical paths, based on a function called Normalized Detector Irradiance (NDI).
 
 Those photons represent a source of contamination and typically must be modeled and removed before the images are ready for science. ROSALIA calculates the flux of photons for each pixel of the focal plane array. For Roman/WFI, that is a total of 300,811,392 pixels! (18 4088x4088 H4RG-10 detectors).
@@ -252,86 +261,44 @@ The code above will generate a FITS file containing 18 SCI extensions, each of t
 
 From the model, we expect to have a Zodiacal light background of ~0.62 e/s.
 
-ROSALIA focuses on modeling three types of backgrounds:
+### Simulating PSF (stars)
 
-1. **Stray-light from sources outside the field of view** (Normalized Detector Irradiance)
-2. **Stray-light from sources inside the field of view** (Point Spread Function)
-3. **Zodiacal light**
-
-#### Out-of-field Stray-light
-
-Open a Python terminal and type:
+Another use of ROSALIA is to simulate stars that actually land inside the field of view of Roman. These are modeled by rosalia_psf. 
 
 ```python
-import rosalia as rs 
+
+import rosalia as rs
+import pandas as pd
 from astropy.time import Time
 
-# First define a Roman Space Telescope WFI exposure basic parameters.
-ra = 123  # Right ascension at the center of the FOV, in degrees. 
-dec = 23  # Declination at the center of the FOV, in degrees.
-PA = 45   # Position angle, counter-clockwise from North, in degrees.
-date = Time("2024-06-01T00:00:00")  # Date of the observation, in Astropy Time format.
-bandpass = "F129"  # A string with the bandpass name for WFI. See https://roman.gsfc.nasa.gov/science/WFI_technical.html
-exptime = 600  # Exposure time, in seconds.
+ra = 123 # Right ascension, in degrees. 
+dec = 23 # Declination, in degrees.
+PA = 45 # Position angle, in degrees.
+date = Time("2024-06-01T00:00:00") # Date of the observation, in Astropy Time YYYY-MM-DDTHH:MM:SS format.
+bandpass = "F129"
+g_mag_max = 15 # Maximum Gaia g-band magnitude considered when searching stars in the Gaia / 2MASS / WISE database. 
+exptime = 600 # Exposure time, in seconds.
 
-rosalia_stray = rs.correct.rosalia_stray(ra=ra, dec=dec, PA=PA, date=date, 
-                                         bandpass=bandpass, exptime=exptime, 
-                                         radius=1, g_mag_max=15, 
-                                         sun_block=False, verbose=False, 
-                                         catalog=None)
+catalog = {"ra": [123.01, 123.02, 123.03],
+           "dec": [23.01, 23.02, 23.03],
+           "mag_lambda": [14, 14.5, 15],
+           "source_id": [1, 2, 3],
+           "cat_id": [1, 2, 3]}
+           
+input_catalog = pd.DataFrame(catalog) # Optional: By defining this catalog manually, we override the automatic query in Gaia / 2MASS / WISE. Useful for quick tests. 
+
+rosalia_psf = rs.correct.rosalia_psf(ra=ra, dec=dec, PA=PA, date=date, 
+                                     bandpass=bandpass, exptime=exptime, 
+                                     input_catalog=input_catalog,
+                                     g_mag_max=15, verbose=1)
 ```
 
-While Nancy Grace Roman Space Telescope is scheduled to be launched no earlier than September 2026, you can start simulating the observations using romanisim.
-
-#### Generating Mock Roman/WFI Observations
-
-1. Install [romanisim](https://romanisim.readthedocs.io/en/latest/) and generate a Roman/WFI example image. For our experiment -- and to maximize the visualization of stray-light -- we will simulate an exposure nearby the Orion's Belt.
-```sh
-   pip install romanisim
-   romanisim-make-image --radec 83.3419927 -1.9665163 RST_WFI_ROSALIA_test_Orion_Belt_SCA{}.asdf --roll -45 --sca -1 --bandpass F158 --level 2 --usecrds
-   ```
-Note: [romanisim](https://romanisim.readthedocs.io/en/latest/) is a package in active development. Please visit the official webpage for more information on usage.
-
-The result from the previous command will be a series of files (18 in total, one ASDF file per Roman WFI detector, or SCA) in the local directory.
-
-```sh
-ls -lah
-
--rw-r--r--   1 user  staff   391M Nov 26 16:02 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI01.asdf
--rw-r--r--   1 user  staff   391M Nov 26 15:39 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI02.asdf
--rw-r--r--   1 user  staff   391M Nov 26 15:42 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI03.asdf
--rw-r--r--   1 user  staff   391M Nov 26 15:46 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI04.asdf
--rw-r--r--   1 user  staff   391M Nov 26 15:49 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI05.asdf
--rw-r--r--   1 user  staff   391M Nov 26 15:53 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI06.asdf
--rw-r--r--   1 user  staff   391M Nov 26 15:56 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI07.asdf
--rw-r--r--   1 user  staff   391M Nov 26 15:59 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI08.asdf
--rw-r--r--   1 user  staff   391M Nov 26 16:03 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI09.asdf
--rw-r--r--   1 user  staff   391M Nov 26 16:06 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI10.asdf
--rw-r--r--   1 user  staff   391M Nov 26 16:10 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI11.asdf
--rw-r--r--   1 user  staff   391M Nov 26 16:13 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI12.asdf
--rw-r--r--   1 user  staff   391M Nov 26 16:22 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI13.asdf
--rw-r--r--   1 user  staff   391M Nov 27 07:14 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI14.asdf
--rw-r--r--   1 user  staff   391M Nov 27 08:53 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI15.asdf
--rw-r--r--   1 user  staff   391M Nov 27 08:56 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI16.asdf
--rw-r--r--   1 user  staff   391M Nov 27 09:00 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI17.asdf
--rw-r--r--   1 user  staff   391M Nov 27 09:04 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI18.asdf
-```
-These 18 files represent a single Roman/WFI level 2 (calibrated, non-combined) exposure.
-
-### Analyze the stray-light level of the Roman/WFI exposures
-2. Let's analyze the Roman/WFI example image with ROSALIA. The script rosalia-stray will extract all the necessary information from the Roman/WFI exposure file metadata, and generate a series of ASDF and FITS files with the pixel-to-pixel flux level expected for this particular exposure.
-```sh
-   rosalia-sky RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI01.asdf
-   ```
-
-
-_For more examples, please refer to the [Documentation](https://example.com)_
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- ASDF -->
 ## What is ASDF? Where are the FITS files?
-[ASDF](https://asdf.readthedocs.io/en/latest/) is the successor of [FITS](https://www.stsci.edu/hst/wfpc2/Wfpc2_dhb/intro_ch23.html) format and has been adopted since JWST . While GUI visualizers like [SAODS9 are not yet compatible with ASDF](https://www.stsci.edu/files/live/sites/www/files/home/jwst/science-planning/user-committees/jwst-users-committee/_documents/jstuc-0919-data-analysis-tool-ferguson.pdf), ROSALIA provides an easy way to extract most useful information from the ASDF files through `exposure-inspector`:
+ROSALIA uses FITS files instead of ASDF files. [ASDF](https://asdf.readthedocs.io/en/latest/) is the successor of [FITS](https://www.stsci.edu/hst/wfpc2/Wfpc2_dhb/intro_ch23.html) format and has been adopted since JWST. However, as of 2026, GUI visualizers like [SAODS9 are not yet compatible with ASDF](https://www.stsci.edu/files/live/sites/www/files/home/jwst/science-planning/user-committees/jwst-users-committee/_documents/jstuc-0919-data-analysis-tool-ferguson.pdf). In case that you are using ASDF, ROSALIA provides an easy way to extract most useful information from the ASDF files through `exposure-inspector`:
 ```sh
    exposure-inspector RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI01.asdf
 ```
