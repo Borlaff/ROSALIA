@@ -31,7 +31,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/Borlaff/ROSALIA">
-    <img src="images/rosalia_logo.png" alt="ROSALIA_logo" width="710" height="437">
+    <img src="https://raw.githubusercontent.com/Borlaff/ROSALIA/main/images/rosalia_logo.png" alt="ROSALIA_logo" width="710" height="437">
   </a>
 
   <p align="center">
@@ -81,8 +81,6 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
-
 ROSALIA (Roman Sky Analyst for Low surface brightness Imaging & Astronomy) is a pipeline to model the sky background level on astronomical images obtained with [NASA/Nancy Grace Roman Space Telescope](https://roman.gsfc.nasa.gov) and its direct predecessor, the legendary [NASA/Hubble Space Telescope](https://science.nasa.gov/mission/hubble/). In particular ROSALIA is focused on the prediction and calibration of *stray-light* in the [Roman Wide Field Instrument](https://roman-docs.stsci.edu/roman-instruments-home/wfi-imaging-mode-user-guide/introduction-to-wfi), one of the main contaminants in ultra deep low surface brightness observations, and the main source of gradients of parasitic light for space telescopes. ROSALIA combines the information from existing photometric catalogs (Gaia, 2MASS, WISE) with precise optical and payload ray-tracing models of the Roman Space Telescope, allowing to generate images of stray-light and other components of the sky-background for user-defined observational conditions.
 
 ROSALIA is funded through a NASA Grant (D.14 Roman 2022), ROSES/Nancy Grace Roman Space Telescope Research and Support Participation Opportunities.
@@ -113,7 +111,6 @@ Sci-PI: Alejandro S. Borlaff (NASA ARC). Admin-PI: Pamela M. Marcum (NASA ARC)
 ROSALIA is based on multiple packages, including [Astropy](https://www.astropy.org/), [Astroquery](https://astroquery.readthedocs.io/en/latest/), and [Romanisim](https://romanisim.readthedocs.io/en/latest/), [NumPy](https://numpy.org/), [SciPy](https://scipy.org/), and [Matplotlib](https://matplotlib.org/) among many others. The easiest way to install all the dependencies is through a package manager like [Conda](https://anaconda.org/anaconda/conda) or [Mamba](https://github.com/mamba-org/mamba). If you have a Conda/Mamba package manager already installed in your system, skip to the following section. If you do not have a package manager, follow the Conda installation instructions at the [Space Telescope stenv environment webpage](https://stenv.readthedocs.io/en/latest/getting_started.html).
 
 ### Installing ROSALIA
-#### For developers
 Create a clean environment for ROSALIA
 ```sh
 conda create -n rosalia python=3.12 conda-forge::astromatic-swarp
@@ -123,27 +120,22 @@ After the new environment is created, we can activate it.
 ```sh
 conda activate rosalia
    ```
-Once in a clean conda environment, we need to download the ROSALIA package from GitHub. 
 
-
-
-
-#### For general users (not yet available!)
-Create a clean environment for ROSALIA
-```sh
-conda create -n rosalia python=3.12 conda-forge::astromatic-swarp
-```
-
-After the new environment is created, we can activate it.
-```sh
-conda activate rosalia
-   ```
 Once in a clean conda environment, we can install ROSALIA. The preferred method to install it is through pip.
 
 ```sh
 pip install rosalia
    ```
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+ROSALIA needs a set of calibrations files to work. Most functions will work without it, but the main ones (rosalia_stray) will return an error when executed if these files are not found. The ROSALIACACHE folder must be defined in the environment as: 
+
+```sh
+export ROSALIACACHE=/home/user/project/rosalia_cache
+   ```
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+Add this line to your .bashrc or .zshrc to set it up by default.
 
 That is it! We are ready to start analyzing Space Telescope images.
 
@@ -153,6 +145,9 @@ That is it! We are ready to start analyzing Space Telescope images.
 ROSALIA estimates the amount of stray-light from Roman Space Telescope images. To do this, it calculates how many photons reach the focal plane array from secondary optical paths, based on a function called Normalized Detector Irradiance (NDI).
 
 Those photons represent a source of contamination and typically must be modeled and removed before the images are ready for science. ROSALIA calculates the flux of photons for each pixel of the focal plane array. For Roman/WFI, that is a total of 300,811,392 pixels! (18 4088x4088 H4RG-10 detectors).
+
+Let's do a quick example to figure out how many photons do we expect to see on an average Roman / WFI exposure. The main source of background light (under normal conditions) is the Zodiacal light. 
+
 
 ROSALIA focuses on modeling three types of backgrounds:
 
