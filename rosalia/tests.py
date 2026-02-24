@@ -13,8 +13,6 @@ from astroquery.gaia import Gaia
 
 import rosalia as rs
 
-psf_archive = os.environ["ROSALIACACHE"] + "/PSF_ARCHIVE/"
-
 def test_fe2mu_mu2fe():
     input_flux = 40
     print("Input flux:" + str(input_flux))

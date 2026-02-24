@@ -31,9 +31,6 @@ import rosalia as rs
 import warnings
 warnings.filterwarnings('ignore')
 
-psf_archive = os.environ["ROSALIACACHE"] + "/PSF_ARCHIVE/"
-
-
 from itertools import cycle
 from shutil import get_terminal_size
 from threading import Thread

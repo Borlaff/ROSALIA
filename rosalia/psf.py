@@ -29,11 +29,6 @@ import rosalia as rs
 import warnings
 warnings.filterwarnings('ignore')
 
-# Adding cache and style files 
-try: 
-    psf_archive = os.environ["ROSALIACACHE"] + "/CORE/PSF_ARCHIVE/"
-except NameError:
-    print("ROSALIACACHE environment variable not set. Please check your .bashrc or .zshrc file and define it. Example: export ROSALIACACHE=/path/to/rosaliacache/")
     
 plt.style.use(rs.__file__ + "/style/presi_style.mplstyle")
 
@@ -55,6 +50,13 @@ def scale_and_subtract_stars(input_name, ext, exposure_identity, g_mag_max=False
 
     # Exposure identity properties
     lambda_ref = exposure_identity["FILTER_IDENTITY"]["filter_lambda_ref"]
+    # Adding cache and style files 
+    try: 
+        psf_archive = os.environ["ROSALIACACHE"] + "/CORE/PSF_ARCHIVE/"
+    except NameError:
+        print("ROSALIACACHE environment variable not set. Please check your .bashrc or .zshrc file and define it. Example: export ROSALIACACHE=/path/to/rosaliacache/")
+        print("rosalia.psf.scale_and_subtract_stars will not work without ROSALIACACHE/CORE/PSF_ARCHIVE defined.")
+
     psf_name = psf_archive + exposure_identity["FILTER"].lower() + "00_tinytim.fits"
     MJD = exposure_identity["EXPSTART"]
 
