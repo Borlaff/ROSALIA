@@ -4,9 +4,9 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rosalia-wfi"
-version = "0.9.7"
+version = "0.9.7.2"
 description = "A software to calibrate the sky background of Space Telescope images"
-readme = "README.rst"
+readme = "README.md"
 requires-python = ">=3.9"
 license = {text = "BSD"}
 authors = [
