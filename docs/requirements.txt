@@ -17,3 +17,4 @@ psutil
 healpy
 astropy-healpix
 celluloid
+LSSTDESC.Coord
