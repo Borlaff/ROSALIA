@@ -20,3 +20,4 @@ celluloid
 LSSTDESC.Coord
 skyfield
 pytest
+ipython
