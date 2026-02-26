@@ -18,3 +18,4 @@ healpy
 astropy-healpix
 celluloid
 LSSTDESC.Coord
+skyfield
