@@ -19,3 +19,4 @@ astropy-healpix
 celluloid
 LSSTDESC.Coord
 skyfield
+pytest
