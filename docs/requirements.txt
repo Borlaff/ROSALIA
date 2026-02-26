@@ -16,3 +16,4 @@ multiprocess
 psutil
 healpy
 astropy-healpix
+celluloid
