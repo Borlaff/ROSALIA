@@ -11,3 +11,4 @@ pandas
 scipy
 tqdm
 setuptools
+dill
