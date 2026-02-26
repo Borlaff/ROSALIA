@@ -25,7 +25,7 @@ extensions = [
     'sphinx.ext.doctest',
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
-    "sphinx_rtd_dark_mode"
+    "sphinx-rtd-dark-mode"
 ]
 
 autosummary_generate = True  # Turn on sphinx.ext.autosummary
