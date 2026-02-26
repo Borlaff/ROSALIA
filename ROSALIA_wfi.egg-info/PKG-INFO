@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: rosalia-wfi
-Version: 0.9.7.5
+Version: 0.9.7.6
 Summary: A software to calibrate the sky background of Space Telescope images
 Author-email: "Alejandro S. Borlaff" <a.s.borlaff@nasa.gov>
 License: BSD
@@ -227,7 +227,7 @@ rosalia_stray = rs.correct.rosalia_stray(ra=ra, dec=dec, PA=PA, date=date,
 The estimated background stray-light model will be stored in a new FITS file, named using the input parameters: 
 
 ```sh
-
+   WFI_F129_RA_123.000_DEC_023.000_MJD_60462.00000_PA_045.00_stray.fits
 ```
 
 ## Not-So-Minimal Use Examples
@@ -257,9 +257,20 @@ rosalia_zody = rs.correct.rosalia_zody(ra=ra, dec=dec, PA=PA, date=date,
 
 The code above will generate a FITS file containing 18 SCI extensions, each of them with the predicted Zodiacal light flux in electrons per second (e/s). The file will be automatically named following following the input ROSALIA convention, in this case:
 
-```WFI_F129_RA_123.000_DEC_045.000_MJD_61314.00000_PA_067.00_zody.fits```
+```sh
+   WFI_F129_RA_123.000_DEC_023.000_MJD_60462.00000_PA_045.zody.fits
+```
 
-From the model, we expect to have a Zodiacal light background of ~0.62 e/s.
+Inspecting the FITS file, we can see that the average value from the model is ~0.62, the units are electrons per second per pixel. So, we expect to have a Zodiacal light background of ~0.62 e/s in this particular location of the sky and time. What is the surface brightness magnitude of such an electron flux? We can transform it using ROSALIA as well. 
+
+```python
+  In [2]: rs.detectors.fe2mu(0.62,instrument="WFI",filter_name="F129",telescope="RST")
+  SVO reported the transmission in m2. Correcting by area of the telescope (4.523893421169302 m2 )
+  Out[2]: array([22.20263638])
+```
+
+So, 0.62 electrons per second correspond to roughly 22.2 mag/arcsec^2. That is very much a reasonable value for the Zodiacal light background for a Optical / NIR space telescope like Roman or Euclid [(Borlaff et al. 2022)](https://ui.adsabs.harvard.edu/abs/2022A%26A...657A..92E/abstract). Now, you can use rs.detectors.fe2mu and rs.detectors.mu2fe to transform back and forth between magnitudes per arcsec^2 and electrons per second per pixel. 
+
 
 ### Simulating PSF (stars)
 
