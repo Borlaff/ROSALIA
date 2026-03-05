@@ -1,4 +1,5 @@
-.fits
+*.fits
+*.asdf
 swarp.conf
 swarp.xml
 subprocess.out

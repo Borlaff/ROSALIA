@@ -12,7 +12,9 @@ Baby steps: Transforming ASDF to FITS
     import rosalia as rs 
     exposure_identity = rs.utils.exposure_inspector(input_name="your_exposure.asdf")
 
-``rs.utils.exposure_inspector`` returns a series of fields containing basic information from the ASDF tree, including the name of the telescope, instrument, detector, and filter, pointing information (RA/Dec), transmission curve of the filter, and the WCS of the header. If the ASDF file contains multiple SCI exposures (e.g., one per SCA), the output will be a list of arrays, one per exposure. To combine the information from multiple exposures, we can use a pattern. For example, if we have 18 ASDF files named ``your_exposure_SCA01.asdf``, ``your_exposure_SCA02.asdf``, ..., ``your_exposure_SCA18.asdf``, we can use the following command to extract the information from all 18 files at once:
+``rs.utils.exposure_inspector`` returns a series of fields containing basic information from the ASDF tree, including the name of the telescope, instrument, detector, pointing information (RA/Dec), WCS of the header(s). For Roman and Hubble Space Telescope exposures, ROSALIA will automatically find the filter transmission curve in `SVO server <https://svo2.cab.inta-csic.es/svo/theory/fps/>` and include it in the output. 
+
+If the input FITS files correspond to multiple SCI exposures (e.g., one per SCA), the output will be a list of arrays, one per exposure. For Roman/WFI, one ASDF file per SCA (detector) will be generated. To combine the information from multiple ASDF files, we can use a pattern. For example, if we have 18 ASDF files named ``your_exposure_SCA01.asdf``, ``your_exposure_SCA02.asdf``, ..., ``your_exposure_SCA18.asdf``, we can use the following command to extract the information from all 18 files at once:
 
 .. code-block:: python
 
@@ -33,6 +35,8 @@ Producing the same resutls as the previous Python command, but in the terminal.
 Generating some mock Roman / WFI observations
 ---------------------------------------------
 
+``ROSALIA`` works over level 2 images. We can use ``romanisim`` to generate mock Roman/WFI exposures. This is particularly useful for testing ``ROSALIA``'s functionalities on Roman data, and for visualizing the impact of stray light on Roman/WFI observations. Note that this is not needed to run ``ROSALIA``, as the main modules will accept coordinates and WCS information as input, and will generate dummy images. However, ``romanisim`` includes multiple processing effects on  to generate a realistic Roman/WFI exposure, and then use ``ROSALIA`` to analyze the stray light in that exposure. We encourage users to visit the official webpage of ``romanisim`` for more information on the package and its functionalities: https://romanisim.readthedocs.io/en/latest/, but we include a simple example here to get you started.
+
 1. Install ``romanisim`` and generate a Roman/WFI example image. For this experiment—*and to maximize the visualization of stray-light*—we will simulate an exposure near Orion's Belt.
 
    .. code-block:: sh
@@ -44,7 +48,7 @@ Generating some mock Roman / WFI observations
 
       ``romanisim`` is a package in active development. Please visit the official webpage for more information on usage: https://romanisim.readthedocs.io/en/latest/
 
-   The result from the previous command will be a series of files (18 in total, one ASDF file per Roman WFI detector, or SCA) in the local directory.
+   Notice the {} in the filename and the -1 in the --sca argument. That will instruct ``romanisim`` to generate files for the 18 Roman / WFI SCAs. The result from the previous command will be a series of files (18 in total, one ASDF file per Roman / WFI SCA) in the local directory.
 
    .. code-block:: console
 
