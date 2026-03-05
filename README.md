@@ -37,7 +37,7 @@
   <p align="center">
     <h2 align="center">ROSALIA: ROman Sky Analyst for Low surface brightness Imaging & Astronomy</h2>
     <br />
-    <a href="https://github.com/Borlaff/ROSALIA"><strong>Explore the docs »</strong></a>
+    <a href="https://rosalia.readthedocs.io/en/latest/index.html"><strong>Explore the docs »</strong></a>
     <br />
     <br />
     <a href="https://github.com/Borlaff/ROSALIA">View Demo</a>
@@ -265,7 +265,7 @@ ROSALIA uses FITS files instead of ASDF files. [ASDF](https://asdf.readthedocs.i
     - [x] Horizons/JPL Solar System Objects
 - [x] Retrieval of stray-light blocking efficiency from ray-tracing models
 - [x] Ingestion of ASDF Roman/WFI simulated files (i.e., https://romanisim.readthedocs.io/en/latest/)
-- [ ] Add diffraction modelling to Roman/WFI.
+- [x] Add diffraction modelling to Roman/WFI.
 - [ ] Add thermal emission model (internal stray-light).
 - [ ] Complete support for Hubble Space Telescope ACS & WFC3/IR.
 - [ ] Automatic identification of SSOs in Roman/WFI observations.
@@ -308,7 +308,7 @@ Instructions for fork/pull contributions.
 <!-- LICENSE -->
 ## License
 
-ROSALIA © 2025 by Alejandro S. Borlaff is licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International.
+ROSALIA © 2025Pπ by Alejandro S. Borlaff is licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

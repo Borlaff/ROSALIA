@@ -47,6 +47,8 @@
 <li class="toctree-l1"><a class="reference internal" href="mission.html">What is ROSALIA?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#transforming-asdf-to-fits">Transforming ASDF to FITS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#generating-some-mock-roman-wfi-observations">Generating some mock Roman / WFI observations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#stray-light-analysis-example">Stray Light Analysis Example</a></li>
 </ul>
 </li>
@@ -82,7 +84,63 @@
              
   <section id="tutorials">
 <h1>Tutorials<a class="headerlink" href="#tutorials" title="Link to this heading"></a></h1>
-<p>This section contains Jupyter notebook tutorials to help you get started with ROSALIA.</p>
+<p>This section contains some code examples and Jupyter notebook tutorials to help you get started with ROSALIA and its functionalities.</p>
+<section id="transforming-asdf-to-fits">
+<h2>Transforming ASDF to FITS<a class="headerlink" href="#transforming-asdf-to-fits" title="Link to this heading"></a></h2>
+<p><a class="reference external" href="https://asdf.readthedocs.io/en/latest/">ASDF</a> is the successor of <a class="reference external" href="https://www.stsci.edu/hst/wfpc2/Wfpc2_dhb/intro_ch23.html">FITS</a> format and has been adopted since JWST. While GUI visualizers like SAO DS9 are not yet compatible with ASDF (<a class="reference external" href="https://www.stsci.edu/files/live/sites/www/files/home/jwst/science-planning/user-committees/jwst-users-committee/_documents/jstuc-0919-data-analysis-tool-ferguson.pdf">see JWST Users Committee note</a>), ROSALIA provides an easy way to extract useful information from ASDF files through <code class="docutils literal notranslate"><span class="pre">exposure-inspector</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">rosalia</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">rs</span>
+<span class="n">exposure_identity</span> <span class="o">=</span> <span class="n">rs</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">exposure_inspector</span><span class="p">(</span><span class="n">input_name</span><span class="o">=</span><span class="s2">&quot;your_exposure.asdf&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">rs.utils.exposure_inspector</span></code> returns a series of fields containing basic information from the ASDF tree, including the name of the telescope, instrument, detector, and filter, pointing information (RA/Dec), transmission curve of the filter, and the WCS of the header. If the ASDF file contains multiple SCI exposures (e.g., one per SCA), the output will be a list of arrays, one per exposure. To combine the information from multiple exposures, we can use a pattern. For example, if we have 18 ASDF files named <code class="docutils literal notranslate"><span class="pre">your_exposure_SCA01.asdf</span></code>, <code class="docutils literal notranslate"><span class="pre">your_exposure_SCA02.asdf</span></code>, …, <code class="docutils literal notranslate"><span class="pre">your_exposure_SCA18.asdf</span></code>, we can use the following command to extract the information from all 18 files at once:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">rosalia</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">rs</span>
+<span class="n">exposure_identity</span> <span class="o">=</span> <span class="n">rs</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">exposure_inspector</span><span class="p">(</span><span class="n">input_name</span><span class="o">=</span><span class="s2">&quot;your_exposure_SCA*.asdf&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The output will be a single FITS file containing the combined information from all 18 ASDF files, which can be easily visualized in SAODS9 or any other FITS viewer. The name of the output FITS file will be the same as the input pattern, but with the <code class="docutils literal notranslate"><span class="pre">*</span></code> replaced by <code class="docutils literal notranslate"><span class="pre">_</span></code> and the extension changed to <code class="docutils literal notranslate"><span class="pre">.fits</span></code>. For example, the output file for the previous command will be named <code class="docutils literal notranslate"><span class="pre">your_exposure_SCA_.fits</span></code>.</p>
+<p>exposure-inspector can be used in the terminal as well, by providing the name of the ASDF file as an argument. For example:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>exposure-inspector<span class="w"> </span>RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI01.asdf
+</pre></div>
+</div>
+<p>Producing the same resutls as the previous Python command, but in the terminal.</p>
+</section>
+<section id="generating-some-mock-roman-wfi-observations">
+<h2>Generating some mock Roman / WFI observations<a class="headerlink" href="#generating-some-mock-roman-wfi-observations" title="Link to this heading"></a></h2>
+<ol class="arabic">
+<li><p>Install <code class="docutils literal notranslate"><span class="pre">romanisim</span></code> and generate a Roman/WFI example image. For this experiment—<em>and to maximize the visualization of stray-light</em>—we will simulate an exposure near Orion’s Belt.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>romanisim
+romanisim-make-image<span class="w"> </span>--radec<span class="w"> </span><span class="m">83</span>.3419927<span class="w"> </span>-1.9665163<span class="w"> </span>RST_WFI_ROSALIA_test_Orion_Belt_SCA<span class="o">{}</span>.asdf<span class="w"> </span>--roll<span class="w"> </span>-45<span class="w"> </span>--sca<span class="w"> </span>-1<span class="w"> </span>--bandpass<span class="w"> </span>F158<span class="w"> </span>--level<span class="w"> </span><span class="m">2</span><span class="w"> </span>--usecrds
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">romanisim</span></code> is a package in active development. Please visit the official webpage for more information on usage: <a class="reference external" href="https://romanisim.readthedocs.io/en/latest/">https://romanisim.readthedocs.io/en/latest/</a></p>
+</div>
+<p>The result from the previous command will be a series of files (18 in total, one ASDF file per Roman WFI detector, or SCA) in the local directory.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">-rw-r--r--   1 user  staff   391M Nov 26 16:02 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI01.asdf</span>
+<span class="go">-rw-r--r--   1 user  staff   391M Nov 26 15:39 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI02.asdf</span>
+<span class="go">-rw-r--r--   1 user  staff   391M Nov 26 15:42 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI03.asdf</span>
+<span class="go">-rw-r--r--   1 user  staff   391M Nov 26 15:46 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI04.asdf</span>
+<span class="go">-rw-r--r--   1 user  staff   391M Nov 26 15:49 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI05.asdf</span>
+<span class="go">-rw-r--r--   1 user  staff   391M Nov 26 15:53 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI06.asdf</span>
+<span class="go">-rw-r--r--   1 user  staff   391M Nov 26 15:56 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI07.asdf</span>
+<span class="go">-rw-r--r--   1 user  staff   391M Nov 26 15:59 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI08.asdf</span>
+<span class="go">-rw-r--r--   1 user  staff   391M Nov 26 16:03 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI09.asdf</span>
+<span class="go">-rw-r--r--   1 user  staff   391M Nov 26 16:06 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI10.asdf</span>
+<span class="go">-rw-r--r--   1 user  staff   391M Nov 26 16:10 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI11.asdf</span>
+<span class="go">-rw-r--r--   1 user  staff   391M Nov 26 16:13 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI12.asdf</span>
+<span class="go">-rw-r--r--   1 user  staff   391M Nov 26 16:22 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI13.asdf</span>
+<span class="go">-rw-r--r--   1 user  staff   391M Nov 27 07:14 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI14.asdf</span>
+<span class="go">-rw-r--r--   1 user  staff   391M Nov 27 08:53 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI15.asdf</span>
+<span class="go">-rw-r--r--   1 user  staff   391M Nov 27 08:56 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI16.asdf</span>
+<span class="go">-rw-r--r--   1 user  staff   391M Nov 27 09:00 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI17.asdf</span>
+<span class="go">-rw-r--r--   1 user  staff   391M Nov 27 09:04 RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI18.asdf</span>
+</pre></div>
+</div>
+<p>These 18 files represent a single Roman/WFI level 2 (calibrated, non-combined) exposure.</p>
+</li>
+</ol>
+</section>
 <section id="stray-light-analysis-example">
 <h2>Stray Light Analysis Example<a class="headerlink" href="#stray-light-analysis-example" title="Link to this heading"></a></h2>
 <p>Learn how to use ROSALIA to analyze stray light in a simple optical system.</p>

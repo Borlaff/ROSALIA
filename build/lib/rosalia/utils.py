@@ -1,12 +1,14 @@
 # Alejandro S. Borlaff. NASA Ames Research Center. a.s.borlaff@nasa.gov / asborlaff@gmail.com
 # January 20, 2023.
 #
-# STRAYCOR/UTILS module
+# ROSALIA/UTILS module
 # This module will hold all the programs not related any other task, mainly system tools.
 #
 # Version log:
 # v.1.0 - 20 Enero 2023. First loading of programs inherited from former monolithic straycor.py
-#
+# v.2.0 - March 4, 2026. Reorganization of the code into a more modular structure. 
+#  This module utils.py is created to hold all the programs not related any other task,
+#  mainly system tools.
 ##########################################################
 import os
 import glob
@@ -16,11 +18,9 @@ from astropy.io import fits
 import pandas as pd
 import astropy.units as u
 import astropy.wcs as astropy_wcs
-from astropy.time import Time
 from astropy.coordinates import SkyCoord  # High-level coordinates
 from tqdm import tqdm
 import bottleneck as bn
-# STRAYCOR modules
 import rosalia as rs
 import dill as pickle
 import requests
@@ -185,14 +185,31 @@ def execute_cmd(cmd, verbose=False):
 ############################
 def exposure_inspector(input_name, verbose=False, lite=False):
     """
-    List wrapper for exposure_inspector_single
+    exposure_inspector: 
+    Inspects and returns critical information about the contents of an exposure telescope.
+    :param input_name: Exposure file to be inspected. It can be a string with the name of the file, a list of files, or a pattern with *.
+    :type input_name: str, list
+    :return: Exposure identity - A dictionary with critical information about the exposure, including pointing (right ascension and declination), position angle, telescope, instrument, detector, filter, and a WCS (Astropy and GWCS).
+    :rtype: dict, pd.DataFrame
     """
 
+    # If the input is a pattern with *, then we will use glob to find the files 
+    # that match the pattern, then we will run convert_ASDF_to_FITS, 
+    # and finally run exposure_inspector of the final product. 
+    list_of_files = glob.glob(input_name)
+    if "*" in input_name and input_name.endswith(".asdf"):
+        output_name = input_name.replace("*", "").replace(".asdf", ".fits")
+        input_name = rs.utils.convert_ASDF_to_FITS(asdf_list=list_of_files, output=output_name)
+        exposure_identity = exposure_inspector_single(input_name, verbose=verbose, lite=lite)
+        return(exposure_identity)
+
+    # If it is just a string without * wildcard, then we will run exposure_inspector_single directly.
     if isinstance(input_name, (str,)):
         exposure_identity = exposure_inspector_single(input_name, verbose=verbose, lite=lite)
         return(exposure_identity)
 
-
+    # If we provide a list of files, then we will run exposure_inspector_single for each file,
+    # and return a dataframe with the results.
     if isinstance(input_name, (list,)):
         exposure_identities = []
         for i in tqdm(range(len(input_name))):
@@ -342,6 +359,7 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
             if verbose: print(rs.plots.style.YELLOW + "Setting to None" + rs.plots.style.RESET)
 
     # Get the exposure time EXPSTART
+    from astropy.time import Time
     t = Time(exposure_identity["EXPSTART"], format='mjd', scale='utc')
     exposure_identity["EXPSTART_ISOT"] = t.isot
 

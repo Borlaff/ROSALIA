@@ -282,6 +282,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#rosalia.telescopes.Hubble.TELESCOP"><code class="docutils literal notranslate"><span class="pre">Hubble.TELESCOP</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#rosalia.telescopes.Hubble.TLE_exposure"><code class="docutils literal notranslate"><span class="pre">Hubble.TLE_exposure()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#rosalia.telescopes.Hubble.f"><code class="docutils literal notranslate"><span class="pre">Hubble.f()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rosalia.telescopes.Hubble.fe2mu"><code class="docutils literal notranslate"><span class="pre">Hubble.fe2mu()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#rosalia.telescopes.Hubble.get_HST_ACS_psf"><code class="docutils literal notranslate"><span class="pre">Hubble.get_HST_ACS_psf()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#rosalia.telescopes.Hubble.get_PSF"><code class="docutils literal notranslate"><span class="pre">Hubble.get_PSF()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#rosalia.telescopes.Hubble.get_canvas_shape"><code class="docutils literal notranslate"><span class="pre">Hubble.get_canvas_shape()</span></code></a></li>
@@ -292,6 +293,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#rosalia.telescopes.Hubble.load_HST_TLEs"><code class="docutils literal notranslate"><span class="pre">Hubble.load_HST_TLEs()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#rosalia.telescopes.Hubble.make_dummy_exposure"><code class="docutils literal notranslate"><span class="pre">Hubble.make_dummy_exposure()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#rosalia.telescopes.Hubble.mirror_radius"><code class="docutils literal notranslate"><span class="pre">Hubble.mirror_radius</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rosalia.telescopes.Hubble.mu2fe"><code class="docutils literal notranslate"><span class="pre">Hubble.mu2fe()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#rosalia.telescopes.Hubble.ndi_estimator"><code class="docutils literal notranslate"><span class="pre">Hubble.ndi_estimator()</span></code></a></li>
 </ul>
 </li>
@@ -1442,6 +1444,11 @@ mu_zody = surface brightness in Jy arcsec-2</p>
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="rosalia.telescopes.Hubble.fe2mu">
+<span class="sig-name descname"><span class="pre">fe2mu</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.telescopes.Hubble.fe2mu" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="rosalia.telescopes.Hubble.get_HST_ACS_psf">
 <span class="sig-name descname"><span class="pre">get_HST_ACS_psf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'WFC1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[2000,</span> <span class="pre">1000]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.telescopes.Hubble.get_HST_ACS_psf" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -1492,6 +1499,11 @@ Current version:   HST_TLE_history_sat000020580.txt - From launch (1990) - up to
 <dl class="py attribute">
 <dt class="sig sig-object py" id="rosalia.telescopes.Hubble.mirror_radius">
 <span class="sig-name descname"><span class="pre">mirror_radius</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;Quantity</span> <span class="pre">1.2</span> <span class="pre">m&gt;</span></span><a class="headerlink" href="#rosalia.telescopes.Hubble.mirror_radius" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosalia.telescopes.Hubble.mu2fe">
+<span class="sig-name descname"><span class="pre">mu2fe</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.telescopes.Hubble.mu2fe" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -2002,17 +2014,17 @@ or list of such containers if there are multiple input datasets.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.utils.execute_cmd">
 <span class="sig-prename descclassname"><span class="pre">rosalia.utils.</span></span><span class="sig-name descname"><span class="pre">execute_cmd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.utils.execute_cmd" title="Link to this definition"></a></dt>
-<dd><p>Executes a shell command line.
-:param cmd: Command line to be executed
-:type cmd: str
-:return: Shell output
-:rtype: str</p>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.utils.exposure_inspector">
 <span class="sig-prename descclassname"><span class="pre">rosalia.utils.</span></span><span class="sig-name descname"><span class="pre">exposure_inspector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.utils.exposure_inspector" title="Link to this definition"></a></dt>
-<dd><p>List wrapper for exposure_inspector_single</p>
+<dd><p>exposure_inspector: 
+Inspects and returns critical information about the contents of an exposure telescope.
+:param input_name: Exposure file to be inspected. It can be a string with the name of the file, a list of files, or a pattern with <a href="#id3"><span class="problematic" id="id4">*</span></a>.
+:type input_name: str, list
+:return: Exposure identity - A dictionary with critical information about the exposure, including pointing (right ascension and declination), position angle, telescope, instrument, detector, filter, and a WCS (Astropy and GWCS).
+:rtype: dict, pd.DataFrame</p>
 </dd></dl>
 
 <dl class="py function">

@@ -360,11 +360,11 @@ class Hubble:
         rs.utils.save_fits(canvas, outname, header)
         return(outname)
 
-    #def mu2fe(mu):
-    #    return(rs.detectors.mu2fe(mu=mu, instrument="ACS", filter_name="F814W", telescope="Hubble", verbose=False))
+    def mu2fe(mu):
+        return(rs.detectors.mu2fe(mu=mu, instrument="ACS", filter_name="F814W", telescope="Hubble", verbose=False))
 
-    #def fe2mu(fe):
-    #    return(rs.detectors.fe2mu(fe=fe, instrument="ACS", filter_name="F814W", telescope="Hubble",verbose=False))
+    def fe2mu(fe):
+        return(rs.detectors.fe2mu(fe=fe, instrument="ACS", filter_name="F814W", telescope="Hubble",verbose=False))
 
     def get_HST_ACS_psf(wavelength, chip="WFC1", xy=[2000, 1000], output=None, verbose=1):
         # from focus_diverse_epsfs import interp_epsf, psf_retriever

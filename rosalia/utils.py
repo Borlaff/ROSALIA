@@ -1,30 +1,26 @@
 # Alejandro S. Borlaff. NASA Ames Research Center. a.s.borlaff@nasa.gov / asborlaff@gmail.com
 # January 20, 2023.
 #
-# STRAYCOR/UTILS module
+# ROSALIA/UTILS module
 # This module will hold all the programs not related any other task, mainly system tools.
 #
 # Version log:
 # v.1.0 - 20 Enero 2023. First loading of programs inherited from former monolithic straycor.py
-#
+# v.2.0 - March 4, 2026. Reorganization of the code into a more modular structure. 
+#  This module utils.py is created to hold all the programs not related any other task,
+#  mainly system tools.
 ##########################################################
 import os
 import glob
-import subprocess
 import numpy as np
 from astropy.io import fits
 import pandas as pd
 import astropy.units as u
 import astropy.wcs as astropy_wcs
-from astropy.time import Time
 from astropy.coordinates import SkyCoord  # High-level coordinates
 from tqdm import tqdm
 import bottleneck as bn
-# STRAYCOR modules
 import rosalia as rs
-import dill as pickle
-import requests
-from matplotlib.path import Path
 
 # print("CHECK THE FLUX OF THE ZODIACAL LIGHT IN A NORMAL IMAGE!!!!!")
 
@@ -36,8 +32,16 @@ from matplotlib.path import Path
 #################################
 
 def hp_resol2nside(resolution):
+    """
+    This program converts a resolution in degrees to the nside parameter of healpix.
+    :param resolution: Resolution in degrees (astropy units).
+    :type resolution: astropy.units.Unit
+    :return: nside parameter of healpix
+    :rtype: int
+    """
     # Input: resolution in degrees (astropy units).
     # Output: int: nside healpix parameter
+
     import healpy as hp
     from astropy import units as u
     i = 0
@@ -45,24 +49,22 @@ def hp_resol2nside(resolution):
     while hp_resolution > resolution:
         nside = 2**i
         hp_resolution = np.degrees(hp.pixelfunc.nside2resol(nside=nside)*u.radian)
-        #print(nside)
-        #print(resolution)
-        #print(hp_resolution)
         i = i + 1
     return(nside)
 
 #################################
 
+""" DEPRECATED
 def make_allsky_MOC(min_resolution):
     import mhealpy as hmap
     from astropy import units as u
-    #print(min_resolution)
     nside = hp_resol2nside(min_resolution)
     MOC = hmap.HealpixMap(nside=nside, density=True)
     return({"MOC": MOC, "nside": nside})
-
+"""
 #################################
 
+""" DEPRECATED
 def make_polygon_MOC(ra_vert, dec_vert, min_resolution):
     import healpy as hp
     import mhealpy as hmap
@@ -82,12 +84,26 @@ def make_polygon_MOC(ra_vert, dec_vert, min_resolution):
     MOC = hmap.HealpixMap.moc_from_pixels(mEq.nside, polygon_pix, density=True)
 
     return({"MOC": MOC, "nside": nside})
-
+"""
 
 ###############################
 
 def interpolate_location_in_fits(fits_name, ext, ra, dec):
-    # Interpolate fits file.
+    """
+    This program interpolates the value of a FITS file at the location of the input coordinates (ra, dec). The FITS file requires to have a WCS in the correct EXT, and the coordinates are transformed to pixel coordinates using the WCS. The interpolation is done using a linear interpolation in the grid of the FITS file. The output is the interpolated value at the input coordinates.
+    
+    :param fits_name: Name of the FITS file to be interpolated
+    :type fits_name: str
+    :param ext: Extension of the FITS file to be interpolated
+    :type ext: int
+    :param ra: Right ascension of the location to be interpolated
+    :type ra: float
+    :param dec: Declination of the location to be interpolated
+    :type dec: float
+    :return: Interpolated value at the input coordinates
+    :rtype: float
+
+    """
 
     # Open the fits file
     fits_file = fits.open(fits_name)
@@ -118,6 +134,13 @@ def interpolate_location_in_fits(fits_name, ext, ra, dec):
 ############################
 
 def load_dict(input_name, verbose=False):
+    """
+    Load a python object using pickle.
+        :param str input_name: Name of the file to be loaded
+        :returns: Python object stored in the file
+        :rtype: Python object
+    """
+    import dill as pickle
     with open(input_name, 'rb') as f:
         if verbose: print("Loading " + input_name)
         dictionary = pickle.load(f)
@@ -130,6 +153,8 @@ def save_dict(dictionary, input_name, verbose=False):
         :returns: Input python object
         :rtype: Python object
     """
+    import dill as pickle
+
     with open(input_name, 'wb') as f:
         if verbose: print("Saving " + input_name)
         pickle.dump(dictionary, f)
@@ -143,6 +168,7 @@ def download_file(url):
         :returns: Local path of the downloaded file
         :rtype: str
     """
+    import requests
     # From: https://stackoverflow.com/questions/16694907/download-large-file-in-python-with-requests
     local_filename = url.split('/')[-1]
     # NOTE the stream=True parameter below
@@ -165,6 +191,7 @@ def execute_cmd(cmd, verbose=False):
     :return: Shell output
     :rtype: str
     """
+    import subprocess
     log_error = open('subprocess.out', "w")
     # output = subprocess.call(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
     #result = subprocess.run(cmd, capture_output=True, text=True)
@@ -185,14 +212,31 @@ def execute_cmd(cmd, verbose=False):
 ############################
 def exposure_inspector(input_name, verbose=False, lite=False):
     """
-    List wrapper for exposure_inspector_single
+    exposure_inspector: 
+    Inspects and returns critical information about the contents of an exposure telescope.
+    :param input_name: Exposure file to be inspected. It can be a string with the name of the file, a list of files, or a pattern with *.
+    :type input_name: str, list
+    :return: Exposure identity - A dictionary with critical information about the exposure, including pointing (right ascension and declination), position angle, telescope, instrument, detector, filter, and a WCS (Astropy and GWCS).
+    :rtype: dict, pd.DataFrame
     """
 
+    # If the input is a pattern with *, then we will use glob to find the files 
+    # that match the pattern, then we will run convert_ASDF_to_FITS, 
+    # and finally run exposure_inspector of the final product. 
+    list_of_files = glob.glob(input_name)
+    if "*" in input_name and input_name.endswith(".asdf"):
+        output_name = input_name.replace("*", "_").replace(".asdf", ".fits")
+        input_name = rs.utils.convert_ASDF_to_FITS(asdf_list=list_of_files, output=output_name)
+        exposure_identity = exposure_inspector_single(input_name, verbose=verbose, lite=lite)
+        return(exposure_identity)
+
+    # If it is just a string without * wildcard, then we will run exposure_inspector_single directly.
     if isinstance(input_name, (str,)):
         exposure_identity = exposure_inspector_single(input_name, verbose=verbose, lite=lite)
         return(exposure_identity)
 
-
+    # If we provide a list of files, then we will run exposure_inspector_single for each file,
+    # and return a dataframe with the results.
     if isinstance(input_name, (list,)):
         exposure_identities = []
         for i in tqdm(range(len(input_name))):
@@ -342,6 +386,7 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
             if verbose: print(rs.plots.style.YELLOW + "Setting to None" + rs.plots.style.RESET)
 
     # Get the exposure time EXPSTART
+    from astropy.time import Time
     t = Time(exposure_identity["EXPSTART"], format='mjd', scale='utc')
     exposure_identity["EXPSTART_ISOT"] = t.isot
 
@@ -1362,6 +1407,8 @@ def ds9tomask(fname, nx, ny, outname):
     x, y = np.meshgrid(np.arange(nx), np.arange(ny))
     x, y = x.flatten(), y.flatten()
     points = np.vstack((x,y)).T
+
+    from matplotlib.path import Path
 
     for i in tqdm(range(len(polygons))):
         path = Path(polygons[i])
