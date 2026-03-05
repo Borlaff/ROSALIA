@@ -1,4 +1,4 @@
-rosalia.utils
+﻿rosalia.utils
 =============
 
 .. automodule:: rosalia.utils
@@ -47,9 +47,7 @@ rosalia.utils
       hp_resol2nside
       interpolate_location_in_fits
       load_dict
-      make_allsky_MOC
       make_ds9_region
-      make_polygon_MOC
       make_profile
       mask_sources
       modify_keyword_hdr

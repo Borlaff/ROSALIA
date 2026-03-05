@@ -87,6 +87,10 @@ ROSALIA is funded through a NASA Grant (D.14 Roman 2022), ROSES/Nancy Grace Roma
 
 Sci-PI: Alejandro S. Borlaff (NASA ARC). Admin-PI: Pamela M. Marcum (NASA ARC)
 
+<a href="https://github.com/Borlaff/ROSALIA">
+    <img src="https://raw.githubusercontent.com/Borlaff/ROSALIA/main/images/rosalia_star_on_the_edge.gif" alt="ROSALIA_animation" width="1500" height="600">
+</a>
+
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

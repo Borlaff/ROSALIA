@@ -169,7 +169,7 @@
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.execute_cmd" title="rosalia.utils.execute_cmd"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute_cmd</span></code></a>(cmd[, verbose])</p></td>
-<td><p></p></td>
+<td><p>Executes a shell command line.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.exposure_inspector" title="rosalia.utils.exposure_inspector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">exposure_inspector</span></code></a>(input_name[, verbose, lite])</p></td>
 <td><p>exposure_inspector:  Inspects and returns critical information about the contents of an exposure telescope. :param input_name: Exposure file to be inspected. It can be a string with the name of the file, a list of files, or a pattern with <a href="#id1"><span class="problematic" id="id2">*</span></a>. :type input_name: str, list :return: Exposure identity - A dictionary with critical information about the exposure, including pointing (right ascension and declination), position angle, telescope, instrument, detector, filter, and a WCS (Astropy and GWCS). :rtype: dict, pd.DataFrame.</p></td>
@@ -220,21 +220,15 @@
 <td><p>Estimates the new coordinates (ra2, dec2) after moving an angular distance theta (radial direction) in the phi direction (0 deg, North, counterclockwise) along a Great Circle from the Equator (ra=0, dec=0) Adapted from Great Circle navigation: <a class="reference external" href="https://en.wikipedia.org/wiki/Great-circle_navigation">https://en.wikipedia.org/wiki/Great-circle_navigation</a></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.hp_resol2nside" title="rosalia.utils.hp_resol2nside"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hp_resol2nside</span></code></a>(resolution)</p></td>
-<td><p></p></td>
+<td><p>This program converts a resolution in degrees to the nside parameter of healpix.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.interpolate_location_in_fits" title="rosalia.utils.interpolate_location_in_fits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interpolate_location_in_fits</span></code></a>(fits_name, ext, ...)</p></td>
-<td><p></p></td>
+<td><p>This program interpolates the value of a FITS file at the location of the input coordinates (ra, dec).</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.load_dict" title="rosalia.utils.load_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_dict</span></code></a>(input_name[, verbose])</p></td>
-<td><p></p></td>
+<td><p>Load a python object using pickle.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.make_allsky_MOC" title="rosalia.utils.make_allsky_MOC"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_allsky_MOC</span></code></a>(min_resolution)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.make_ds9_region" title="rosalia.utils.make_ds9_region"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_ds9_region</span></code></a>(ra, dec[, output])</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.make_polygon_MOC" title="rosalia.utils.make_polygon_MOC"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_polygon_MOC</span></code></a>(ra_vert, dec_vert, ...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.make_ds9_region" title="rosalia.utils.make_ds9_region"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_ds9_region</span></code></a>(ra, dec[, output])</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.make_profile" title="rosalia.utils.make_profile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_profile</span></code></a>(image[, radial_mask, ext, ...])</p></td>

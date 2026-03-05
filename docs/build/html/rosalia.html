@@ -384,9 +384,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.hp_resol2nside"><code class="docutils literal notranslate"><span class="pre">hp_resol2nside()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.interpolate_location_in_fits"><code class="docutils literal notranslate"><span class="pre">interpolate_location_in_fits()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.load_dict"><code class="docutils literal notranslate"><span class="pre">load_dict()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.make_allsky_MOC"><code class="docutils literal notranslate"><span class="pre">make_allsky_MOC()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.make_ds9_region"><code class="docutils literal notranslate"><span class="pre">make_ds9_region()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.make_polygon_MOC"><code class="docutils literal notranslate"><span class="pre">make_polygon_MOC()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.make_profile"><code class="docutils literal notranslate"><span class="pre">make_profile()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.mask_sources"><code class="docutils literal notranslate"><span class="pre">mask_sources()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.modify_keyword_hdr"><code class="docutils literal notranslate"><span class="pre">modify_keyword_hdr()</span></code></a></li>
@@ -2014,7 +2012,12 @@ or list of such containers if there are multiple input datasets.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.utils.execute_cmd">
 <span class="sig-prename descclassname"><span class="pre">rosalia.utils.</span></span><span class="sig-name descname"><span class="pre">execute_cmd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.utils.execute_cmd" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Executes a shell command line.
+:param cmd: Command line to be executed
+:type cmd: str
+:return: Shell output
+:rtype: str</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.utils.exposure_inspector">
@@ -2167,31 +2170,57 @@ Adapted from Great Circle navigation: <a class="reference external" href="https:
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.utils.hp_resol2nside">
 <span class="sig-prename descclassname"><span class="pre">rosalia.utils.</span></span><span class="sig-name descname"><span class="pre">hp_resol2nside</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resolution</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.utils.hp_resol2nside" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>This program converts a resolution in degrees to the nside parameter of healpix.
+:param resolution: Resolution in degrees (astropy units).
+:type resolution: astropy.units.Unit
+:return: nside parameter of healpix
+:rtype: int</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.utils.interpolate_location_in_fits">
 <span class="sig-prename descclassname"><span class="pre">rosalia.utils.</span></span><span class="sig-name descname"><span class="pre">interpolate_location_in_fits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fits_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.utils.interpolate_location_in_fits" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>This program interpolates the value of a FITS file at the location of the input coordinates (ra, dec). The FITS file requires to have a WCS in the correct EXT, and the coordinates are transformed to pixel coordinates using the WCS. The interpolation is done using a linear interpolation in the grid of the FITS file. The output is the interpolated value at the input coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fits_name</strong> (<em>str</em>) – Name of the FITS file to be interpolated</p></li>
+<li><p><strong>ext</strong> (<em>int</em>) – Extension of the FITS file to be interpolated</p></li>
+<li><p><strong>ra</strong> (<em>float</em>) – Right ascension of the location to be interpolated</p></li>
+<li><p><strong>dec</strong> (<em>float</em>) – Declination of the location to be interpolated</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Interpolated value at the input coordinates</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.utils.load_dict">
 <span class="sig-prename descclassname"><span class="pre">rosalia.utils.</span></span><span class="sig-name descname"><span class="pre">load_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.utils.load_dict" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="rosalia.utils.make_allsky_MOC">
-<span class="sig-prename descclassname"><span class="pre">rosalia.utils.</span></span><span class="sig-name descname"><span class="pre">make_allsky_MOC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_resolution</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.utils.make_allsky_MOC" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><dl class="simple">
+<dt>Load a python object using pickle.</dt><dd><dl class="field-list simple">
+<dt class="field-odd">param str input_name<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Name of the file to be loaded</p>
+</dd>
+<dt class="field-even">returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Python object stored in the file</p>
+</dd>
+<dt class="field-odd">rtype<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Python object</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.utils.make_ds9_region">
 <span class="sig-prename descclassname"><span class="pre">rosalia.utils.</span></span><span class="sig-name descname"><span class="pre">make_ds9_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ds9.reg'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.utils.make_ds9_region" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="rosalia.utils.make_polygon_MOC">
-<span class="sig-prename descclassname"><span class="pre">rosalia.utils.</span></span><span class="sig-name descname"><span class="pre">make_polygon_MOC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ra_vert</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec_vert</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_resolution</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.utils.make_polygon_MOC" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">

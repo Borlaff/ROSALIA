@@ -3,7 +3,7 @@ Tutorials
 
 This section contains some code examples and Jupyter notebook tutorials to help you get started with ROSALIA and its functionalities.
 
-Transforming ASDF to FITS
+Baby steps: Transforming ASDF to FITS
 -----------------------------
 `ASDF <https://asdf.readthedocs.io/en/latest/>`_ is the successor of `FITS <https://www.stsci.edu/hst/wfpc2/Wfpc2_dhb/intro_ch23.html>`_ format and has been adopted since JWST. While GUI visualizers like SAO DS9 are not yet compatible with ASDF (`see JWST Users Committee note <https://www.stsci.edu/files/live/sites/www/files/home/jwst/science-planning/user-committees/jwst-users-committee/_documents/jstuc-0919-data-analysis-tool-ferguson.pdf>`_), ROSALIA provides an easy way to extract useful information from ASDF files through ``exposure-inspector``:
 
