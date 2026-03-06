@@ -695,7 +695,6 @@ def main_offender(input_name=None, ext=None, ra=None, dec=None, phi=0,
 
     rs.utils.save_fits(array=data_output, name=output_name, header=header_output,
                        extname=None, overwrite=True, output_verify='silentfix')
-
     # Main-offender
     input_fits = fits.open(input_name)
     data_output = []
@@ -713,6 +712,30 @@ def main_offender(input_name=None, ext=None, ra=None, dec=None, phi=0,
                        output_verify='silentfix')
 
 
+    # Let's do one more step to include the needed metadata from the dummy file. 
+    stray_image = fits.open(output_name)
+    main_offender_image = fits.open(main_offender_output_name)
+    exposure_identity_keys_to_copy = ["TELESCOP", "INSTRUME", "DETECTOR", "FILTER", "RA_TARG", "DEC_TARG", 
+                                      "RA_PNT", "DEC_PNT", "X_PNT", "Y_PNT", "PA",
+                                      "EXPTIME", "EXPSTART", "EXPSTART_ISOT"]
+    for key in exposure_identity_keys_to_copy:
+        stray_image[0].header[key] = image_identity[key]
+        main_offender_image[0].header[key] = image_identity[key]
+    
+    # Additional keys: 
+    stray_image[0].header["WAVEREF"] = image_identity["FILTER_IDENTITY"]["filter_lambda_ref"]
+    main_offender_image[0].header["WAVEREF"] = image_identity["FILTER_IDENTITY"]["filter_lambda_ref"]
+    stray_image[0].header["WAVEMIN"] = image_identity["FILTER_IDENTITY"]["filter_lambda_min"]
+    main_offender_image[0].header["WAVEMIN"] = image_identity["FILTER_IDENTITY"]["filter_lambda_min"]
+    stray_image[0].header["WAVEMAX"] = image_identity["FILTER_IDENTITY"]["filter_lambda_max"]
+    main_offender_image[0].header["WAVEMAX"] = image_identity["FILTER_IDENTITY"]["filter_lambda_max"]
+    
+    # Verify, save and close
+    stray_image.verify("silentfix")
+    main_offender_image.verify("silentfix")
+    stray_image.writeto(output_name, overwrite=True)
+    main_offender_image.writeto(main_offender_output_name, overwrite=True)
+    
 
     print("Output saved in: " + output_name)
 

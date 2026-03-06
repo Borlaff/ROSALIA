@@ -71,13 +71,6 @@ def create_roman_dummy(point, date, band, PA=None, exptime=500, output="default_
         out_sca_filename = output.replace(".fits", "_sca" + SCA_name + ".fits")
         temp_out_sca_filename_list.append(out_sca_filename)
 
-        #wcs_dict = roman.getWCS(world_pos=targ_pos, PA=WFI_PA, SCAs=SCA_i+1, date=date.tt.datetime) # world_pos, PA=None, date=None, SCAs=None, PA_is_FPA=False)
-        #wcs = wcs_dict[SCA_i+1]
-
-        # Set up the full image for the galaxies
-        #full_image = galsim.ImageF(roman.n_pix, roman.n_pix, wcs=wcs)
-        #full_image.write(out_sca_filename)
-
         # Romanisim procedure>
         metadata = ris.set_metadata(date=date,
                             bandpass=band,
@@ -625,7 +618,7 @@ def roman_estimate_straylight_SCA(data, wcs, SCA, filter_identity, ra_stars,
 
             # Plot the Roman/WFI loading bar
             os.system('clear')
-            print(rs.plots.style.CYAN + " ROSALIA Stray-light Mapper: Scanning ... " + rs.plots.style.RESET)
+            print(rs.plots.style.CYAN + "ROSALIA Stray-light Mapper: Scanning ... " + rs.plots.style.RESET)
             canvas = rs.plots.print_ascii_focal_plane(x=X_label, y=Y_label, SCA=SCA)
             print(rs.plots.style.CYAN + 'SCA ' + str(SCA) + " - Subarray X=" + str(X_label) + " - Subarray Y=" + str(Y_label))
             print('SCA ' + str(SCA) + " out of 18: " + str(np.round(100*i/n_subarrays,2)) + '% completed' + rs.plots.style.RESET)
