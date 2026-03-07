@@ -31,7 +31,7 @@ from astropy.coordinates import ICRS, Angle, SkyCoord
 
 ###########################
 
-def rosalia_stray(ra, dec, PA, date, bandpass, exptime, radius=1,
+def rosalia_stray(ra, dec, PA, date, bandpass, exptime, input_fits=None, radius=1,
                   g_mag_max=15, sun_block=False, verbose=False, catalog=None):
     """
     Identify and estimate straylight from stars outside the field of view.
@@ -91,24 +91,35 @@ def rosalia_stray(ra, dec, PA, date, bandpass, exptime, radius=1,
     logger = logging.getLogger()
     logger.setLevel(logging.CRITICAL)
 
-    # Make the Roman Dummy image
-    roman_dummy_name = os.getcwd() + "/WFI_" + bandpass +\
+    if input_fits is None:
+        # Make the Roman Dummy image
+        roman_dummy_name = os.getcwd() + "/WFI_" + bandpass +\
                                      "_RA_" + '{:07.3f}'.format(ra) +\
                                      "_DEC_" + '{:07.3f}'.format(dec) +\
                                      "_MJD_" + '{:07.5f}'.format(date.mjd) +\
                                      "_PA_" + '{:06.2f}'.format(PA) + ".fits"
-    output_name = roman_dummy_name.replace(".fits","_stray.fits")
-    central_coords = SkyCoord(ra, dec, frame="icrs", unit="deg")
+        output_name = roman_dummy_name.replace(".fits","_stray.fits")
+        central_coords = SkyCoord(ra, dec, frame="icrs", unit="deg")
 
-    input_name = rs.roman.create_roman_dummy(point=central_coords, date=date,
+        input_name = rs.roman.create_roman_dummy(point=central_coords, date=date,
                                                band=bandpass, PA=PA, exptime=exptime,
                                                output=roman_dummy_name)
-    print(input_name)
+        print(input_name)
+    else: 
+        input_name = input_fits
+        output_name = input_name.replace(".fits","_stray.fits")
 
     # Get the image identity
     image_identity = rs.utils.exposure_inspector(input_name=input_name, verbose=verbose, lite=True)
-    
 
+    
+    ra = exposure_dict["point"].ra.deg
+    dec = exposure_dict["point"].dec.deg
+    PA = exposure_dict["PA"]
+    date = exposure_dict["date"]
+    bandpass = exposure_dict["band"]
+    exptime = exposure_dict["exptime"]
+ 
     if input_name is None:
         input_name = rs.roman.create_roman_dummy(point=exposure_dict["point"],
                                                  date=exposure_dict["date"],
@@ -723,12 +734,12 @@ def main_offender(input_name=None, ext=None, ra=None, dec=None, phi=0,
         main_offender_image[0].header[key] = image_identity[key]
     
     # Additional keys: 
-    stray_image[0].header["WAVEREF"] = image_identity["FILTER_IDENTITY"]["filter_lambda_ref"]
-    main_offender_image[0].header["WAVEREF"] = image_identity["FILTER_IDENTITY"]["filter_lambda_ref"]
-    stray_image[0].header["WAVEMIN"] = image_identity["FILTER_IDENTITY"]["filter_lambda_min"]
-    main_offender_image[0].header["WAVEMIN"] = image_identity["FILTER_IDENTITY"]["filter_lambda_min"]
-    stray_image[0].header["WAVEMAX"] = image_identity["FILTER_IDENTITY"]["filter_lambda_max"]
-    main_offender_image[0].header["WAVEMAX"] = image_identity["FILTER_IDENTITY"]["filter_lambda_max"]
+    stray_image[0].header["WAVEREF"] = image_identity["FILTER_IDENTITY"]["filter_lambda_ref"].to("nm").value
+    main_offender_image[0].header["WAVEREF"] = image_identity["FILTER_IDENTITY"]["filter_lambda_ref"].to("nm").value
+    stray_image[0].header["WAVEMIN"] = image_identity["FILTER_IDENTITY"]["filter_lambda_min"].to("Angstrom").value
+    main_offender_image[0].header["WAVEMIN"] = image_identity["FILTER_IDENTITY"]["filter_lambda_min"].to("nm").value
+    stray_image[0].header["WAVEMAX"] = image_identity["FILTER_IDENTITY"]["filter_lambda_max"].to("nm").value
+    main_offender_image[0].header["WAVEMAX"] = image_identity["FILTER_IDENTITY"]["filter_lambda_max"].to("nm").value
     
     # Verify, save and close
     stray_image.verify("silentfix")

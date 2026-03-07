@@ -92,3 +92,9 @@ To run this notebook locally, make sure you have Jupyter installed and then:
 .. code-block:: bash
 
     jupyter notebook notebooks/R1_Rosalia_stray_example.ipynb
+
+.. video:: ../../images/rosalia_loading.mp4
+  :width: 802
+  :height: 512
+  :alt: ROSALIA Stray-light loading bar
+

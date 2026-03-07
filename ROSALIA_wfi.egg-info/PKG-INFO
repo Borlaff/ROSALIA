@@ -6,6 +6,9 @@ Author-email: "Alejandro S. Borlaff" <a.s.borlaff@nasa.gov>
 License: BSD
 Project-URL: Homepage, https://github.com/Borlaff/ROSALIA
 Project-URL: Repository, https://github.com/Borlaff/ROSALIA
+Project-URL: Tracker, https://github.com/Borlaff/ROSALIA/issues
+Project-URL: Documentation, https://rosalia.readthedocs.io/en/stable/
+Project-URL: Source Code, https://github.com/Borlaff/ROSALIA
 Keywords: Hubble,Roman,LSB,sky-background
 Classifier: Development Status :: 3 - Alpha
 Classifier: Intended Audience :: Science/Research

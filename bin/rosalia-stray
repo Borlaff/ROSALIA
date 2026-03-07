@@ -4,28 +4,40 @@ from rosalia.correct import rosalia_stray
 import argparse
 import yaml
 import glob
+from astropy.time import Time
 
 
 
 def go(args):
-    if args.input is not None:
-        if "*" in args.input:
-            import glob
-            args.input = sorted(glob.glob(args.input))
+
+    if (args.ra is None) and (args.input is None):
+        print('Warning! Please input either a set of coordinates, position angle, bandpass, exposure date, and exposure time through --ra, --dec, --PA, --date, --bandpass, and --exptime or an image with --input.')
+        print('ROSALIA / rosalia-stray: Calculate stray-light level in Roman/WFI exposures')
+        print('EXAMPLE: rosalia-stray input_image.asdf')
+        return
+    
+    else:
+        if args.input is not None:
+            if "*" in args.input:
+                import glob
+                args.input = sorted(glob.glob(args.input))
+        
+        if args.date is not None:
+            args.date = Time(args.date, format="mjd")
 
         if args.verbose > 0:
             from rosalia.plots import plot_rosalia_logo
             plot_rosalia_logo()
 
-        rosalia_stray_db = rosalia_stray(input_name=args.input,
-                                         output_name=args.output,
+        #ra, dec, PA, date, bandpass, exptime, input_fits=None, radius=1,
+        #           g_mag_max=15, sun_block=False, verbose=False, catalog=None
+        rosalia_stray_db = rosalia_stray(ra=args.ra, dec=args.dec,
+                                         PA=args.PA, date=args.date, bandpass=args.bandpass, exptime=args.exptime, 
+                                         input_fits=args.input,
                                          radius=args.radius,
                                          g_mag_max=args.g_mag_max,
                                          verbose=args.verbose)
         #print(exposure_identity)
-    else:
-        print('ROSALIA / rosalia-stray: Calculate stray-light level in Roman/WFI exposures')
-        print('EXAMPLE: rosalia-stray input_image.asdf')
 
 
 if __name__ == '__main__':
@@ -33,12 +45,19 @@ if __name__ == '__main__':
         description='ROSALIA / rosalia-stray: Calculate stray-light level in Roman/WFI exposures',
         epilog='EXAMPLE: %(prog)s input_image*.asdf',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('input', type=str, help='Input pattern that all asdf files share. Example: input_pattern = RST_WFI_SCA_*.asdf if your files are RST_WFI_SCA_01.asdf, RST_WFI_SCA_02.asdf, RST_WFI_SCA_03.asdf [...] RST_WFI_SCA_18.asdf.')
-    parser.add_argument('--output', type=str, default="default_rosalia-stray_output.fits", help='Name of the output FITS file containing the stray-light level. Default: "rosalia_stray_output.fits"')
+    parser.add_argument('--ra', type=float, default=None, help='Right Ascension of Roman/WFI FOV center')
+    parser.add_argument('--dec', type=float, default=None, help='Declination of Roman/WFI FOV center')
+    parser.add_argument('--PA', type=float, default=None, help='Position Angle of Roman/WFI. Positive counter-clockwise from North to East')
+    parser.add_argument('--date', type=float, default=None, help='MJD of date of observation')
+    parser.add_argument('--bandpass', type=str, default=None, help='Bandpass of observation')
+    parser.add_argument('--exptime', type=float, default=None, help='Exposure Time of observation')
+    parser.add_argument('--input', type=float, default=None, help='Input pattern that all asdf files share. Example: input_pattern = RST_WFI_SCA_*.asdf if your files are RST_WFI_SCA_01.asdf, RST_WFI_SCA_02.asdf, RST_WFI_SCA_03.asdf [...] RST_WFI_SCA_18.asdf.')
     parser.add_argument('--radius', type=float, default=0.1, help='Maximum radius up to where all stars are considered individually. The lower the value, the faster the processing. Default: 0.1 degree.')
     parser.add_argument('--g_mag_max', type=float, default=15, help='Maximum magnitude for stars considered in the calculated. The lower the value, the faster the processing. Default: 15 mag.')
     parser.add_argument('--verbose', type=bool, default=False, help='Verbose option. Set True to see all the information.')
 
+    # ra, dec, PA, date, bandpass, exptime, input_fits=None, radius=1,
+    #               g_mag_max=15, sun_block=False, verbose=False, catalog=None):
     args = parser.parse_args()
 
     go(args)

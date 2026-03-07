@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
+requires = ["setuptools>=61.0", "Cython >=0.29.21", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -56,7 +56,7 @@ dependencies = [
     "ipython",
     "pysynphot",
     "sphericalpolygon",
-    "sphinx", "sphinx-rtd-dark-mode",
+    "sphinx", "sphinx-rtd-dark-mode", "sphinxcontrib-video",
     "twine",
     "psutil",
     "zodipy",
@@ -65,19 +65,16 @@ dependencies = [
 [project.urls]
 Homepage = "https://github.com/Borlaff/ROSALIA"
 Repository = "https://github.com/Borlaff/ROSALIA"
+Tracker = "https://github.com/Borlaff/ROSALIA/issues"
+Documentation = "https://rosalia.readthedocs.io/en/stable/"
+"Source Code" = "https://github.com/Borlaff/ROSALIA"
 
-[project.scripts]
-rosalia-sky = "rosalia.skywalker:main"
-run-rosalia-tests = "rosalia.tests:main"
-exposure-inspector = "rosalia.bootima:main"
-rosalia-stray = "rosalia.sso:main"
-test-rosalia-parser = "rosalia.correct:main"
 
 [tool.setuptools]
 packages = ["rosalia"]
 
 [tool.setuptools.package-data]
-rosalia = ["*.mplstyle", "*.csv", "*.txt", "images/*"]
+rosalia = ["*.mplstyle", "*.csv", "*.txt", "images/*", "bin/*"]
 
 [tool.pytest.ini_options]
 testpaths = ["rosalia"]
