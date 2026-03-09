@@ -50,6 +50,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#baby-steps-transforming-asdf-to-fits">Baby steps: Transforming ASDF to FITS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#generating-some-mock-roman-wfi-observations">Generating some mock Roman / WFI observations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#stray-light-analysis-example">Stray Light Analysis Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#estimating-the-surface-brigthness-limit-of-roman-wfi-observations">Estimating the surface brigthness limit of Roman WFI observations</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">How to use</a></li>
@@ -157,6 +158,15 @@ romanisim-make-image<span class="w"> </span>--radec<span class="w"> </span><span
 </ul>
 <p>To run this notebook locally, make sure you have Jupyter installed and then:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>jupyter<span class="w"> </span>notebook<span class="w"> </span>notebooks/R1_Rosalia_stray_example.ipynb
+</pre></div>
+</div>
+</section>
+<section id="estimating-the-surface-brigthness-limit-of-roman-wfi-observations">
+<h2>Estimating the surface brigthness limit of Roman WFI observations<a class="headerlink" href="#estimating-the-surface-brigthness-limit-of-roman-wfi-observations" title="Link to this heading"></a></h2>
+<p>In this tutorial you can find an example of use of a very approximate function to estimate the surface brightness limit of Roman/WFI observations as a function of the exposure time and the level of stray light in the field. This is not meant to be a rigorous calculation, but rather an example of how to use ROSALIA to quickly estimate the impact of stray light on the surface brightness limit of Roman/WFI observations.</p>
+<p>This is a very crude solution that does not take into account systematic effects like flat field, CTE, bias, or gradients. The only limiting factor is photon noise from Zodiacal light. However, Zodiacal light is 95% of the limit, so it will work sufficiently well for most purposes.</p>
+<p>For a more realistic simulation, we recommend to simulate the individual exposures with Romanisim: <a class="reference external" href="https://romanisim.readthedocs.io/en/latest/">https://romanisim.readthedocs.io/en/latest/</a>, and then combine the individual exposures. The resulting noise then will include the systematic effects mentioned above.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>jupyter<span class="w"> </span>notebook<span class="w"> </span>notebooks/R0_Rosalia_surface_brightness_limit.ipynb
 </pre></div>
 </div>
 </section>

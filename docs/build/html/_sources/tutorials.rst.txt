@@ -98,3 +98,16 @@ To run this notebook locally, make sure you have Jupyter installed and then:
   :height: 512
   :alt: ROSALIA Stray-light loading bar
 
+
+Estimating the surface brigthness limit of Roman WFI observations
+-----------------------------
+
+In this tutorial you can find an example of use of a very approximate function to estimate the surface brightness limit of Roman/WFI observations as a function of the exposure time and the level of stray light in the field. This is not meant to be a rigorous calculation, but rather an example of how to use ROSALIA to quickly estimate the impact of stray light on the surface brightness limit of Roman/WFI observations. 
+
+This is a very crude solution that does not take into account systematic effects like flat field, CTE, bias, or gradients. The only limiting factor is photon noise from Zodiacal light. However, Zodiacal light is 95% of the limit, so it will work sufficiently well for most purposes.
+
+For a more realistic simulation, we recommend to simulate the individual exposures with Romanisim: https://romanisim.readthedocs.io/en/latest/, and then combine the individual exposures. The resulting noise then will include the systematic effects mentioned above. 
+
+.. code-block:: bash
+
+    jupyter notebook notebooks/R0_Rosalia_surface_brightness_limit.ipynb

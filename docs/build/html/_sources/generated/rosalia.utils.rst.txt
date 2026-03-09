@@ -50,6 +50,7 @@
       make_ds9_region
       make_profile
       mask_sources
+      measure_maglim
       modify_keyword_hdr
       position_angle
       radec_to_xy
