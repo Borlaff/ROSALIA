@@ -1653,3 +1653,33 @@ def divide_array_in_chunks(array, chunk_size):
         chunks.append(array[end_i:])
 
     return(chunks)
+
+
+def measure_maglim(mu_sky, instrument, filter_name, telescope, exptime, verbose=False):
+    import numpy as np
+    # With the mu_sky level, calculate the depth of the images. 
+    # Input: 
+    # mu_sky: AB magnitudes, mag arcsec^-2
+    
+
+    # Get telescope 
+    telescope_class = rs.telescopes.telescope_class_finder(telescope=telescope)
+    pixscale = telescope_class.get_pixscale(instrument=instrument)
+    photon_flux = rs.detectors.mu2fe(mu=mu_sky, instrument=instrument,
+                                     filter_name=filter_name, telescope=telescope, verbose=verbose)
+
+    
+    print("Photon_flux " + str(photon_flux) + " photons s⁻¹ pixel")
+
+    # Photon noise level at exposure time
+    sd_photon_flux = np.sqrt(photon_flux*exptime)/exptime
+    sigma_3_10x10_arcsec = 3*sd_photon_flux/np.sqrt((10/pixscale.to("arcsec").value)**2)
+    # print(np.sqrt((10/pixscale.to("arcsec").value)**2))
+    # Fl noise at exposure time
+    mu_lim_3sigma_10x10 = rs.detectors.fe2mu(fe=sigma_3_10x10_arcsec, instrument=instrument,
+                                             filter_name=filter_name, telescope=telescope, verbose=verbose)
+    
+    # mag_lim = -2.5*np.log10(3*sd_fnu*1E+26/np.sqrt((10/pix_scale)**2)/exptime) + 8.9
+    print("Limiting magnitude : " + str(mu_lim_3sigma_10x10))
+    return(mu_lim_3sigma_10x10)
+    

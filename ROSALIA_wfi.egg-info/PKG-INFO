@@ -54,6 +54,7 @@ Requires-Dist: pysynphot
 Requires-Dist: sphericalpolygon
 Requires-Dist: sphinx
 Requires-Dist: sphinx-rtd-dark-mode
+Requires-Dist: sphinxcontrib-video
 Requires-Dist: twine
 Requires-Dist: psutil
 Requires-Dist: zodipy

@@ -29,6 +29,7 @@ pysynphot
 sphericalpolygon
 sphinx
 sphinx-rtd-dark-mode
+sphinxcontrib-video
 twine
 psutil
 zodipy
