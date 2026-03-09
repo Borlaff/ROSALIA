@@ -108,6 +108,4 @@ This is a very crude solution that does not take into account systematic effects
 
 For a more realistic simulation, we recommend to simulate the individual exposures with Romanisim: https://romanisim.readthedocs.io/en/latest/, and then combine the individual exposures. The resulting noise then will include the systematic effects mentioned above. 
 
-.. code-block:: bash
-
-    jupyter notebook notebooks/R0_Rosalia_surface_brightness_limit.ipynb
+* :download:`R0_Rosalia_surface_brightness_limit.ipynb <../../notebooks/R0_Rosalia_surface_brightness_limit.ipynb>`
