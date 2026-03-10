@@ -1656,7 +1656,6 @@ def divide_array_in_chunks(array, chunk_size):
 
 
 def measure_maglim(mu_sky, instrument, filter_name, telescope, exptime, sigma=3, box=10, verbose=False):
-    import numpy as np
     '''Measure the limiting magnitude of an image given the sky background level, the instrument, 
     filter, telescope and exposure time.
     
@@ -1687,6 +1686,7 @@ def measure_maglim(mu_sky, instrument, filter_name, telescope, exptime, sigma=3,
             Limiting surface brightness in AB magnitudes per square arcsecond for the 
             specified sigma detection in the specified box size (default is 3-sigma in a 10x10 arcsecond area).
     '''
+    import numpy as np
 
     # Get telescope 
     telescope_class = rs.telescopes.telescope_class_finder(telescope=telescope)
