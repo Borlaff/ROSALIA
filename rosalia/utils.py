@@ -1655,12 +1655,38 @@ def divide_array_in_chunks(array, chunk_size):
     return(chunks)
 
 
-def measure_maglim(mu_sky, instrument, filter_name, telescope, exptime, verbose=False):
+def measure_maglim(mu_sky, instrument, filter_name, telescope, exptime, sigma=3, box=10, verbose=False):
     import numpy as np
-    # With the mu_sky level, calculate the depth of the images. 
-    # Input: 
-    # mu_sky: AB magnitudes, mag arcsec^-2
+    '''Measure the limiting magnitude of an image given the sky background level, the instrument, 
+    filter, telescope and exposure time.
     
+    Parameters
+    ----------
+
+        mu_sky : float
+            Sky background level in AB magnitudes per square arcsecond.
+        instrument : str
+            Name of the instrument used for the observation.
+        filter_name : str
+            Name of the filter used for the observation.
+        telescope : str
+            Name of the telescope used for the observation.
+        exptime : float
+            Exposure time in seconds.
+        sigma : float, optional
+            Sigma level for the detection. Default is 3.
+        box : float, optional
+            Size of the box in arcseconds for the detection. Default is 10.
+        verbose : bool, optional
+            If True, print detailed information. Default is False.
+
+    Returns
+    -------
+        
+        mu_lim : float
+            Limiting surface brightness in AB magnitudes per square arcsecond for the 
+            specified sigma detection in the specified box size (default is 3-sigma in a 10x10 arcsecond area).
+    '''
 
     # Get telescope 
     telescope_class = rs.telescopes.telescope_class_finder(telescope=telescope)
@@ -1668,18 +1694,19 @@ def measure_maglim(mu_sky, instrument, filter_name, telescope, exptime, verbose=
     photon_flux = rs.detectors.mu2fe(mu=mu_sky, instrument=instrument,
                                      filter_name=filter_name, telescope=telescope, verbose=verbose)
 
-    
-    print("Photon_flux " + str(photon_flux) + " photons s⁻¹ pixel")
+    if verbose: print("Photon_flux " + str(photon_flux) + " photons s⁻¹ pixel")
 
     # Photon noise level at exposure time
     sd_photon_flux = np.sqrt(photon_flux*exptime)/exptime
-    sigma_3_10x10_arcsec = 3*sd_photon_flux/np.sqrt((10/pixscale.to("arcsec").value)**2)
-    # print(np.sqrt((10/pixscale.to("arcsec").value)**2))
+    sigma_3_10x10_arcsec = sigma*sd_photon_flux/np.sqrt((box/pixscale.to("arcsec").value)**2)
+
+
     # Fl noise at exposure time
-    mu_lim_3sigma_10x10 = rs.detectors.fe2mu(fe=sigma_3_10x10_arcsec, instrument=instrument,
+    mu_lim = rs.detectors.fe2mu(fe=sigma_3_10x10_arcsec, instrument=instrument,
                                              filter_name=filter_name, telescope=telescope, verbose=verbose)
     
     # mag_lim = -2.5*np.log10(3*sd_fnu*1E+26/np.sqrt((10/pix_scale)**2)/exptime) + 8.9
-    print("Limiting magnitude : " + str(mu_lim_3sigma_10x10))
-    return(mu_lim_3sigma_10x10)
+    if verbose: print("Limiting magnitude : " + str(mu_lim))
+
+    return(mu_lim)
     
