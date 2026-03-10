@@ -25,4 +25,4 @@ Anton Koekemoer (collaborator) - STScI
 
 Fernando Buitrago (collaborator) - Universidad de Valladolid, Spain
 
-Sarah Caddy (collaborator) - NASA Ames Research Center
+Sarah Caddy (collaborator) - Melbourne Space Laboratory, University of Melbourne, Australia
