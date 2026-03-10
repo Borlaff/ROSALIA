@@ -10,8 +10,19 @@ Who is ROSALIA?
 If you have any questions, suggestions, or want to contribute to the project, please do not hesitate to contact us at a.s.borlaff@nasa.gov.
 
 The ROSALIA team is:
+
 Alejandro S. Borlaff  (Scientific PI) - NASA Ames Research Center, BAERI – a.s.borlaff@nasa.gov
+
 Pamela M. Marcum (Admin PI) - NASA Ames Research Center
+
 Scott Rohrbach (Optical Engineer) - NASA Goddard Space Flight Center
+
 Seppo Laine (Roman Scientist) - IPAC Caltech
+
 Pablo M. Sanchez-Alarcon (NASA Postdoctoral Fellow) - NASA Ames Research Center
+
+Anton Koekemoer (collaborator) - STScI
+
+Fernando Buitrago (collaborator) - Universidad de Valladolid, Spain
+
+Sarah Caddy (collaborator) - NASA Ames Research Center

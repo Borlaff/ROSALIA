@@ -93,7 +93,7 @@ To run this notebook locally, make sure you have Jupyter installed and then:
 
     jupyter notebook notebooks/R1_Rosalia_stray_example.ipynb
 
-.. video:: ../../images/rosalia_loading.mp4
+.. image:: ../../images/rosalia_loading.gif
   :width: 802
   :height: 512
   :alt: ROSALIA Stray-light loading bar
@@ -108,4 +108,4 @@ This is a very crude solution that does not take into account systematic effects
 
 For a more realistic simulation, we recommend to simulate the individual exposures with Romanisim: https://romanisim.readthedocs.io/en/latest/, and then combine the individual exposures. The resulting noise then will include the systematic effects mentioned above. 
 
-* :download:`R0_Rosalia_surface_brightness_limit.ipynb <../../notebooks/R0_Rosalia_surface_brightness_limit.ipynb>`
+* :download:`R0_Surface_brightness_limit.ipynb <../../notebooks/R0_Surface_brightness_limit.ipynb>`
