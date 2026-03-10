@@ -136,7 +136,11 @@ pip install rosalia
    ```
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-ROSALIA needs a set of calibrations files to work. Most functions will work without it, but the main ones (rosalia_stray) will return an error when executed if these files are not found. The ROSALIACACHE folder must be defined in the environment as: 
+ROSALIA needs a set of calibrations files to work. ROSALIA needs a series of cache files to work. If they are not installed, most of the functions will work, but you won't be able to estimate the surface brightness of the stray light, which is one of the main functionalities of ROSALIA. To install the cache files, download the following folder:
+
+[ROSALIA Cache](https://zenodo.org/records/18882110/files/rosalia-cache.tar.gz)
+
+Most functions will work without it, but the main ones (rosalia_stray) will return an error when executed if these files are not found. The ROSALIACACHE folder must be defined in the environment as: 
 
 ```sh
 export ROSALIACACHE=/home/user/project/rosalia_cache

@@ -101,7 +101,14 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">rosalia</span>
 </pre></div>
 </div>
-<p>That is it! We are ready to start analyzing Space Telescope images.</p>
+<p>ROSALIA needs a series of cache files to work. If they are not installed, most of the functions will work, but you won’t be able to estimate the surface brightness of the stray light, which is one of the main functionalities of ROSALIA. To install the cache files, download the following folder:</p>
+<p><a class="reference external" href="https://zenodo.org/records/18882110/files/rosalia-cache.tar.gz">ROSALIA Cache</a>,</p>
+<p>Then, extract the contents of the downloaded file and move the resulting folder to a location of your choice. Finally, set the environment variable <code class="docutils literal notranslate"><span class="pre">ROSALIACACHE</span></code> to point to the location of the extracted folder. For example, if you extracted the folder to <code class="docutils literal notranslate"><span class="pre">/path/to/rosalia-cache</span></code>, you can set the environment variable as follows:
+.. code-block:: sh</p>
+<blockquote>
+<div><p>export ROSALIACACHE=/path/to/rosalia-cache</p>
+</div></blockquote>
+<p>That is it! We are ready to start analyzing Roman Space Telescope images.</p>
 </section>
 </section>
 
