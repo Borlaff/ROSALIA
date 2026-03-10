@@ -17,11 +17,13 @@ Pamela M. Marcum (Admin PI) - NASA Ames Research Center
 
 Scott Rohrbach (Optical Engineer) - NASA Goddard Space Flight Center
 
-Seppo Laine (Roman Scientist) - IPAC Caltech
+Seppo Laine (Roman Scientist) - IPAC Caltech, Pasadena, USA
 
 Pablo M. Sanchez-Alarcon (NASA Postdoctoral Fellow) - NASA Ames Research Center
 
-Anton Koekemoer (collaborator) - STScI
+Mireia Montes (collaborator) - Institute of Space Sciences (ICE-CSIC), Spain
+
+Anton Koekemoer (collaborator) - STScI, Baltimore, USA
 
 Fernando Buitrago (collaborator) - Universidad de Valladolid, Spain
 
