@@ -2237,7 +2237,42 @@ Adapted from Great Circle navigation: <a class="reference external" href="https:
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.utils.measure_maglim">
 <span class="sig-prename descclassname"><span class="pre">rosalia.utils.</span></span><span class="sig-name descname"><span class="pre">measure_maglim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mu_sky</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instrument</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">telescope</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exptime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.utils.measure_maglim" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Measure the limiting magnitude of an image given the sky background level, the instrument, 
+filter, telescope and exposure time.</p>
+<section id="id5">
+<h3>Parameters<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<blockquote>
+<div><dl class="simple">
+<dt>mu_sky<span class="classifier">float</span></dt><dd><p>Sky background level in AB magnitudes per square arcsecond.</p>
+</dd>
+<dt>instrument<span class="classifier">str</span></dt><dd><p>Name of the instrument used for the observation.</p>
+</dd>
+<dt>filter_name<span class="classifier">str</span></dt><dd><p>Name of the filter used for the observation.</p>
+</dd>
+<dt>telescope<span class="classifier">str</span></dt><dd><p>Name of the telescope used for the observation.</p>
+</dd>
+<dt>exptime<span class="classifier">float</span></dt><dd><p>Exposure time in seconds.</p>
+</dd>
+<dt>sigma<span class="classifier">float, optional</span></dt><dd><p>Sigma level for the detection. Default is 3.</p>
+</dd>
+<dt>box<span class="classifier">float, optional</span></dt><dd><p>Size of the box in arcseconds for the detection. Default is 10.</p>
+</dd>
+<dt>verbose<span class="classifier">bool, optional</span></dt><dd><p>If True, print detailed information. Default is False.</p>
+</dd>
+</dl>
+</div></blockquote>
+</section>
+<section id="id6">
+<h3>Returns<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<blockquote>
+<div><dl class="simple">
+<dt>mu_lim<span class="classifier">float</span></dt><dd><p>Limiting surface brightness in AB magnitudes per square arcsecond for the 
+specified sigma detection in the specified box size (default is 3-sigma in a 10x10 arcsecond area).</p>
+</dd>
+</dl>
+</div></blockquote>
+</section>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.utils.modify_keyword_hdr">
