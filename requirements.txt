@@ -21,3 +21,4 @@ LSSTDESC.Coord
 skyfield
 pytest
 ipython
+pysiaf

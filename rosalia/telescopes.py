@@ -448,6 +448,37 @@ class Roman:
         psf_wfi = wfi.calc_psf(fov_pixels = fov_pixels, oversample=oversample)
         return(psf_wfi[0])
 
+    def get_bestPA(ra, dec, mjd):
+        """
+        get_bestPA calculates the best position angle for Roman's WFI given the target coordinates and the time of observation. It uses the galsim.roman.bestPA function to compute the optimal position angle that gets the Sun on the sunshield. The function takes in the right ascension (ra), declination (dec), and modified Julian date (mjd) as inputs and returns the best position angle in degrees.
+       
+        Input parameters:
+        - ra: Right ascension of the target in degrees.
+        - dec: Declination of the target in degrees.
+        - mjd: Modified Julian Date of the observation.
+
+        Output:
+        - WFI_PA: The best position angle for Roman's WFI in degrees.
+
+        """
+
+        import galsim
+        import coord
+        import galsim.roman as galsim_roman
+        from astropy.time import Time
+
+        # Setting up the parameters in GalSim format
+        ra_targ = coord.Angle(ra*coord.degrees)
+        dec_targ = coord.Angle(dec*coord.degrees)
+        targ_pos = galsim.CelestialCoord(ra=ra_targ, dec=dec_targ)
+        t = Time(mjd, format='mjd')
+        dt = t.to_datetime()
+    
+        WFI_PA = galsim_roman.bestPA(targ_pos, dt)
+        return(WFI_PA.deg)
+
+
+
     def get_psf(detector_position, detector, filter_name):
         SCA = detector
         from romanisim.bandpass import roman2galsim_bandpass
