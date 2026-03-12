@@ -513,6 +513,50 @@ class Roman:
         os.system("rm " + outname)
         return(psf_wfi[0])
 
+    def find_wfi_center_for_offset_target(ra_target, dec_target, mjd, dX, dY, PA_wfi=None, verbose=False):
+        # dX dY in degrees
+    
+        import pysiaf
+        # Define the Roman Space Telescope Frame 
+        rsiaf = pysiaf.Siaf('Roman')
+        wfi_cen = rsiaf['WFI_CEN']
+
+        # Find the optimal position angle of the observatory at that RA, Dec, and date
+        # if PA_wfi is None:
+        # This is the position angle of the observatory
+        # WFI focal plane Y direction is -60 degrees offset from this. 
+        PA_v3 = rs.telescopes.Roman.get_bestPA(ra=ra_target, dec=dec_target, mjd=mjd)
+            #PA_wfi = PA_v3 - 60*u.degree
+        # else:
+            #PA_v3 = PA_wfi + 60*u.degree
+        
+        if verbose:
+            print("RA: " + str(ra_target) + " - DEC: " + str(dec_target) + " PA_v3: " + str(PA_v3))
+    
+        # First, we find v2, v3 for the stray light point we want to hit
+        # these are the coordinates in the telescope (V2, V3) plane, 
+        # with origin in WFI_CEN, the center of the focal plane array.
+        v2, v3 = wfi_cen.idl_to_tel(dX*60*60, dY*60*60, method="spherical", 
+                                    input_coordinates="polar", output_coordinates="polar")
+
+
+        # Then we define the attitude matrix required to place that v2 and v3 on the star
+        attmat = pysiaf.utils.rotations.attitude_matrix(nu2=v2, nu3=v3,
+                                                    ra=ra_target, dec=dec_target, 
+                                                    pa=PA_v3)
+
+        # We apply the attitude matrix to the observatory
+        wfi_cen.set_attitude_matrix(attmat)
+        # compute the position angle at that aperture
+        V2Ref = rsiaf.apertures['WFI_CEN'].V2Ref
+        V3Ref = rsiaf.apertures['WFI_CEN'].V3Ref
+        pa = pysiaf.utils.rotations.posangle(attmat, V2Ref, V3Ref)
+    
+        # Compute the sky coordinates of the WFI_CEN aperture reference position
+        wfi_ra, wfi_dec = wfi_cen.idl_to_sky(0, 0)
+        if verbose: print(f'' + name.iloc[i] + f' - WFI_CEN: RA = {wfi_ra:.5f} deg, Dec = {wfi_dec:.5f} deg')
+        return({"ra_wficen": wfi_ra, "dec_wficen": wfi_dec, "pa_wfi": pa - 60})
+    
 #################################################################
 
 class CSST:
