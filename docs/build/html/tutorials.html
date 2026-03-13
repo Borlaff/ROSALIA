@@ -47,7 +47,7 @@
 <li class="toctree-l1"><a class="reference internal" href="mission.html">What is ROSALIA?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorials</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#baby-steps-transforming-asdf-to-fits">Baby steps: Transforming ASDF to FITS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#transforming-asdf-to-fits">Transforming ASDF to FITS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#generating-some-mock-roman-wfi-observations">Generating some mock Roman / WFI observations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#stray-light-analysis-example">Stray Light Analysis Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#estimating-the-surface-brigthness-limit-of-roman-wfi-observations">Estimating the surface brigthness limit of Roman WFI observations</a></li>
@@ -86,8 +86,8 @@
   <section id="tutorials">
 <h1>Tutorials<a class="headerlink" href="#tutorials" title="Link to this heading"></a></h1>
 <p>This section contains some code examples and Jupyter notebook tutorials to help you get started with ROSALIA and its functionalities.</p>
-<section id="baby-steps-transforming-asdf-to-fits">
-<h2>Baby steps: Transforming ASDF to FITS<a class="headerlink" href="#baby-steps-transforming-asdf-to-fits" title="Link to this heading"></a></h2>
+<section id="transforming-asdf-to-fits">
+<h2>Transforming ASDF to FITS<a class="headerlink" href="#transforming-asdf-to-fits" title="Link to this heading"></a></h2>
 <p><a class="reference external" href="https://asdf.readthedocs.io/en/latest/">ASDF</a> is the successor of <a class="reference external" href="https://www.stsci.edu/hst/wfpc2/Wfpc2_dhb/intro_ch23.html">FITS</a> format and has been adopted since JWST. While GUI visualizers like SAO DS9 are not yet compatible with ASDF (<a class="reference external" href="https://www.stsci.edu/files/live/sites/www/files/home/jwst/science-planning/user-committees/jwst-users-committee/_documents/jstuc-0919-data-analysis-tool-ferguson.pdf">see JWST Users Committee note</a>), ROSALIA provides an easy way to extract useful information from ASDF files through <code class="docutils literal notranslate"><span class="pre">exposure-inspector</span></code>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">rosalia</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">rs</span>
 <span class="n">exposure_identity</span> <span class="o">=</span> <span class="n">rs</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">exposure_inspector</span><span class="p">(</span><span class="n">input_name</span><span class="o">=</span><span class="s2">&quot;your_exposure.asdf&quot;</span><span class="p">)</span>
@@ -95,15 +95,8 @@
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">rs.utils.exposure_inspector</span></code> returns a series of fields containing basic information from the ASDF tree, including the name of the telescope, instrument, detector, pointing information (RA/Dec), WCS of the header(s). For Roman and Hubble Space Telescope exposures, ROSALIA will automatically find the filter transmission curve in <cite>SVO server &lt;https://svo2.cab.inta-csic.es/svo/theory/fps/&gt;</cite> and include it in the output.</p>
 <p>If the input FITS files correspond to multiple SCI exposures (e.g., one per SCA), the output will be a list of arrays, one per exposure. For Roman/WFI, one ASDF file per SCA (detector) will be generated. To combine the information from multiple ASDF files, we can use a pattern. For example, if we have 18 ASDF files named <code class="docutils literal notranslate"><span class="pre">your_exposure_SCA01.asdf</span></code>, <code class="docutils literal notranslate"><span class="pre">your_exposure_SCA02.asdf</span></code>, …, <code class="docutils literal notranslate"><span class="pre">your_exposure_SCA18.asdf</span></code>, we can use the following command to extract the information from all 18 files at once:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">rosalia</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">rs</span>
-<span class="n">exposure_identity</span> <span class="o">=</span> <span class="n">rs</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">exposure_inspector</span><span class="p">(</span><span class="n">input_name</span><span class="o">=</span><span class="s2">&quot;your_exposure_SCA*.asdf&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
 <p>The output will be a single FITS file containing the combined information from all 18 ASDF files, which can be easily visualized in SAODS9 or any other FITS viewer. The name of the output FITS file will be the same as the input pattern, but with the <code class="docutils literal notranslate"><span class="pre">*</span></code> replaced by <code class="docutils literal notranslate"><span class="pre">_</span></code> and the extension changed to <code class="docutils literal notranslate"><span class="pre">.fits</span></code>. For example, the output file for the previous command will be named <code class="docutils literal notranslate"><span class="pre">your_exposure_SCA_.fits</span></code>.</p>
 <p>exposure-inspector can be used in the terminal as well, by providing the name of the ASDF file as an argument. For example:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>exposure-inspector<span class="w"> </span>RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI01.asdf
-</pre></div>
-</div>
 <p>Producing the same resutls as the previous Python command, but in the terminal.</p>
 </section>
 <section id="generating-some-mock-roman-wfi-observations">

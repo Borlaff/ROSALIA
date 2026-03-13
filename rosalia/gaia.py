@@ -140,7 +140,7 @@ def query_gaia_2mass_wise(ra, dec, radius, g_mag_max=False, verbose=False, query
     if verbose: print("> Query to Gaia/2MASS/WISE databases finished.")
     filtered_table = job.get_results().to_pandas()
 
-    filtered_table.to_csv(query_filename.replace(".csv", "_temp.csv")) # Debugging
+    # filtered_table.to_csv(query_filename.replace(".csv", "_temp.csv")) # Debugging
 
     # Correct the magnitudes to the AB system.
 

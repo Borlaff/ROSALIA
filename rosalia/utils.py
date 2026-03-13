@@ -501,14 +501,11 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
             for sci_ext_i in exposure_identity["SCIEXTS"]:
                 swarp_cmd_str = swarp_cmd_str + '"' + input_name+"["+str(sci_ext_i)  + ']" '
 
-            outname, outname_scaled = run_swarp(pattern=swarp_cmd_str,
-                                                outname=input_name.replace(".fits", "_swarp_coadd.fits"),
+            outname, outname_scaled = run_swarp(pattern=swarp_cmd_str, 
+                                                outname=input_name.replace(".fits", "_drz.fits"),
+                                                scale=0.1,
                                                 coveredfrac=1)
-            #swarp_coadd_name =
-            #swarp_cmd_str = swarp_cmd_str + ' -SUBTRACT_BACK N -BLANK_BADPIXELS Y -VERBOSE_TYPE QUIET -IMAGEOUT_NAME "' + input_name.replace(".fits", "_swarp_coadd.fits") + '"'
 
-            #if verbose: print(swarp_cmd_str)
-            #execute_cmd(swarp_cmd_str)
 
             swarp_coadd = fits.open(outname)
             reference_header = swarp_coadd[0].header
@@ -524,17 +521,45 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
 
 
 
-def run_swarp(pattern, outname, coveredfrac=1, verbose=False):
+def run_swarp(pattern, outname, scale=1, coveredfrac=1, verbose=False):
+    """
+    run_swarp:
+    This program runs SWARP on the input pattern of files, and generates a mosaic with the output name specified in outname. The pattern can be a string with the name of the file, a list of files, or a pattern with *. The output mosaic will be saved as outname, and if scale is different from 1, a scaled version of the mosaic will be saved as outname with the suffix "_scaled.fits". 
+
+    :param pattern: Pattern of files to be mosaicked. It can be a string with the name of the file, a list of files, or a pattern with *.
+    :type pattern: str, list
+    :param outname: Name of the output mosaic file. It should end with .fits
+    :type outname: str
+    :param scale: Scale factor for the output mosaic. If scale is different from 1, a scaled version of the mosaic will be saved as outname with the suffix "_scaled.fits". The scale factor is applied to the pixel scale of the mosaic, so that the output mosaic will have a pixel scale that is scale times the original pixel scale. For example, if scale=0.1, the output mosaic will have a pixel scale that is 10 times the original pixel scale, and the output mosaic will be 10 times smaller in size than the original mosaic. The default value is 1 (no scaling). 
+    :type scale: float
+
+    :param coveredfrac: Fraction of the mosaic that must be covered by input images. The default value is 1 (all pixels must be covered).
+    :type coveredfrac: float
+    :param verbose: If True, print verbose output. The default value is False.
+    :type verbose: bool
+
+    :return: List with the names of the output mosaic files. The first element is the name of the mosaic with the original pixel scale, and the second element is the name of the mosaic with the scaled pixel scale (if scale is different from 1). If scale is 1, the second element will be None.
+    :rtype: list
+    """
+
     rs.utils.execute_cmd("swarp -d > swarp.conf", verbose=verbose) # Generate a default config file for swarp
     rs.utils.execute_cmd("swarp -c swarp.conf -SUBTRACT_BACK N -BLANK_BADPIXELS Y -VERBOSE_TYPE QUIET " + pattern, verbose=verbose) # Run swarp on all the SCAs
     rs.utils.execute_cmd("mv coadd.fits " + outname, verbose=verbose) # Make a compressed version, for easiest visualization.
-    outname_warped = outname.replace(".fits", "_warped.fits")
-    rs.utils.execute_cmd("astwarp " + outname +" -h0 --coveredfrac=" + str(coveredfrac) + " --scale=0.1,0.1 --output=" + outname_warped, verbose=verbose) # Make a compressed version, for easiest visualization.
-    outname_scaled = outname.replace(".fits", "_scaled.fits")
-    rs.utils.execute_cmd("astarithmetic -h1 " + outname_warped + " 0.01 x --output=" + outname_scaled, verbose=verbose) # Make a compressed version, for easiest visualization.
-    rs.utils.execute_cmd("rm " + outname_warped, verbose=verbose)
-    print("Result in " + outname + " & " + outname_scaled)
-    return([outname, outname_scaled])
+    
+    # Clean the swarp files
+    rs.utils.execute_cmd("rm swarp.conf swarp.xml coadd.weight.fits subprocess.out", verbose=verbose)
+
+    if verbose: print("Mosaic saved as " + outname)
+    if scale !=1:
+        outname_warped = outname.replace(".fits", "_warped.fits")
+        rs.utils.execute_cmd("astwarp " + outname +" -h0 --coveredfrac=" + str(coveredfrac) + " --scale="+str(scale)+","+str(scale)+" --output=" + outname_warped, verbose=verbose) # Make a compressed version, for easiest visualization.
+        outname_scaled = outname.replace(".fits", "_scaled.fits")
+        rs.utils.execute_cmd("astarithmetic -h1 " + outname_warped + " "+str(scale**2)+" x --output=" + outname_scaled, verbose=verbose) # Make a compressed version, for easiest visualization.
+        rs.utils.execute_cmd("rm " + outname_warped, verbose=verbose)
+        if verbose: print("Scaled mosaic ("+str(scale)+"x"+str(scale)+") saved as " + outname_scaled)
+        return([outname, outname_scaled])
+    else:
+        return([outname, None])
 
 
 #####################################################################

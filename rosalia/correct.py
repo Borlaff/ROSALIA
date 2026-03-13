@@ -148,12 +148,6 @@ def rosalia_stray(ra, dec, PA, date, bandpass, exptime, input_fits=None, radius=
                                      sun_block = sun_block,
                                      output_name = output_name)
 
-    # Make a 0.1 x 0.1 scaled version for inspection ease.
-    # outname = output_name.replace(".fits", "_scaled.fits")
-    # outname, outname_scaled = rs.utils.run_swarp(pattern=output_name, outname=outname, coveredfrac=1)
-    # main_offender_db["mosaic_name"] = outname
-    # main_offender_db["mosaic_name_scaled"] = outname_scaled
-
     return(main_offender_db)
 
 ###########################
@@ -303,6 +297,7 @@ def rosalia_psf(ra, dec, PA, g_mag_max, date, bandpass, exptime, input_catalog=N
                                                           # ra=ra, dec=dec, MJD=MJD, radius=radius, g_mag_max=g_mag_max, verbose=verbose)
     #hybrid_catalog = gaia_query_dict["gaia_query"]
 
+    source_catalog_filename = roman_dummy_name.replace(".fits", "_source_catalog.csv")
     if input_catalog is not None:
         hybrid_catalog = input_catalog
     
@@ -313,7 +308,8 @@ def rosalia_psf(ra, dec, PA, g_mag_max, date, bandpass, exptime, input_catalog=N
                                                lambda_ref=image_identity["FILTER_IDENTITY"]["filter_lambda_ref"],
                                                MJD=date.mjd,
                                                observer=image_identity["TELESCOP"],
-                                               g_mag_max=g_mag_max, verbose=verbose)
+                                               g_mag_max=g_mag_max, verbose=verbose, 
+                                               query_filename=source_catalog_filename)
 
     # def rosalia_stray(input_name, output_name="rosalia_stray_output.fits", radius=1, g_mag_max=15, sun_block=False, verbose=False, catalog=None):
 
@@ -565,7 +561,7 @@ def main_offender(input_name=None, ext=None, ra=None, dec=None, phi=0,
     else:
         hybrid_catalog = input_catalog
 
-    hybrid_catalog.to_csv(output_name.replace(".fits", "_catalog.csv"))
+    hybrid_catalog.to_csv(source_catalog_filename)
 
 
     # If sun_block is True, then remove the Sun from the catalog.

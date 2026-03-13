@@ -3,7 +3,7 @@ Tutorials
 
 This section contains some code examples and Jupyter notebook tutorials to help you get started with ROSALIA and its functionalities.
 
-Baby steps: Transforming ASDF to FITS
+Transforming ASDF to FITS
 -----------------------------
 `ASDF <https://asdf.readthedocs.io/en/latest/>`_ is the successor of `FITS <https://www.stsci.edu/hst/wfpc2/Wfpc2_dhb/intro_ch23.html>`_ format and has been adopted since JWST. While GUI visualizers like SAO DS9 are not yet compatible with ASDF (`see JWST Users Committee note <https://www.stsci.edu/files/live/sites/www/files/home/jwst/science-planning/user-committees/jwst-users-committee/_documents/jstuc-0919-data-analysis-tool-ferguson.pdf>`_), ROSALIA provides an easy way to extract useful information from ASDF files through ``exposure-inspector``:
 
@@ -17,8 +17,6 @@ Baby steps: Transforming ASDF to FITS
 If the input FITS files correspond to multiple SCI exposures (e.g., one per SCA), the output will be a list of arrays, one per exposure. For Roman/WFI, one ASDF file per SCA (detector) will be generated. To combine the information from multiple ASDF files, we can use a pattern. For example, if we have 18 ASDF files named ``your_exposure_SCA01.asdf``, ``your_exposure_SCA02.asdf``, ..., ``your_exposure_SCA18.asdf``, we can use the following command to extract the information from all 18 files at once:
 
 .. code-block:: python
-
-    import rosalia as rs 
     exposure_identity = rs.utils.exposure_inspector(input_name="your_exposure_SCA*.asdf")
 
 The output will be a single FITS file containing the combined information from all 18 ASDF files, which can be easily visualized in SAODS9 or any other FITS viewer. The name of the output FITS file will be the same as the input pattern, but with the ``*`` replaced by ``_`` and the extension changed to ``.fits``. For example, the output file for the previous command will be named ``your_exposure_SCA_.fits``.
@@ -26,7 +24,6 @@ The output will be a single FITS file containing the combined information from a
 exposure-inspector can be used in the terminal as well, by providing the name of the ASDF file as an argument. For example:
 
 .. code-block:: sh
-
    exposure-inspector RST_WFI_ROSALIA_test_Orion_Belt_SCAWFI01.asdf
 
 Producing the same resutls as the previous Python command, but in the terminal.
@@ -92,6 +89,7 @@ To run this notebook locally, make sure you have Jupyter installed and then:
 .. code-block:: bash
 
     jupyter notebook notebooks/R1_Rosalia_stray_example.ipynb
+
 
 .. image:: ../../images/rosalia_loading.gif
   :width: 802
