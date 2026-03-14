@@ -557,6 +557,8 @@ def run_swarp(pattern, outname, scale=1, coveredfrac=1, verbose=False):
         rs.utils.execute_cmd("astarithmetic -h1 " + outname_warped + " "+str(scale**2)+" x --output=" + outname_scaled, verbose=verbose) # Make a compressed version, for easiest visualization.
         rs.utils.execute_cmd("rm " + outname_warped, verbose=verbose)
         if verbose: print("Scaled mosaic ("+str(scale)+"x"+str(scale)+") saved as " + outname_scaled)
+
+    if scale != 1:
         return([outname, outname_scaled])
     else:
         return([outname, None])
@@ -1499,22 +1501,6 @@ def get_data_and_wcs(input_name, ext):
     wcs = astropy_wcs.WCS(input_fits[ext].header, input_fits)
     return([input_fits[ext].data, wcs])
 
-#####################################################################
-
-def get_keys_from_header(fits_list, index, ext=0):
-    PARAM = []
-    for j in range(len(index)):
-        PARAM.append([])
-    for raw_name in fits_list:
-        # print(raw_name)
-        raw_fits = fits.open(raw_name)
-        for j in range(len(index)):
-            try:
-                PARAM[j].append(raw_fits[ext].header[index[j]])
-            except KeyError:
-                print("KeyError: Header keyword not found")
-                PARAM[j].append("NONE")
-    return(list(PARAM))
 
 #####################################################################
 
@@ -1735,3 +1721,39 @@ def measure_maglim(mu_sky, instrument, filter_name, telescope, exptime, sigma=3,
 
     return(mu_lim)
     
+
+    ##################
+
+#####################################################################
+
+def get_keys_from_header(fits_list, index, ext=0):
+    PARAM = []
+    for j in range(len(index)):
+        PARAM.append([])
+    for raw_name in fits_list:
+        # print(raw_name)
+        raw_fits = fits.open(raw_name)
+        for j in range(len(index)):
+            try:
+                PARAM[j].append(raw_fits[ext].header[index[j]])
+            except KeyError:
+                print("KeyError: Header keyword not found")
+                PARAM[j].append("NONE")
+    return(list(PARAM))
+
+
+def write_parameters_list(fits_list, index, value, ext=0):
+    for i in range(fits_list):
+        raw_name = fits_list[i]
+        print(raw_name)
+        raw_fits = fits.open(raw_name)
+        for j in range(len(index)):
+            try:
+                raw_fits[ext].header[index[j]] = value[j][i]
+            except KeyError:
+                print("KeyError: Extension not found")
+        raw_fits.verify("silentfix")
+        raw_fits.writeto(raw_name, overwrite=True)
+        raw_fits.close()
+    return()
+

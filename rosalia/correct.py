@@ -148,6 +148,27 @@ def rosalia_stray(ra, dec, PA, date, bandpass, exptime, input_fits=None, radius=
                                      sun_block = sun_block,
                                      output_name = output_name)
 
+
+
+    drz_name, scaled_drz_name = rs.utils.run_swarp(pattern=main_offender_db["output_name"], 
+                                                   outname=main_offender_db["output_name"].replace(".fits","_drz.fits"), scale=0.1)
+    
+    mainoff_name, scaled_mainoff_name = rs.utils.run_swarp(pattern=main_offender_db["main_offender_output"], outname=main_offender_db["main_offender_output"].replace(".fits","_drz.fits"), scale=0.1)
+
+    # Writing necessary keywords in the output mosaics. 
+    keywords = ["RA_TARG", "DEC_TARG", "EXPSTART", "EXPTIME", "FILTER", "WAVEREF", "WAVEMIN", "WAVEMAX", "TELESCOP", "INSTRUME", "DETECTOR"]
+    key_values = rs.utils.get_keys_from_header([fits_input_name], keywords, ext=0)
+    rs.utils.write_parameters_list([drz_name], keywords, key_values, ext=0)
+    rs.utils.write_parameters_list([scaled_drz_name], keywords, key_values, ext=0)
+    rs.utils.write_parameters_list([scaled_drz_name], ["PIXSCALE"], [[1]], ext=0)
+    rs.utils.write_parameters_list([scaled_drz_name], ["REBINNED"], [[10]], ext=0)
+
+    rs.utils.write_parameters_list([mainoff_name], keywords, key_values, ext=0)
+    rs.utils.write_parameters_list([scaled_mainoff_name], keywords, key_values, ext=0)
+    rs.utils.write_parameters_list([scaled_mainoff_name], ["PIXSCALE"], [[1]], ext=0)
+    rs.utils.write_parameters_list([scaled_mainoff_name], ["REBINNED"], [[10]], ext=0)
+
+
     return(main_offender_db)
 
 ###########################
