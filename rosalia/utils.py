@@ -470,9 +470,14 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
     # If LITE, fill this anyways.
     for sci_ext_i in exposure_identity["SCIEXTS"]:
         data_shape.append(input_fits[sci_ext_i].data.shape)
-        astropywcs.append(astropy_wcs.WCS(input_fits[sci_ext_i].header, input_fits))
+        astropywcs_i = astropy_wcs.WCS(input_fits[sci_ext_i].header)
+        astropywcs_i["EXTNAME"] = "SCI"
+        astropywcs_i["SCA"] = sci_ext_i                
+        astropywcs.append(astropywcs_i, input_fits)
     exposure_identity["DATA_SHAPE"] = data_shape
     exposure_identity["ASTROPYWCS"] = astropywcs
+
+
 
     # If not lite, do one more loop with the data to make a swarp coadd.
     if not lite: # Avoid generating the mosaic header.

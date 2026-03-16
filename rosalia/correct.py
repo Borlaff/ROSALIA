@@ -153,7 +153,8 @@ def rosalia_stray(ra, dec, PA, date, bandpass, exptime, input_fits=None, radius=
     drz_name, scaled_drz_name = rs.utils.run_swarp(pattern=main_offender_db["output_name"], 
                                                    outname=main_offender_db["output_name"].replace(".fits","_drz.fits"), scale=0.1)
     
-    mainoff_name, scaled_mainoff_name = rs.utils.run_swarp(pattern=main_offender_db["main_offender_output"], outname=main_offender_db["main_offender_output"].replace(".fits","_drz.fits"), scale=0.1)
+    mainoff_name, scaled_mainoff_name = rs.utils.run_swarp(pattern=main_offender_db["main_offender_output"],
+                                                           outname=main_offender_db["main_offender_output"].replace(".fits","_drz.fits"), scale=0.1)
 
     # Writing necessary keywords in the output mosaics. 
     keywords = ["RA_TARG", "DEC_TARG", "EXPSTART", "EXPTIME", "FILTER", "WAVEREF", "WAVEMIN", "WAVEMAX", "TELESCOP", "INSTRUME", "DETECTOR"]
@@ -730,6 +731,7 @@ def main_offender(input_name=None, ext=None, ra=None, dec=None, phi=0,
     for SCIEXT_i, main_offender_i in tqdm(zip(SCIEXTS, main_offender_list)):
         data_output.append(main_offender_i)
         header_output.append(image_identity["ASTROPYWCS"][SCIEXT_i-1].to_header())
+
 
     main_offender_output_name = output_name.replace(".fits", "_main_off.fits")
     rs.utils.save_fits(array=data_output, 
