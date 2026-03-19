@@ -6,3 +6,4 @@ subprocess.out
 temp*
 *temp
 *csv
+*pyc
