@@ -854,8 +854,7 @@ def get_hybrid_catalog(ra, dec, radius, lambda_ref, MJD, observer, g_mag_max=Fal
     sep = c.separation(star_coords)
     high_resolution_catalog["dist"] = sep.deg
     high_resolution_catalog = high_resolution_catalog.sort_values(by=["mag_lambda"], ascending=True)
-    high_resolution_catalog["cat_id"] = np.linspace(0, len(high_resolution_catalog)-1, len(high_resolution_catalog), dtype="int64")
-
+    high_resolution_catalog["cat_id"] = np.linspace(1, len(high_resolution_catalog), len(high_resolution_catalog), dtype="int64")
     high_resolution_catalog.to_csv(query_filename)
 
     return(high_resolution_catalog)

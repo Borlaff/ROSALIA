@@ -25,7 +25,6 @@ import astropy.units as u
 from astropy.coordinates import match_coordinates_sky, ICRS, Angle, SkyCoord
 from astropy.table import Table, join
 import astropy_healpix as astro_hp
-from astroquery.gaia import Gaia
 import rosalia as rs
 from rosalia.plots import style
 import rosalia.constants as rs_constants
@@ -40,6 +39,7 @@ def query_gaia_2mass_wise(ra, dec, radius, g_mag_max=False, verbose=False, query
 
     # C is the central coordinates of the pointing.
     c = SkyCoord(ra, dec, frame='icrs', unit="deg")
+    from astroquery.gaia import Gaia
 
     # Initialize the tables
     if verbose: print("Loading Gaia databases...")
@@ -250,6 +250,8 @@ def query_healpix_ra_slices(healpix_lvl=7, verbose=False):
     # This program is only run in case that the low resolution map is needed.
     # It can take one or two days, depending on the healpix mapping grid
     #healpix_lvl = 7
+    from astroquery.gaia import Gaia
+
     filtered_table_list = []
     ra_list = np.linspace(0, 359, 360)
     for ra_i in tqdm(ra_list):

@@ -161,7 +161,11 @@ def rosalia_stray(ra, dec, PA, date, bandpass, exptime, input_fits=None, radius=
                                                      reference_name=main_offender_db["main_offender_output"], 
                                                      reference_ext=rs.telescopes.Roman.WFI_SCAs)
     
-    rs.utils.save_fits(array=data, name=main_offender_db["main_offender_output"], header=header, overwrite=True)
+    scaled_main_off = main_offender_db["main_offender_output"].replace(".fits", "_scaled.fits")
+
+    catalog_name = main_offender_db["star_catalog"]
+
+    rs.utils.save_fits(array=data, name=scaled_main_off, header=header, overwrite=True)
 
     # Writing necessary keywords in the output mosaics. 
     keywords = ["RA_TARG", "DEC_TARG", "EXPSTART", "EXPTIME", "FILTER", "WAVEREF", "WAVEMIN", "WAVEMAX", "TELESCOP", "INSTRUME", "DETECTOR"]
@@ -171,10 +175,32 @@ def rosalia_stray(ra, dec, PA, date, bandpass, exptime, input_fits=None, radius=
     rs.utils.write_parameters_list([scaled_drz_name], ["PIXSCALE"], [[1]], ext=0)
     rs.utils.write_parameters_list([scaled_drz_name], ["REBINNED"], [[10]], ext=0)
 
-    rs.utils.write_parameters_list([mainoff_name], keywords, key_values, ext=0)
-    rs.utils.write_parameters_list([scaled_mainoff_name], keywords, key_values, ext=0)
-    rs.utils.write_parameters_list([scaled_mainoff_name], ["PIXSCALE"], [[1]], ext=0)
-    rs.utils.write_parameters_list([scaled_mainoff_name], ["REBINNED"], [[10]], ext=0)
+    rs.utils.write_parameters_list([main_offender_db["main_offender_output"]], keywords, key_values, ext=0)
+    rs.utils.write_parameters_list([scaled_main_off], keywords, key_values, ext=0)
+    rs.utils.write_parameters_list([scaled_main_off], ["PIXSCALE"], [[1]], ext=0)
+    rs.utils.write_parameters_list([scaled_main_off], ["REBINNED"], [[10]], ext=0)
+
+    # Make the plots. 
+    fe2mu_png = rs.plots.make_stray_plot(input_name=scaled_drz_name,
+                                        ext=1, mode="fe2mu",
+               color_label = "Surface brightness (mag arcsec$^{-2}$)")
+
+    fe_png = rs.plots.make_stray_plot(input_name=scaled_drz_name, ext=1, mode="fe", 
+                color_label = "Flux (e/s/px)",cmap="RdYlBu_r")
+
+    main_offender_png = rs.plots.make_stray_plot(input_name=scaled_main_off, ext=0, 
+                                                 mode="main_offender", 
+                catalog_name=catalog_name, 
+                color_label = "Main offending source (ID)")
+
+    stars_around_png = rs.plots.make_stars_around_plot(fits_input_name, catalog_name, output_name=None)
+
+    rs.utils.execute_cmd("magick -adjoin " +\
+                        fe2mu_png + " " +\
+                        fe_png + " "+\
+                        main_offender_png + " " +\
+                        stars_around_png + " "+\
+                        fits_input_name.replace(".fits", ".pdf"))
 
 
     return(main_offender_db)
@@ -778,7 +804,7 @@ def main_offender(input_name=None, ext=None, ra=None, dec=None, phi=0,
 
     return({"image_identity":image_identity,
             "straylevel_list": straylevel_list,
-            "star_catalog": hybrid_catalog,
+            "star_catalog": source_catalog_filename,
             "output_name": output_name,
             "main_offender_output": main_offender_output_name,
             "detector_square": detector_square_list})

@@ -568,6 +568,13 @@ def run_swarp(pattern, outname, scale=1, coveredfrac=1, verbose=False):
 
     rs.utils.execute_cmd("swarp -d > swarp.conf", verbose=verbose) # Generate a default config file for swarp
     rs.utils.execute_cmd("swarp -c swarp.conf -SUBTRACT_BACK N -BLANK_BADPIXELS Y -VERBOSE_TYPE QUIET " + pattern, verbose=verbose) # Run swarp on all the SCAs
+
+    # Mask all the 0s as NANs
+    hdu = fits.open("coadd.fits")
+    hdu[0].data[hdu[0].data == 0] = np.nan
+    hdu.verify('silentfix') # Fix the header to make it compatible with astropy.io.fits
+    hdu.writeto("coadd.fits", overwrite=True) # Save the mosaic as coadd.fits
+
     rs.utils.execute_cmd("mv coadd.fits " + outname, verbose=verbose) # Make a compressed version, for easiest visualization.
     
     # Clean the swarp files
@@ -1767,7 +1774,7 @@ def get_keys_from_header(fits_list, index, ext=0):
 
 
 def write_parameters_list(fits_list, index, value, ext=0):
-    for i in range(fits_list):
+    for i in range(len(fits_list)):
         raw_name = fits_list[i]
         print(raw_name)
         raw_fits = fits.open(raw_name)

@@ -24,3 +24,5 @@ skyfield
 pytest
 ipython
 pysiaf
+ephem
+pysolar

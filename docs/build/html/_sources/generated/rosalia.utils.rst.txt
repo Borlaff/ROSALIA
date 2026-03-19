@@ -55,6 +55,7 @@
       position_angle
       radec_to_xy
       read_ds9reg
+      reproject_roman_wfi_fits
       run_basic_astrodrizzle
       run_basic_noisechisel
       run_swarp
@@ -64,5 +65,6 @@
       sort_hst_flcs_by_filter
       sphere_dist
       thetaphi_2_radec
+      write_parameters_list
       xy_to_radec
    

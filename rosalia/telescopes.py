@@ -276,6 +276,11 @@ class Hubble:
 
     ndi_estimator = ndi_estimator
 
+    def load_TLE_tuple():
+        tle_tuple = (b'0 HST\n',
+        b'1 20580U 90037B   26039.77140942  .00007499  00000+0  25069-3 0  9991\n',
+        b'2 20580  28.4663 237.2056 0001769 143.1754 216.8963 15.29016206768883\n')
+        return(tle_tuple)
 
     def load_HST_TLEs(verbose=False):
         """ Loads the history of TLEs for Hubble Space Telescope.
@@ -594,6 +599,12 @@ class CSST:
         satellite = EarthSatellite(line1, line2, 'CSST', ts)
         return(satellite)
 
+    def TLE_tuple():
+        line0 = b'0 CSST\n'
+        line1 = b'1 48274U 21035A   26040.41958422  .00018345  00000+0  22932-3 0  9994\n'
+        line2 = b'2 48274  41.4684  20.0103 0004697  39.0740 321.0437 15.59384169273192\n'
+        return((line0, line1, line2))
+
     def TLE_exposure(epoch):
         return(rs.telescopes.CSST.load_example_TLE_CSST())
 
@@ -734,6 +745,12 @@ class SPHEREx:
         line2 = '2 63182  97.9549 227.6915 0009366 239.5726 120.4558 14.73753633 49230'
         satellite = EarthSatellite(line1, line2, 'SPHEREx', ts)
         return(satellite)
+    
+    def TLE_tuple():
+        line0 = b'0 SPHEREx\n'
+        line1 = b'1 63182U 25047E   26040.49042002  .00001639  00000+0  25830-3 0  9990\n'
+        line2 = b'2 63182  97.9549 227.6915 0009366 239.5726 120.4558 14.73753633 49230\n'
+        return((line0, line1, line2))
 
     def get_canvas_shape(instrument):
         if instrument == "SPHEREx":
@@ -839,6 +856,12 @@ class ARRAKIHS:
         line2 = '2 99999 098.6066 190.9024 0019445 243.2152 354.9930 14.25484048052155'
         satellite = EarthSatellite(line1, line2, 'ARRAKIHS', ts)
         return(satellite)
+    
+    def TLE_tuple():
+        line0 = b'0 ARRAKIHS\n'
+        line1 = b'1 99999U          25001.00000000  .00000000  00000-0  00000-0 0 00006\n'
+        line2 = b'2 99999 098.6066 190.9024 0019445 243.2152 354.9930 14.25484048052155\n'
+        return((line0, line1, line2))
 
     def get_canvas_shape(instrument):
         if instrument == "ARRAKIHS":

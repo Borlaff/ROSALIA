@@ -3,7 +3,7 @@ Welcome to Roman / ROSALIA's documentation!
 
 .. image:: ../../images/rosalia_logo.png
   :width: 700
-  :alt: Alternative text
+  :alt: The ROSALIA WFS Project logo 
 
 **ROSALIA** (*Roman Sky Analyst for Low surface brightness Imaging & Astronomy*)
 is a NASA pipeline to model the sky background level on astronomical images obtained
@@ -41,6 +41,7 @@ Contents
 
     mission
     installation
+    measuringstray
     tutorials
     usage
     whoarewe

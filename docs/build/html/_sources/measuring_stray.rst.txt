@@ -1,0 +1,42 @@
+Measuring Stray Light
+=========
+
+Quickstart: Stray Light Analysis Example with ROSALIA
+-----------------------------
+
+The following Jupyter-notebook shows a quick example to estimate stray-light with ROSALIA. The notebook is available in the ``notebooks`` directory of the ROSALIA repository, and can be downloaded from the link below:
+* :download:`R1_Rosalia_stray_example.ipynb <../../notebooks/R1_Rosalia_stray_example.ipynb>`
+
+
+
+To run this notebook locally, make sure you have Jupyter installed and then:
+
+.. code-block:: bash
+
+    jupyter notebook notebooks/R1_Rosalia_stray_example.ipynb
+
+
+.. image:: ../../images/rosalia_loading.gif
+  :width: 802
+  :height: 512
+  :alt: ROSALIA Stray-light loading bar
+
+
+Case study: Calibrating stray-light with a bright star
+-----------------------------
+
+A particular case of interest would be to produce an intense stray-light background signal on purpose, to calibrate the models against real observations. In that case, the star would need to be as bright as possible, and we would need to place it in positions around Roman Space Telescope WFI that are known to produce significant stray light. With ROSALIA, it is possible to find out where should we point our telescope and which roll (position) angle we should have to maximize or minimize the stray-light from a star. 
+
+First, let's visualize the Normalized Detector Irradiance map for Roman Space Telescope Wide Field Instrument. 
+
+.. image:: ../../notebooks/ndi_2deg_CARs_no_points.png
+    :width: 49 %
+.. image:: ../../notebooks/ndi_20deg_CARs_no_points.png
+    :width: 49 %
+
+
+
+
+
+
+The following Jupyter-notebook shows an example of how to do that with ROSALIA. The notebook is available in the ``notebooks`` directory of the ROSALIA repository, and can be downloaded from the link below:
