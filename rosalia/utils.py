@@ -470,10 +470,11 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
     # If LITE, fill this anyways.
     for sci_ext_i in exposure_identity["SCIEXTS"]:
         data_shape.append(input_fits[sci_ext_i].data.shape)
-        astropywcs_i = astropy_wcs.WCS(input_fits[sci_ext_i].header)
-        astropywcs_i["EXTNAME"] = "SCI"
-        astropywcs_i["SCA"] = sci_ext_i                
-        astropywcs.append(astropywcs_i, input_fits)
+        header_i = input_fits[sci_ext_i].header
+        header_i["EXTNAME"] = "SCI"
+        header_i["SCA"] = sci_ext_i       
+        astropywcs_i = astropy_wcs.WCS(header_i)
+        astropywcs.append(astropywcs_i)
     exposure_identity["DATA_SHAPE"] = data_shape
     exposure_identity["ASTROPYWCS"] = astropywcs
 
@@ -524,6 +525,24 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
 
     return(exposure_identity)
 
+
+def reproject_roman_wfi_fits(input_name, input_ext, reference_name, reference_ext):
+    from astropy.wcs import WCS as astropy_wcs
+    from reproject import reproject_interp
+    from tqdm import tqdm
+    
+    hdu = fits.open(input_name)
+    hdu_mainoff = fits.open(reference_name)
+    data = hdu[input_ext].data
+    wcs = astropy_wcs(hdu[input_ext].header)
+
+    canvas = np.zeros(data.shape)
+        
+    for SCAi in tqdm(reference_ext-1):
+        array, footprint = reproject_interp(hdu_mainoff[SCAi+1], hdu[input_ext].header, parallel=True)
+        canvas = np.nansum(np.array([canvas, array]), axis=0)
+    return([canvas, hdu[input_ext].header])
+    
 
 
 def run_swarp(pattern, outname, scale=1, coveredfrac=1, verbose=False):

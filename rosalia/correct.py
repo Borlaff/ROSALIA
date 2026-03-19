@@ -153,8 +153,15 @@ def rosalia_stray(ra, dec, PA, date, bandpass, exptime, input_fits=None, radius=
     drz_name, scaled_drz_name = rs.utils.run_swarp(pattern=main_offender_db["output_name"], 
                                                    outname=main_offender_db["output_name"].replace(".fits","_drz.fits"), scale=0.1)
     
-    mainoff_name, scaled_mainoff_name = rs.utils.run_swarp(pattern=main_offender_db["main_offender_output"],
-                                                           outname=main_offender_db["main_offender_output"].replace(".fits","_drz.fits"), scale=0.1)
+    #mainoff_name, scaled_mainoff_name = rs.utils.run_swarp(pattern=main_offender_db["main_offender_output"],
+    #                                                       outname=main_offender_db["main_offender_output"].replace(".fits","_drz.fits"), scale=0.1)
+
+    data, header = rs.utils.reproject_roman_wfi_fits(input_name=scaled_drz_name, 
+                                                     input_ext=1,
+                                                     reference_name=main_offender_db["main_offender_output"], 
+                                                     reference_ext=rs.telescopes.Roman.WFI_SCAs)
+    
+    rs.utils.save_fits(array=data, name=main_offender_db["main_offender_output"], header=header, overwrite=True)
 
     # Writing necessary keywords in the output mosaics. 
     keywords = ["RA_TARG", "DEC_TARG", "EXPSTART", "EXPTIME", "FILTER", "WAVEREF", "WAVEMIN", "WAVEMAX", "TELESCOP", "INSTRUME", "DETECTOR"]

@@ -34,3 +34,7 @@ import rosalia.constants
 import rosalia.plots
 import rosalia.albedo
 import rosalia.render
+
+import logging
+logger = logging.getLogger()
+logger.setLevel(logging.CRITICAL)
