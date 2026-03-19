@@ -106,7 +106,11 @@ def main_offender_find_fraction_of_map(mainoff_name, catalog_name):
 
     hdu = fits.open(mainoff_name)
     data = hdu[0].data
-    data[data == 0] = np.nan
+    try:
+        data[data == 0] = np.nan
+    except:
+        pass
+
     catalog = pd.read_csv(catalog_name)
         
     data_flat = data.flatten()
@@ -145,9 +149,10 @@ def main_offender_find_fraction_of_map(mainoff_name, catalog_name):
         if len(simbad_query)==1:
             print(simbad_query["main_id"][0])
             source_name = simbad_query["main_id"][0]
-        else:
+        if len(simbad_query)>1:
             print("Simbad has multiple offending sources at  " + str(ra) + " - " + str(dec)) 
-            source_name = "CAT_ID_" + str(unique_id)
+            source_name = simbad_query["main_id"][0] + "_" + str(unique_id)
+            # source_name = 
             
         ra_list.append(ra)
         dec_list.append(dec)
@@ -158,7 +163,29 @@ def main_offender_find_fraction_of_map(mainoff_name, catalog_name):
                                      "source_name":source_name_list,
                                     "fraction_by_offender":fraction_by_offender})
     main_offender_db = main_offender_db.sort_values(by=["fraction_by_offender"], ascending=False)
-    return(main_offender_db)
+
+
+    # How many stars are offenders? Show a max of 10. 
+    n_offenders = len(main_offender_db)
+    if n_offenders > 10:
+        main_offender_db = main_offender_db[:10]
+        
+        
+    # 2. Prepare your 10 lines of text
+    lines = ['Main stray-light offenders:\n']
+    for i in range(len(main_offender_db)):
+        name = main_offender_db["source_name"].iloc[i]
+        percen = 100*main_offender_db["fraction_by_offender"].iloc[i]
+        ra = main_offender_db["ra"].iloc[i]
+        dec = main_offender_db["dec"].iloc[i]
+        mag_lambda = main_offender_db["mag_lambda"].iloc[i]
+        source_id = main_offender_db["source_id"].iloc[i]
+        lines.append('' + str(name) + " " + str("{:.2f}".format(percen)) + "% - ("  + str("{:.2f}".format(ra)) + ", " + str("{:.2f}".format(dec)) +  "), m="  + str("{:.2f}".format(mag_lambda)) )
+    multiline_text = "\n".join(lines)
+    print(multiline_text)
+
+
+    return(main_offender_db, multiline_text)
 
 
 def make_stray_plot(input_name, ext, mode="normal", catalog_name=None, 
@@ -206,26 +233,7 @@ def make_stray_plot(input_name, ext, mode="normal", catalog_name=None,
     cbar.set_label(label=color_label,weight='bold')
 
     if mode == "main_offender":
-        main_offender_db = main_offender_find_fraction_of_map(input_name, catalog_name)
-
-        # How many stars are offenders? Show a max of 10. 
-        n_offenders = len(main_offender_db)
-        if n_offenders > 10:
-            main_offender_db = main_offender_db[:10]
-        
-        
-        # 2. Prepare your 10 lines of text
-        lines = ['Main stray-light offenders:\n']
-        for i in range(len(main_offender_db)):
-            name = main_offender_db["source_name"].iloc[i]
-            percen = 100*main_offender_db["fraction_by_offender"].iloc[i]
-            ra = main_offender_db["ra"].iloc[i]
-            dec = main_offender_db["dec"].iloc[i]
-            mag_lambda = main_offender_db["mag_lambda"].iloc[i]
-            source_id = main_offender_db["source_id"].iloc[i]
-            lines.append('' + str(name) + " [ID: " + str(source_id) + " ] - " + str("{:.2f}".format(percen)) + "% - RA: "  + str("{:.2f}".format(ra)) + " DEC: " + str("{:.2f}".format(dec)) +  ", m="  + str("{:.2f}".format(mag_lambda)) )
-        multiline_text = "\n".join(lines)
-        print(multiline_text)
+        main_offender_db, multiline_text = main_offender_find_fraction_of_map(input_name, catalog_name)
         # 3. Add the text box
         # x, y coordinates are in data units by default
         ax.text(1.25, 0.95, multiline_text, 
@@ -240,7 +248,7 @@ def make_stray_plot(input_name, ext, mode="normal", catalog_name=None,
     return(output_name)
 
 
-def make_stars_around_plot(flt_name, catalog_name, output_name=None):
+def make_stars_around_plot(flt_name, catalog_name, radius = 0.6, output_name=None):
     if output_name is None:
         output_name = flt_name.replace(".fits", "_stars_close.png")
         
@@ -261,7 +269,7 @@ def make_stars_around_plot(flt_name, catalog_name, output_name=None):
         detector_square_list.append(np.concatenate([detector_corners["corners_world"], detector_corners["corners_world"]]))
 
     
-    radius = 0.6
+    
     RA_TARG = image_identity["RA_TARG"]
     DEC_TARG = image_identity["DEC_TARG"]
     hybrid_catalog = pd.read_csv(catalog_name)    

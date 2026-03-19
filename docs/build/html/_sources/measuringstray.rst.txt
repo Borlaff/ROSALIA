@@ -60,7 +60,7 @@ We can identify several points of interested were stray-light is expected to pea
 Now that we have found out where which orientations - defined as X and Y angular offsets from the center of the Roman WFI focal plane - should we use to produce stray-light, let's find out where should we point Roman/WFI to get a particular target oriented to those locations. This can be done using *rs.telescopes.Roman.find_wfi_center_for_offset_targets*:
 
 .. code-block:: python
-    
+
     # These are the coordinates of specially sensitive locations 
     # for stray-light, measured in offset degrees from the center of WFI focal plane
     dX = np.array([-3.7, 3.7, 6.05, 2.45, -2.45, -6.05, -2, 2, -1.3, 1.3, -0.0688, 0.0688, -0.138, 0.138])
@@ -89,6 +89,23 @@ Now that we have found out where which orientations - defined as X and Y angular
         ra_wfi[i] = offset_pointing["ra_wficen"]
         dec_wfi[i] = offset_pointing["dec_wficen"]
         pa_wfi[i] = offset_pointing["pa_wfi"]
+
+Now that we have the exposure parameters for WFI, we only need to simulate the stray-light with *rosalia_stray*: 
+
+.. code-block:: python
+
+    for i in range(number_of_points_of_interest):
+        ra = ra_wfi[i]
+        dec = dec_wfi[i]
+        pa = pa_wfi[i]
+        mjd = mjd
+        bandpass="F129"
+        exptime=600
+        rosalia_stray = rs.correct.rosalia_stray(ra=ra, dec=dec, 
+                                                 PA=pa, date=date, bandpass=bandpass, 
+                                                 exptime=exptime, radius=1,
+                                                 g_mag_max=15)
+
 
 
 

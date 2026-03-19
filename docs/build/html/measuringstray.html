@@ -153,6 +153,20 @@
     <span class="n">pa_wfi</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">offset_pointing</span><span class="p">[</span><span class="s2">&quot;pa_wfi&quot;</span><span class="p">]</span>
 </pre></div>
 </div>
+<p>Now that we have the exposure parameters for WFI, we only need to simulate the stray-light with <em>rosalia_stray</em>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">number_of_points_of_interest</span><span class="p">):</span>
+    <span class="n">ra</span> <span class="o">=</span> <span class="n">ra_wfi</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">dec</span> <span class="o">=</span> <span class="n">dec_wfi</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">pa</span> <span class="o">=</span> <span class="n">pa_wfi</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">mjd</span> <span class="o">=</span> <span class="n">mjd</span>
+    <span class="n">bandpass</span><span class="o">=</span><span class="s2">&quot;F129&quot;</span>
+    <span class="n">exptime</span><span class="o">=</span><span class="mi">600</span>
+    <span class="n">rosalia_stray</span> <span class="o">=</span> <span class="n">rs</span><span class="o">.</span><span class="n">correct</span><span class="o">.</span><span class="n">rosalia_stray</span><span class="p">(</span><span class="n">ra</span><span class="o">=</span><span class="n">ra</span><span class="p">,</span> <span class="n">dec</span><span class="o">=</span><span class="n">dec</span><span class="p">,</span>
+                                             <span class="n">PA</span><span class="o">=</span><span class="n">pa</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="n">date</span><span class="p">,</span> <span class="n">bandpass</span><span class="o">=</span><span class="n">bandpass</span><span class="p">,</span>
+                                             <span class="n">exptime</span><span class="o">=</span><span class="n">exptime</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                                             <span class="n">g_mag_max</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+</pre></div>
+</div>
 <p>The following Jupyter-notebook shows an example of how to do that with ROSALIA. The notebook is available in the <code class="docutils literal notranslate"><span class="pre">notebooks</span></code> directory of the ROSALIA repository, and can be downloaded from the link below:</p>
 </section>
 </section>
