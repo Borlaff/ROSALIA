@@ -156,7 +156,7 @@ That is it! We are ready to start analyzing Space Telescope images.
 
 1. **Create the environment with the correct architecture:**
    ```bash
-   CONDA_SUBDIR=osx-64 conda create -n swarp_env astromatic-swarp
+   CONDA_SUBDIR=osx-64 create -n rosalia python=3.12 conda-forge::astromatic-swarp
    ```
 
 <!-- USAGE EXAMPLES -->
