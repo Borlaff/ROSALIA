@@ -94,7 +94,224 @@ class Loader:
         self.stop()
 ################################################################################
 
-def plot_stars_around(catalog, max_plot_size=100, min_plot_size=5, alpha=0.2):
+
+
+def main_offender_find_fraction_of_map(mainoff_name, catalog_name):
+    from astropy.io import fits
+    import numpy as np
+    import pandas as pd
+    from astroquery.simbad import Simbad
+    import astropy.units as u
+    from astropy.coordinates import SkyCoord
+
+    hdu = fits.open(mainoff_name)
+    data = hdu[0].data
+    try:
+        data[data == 0] = np.nan
+    except:
+        pass
+
+    catalog = pd.read_csv(catalog_name)
+        
+    data_flat = data.flatten()
+    data_flat = data_flat[~np.isnan(data_flat)] 
+
+    unique_ids, unique_counts = np.unique(data_flat.astype("int64"), return_counts=True)
+    unique_ids = unique_ids[unique_counts>1]
+    # print(unique_ids)
+    fraction_by_offender = np.zeros(len(unique_ids))
+
+    import bottleneck as bn
+    source_name_list = []
+    ra_list = []
+    dec_list = []
+    mag_lambda_list = []
+    for i in range(len(unique_ids)): 
+        unique_id = unique_ids[i]
+        # print(unique_id)
+        pixels_with_id = bn.nansum(data == unique_id)
+        #print("pixels_with_id: " + str(unique_id) + " - " + str(pixels_with_id))
+        total_valid_pixels = len(data.flatten())-bn.nansum(np.isnan(data.flatten()))
+        #print("total_valid_pixels: " + str(total_valid_pixels)) 
+        fraction_by_offender[i] = pixels_with_id/total_valid_pixels
+        #print(pixels_with_id/total_valid_pixels)
+        #print(fraction_by_offender[i])
+
+        ra = np.float32(catalog.iloc[catalog["cat_id"] == unique_id]["ra"])[0]
+        dec = np.float32(catalog.iloc[catalog["cat_id"] == unique_id]["dec"])[0]
+        mag_lambda = np.float32(catalog.iloc[catalog["cat_id"] == unique_id]["mag_lambda"])[0]
+
+        # Try to find the name of the main_offender
+        simbad_query = Simbad.query_region(SkyCoord(ra, dec, unit=(u.deg, u.deg), frame='icrs'), radius=1 * u.arcsec)
+        if len(simbad_query)==0:
+            print("Simbad cannot find the name of the offender at " + str(ra) + " - " + str(dec)) 
+            source_name = "CAT_ID_" + str(unique_id)
+        if len(simbad_query)==1:
+            print(simbad_query["main_id"][0])
+            source_name = simbad_query["main_id"][0]
+        if len(simbad_query)>1:
+            print("Simbad has multiple offending sources at  " + str(ra) + " - " + str(dec)) 
+            source_name = simbad_query["main_id"][0] + "_" + str(unique_id)
+            # source_name = 
+            
+        ra_list.append(ra)
+        dec_list.append(dec)
+        mag_lambda_list.append(mag_lambda)
+        source_name_list.append(source_name)
+    
+    main_offender_db = pd.DataFrame({"source_id":unique_ids, "ra": ra_list, "dec": dec_list, "mag_lambda": mag_lambda_list,
+                                     "source_name":source_name_list,
+                                    "fraction_by_offender":fraction_by_offender})
+    main_offender_db = main_offender_db.sort_values(by=["fraction_by_offender"], ascending=False)
+
+
+    # How many stars are offenders? Show a max of 10. 
+    n_offenders = len(main_offender_db)
+    if n_offenders > 10:
+        main_offender_db = main_offender_db[:10]
+        
+        
+    # 2. Prepare your 10 lines of text
+    lines = ['Main stray-light offenders:\n']
+    for i in range(len(main_offender_db)):
+        name = main_offender_db["source_name"].iloc[i]
+        percen = 100*main_offender_db["fraction_by_offender"].iloc[i]
+        ra = main_offender_db["ra"].iloc[i]
+        dec = main_offender_db["dec"].iloc[i]
+        mag_lambda = main_offender_db["mag_lambda"].iloc[i]
+        source_id = main_offender_db["source_id"].iloc[i]
+        lines.append('' + str(name) + " " + str("{:.2f}".format(percen)) + "% - ("  + str("{:.2f}".format(ra)) + ", " + str("{:.2f}".format(dec)) +  "), m="  + str("{:.2f}".format(mag_lambda)) )
+    multiline_text = "\n".join(lines)
+    print(multiline_text)
+
+
+    return(main_offender_db, multiline_text)
+
+
+def make_stray_plot(input_name, ext, mode="normal", catalog_name=None, 
+                    vmin=None, vmax=None, 
+                    color_label = 'Surface brightness (mag arcsec$^{-2}$)',
+                    cmap="RdYlBu", output_name=None):
+    import matplotlib.pyplot as plt
+    from astropy.utils.data import get_pkg_data_filename
+    from astropy.wcs import WCS as astropy_wcs
+    from astropy.io import fits
+    import os
+    import numpy as np
+    import rosalia as rs
+    if output_name is None:
+        output_name = input_name.replace(".fits", "_" + mode + ".png")
+    plt.style.use(os.path.dirname(rs.__file__) + "/style/nature_style.mplstyle")
+
+    hdu = fits.open(input_name)
+    data = hdu[ext].data
+    wcs = astropy_wcs(hdu[ext].header)
+
+    
+    #if mode == "main_offender":
+    #    data, header = rs.utils.reproject_roman_wfi_fits(input_name, input_ext=ext,
+    #                                            reference_name=flt_name, 
+    #                                            reference_ext=np.linspace(1,18,18, dtype="int"))
+    
+    fig, ax = plt.subplots(figsize=(10, 7), subplot_kw=dict(projection=wcs))
+
+    if mode == "fe2mu":
+        data = rs.detectors.fe2mu(data, telescope="Roman", instrument="WFI", filter_name="F129")
+
+
+    data[np.isinf(data)] = np.nan
+    data[data == 0] = np.nan
+
+    vmin = np.nanpercentile(data, 5)
+    vmax = np.nanpercentile(data, 95)
+
+    print(vmin)
+    print(vmax)
+    im=ax.imshow(data, vmin=vmin, vmax=vmax, origin='lower', cmap=cmap)
+    ax.set(xlabel='Right ascension (degrees)', ylabel='Declination (degrees)')
+    cbar = plt.colorbar(im, ax=ax, location='right', fraction=0.046, pad=0.04)
+    cbar.set_label(label=color_label,weight='bold')
+
+    if mode == "main_offender":
+        main_offender_db, multiline_text = main_offender_find_fraction_of_map(input_name, catalog_name)
+        # 3. Add the text box
+        # x, y coordinates are in data units by default
+        ax.text(1.25, 0.95, multiline_text, 
+            fontsize=9,
+            color='black',
+            transform=ax.transAxes,
+            verticalalignment='top', 
+            bbox=dict(facecolor='white', alpha=0.5))
+    fig.tight_layout()
+    plt.savefig(output_name, dpi=300)
+    plt.show()
+    return(output_name)
+
+
+def make_stars_around_plot(flt_name, catalog_name, radius = 0.6, output_name=None):
+    if output_name is None:
+        output_name = flt_name.replace(".fits", "_stars_close.png")
+        
+    # if True:
+    import rosalia as rs
+    import pandas as pd
+    import matplotlib.pyplot as plt
+    from astropy.io import fits
+    import numpy as np
+    # Open the original flt file
+    image_identity = rs.utils.exposure_inspector(input_name=flt_name, verbose=False, lite=True)
+    
+    # Get the detector corners: 
+    detector_square_list = []
+    for SCIEXT_i in rs.telescopes.Roman.WFI_SCAs:
+        detector_corners = rs.detectors.get_detector_corners(data_shape=image_identity["DATA_SHAPE"][SCIEXT_i-1],
+                                                             wcs=image_identity["ASTROPYWCS"][SCIEXT_i-1])
+        detector_square_list.append(np.concatenate([detector_corners["corners_world"], detector_corners["corners_world"]]))
+
+    
+    
+    RA_TARG = image_identity["RA_TARG"]
+    DEC_TARG = image_identity["DEC_TARG"]
+    hybrid_catalog = pd.read_csv(catalog_name)    
+    from astropy.coordinates import SkyCoord
+    import astropy.units as u
+
+    # Make a cut in the plot for the stars closer than radius
+    target = SkyCoord(RA_TARG*u.deg, DEC_TARG*u.deg, unit="degree", frame="icrs")
+    hybrid = SkyCoord(hybrid_catalog["ra"]*u.deg, hybrid_catalog["dec"]*u.deg, unit="degree", frame="icrs")
+    separation = target.separation(hybrid)
+
+    hybrid_catalog_close = hybrid_catalog[separation.value<2*radius]
+    fig, ax = plt.subplots(figsize=(9, 7))
+
+    plot_size, mag_lambda_range, plot_size_range = rs.plots.plot_stars_around(ax=ax, catalog=hybrid_catalog_close, 
+                                           max_plot_size=50, min_plot_size=5, alpha=0.2)
+    plot_radec_limits = rs.gaia.find_ra_dec_constraints(ra=RA_TARG, dec=DEC_TARG, radius=radius/4)
+    for detector_square in detector_square_list:
+        plt.plot(detector_square[:,0], detector_square[:,1], alpha=0.5, color="red")
+    ax.set_xlim((plot_radec_limits["ra_max"], plot_radec_limits["ra_min"]))
+    ax.set_ylim((plot_radec_limits["dec_min"], plot_radec_limits["dec_max"]))
+
+    # Make the legend 
+    for i in range(len(mag_lambda_range) - 1, -1, -1):
+        ax.scatter(-9999, -9999, transform=ax.transAxes, 
+                   s=plot_size_range[i], marker="o", 
+                   facecolor="grey", edgecolor="black",
+                   alpha=0.2, label=str(mag_lambda_range[i])) 
+    ax.legend(loc="best", title="AB Mag", fancybox=True, edgecolor="white", bbox_to_anchor=(1.2, 0.5))
+    fig.tight_layout()
+    plt.savefig(output_name, dpi=300)
+
+    plt.show()
+    return(output_name)
+
+
+
+
+
+#############
+
+def plot_stars_around(ax, catalog, max_plot_size=50, min_plot_size=5, alpha=0.2):
     # Auxiliary function to merge some plotting steps in the stray-ligth mapping
 
     flux_for_plot = 10**(0.4*(8.9-np.array(catalog["mag_lambda"])))
@@ -131,10 +348,23 @@ def plot_stars_around(catalog, max_plot_size=100, min_plot_size=5, alpha=0.2):
 
     # Idea: Plot the main stars with a different color.
     plot_size = flux_for_plot*(max_plot_size-min_plot_size)/(max_flux-min_flux)+0.1
-    plt.scatter(ra_stars, dec_stars, marker="o", facecolor="grey", edgecolor="black", alpha=alpha, s=plot_size)
-    plt.xlabel("RA (ICRS)")
-    plt.ylabel("DEC (ICRS)")
-    return(plot_size)
+    ax.scatter(ra_stars, dec_stars, marker="o", facecolor="grey", edgecolor="black",
+                 alpha=alpha, s=plot_size)
+    ax.set_xlabel("RA (ICRS)")
+    ax.set_ylabel("DEC (ICRS)")
+
+
+    ### Give the plot sizes and representative magnitudes. 
+    mag_lambda = catalog["mag_lambda"]
+    mag_lambda_range = np.unique(mag_lambda.astype("int"))
+    from scipy import interpolate
+    plot_size_interpolator = interpolate.interp1d(x=mag_lambda,
+                                              y=plot_size, kind="linear",
+                                              fill_value="extrapolate")
+    plot_size_range = plot_size_interpolator(mag_lambda_range)
+
+
+    return(plot_size,mag_lambda_range, plot_size_range)
 
 ################################################################################
 

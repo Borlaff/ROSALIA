@@ -12,7 +12,7 @@ from astropy.coordinates import Angle, Latitude, Longitude  # Angles
 import astropy.units as u
 from astropy import constants as const
 from datetime import datetime
-
+import logging
 
 
 # --------------------- #
@@ -262,6 +262,8 @@ def roman_WFI_NDI_estimator_direct(ra_stars, dec_stars, ra_point, dec_point, pa_
     import astropy.wcs as astropy_wcs
     from scipy.interpolate import RegularGridInterpolator
     from astropy.io import fits
+    logger = logging.getLogger()
+    logger.setLevel(logging.CRITICAL)
 
     # Identify NDI calibration file
 
@@ -299,6 +301,7 @@ def roman_WFI_NDI_estimator_direct(ra_stars, dec_stars, ra_point, dec_point, pa_
 
 
     if (level==3):
+
         import healpy as hp
 
         ndi_name = os.environ['ROSALIACACHE'] + "/CORE/NDI/RST/ndi_lvl" + str(level) + "/" + "lvl" + str(level) + "_SCA_" + str(SCA) + "_SUB_X" + str(X_label) + "_Y" + str(Y_label) + "_HP.fits"
@@ -380,7 +383,7 @@ def roman_estimate_straylight_SCA(data, wcs, SCA, filter_identity, ra_stars,
     from tqdm import tqdm
     import numexpr
     import bottleneck as bn
-
+    from IPython.display import clear_output
     # Level 1 stars are the closest. R to the center of the SCA of 1 degree.
     # Level 2 stars have a distance between 1 degree and 10 degrees to the center of the SCA.
     # Level 3 stars have a distance of 10 degrees or more to the SCA.
@@ -573,7 +576,7 @@ def roman_estimate_straylight_SCA(data, wcs, SCA, filter_identity, ra_stars,
                 NDI_level_3 = roman_WFI_NDI_estimator_direct(ra_stars=ra_level_3_stars, dec_stars=dec_level_3_stars,
                                                      ra_point=ra_point, dec_point=dec_point, pa_point=pa_point,
                                                      SCA=SCA, X_label=X_label, Y_label=Y_label, level=3, verbose=True)
-                straylight_level_3 =     (NDI_level_3*(pixsize**2)*filter_identity["filter_transmission_ref"]*filter_identity["filter_lambda_ref"]*irradiance_level_3_stars/const.c/    const.h).decompose()
+                straylight_level_3 =     (NDI_level_3*(pixsize**2)*filter_identity["filter_transmission_ref"]*filter_identity["filter_lambda_ref"]*irradiance_level_3_stars/const.c/const.h).decompose()
                 where_max_stray = np.where(straylight_level_3.value == bn.nanmax(straylight_level_3))[0][0]
                 id_main_offender_level_3 = id_level_3_stars[where_max_stray]
                 source_id_main_offender_level_3 = source_id_level_3[where_max_stray]
@@ -617,7 +620,8 @@ def roman_estimate_straylight_SCA(data, wcs, SCA, filter_identity, ra_stars,
             col_main_off_id[i] = main_offender_SCA[ymid, xmid]
 
             # Plot the Roman/WFI loading bar
-            os.system('clear')
+            # os.system('clear')
+            clear_output(wait=True)
             print(rs.plots.style.CYAN + "ROSALIA Stray-light Mapper: Scanning ... " + rs.plots.style.RESET)
             canvas = rs.plots.print_ascii_focal_plane(x=X_label, y=Y_label, SCA=SCA)
             print(rs.plots.style.CYAN + 'SCA ' + str(SCA) + " - Subarray X=" + str(X_label) + " - Subarray Y=" + str(Y_label))

@@ -1,4 +1,4 @@
-rosalia.plots
+﻿rosalia.plots
 =============
 
 .. automodule:: rosalia.plots
@@ -8,6 +8,9 @@ rosalia.plots
 
    .. autosummary::
    
+      main_offender_find_fraction_of_map
+      make_stars_around_plot
+      make_stray_plot
       plot_rosalia_logo
       plot_stars_around
       plot_stray_and_ndi_map

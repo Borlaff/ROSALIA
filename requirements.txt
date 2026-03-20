@@ -1,5 +1,7 @@
 sphinx
 sphinx-rtd-theme
+sphinx-design
+sphinx-tabs
 astropy
 astroquery
 Bottleneck
@@ -21,3 +23,6 @@ LSSTDESC.Coord
 skyfield
 pytest
 ipython
+pysiaf
+ephem
+pysolar

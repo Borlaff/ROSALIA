@@ -276,6 +276,11 @@ class Hubble:
 
     ndi_estimator = ndi_estimator
 
+    def load_TLE_tuple():
+        tle_tuple = (b'0 HST\n',
+        b'1 20580U 90037B   26039.77140942  .00007499  00000+0  25069-3 0  9991\n',
+        b'2 20580  28.4663 237.2056 0001769 143.1754 216.8963 15.29016206768883\n')
+        return(tle_tuple)
 
     def load_HST_TLEs(verbose=False):
         """ Loads the history of TLEs for Hubble Space Telescope.
@@ -448,6 +453,37 @@ class Roman:
         psf_wfi = wfi.calc_psf(fov_pixels = fov_pixels, oversample=oversample)
         return(psf_wfi[0])
 
+    def get_bestPA(ra, dec, mjd):
+        """
+        get_bestPA calculates the best position angle for Roman's WFI given the target coordinates and the time of observation. It uses the galsim.roman.bestPA function to compute the optimal position angle that gets the Sun on the sunshield. The function takes in the right ascension (ra), declination (dec), and modified Julian date (mjd) as inputs and returns the best position angle in degrees.
+       
+        Input parameters:
+        - ra: Right ascension of the target in degrees.
+        - dec: Declination of the target in degrees.
+        - mjd: Modified Julian Date of the observation.
+
+        Output:
+        - WFI_PA: The best position angle for Roman's WFI in degrees.
+
+        """
+
+        import galsim
+        import coord
+        import galsim.roman as galsim_roman
+        from astropy.time import Time
+
+        # Setting up the parameters in GalSim format
+        ra_targ = coord.Angle(ra*coord.degrees)
+        dec_targ = coord.Angle(dec*coord.degrees)
+        targ_pos = galsim.CelestialCoord(ra=ra_targ, dec=dec_targ)
+        t = Time(mjd, format='mjd')
+        dt = t.to_datetime()
+    
+        WFI_PA = galsim_roman.bestPA(targ_pos, dt)
+        return(WFI_PA.deg)
+
+
+
     def get_psf(detector_position, detector, filter_name):
         SCA = detector
         from romanisim.bandpass import roman2galsim_bandpass
@@ -482,6 +518,50 @@ class Roman:
         os.system("rm " + outname)
         return(psf_wfi[0])
 
+    def find_wfi_center_for_offset_target(ra_target, dec_target, mjd, dX, dY, PA_wfi=None, verbose=False):
+        # dX dY in degrees
+    
+        import pysiaf
+        # Define the Roman Space Telescope Frame 
+        rsiaf = pysiaf.Siaf('Roman')
+        wfi_cen = rsiaf['WFI_CEN']
+
+        # Find the optimal position angle of the observatory at that RA, Dec, and date
+        # if PA_wfi is None:
+        # This is the position angle of the observatory
+        # WFI focal plane Y direction is -60 degrees offset from this. 
+        PA_v3 = rs.telescopes.Roman.get_bestPA(ra=ra_target, dec=dec_target, mjd=mjd)
+            #PA_wfi = PA_v3 - 60*u.degree
+        # else:
+            #PA_v3 = PA_wfi + 60*u.degree
+        
+        if verbose:
+            print("RA: " + str(ra_target) + " - DEC: " + str(dec_target) + " PA_v3: " + str(PA_v3))
+    
+        # First, we find v2, v3 for the stray light point we want to hit
+        # these are the coordinates in the telescope (V2, V3) plane, 
+        # with origin in WFI_CEN, the center of the focal plane array.
+        v2, v3 = wfi_cen.idl_to_tel(dX*60*60, dY*60*60, method="spherical", 
+                                    input_coordinates="polar", output_coordinates="polar")
+
+
+        # Then we define the attitude matrix required to place that v2 and v3 on the star
+        attmat = pysiaf.utils.rotations.attitude_matrix(nu2=v2, nu3=v3,
+                                                    ra=ra_target, dec=dec_target, 
+                                                    pa=PA_v3)
+
+        # We apply the attitude matrix to the observatory
+        wfi_cen.set_attitude_matrix(attmat)
+        # compute the position angle at that aperture
+        V2Ref = rsiaf.apertures['WFI_CEN'].V2Ref
+        V3Ref = rsiaf.apertures['WFI_CEN'].V3Ref
+        pa = pysiaf.utils.rotations.posangle(attmat, V2Ref, V3Ref)
+    
+        # Compute the sky coordinates of the WFI_CEN aperture reference position
+        wfi_ra, wfi_dec = wfi_cen.idl_to_sky(0, 0)
+        if verbose: print(f'' + name.iloc[i] + f' - WFI_CEN: RA = {wfi_ra:.5f} deg, Dec = {wfi_dec:.5f} deg')
+        return({"ra_wficen": wfi_ra, "dec_wficen": wfi_dec, "pa_wfi": pa - 60})
+    
 #################################################################
 
 class CSST:
@@ -518,6 +598,12 @@ class CSST:
         line2 = '2 48274  41.4684  20.0103 0004697  39.0740 321.0437 15.59384169273192'
         satellite = EarthSatellite(line1, line2, 'CSST', ts)
         return(satellite)
+
+    def TLE_tuple():
+        line0 = b'0 CSST\n'
+        line1 = b'1 48274U 21035A   26040.41958422  .00018345  00000+0  22932-3 0  9994\n'
+        line2 = b'2 48274  41.4684  20.0103 0004697  39.0740 321.0437 15.59384169273192\n'
+        return((line0, line1, line2))
 
     def TLE_exposure(epoch):
         return(rs.telescopes.CSST.load_example_TLE_CSST())
@@ -659,6 +745,12 @@ class SPHEREx:
         line2 = '2 63182  97.9549 227.6915 0009366 239.5726 120.4558 14.73753633 49230'
         satellite = EarthSatellite(line1, line2, 'SPHEREx', ts)
         return(satellite)
+    
+    def TLE_tuple():
+        line0 = b'0 SPHEREx\n'
+        line1 = b'1 63182U 25047E   26040.49042002  .00001639  00000+0  25830-3 0  9990\n'
+        line2 = b'2 63182  97.9549 227.6915 0009366 239.5726 120.4558 14.73753633 49230\n'
+        return((line0, line1, line2))
 
     def get_canvas_shape(instrument):
         if instrument == "SPHEREx":
@@ -764,6 +856,12 @@ class ARRAKIHS:
         line2 = '2 99999 098.6066 190.9024 0019445 243.2152 354.9930 14.25484048052155'
         satellite = EarthSatellite(line1, line2, 'ARRAKIHS', ts)
         return(satellite)
+    
+    def TLE_tuple():
+        line0 = b'0 ARRAKIHS\n'
+        line1 = b'1 99999U          25001.00000000  .00000000  00000-0  00000-0 0 00006\n'
+        line2 = b'2 99999 098.6066 190.9024 0019445 243.2152 354.9930 14.25484048052155\n'
+        return((line0, line1, line2))
 
     def get_canvas_shape(instrument):
         if instrument == "ARRAKIHS":

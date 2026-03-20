@@ -45,7 +45,7 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../mission.html">What is ROSALIA?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Additional Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../usage.html">How to use</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../whoarewe.html">Who is ROSALIA?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../rosalia.html">ROSALIA package</a></li>
@@ -238,7 +238,7 @@
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.measure_maglim" title="rosalia.utils.measure_maglim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">measure_maglim</span></code></a>(mu_sky, instrument, ...[, ...])</p></td>
-<td><p></p></td>
+<td><p>Measure the limiting magnitude of an image given the sky background level, the instrument,  filter, telescope and exposure time.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.modify_keyword_hdr" title="rosalia.utils.modify_keyword_hdr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">modify_keyword_hdr</span></code></a>(input_name, ext, keyword, ...)</p></td>
 <td><p></p></td>
@@ -252,31 +252,37 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.read_ds9reg" title="rosalia.utils.read_ds9reg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_ds9reg</span></code></a>(fname)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.run_basic_astrodrizzle" title="rosalia.utils.run_basic_astrodrizzle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_basic_astrodrizzle</span></code></a>(file_name)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.reproject_roman_wfi_fits" title="rosalia.utils.reproject_roman_wfi_fits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reproject_roman_wfi_fits</span></code></a>(input_name, ...)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.run_basic_noisechisel" title="rosalia.utils.run_basic_noisechisel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_basic_noisechisel</span></code></a>(file_name, ext)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.run_basic_astrodrizzle" title="rosalia.utils.run_basic_astrodrizzle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_basic_astrodrizzle</span></code></a>(file_name)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.run_swarp" title="rosalia.utils.run_swarp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_swarp</span></code></a>(pattern, outname[, coveredfrac, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.run_basic_noisechisel" title="rosalia.utils.run_basic_noisechisel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_basic_noisechisel</span></code></a>(file_name, ext)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.save_dict" title="rosalia.utils.save_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_dict</span></code></a>(dictionary, input_name[, verbose])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.run_swarp" title="rosalia.utils.run_swarp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_swarp</span></code></a>(pattern, outname[, scale, ...])</p></td>
+<td><p>run_swarp: This program runs SWARP on the input pattern of files, and generates a mosaic with the output name specified in outname. The pattern can be a string with the name of the file, a list of files, or a pattern with <a href="#id3"><span class="problematic" id="id4">*</span></a>. The output mosaic will be saved as outname, and if scale is different from 1, a scaled version of the mosaic will be saved as outname with the suffix &quot;_scaled.fits&quot;. .</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.save_dict" title="rosalia.utils.save_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_dict</span></code></a>(dictionary, input_name[, verbose])</p></td>
 <td><p>Save a python object using pickle.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.save_fits" title="rosalia.utils.save_fits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_fits</span></code></a>(array, name[, header, extname, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.save_fits" title="rosalia.utils.save_fits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_fits</span></code></a>(array, name[, header, extname, ...])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.separation_and_position_angle" title="rosalia.utils.separation_and_position_angle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">separation_and_position_angle</span></code></a>(ra1, dec1, ...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.separation_and_position_angle" title="rosalia.utils.separation_and_position_angle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">separation_and_position_angle</span></code></a>(ra1, dec1, ...)</p></td>
 <td><p>Einsum version of the angular separation function by Astropy einsum_angular_distance_harversine v1: October 17, 2024 - Fastest version compared against numba, or astropy.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.sort_hst_flcs_by_filter" title="rosalia.utils.sort_hst_flcs_by_filter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sort_hst_flcs_by_filter</span></code></a>(filelist)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.sort_hst_flcs_by_filter" title="rosalia.utils.sort_hst_flcs_by_filter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sort_hst_flcs_by_filter</span></code></a>(filelist)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.sphere_dist" title="rosalia.utils.sphere_dist"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sphere_dist</span></code></a>(ra1, dec1, ra2, dec2)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.sphere_dist" title="rosalia.utils.sphere_dist"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sphere_dist</span></code></a>(ra1, dec1, ra2, dec2)</p></td>
 <td><p>A faster separation calculator than astropy solution.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.thetaphi_2_radec" title="rosalia.utils.thetaphi_2_radec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">thetaphi_2_radec</span></code></a>(theta, phi)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.thetaphi_2_radec" title="rosalia.utils.thetaphi_2_radec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">thetaphi_2_radec</span></code></a>(theta, phi)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.write_parameters_list" title="rosalia.utils.write_parameters_list"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_parameters_list</span></code></a>(fits_list, index, value)</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.utils.xy_to_radec" title="rosalia.utils.xy_to_radec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xy_to_radec</span></code></a>(x, y, fits_name, ext)</p></td>

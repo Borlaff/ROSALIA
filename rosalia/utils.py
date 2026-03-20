@@ -470,9 +470,15 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
     # If LITE, fill this anyways.
     for sci_ext_i in exposure_identity["SCIEXTS"]:
         data_shape.append(input_fits[sci_ext_i].data.shape)
-        astropywcs.append(astropy_wcs.WCS(input_fits[sci_ext_i].header, input_fits))
+        header_i = input_fits[sci_ext_i].header
+        header_i["EXTNAME"] = "SCI"
+        header_i["SCA"] = sci_ext_i       
+        astropywcs_i = astropy_wcs.WCS(header_i)
+        astropywcs.append(astropywcs_i)
     exposure_identity["DATA_SHAPE"] = data_shape
     exposure_identity["ASTROPYWCS"] = astropywcs
+
+
 
     # If not lite, do one more loop with the data to make a swarp coadd.
     if not lite: # Avoid generating the mosaic header.
@@ -501,14 +507,11 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
             for sci_ext_i in exposure_identity["SCIEXTS"]:
                 swarp_cmd_str = swarp_cmd_str + '"' + input_name+"["+str(sci_ext_i)  + ']" '
 
-            outname, outname_scaled = run_swarp(pattern=swarp_cmd_str,
-                                                outname=input_name.replace(".fits", "_swarp_coadd.fits"),
+            outname, outname_scaled = run_swarp(pattern=swarp_cmd_str, 
+                                                outname=input_name.replace(".fits", "_drz.fits"),
+                                                scale=0.1,
                                                 coveredfrac=1)
-            #swarp_coadd_name =
-            #swarp_cmd_str = swarp_cmd_str + ' -SUBTRACT_BACK N -BLANK_BADPIXELS Y -VERBOSE_TYPE QUIET -IMAGEOUT_NAME "' + input_name.replace(".fits", "_swarp_coadd.fits") + '"'
 
-            #if verbose: print(swarp_cmd_str)
-            #execute_cmd(swarp_cmd_str)
 
             swarp_coadd = fits.open(outname)
             reference_header = swarp_coadd[0].header
@@ -523,18 +526,73 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
     return(exposure_identity)
 
 
+def reproject_roman_wfi_fits(input_name, input_ext, reference_name, reference_ext):
+    from astropy.wcs import WCS as astropy_wcs
+    from reproject import reproject_interp
+    from tqdm import tqdm
+    
+    hdu = fits.open(input_name)
+    hdu_mainoff = fits.open(reference_name)
+    data = hdu[input_ext].data
+    wcs = astropy_wcs(hdu[input_ext].header)
 
-def run_swarp(pattern, outname, coveredfrac=1, verbose=False):
+    canvas = np.zeros(data.shape)
+        
+    for SCAi in tqdm(reference_ext-1):
+        array, footprint = reproject_interp(hdu_mainoff[SCAi+1], hdu[input_ext].header, parallel=True)
+        canvas = np.nansum(np.array([canvas, array]), axis=0)
+    return([canvas, hdu[input_ext].header])
+    
+
+
+def run_swarp(pattern, outname, scale=1, coveredfrac=1, verbose=False):
+    """
+    run_swarp:
+    This program runs SWARP on the input pattern of files, and generates a mosaic with the output name specified in outname. The pattern can be a string with the name of the file, a list of files, or a pattern with *. The output mosaic will be saved as outname, and if scale is different from 1, a scaled version of the mosaic will be saved as outname with the suffix "_scaled.fits". 
+
+    :param pattern: Pattern of files to be mosaicked. It can be a string with the name of the file, a list of files, or a pattern with *.
+    :type pattern: str, list
+    :param outname: Name of the output mosaic file. It should end with .fits
+    :type outname: str
+    :param scale: Scale factor for the output mosaic. If scale is different from 1, a scaled version of the mosaic will be saved as outname with the suffix "_scaled.fits". The scale factor is applied to the pixel scale of the mosaic, so that the output mosaic will have a pixel scale that is scale times the original pixel scale. For example, if scale=0.1, the output mosaic will have a pixel scale that is 10 times the original pixel scale, and the output mosaic will be 10 times smaller in size than the original mosaic. The default value is 1 (no scaling). 
+    :type scale: float
+
+    :param coveredfrac: Fraction of the mosaic that must be covered by input images. The default value is 1 (all pixels must be covered).
+    :type coveredfrac: float
+    :param verbose: If True, print verbose output. The default value is False.
+    :type verbose: bool
+
+    :return: List with the names of the output mosaic files. The first element is the name of the mosaic with the original pixel scale, and the second element is the name of the mosaic with the scaled pixel scale (if scale is different from 1). If scale is 1, the second element will be None.
+    :rtype: list
+    """
+
     rs.utils.execute_cmd("swarp -d > swarp.conf", verbose=verbose) # Generate a default config file for swarp
     rs.utils.execute_cmd("swarp -c swarp.conf -SUBTRACT_BACK N -BLANK_BADPIXELS Y -VERBOSE_TYPE QUIET " + pattern, verbose=verbose) # Run swarp on all the SCAs
+
+    # Mask all the 0s as NANs
+    hdu = fits.open("coadd.fits")
+    hdu[0].data[hdu[0].data == 0] = np.nan
+    hdu.verify('silentfix') # Fix the header to make it compatible with astropy.io.fits
+    hdu.writeto("coadd.fits", overwrite=True) # Save the mosaic as coadd.fits
+
     rs.utils.execute_cmd("mv coadd.fits " + outname, verbose=verbose) # Make a compressed version, for easiest visualization.
-    outname_warped = outname.replace(".fits", "_warped.fits")
-    rs.utils.execute_cmd("astwarp " + outname +" -h0 --coveredfrac=" + str(coveredfrac) + " --scale=0.1,0.1 --output=" + outname_warped, verbose=verbose) # Make a compressed version, for easiest visualization.
-    outname_scaled = outname.replace(".fits", "_scaled.fits")
-    rs.utils.execute_cmd("astarithmetic -h1 " + outname_warped + " 0.01 x --output=" + outname_scaled, verbose=verbose) # Make a compressed version, for easiest visualization.
-    rs.utils.execute_cmd("rm " + outname_warped, verbose=verbose)
-    print("Result in " + outname + " & " + outname_scaled)
-    return([outname, outname_scaled])
+    
+    # Clean the swarp files
+    rs.utils.execute_cmd("rm swarp.conf swarp.xml coadd.weight.fits subprocess.out", verbose=verbose)
+
+    if verbose: print("Mosaic saved as " + outname)
+    if scale !=1:
+        outname_warped = outname.replace(".fits", "_warped.fits")
+        rs.utils.execute_cmd("astwarp " + outname +" -h0 --coveredfrac=" + str(coveredfrac) + " --scale="+str(scale)+","+str(scale)+" --output=" + outname_warped, verbose=verbose) # Make a compressed version, for easiest visualization.
+        outname_scaled = outname.replace(".fits", "_scaled.fits")
+        rs.utils.execute_cmd("astarithmetic -h1 " + outname_warped + " "+str(scale**2)+" x --output=" + outname_scaled, verbose=verbose) # Make a compressed version, for easiest visualization.
+        rs.utils.execute_cmd("rm " + outname_warped, verbose=verbose)
+        if verbose: print("Scaled mosaic ("+str(scale)+"x"+str(scale)+") saved as " + outname_scaled)
+
+    if scale != 1:
+        return([outname, outname_scaled])
+    else:
+        return([outname, None])
 
 
 #####################################################################
@@ -1474,22 +1532,6 @@ def get_data_and_wcs(input_name, ext):
     wcs = astropy_wcs.WCS(input_fits[ext].header, input_fits)
     return([input_fits[ext].data, wcs])
 
-#####################################################################
-
-def get_keys_from_header(fits_list, index, ext=0):
-    PARAM = []
-    for j in range(len(index)):
-        PARAM.append([])
-    for raw_name in fits_list:
-        # print(raw_name)
-        raw_fits = fits.open(raw_name)
-        for j in range(len(index)):
-            try:
-                PARAM[j].append(raw_fits[ext].header[index[j]])
-            except KeyError:
-                print("KeyError: Header keyword not found")
-                PARAM[j].append("NONE")
-    return(list(PARAM))
 
 #####################################################################
 
@@ -1710,3 +1752,39 @@ def measure_maglim(mu_sky, instrument, filter_name, telescope, exptime, sigma=3,
 
     return(mu_lim)
     
+
+    ##################
+
+#####################################################################
+
+def get_keys_from_header(fits_list, index, ext=0):
+    PARAM = []
+    for j in range(len(index)):
+        PARAM.append([])
+    for raw_name in fits_list:
+        # print(raw_name)
+        raw_fits = fits.open(raw_name)
+        for j in range(len(index)):
+            try:
+                PARAM[j].append(raw_fits[ext].header[index[j]])
+            except KeyError:
+                print("KeyError: Header keyword not found")
+                PARAM[j].append("NONE")
+    return(list(PARAM))
+
+
+def write_parameters_list(fits_list, index, value, ext=0):
+    for i in range(len(fits_list)):
+        raw_name = fits_list[i]
+        print(raw_name)
+        raw_fits = fits.open(raw_name)
+        for j in range(len(index)):
+            try:
+                raw_fits[ext].header[index[j]] = value[j][i]
+            except KeyError:
+                print("KeyError: Extension not found")
+        raw_fits.verify("silentfix")
+        raw_fits.writeto(raw_name, overwrite=True)
+        raw_fits.close()
+    return()
+

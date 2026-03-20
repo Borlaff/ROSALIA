@@ -6,7 +6,6 @@ import bottleneck as bn
 import pandas as pd
 import pytest
 from numpy.testing import assert_allclose
-from astroquery.gaia import Gaia
 
 # Custom modules
 #sys.path.append("/Users/aborlaff/NASA/STRAYCOR/")
@@ -25,6 +24,8 @@ def test_fe2mu_mu2fe():
     return(True)
 
 def test_magnitude_conversion_gaia():
+    from astroquery.gaia import Gaia
+
     # Reference guide for the Gaia photometric zeropoints
     # https://gea.esac.esa.int/archive/documentation/GDR2/Data_processing/chap_cu5pho/sec_cu5pho_calibr/ssec_cu5pho_calibr_extern.html
 
@@ -95,6 +96,7 @@ def test_magnitude_conversion_gaia():
     return(True)
 
 def test_photometry_superstars():
+    from astroquery.gaia import Gaia
 
     # First we make a catalog on high-resolution for all the stars inside a region.
     obj_ra = 199.5 # deg

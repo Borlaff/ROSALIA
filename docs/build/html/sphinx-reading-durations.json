@@ -1,3 +1,8 @@
 {
-    "tutorials": 0.028
+    "generated/rosalia.detectors": 0.038,
+    "generated/rosalia.plots": 0.045,
+    "generated/rosalia.psf": 0.041,
+    "generated/rosalia.roman": 0.029,
+    "measuringstray": 0.014,
+    "rosalia": 2.196
 }

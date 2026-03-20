@@ -148,11 +148,60 @@ def rosalia_stray(ra, dec, PA, date, bandpass, exptime, input_fits=None, radius=
                                      sun_block = sun_block,
                                      output_name = output_name)
 
-    # Make a 0.1 x 0.1 scaled version for inspection ease.
-    # outname = output_name.replace(".fits", "_scaled.fits")
-    # outname, outname_scaled = rs.utils.run_swarp(pattern=output_name, outname=outname, coveredfrac=1)
-    # main_offender_db["mosaic_name"] = outname
-    # main_offender_db["mosaic_name_scaled"] = outname_scaled
+
+
+    drz_name, scaled_drz_name = rs.utils.run_swarp(pattern=main_offender_db["output_name"], 
+                                                   outname=main_offender_db["output_name"].replace(".fits","_drz.fits"), scale=0.1)
+    
+    #mainoff_name, scaled_mainoff_name = rs.utils.run_swarp(pattern=main_offender_db["main_offender_output"],
+    #                                                       outname=main_offender_db["main_offender_output"].replace(".fits","_drz.fits"), scale=0.1)
+
+    data, header = rs.utils.reproject_roman_wfi_fits(input_name=scaled_drz_name, 
+                                                     input_ext=1,
+                                                     reference_name=main_offender_db["main_offender_output"], 
+                                                     reference_ext=rs.telescopes.Roman.WFI_SCAs)
+    
+    scaled_main_off = main_offender_db["main_offender_output"].replace(".fits", "_scaled.fits")
+
+    catalog_name = main_offender_db["star_catalog"]
+
+    rs.utils.save_fits(array=data, name=scaled_main_off, header=header, overwrite=True)
+
+    # Writing necessary keywords in the output mosaics. 
+    keywords = ["RA_TARG", "DEC_TARG", "EXPSTART", "EXPTIME", "FILTER", "WAVEREF", "WAVEMIN", "WAVEMAX", "TELESCOP", "INSTRUME", "DETECTOR"]
+    key_values = rs.utils.get_keys_from_header([fits_input_name], keywords, ext=0)
+    rs.utils.write_parameters_list([drz_name], keywords, key_values, ext=0)
+    rs.utils.write_parameters_list([scaled_drz_name], keywords, key_values, ext=0)
+    rs.utils.write_parameters_list([scaled_drz_name], ["PIXSCALE"], [[1]], ext=0)
+    rs.utils.write_parameters_list([scaled_drz_name], ["REBINNED"], [[10]], ext=0)
+
+    rs.utils.write_parameters_list([main_offender_db["main_offender_output"]], keywords, key_values, ext=0)
+    rs.utils.write_parameters_list([scaled_main_off], keywords, key_values, ext=0)
+    rs.utils.write_parameters_list([scaled_main_off], ["PIXSCALE"], [[1]], ext=0)
+    rs.utils.write_parameters_list([scaled_main_off], ["REBINNED"], [[10]], ext=0)
+
+    # Make the plots. 
+    fe2mu_png = rs.plots.make_stray_plot(input_name=scaled_drz_name,
+                                        ext=1, mode="fe2mu",
+               color_label = "Surface brightness (mag arcsec$^{-2}$)")
+
+    fe_png = rs.plots.make_stray_plot(input_name=scaled_drz_name, ext=1, mode="fe", 
+                color_label = "Flux (e/s/px)",cmap="RdYlBu_r")
+
+    main_offender_png = rs.plots.make_stray_plot(input_name=scaled_main_off, ext=0, 
+                                                 mode="main_offender", 
+                catalog_name=catalog_name, 
+                color_label = "Main offending source (ID)")
+
+    stars_around_png = rs.plots.make_stars_around_plot(fits_input_name, catalog_name, output_name=None)
+
+    rs.utils.execute_cmd("magick -adjoin " +\
+                        fe2mu_png + " " +\
+                        fe_png + " "+\
+                        main_offender_png + " " +\
+                        stars_around_png + " "+\
+                        fits_input_name.replace(".fits", ".pdf"))
+
 
     return(main_offender_db)
 
@@ -303,6 +352,7 @@ def rosalia_psf(ra, dec, PA, g_mag_max, date, bandpass, exptime, input_catalog=N
                                                           # ra=ra, dec=dec, MJD=MJD, radius=radius, g_mag_max=g_mag_max, verbose=verbose)
     #hybrid_catalog = gaia_query_dict["gaia_query"]
 
+    source_catalog_filename = roman_dummy_name.replace(".fits", "_source_catalog.csv")
     if input_catalog is not None:
         hybrid_catalog = input_catalog
     
@@ -313,7 +363,8 @@ def rosalia_psf(ra, dec, PA, g_mag_max, date, bandpass, exptime, input_catalog=N
                                                lambda_ref=image_identity["FILTER_IDENTITY"]["filter_lambda_ref"],
                                                MJD=date.mjd,
                                                observer=image_identity["TELESCOP"],
-                                               g_mag_max=g_mag_max, verbose=verbose)
+                                               g_mag_max=g_mag_max, verbose=verbose, 
+                                               query_filename=source_catalog_filename)
 
     # def rosalia_stray(input_name, output_name="rosalia_stray_output.fits", radius=1, g_mag_max=15, sun_block=False, verbose=False, catalog=None):
 
@@ -565,7 +616,7 @@ def main_offender(input_name=None, ext=None, ra=None, dec=None, phi=0,
     else:
         hybrid_catalog = input_catalog
 
-    hybrid_catalog.to_csv(output_name.replace(".fits", "_catalog.csv"))
+    hybrid_catalog.to_csv(source_catalog_filename)
 
 
     # If sun_block is True, then remove the Sun from the catalog.
@@ -714,6 +765,7 @@ def main_offender(input_name=None, ext=None, ra=None, dec=None, phi=0,
         data_output.append(main_offender_i)
         header_output.append(image_identity["ASTROPYWCS"][SCIEXT_i-1].to_header())
 
+
     main_offender_output_name = output_name.replace(".fits", "_main_off.fits")
     rs.utils.save_fits(array=data_output, 
                        name=main_offender_output_name, 
@@ -752,7 +804,7 @@ def main_offender(input_name=None, ext=None, ra=None, dec=None, phi=0,
 
     return({"image_identity":image_identity,
             "straylevel_list": straylevel_list,
-            "star_catalog": hybrid_catalog,
+            "star_catalog": source_catalog_filename,
             "output_name": output_name,
             "main_offender_output": main_offender_output_name,
             "detector_square": detector_square_list})

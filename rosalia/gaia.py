@@ -25,7 +25,6 @@ import astropy.units as u
 from astropy.coordinates import match_coordinates_sky, ICRS, Angle, SkyCoord
 from astropy.table import Table, join
 import astropy_healpix as astro_hp
-from astroquery.gaia import Gaia
 import rosalia as rs
 from rosalia.plots import style
 import rosalia.constants as rs_constants
@@ -40,6 +39,7 @@ def query_gaia_2mass_wise(ra, dec, radius, g_mag_max=False, verbose=False, query
 
     # C is the central coordinates of the pointing.
     c = SkyCoord(ra, dec, frame='icrs', unit="deg")
+    from astroquery.gaia import Gaia
 
     # Initialize the tables
     if verbose: print("Loading Gaia databases...")
@@ -140,7 +140,7 @@ def query_gaia_2mass_wise(ra, dec, radius, g_mag_max=False, verbose=False, query
     if verbose: print("> Query to Gaia/2MASS/WISE databases finished.")
     filtered_table = job.get_results().to_pandas()
 
-    filtered_table.to_csv(query_filename.replace(".csv", "_temp.csv")) # Debugging
+    # filtered_table.to_csv(query_filename.replace(".csv", "_temp.csv")) # Debugging
 
     # Correct the magnitudes to the AB system.
 
@@ -177,31 +177,31 @@ def query_gaia_2mass_wise(ra, dec, radius, g_mag_max=False, verbose=False, query
                                      #"source_id_2":  filtered_table["source_id_2"],
                                   "ra": filtered_table["ra"],
                                   "dec": filtered_table["dec"],
-                                  "wise_ra": filtered_table["wise_ra"],
-                                  "wise_dec": filtered_table["wise_dec"],
-                                  "tmass_ra": filtered_table["tmass_ra"],
-                                  "tmass_dec": filtered_table["tmass_dec"],
-                                  "phot_bp_mean_mag": filtered_table["phot_bp_mean_mag_AB"],
-                                  "phot_g_mean_mag":  filtered_table["phot_g_mean_mag_AB"],
-                                  "phot_rp_mean_mag":  filtered_table["phot_rp_mean_mag_AB"],
-                                  "parallax": filtered_table["parallax"],
-                                  "w1": 10**(0.4*(8.9 - filtered_table["phot_w1_mean_mag_AB"])),
-                                  "w1_error": np.zeros(len(filtered_table)),
-                                  "w2": 10**(0.4*(8.9 - filtered_table["phot_w2_mean_mag_AB"])),
-                                  "w2_error": np.zeros(len(filtered_table)),
-                                  "w3": 10**(0.4*(8.9 - filtered_table["phot_w3_mean_mag_AB"])),
-                                  "w3_error": np.zeros(len(filtered_table)),
-                                  "w4": 10**(0.4*(8.9 - filtered_table["phot_w4_mean_mag_AB"])),
-                                  "w4_error": np.zeros(len(filtered_table)),
-                                  "j":  10**(0.4*(8.9 - filtered_table["phot_j_mean_mag_AB"])),
-                                  "j_error": np.zeros(len(filtered_table)),
-                                  "h":  10**(0.4*(8.9 - filtered_table["phot_h_mean_mag_AB"])),
-                                  "h_error": np.zeros(len(filtered_table)),
-                                  "ks":  10**(0.4*(8.9 - filtered_table["phot_ks_mean_mag_AB"])),
-                                  "ks_error": np.zeros(len(filtered_table)),
-                                  "g": 10**(0.4*(8.9 - filtered_table["phot_g_mean_mag_AB"])),
-                                  "bp": 10**(0.4*(8.9 - filtered_table["phot_bp_mean_mag_AB"])),
-                                  "rp": 10**(0.4*(8.9 - filtered_table["phot_rp_mean_mag_AB"])),
+                                  #"wise_ra": filtered_table["wise_ra"],
+                                  #"wise_dec": filtered_table["wise_dec"],
+                                  #"tmass_ra": filtered_table["tmass_ra"],
+                                  #"tmass_dec": filtered_table["tmass_dec"],
+                                  #"phot_bp_mean_mag": filtered_table["phot_bp_mean_mag_AB"],
+                                  #"phot_g_mean_mag":  filtered_table["phot_g_mean_mag_AB"],
+                                  #"phot_rp_mean_mag":  filtered_table["phot_rp_mean_mag_AB"],
+                                  #"parallax": filtered_table["parallax"],
+                                  #"w1": 10**(0.4*(8.9 - filtered_table["phot_w1_mean_mag_AB"])),
+                                  #"w1_error": np.zeros(len(filtered_table)),
+                                  #"w2": 10**(0.4*(8.9 - filtered_table["phot_w2_mean_mag_AB"])),
+                                  #"w2_error": np.zeros(len(filtered_table)),
+                                  #"w3": 10**(0.4*(8.9 - filtered_table["phot_w3_mean_mag_AB"])),
+                                  #"w3_error": np.zeros(len(filtered_table)),
+                                  #"w4": 10**(0.4*(8.9 - filtered_table["phot_w4_mean_mag_AB"])),
+                                  #"w4_error": np.zeros(len(filtered_table)),
+                                  #"j":  10**(0.4*(8.9 - filtered_table["phot_j_mean_mag_AB"])),
+                                  #"j_error": np.zeros(len(filtered_table)),
+                                  #"h":  10**(0.4*(8.9 - filtered_table["phot_h_mean_mag_AB"])),
+                                  #"h_error": np.zeros(len(filtered_table)),
+                                  #"ks":  10**(0.4*(8.9 - filtered_table["phot_ks_mean_mag_AB"])),
+                                  #"ks_error": np.zeros(len(filtered_table)),
+                                  #"g": 10**(0.4*(8.9 - filtered_table["phot_g_mean_mag_AB"])),
+                                  #"bp": 10**(0.4*(8.9 - filtered_table["phot_bp_mean_mag_AB"])),
+                                  #"rp": 10**(0.4*(8.9 - filtered_table["phot_rp_mean_mag_AB"])),
                                   "phot_g_mean_mag_AB":   filtered_table["phot_g_mean_mag_AB"],
                                   "phot_bp_mean_mag_AB":  filtered_table["phot_bp_mean_mag_AB"],
                                   "phot_rp_mean_mag_AB":  filtered_table["phot_rp_mean_mag_AB"],
@@ -250,6 +250,8 @@ def query_healpix_ra_slices(healpix_lvl=7, verbose=False):
     # This program is only run in case that the low resolution map is needed.
     # It can take one or two days, depending on the healpix mapping grid
     #healpix_lvl = 7
+    from astroquery.gaia import Gaia
+
     filtered_table_list = []
     ra_list = np.linspace(0, 359, 360)
     for ra_i in tqdm(ra_list):
@@ -368,8 +370,8 @@ def query_healpix_ra_slices(healpix_lvl=7, verbose=False):
     healpix_table = pd.DataFrame({"healpix_lvl": healpix_lvl_list,
                                   "source_id": healpix_lvl_list,
                                   "source_id_2": "Healpix_superstar",
-                                  "ra": np.float16(geo_RA_list),
-                                  "dec": np.float16(geo_DEC_list),
+                                  "ra": np.float32(geo_RA_list),
+                                  "dec": np.float32(geo_DEC_list),
                                   "wise_ra": np.float16(geo_RA_list),
                                   "wise_dec": np.float16(geo_DEC_list),
                                   "tmass_ra": np.float16(geo_RA_list),

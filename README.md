@@ -132,7 +132,7 @@ conda activate rosalia
 Once in a clean conda environment, we can install ROSALIA. The preferred method to install it is through pip.
 
 ```sh
-pip install rosalia
+pip install rosalia-wfi
    ```
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -143,7 +143,7 @@ ROSALIA needs a set of calibrations files to work. ROSALIA needs a series of cac
 Most functions will work without it, but the main ones (rosalia_stray) will return an error when executed if these files are not found. The ROSALIACACHE folder must be defined in the environment as: 
 
 ```sh
-export ROSALIACACHE=/home/user/project/rosalia_cache
+export ROSALIACACHE=/home/user/project/rosalia-cache
    ```
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
