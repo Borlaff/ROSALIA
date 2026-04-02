@@ -23,6 +23,7 @@ import rosalia.ndi
 import rosalia.psf
 import rosalia.gaia
 import rosalia.gnu
+import rosalia.point
 import rosalia.roman
 import rosalia.sky
 import rosalia.skysurf

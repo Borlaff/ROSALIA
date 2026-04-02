@@ -31,8 +31,9 @@ from astropy.coordinates import ICRS, Angle, SkyCoord
 
 ###########################
 
-def rosalia_stray(ra, dec, PA, date, bandpass, exptime, input_fits=None, radius=1,
-                  g_mag_max=15, sun_block=False, verbose=False, catalog=None):
+def rosalia_stray(ra, dec, PA, date, bandpass, exptime, prefix="", input_fits=None, radius=1,
+                  g_mag_max=15, sun_block=False, verbose=False, catalog=None, 
+                  figsize=(10,7), mu_vmin=None, mu_vmax=None):
     """
     Identify and estimate straylight from stars outside the field of view.
 
@@ -93,7 +94,7 @@ def rosalia_stray(ra, dec, PA, date, bandpass, exptime, input_fits=None, radius=
 
     if input_fits is None:
         # Make the Roman Dummy image
-        roman_dummy_name = os.getcwd() + "/WFI_" + bandpass +\
+        roman_dummy_name = os.getcwd() + "/" + prefix + "WFI_" + bandpass +\
                                      "_RA_" + '{:07.3f}'.format(ra) +\
                                      "_DEC_" + '{:07.3f}'.format(dec) +\
                                      "_MJD_" + '{:07.5f}'.format(date.mjd) +\
@@ -149,6 +150,7 @@ def rosalia_stray(ra, dec, PA, date, bandpass, exptime, input_fits=None, radius=
                                      output_name = output_name)
 
 
+    if verbose > 0: print("Generating ROSALIA summary report...")
 
     drz_name, scaled_drz_name = rs.utils.run_swarp(pattern=main_offender_db["output_name"], 
                                                    outname=main_offender_db["output_name"].replace(".fits","_drz.fits"), scale=0.1)
@@ -181,25 +183,44 @@ def rosalia_stray(ra, dec, PA, date, bandpass, exptime, input_fits=None, radius=
     rs.utils.write_parameters_list([scaled_main_off], ["REBINNED"], [[10]], ext=0)
 
     # Make the plots. 
+    if verbose > 0: print("Plot: Stray-light surface brightness magnitude.")
     fe2mu_png = rs.plots.make_stray_plot(input_name=scaled_drz_name,
                                         ext=1, mode="fe2mu",
-               color_label = "Surface brightness (mag arcsec$^{-2}$)")
+               color_label = "Surface brightness (mag arcsec$^{-2}$)", figsize=figsize,mu_vmin=mu_vmin, mu_vmax=mu_vmax)
 
+    if verbose > 0: print("Plot: Stray-light surface brightness flux.")
     fe_png = rs.plots.make_stray_plot(input_name=scaled_drz_name, ext=1, mode="fe", 
-                color_label = "Flux (e/s/px)",cmap="RdYlBu_r")
+                color_label = "Flux (e/s/px)",cmap="RdYlBu_r", figsize=figsize)
 
+    if verbose > 0: print("Plot: Main offender map.")
     main_offender_png = rs.plots.make_stray_plot(input_name=scaled_main_off, ext=0, 
                                                  mode="main_offender", 
                 catalog_name=catalog_name, 
-                color_label = "Main offending source (ID)")
+                color_label = "Main offending source (ID)", figsize=figsize)
 
-    stars_around_png = rs.plots.make_stars_around_plot(fits_input_name, catalog_name, output_name=None)
+    
+    if verbose > 0: print("Plot: Source environment map.")
+    try:
+        stars_around_png = rs.plots.make_stars_around_plot(fits_input_name, catalog_name, output_name=None, figsize=figsize)
+    except:
+        print(rs.plots.style.YELLOW + "WARNING: Could not make stars around plot. Check if the catalog has the right columns." + rs.plots.style.RESET)
+        stars_around_png = ""
+
+
+    if verbose > 0: print("Plot: Location of Main offenders on NDI map.")
+    try:
+        ndi_mainoff_name = rs.plots.plot_ndi_main_offenders(input_name=fits_input_name, scaled_main_off=scaled_main_off, 
+                                                        catalog_name=catalog_name, ndi_level=2, figsize=figsize)
+    except:
+        print(rs.plots.style.YELLOW + "WARNING: Could not make stars Main offender plot. Check if the catalog has the right columns." + rs.plots.style.RESET)
+        ndi_mainoff_name = ""
 
     rs.utils.execute_cmd("magick -adjoin " +\
                         fe2mu_png + " " +\
                         fe_png + " "+\
                         main_offender_png + " " +\
                         stars_around_png + " "+\
+                        ndi_mainoff_name + " "+\
                         fits_input_name.replace(".fits", ".pdf"))
 
 
@@ -515,7 +536,9 @@ def main_offender(input_name=None, ext=None, ra=None, dec=None, phi=0,
                   step=200, grid_method="random", verbose=False, ndi_mode="legacy",
                   input_catalog=None, match_inside_stars=False, sun_block=False,
                   output_name="main_offender_default_output.fits"):
+    #print("input_catalog")
 
+    #print(input_catalog)
     #######################################
     # main_offender: Alejandro S. Borlaff. NASA/Ames STA. a.s.borlaff@nasa.gov
     # -------------------------------
@@ -575,36 +598,35 @@ def main_offender(input_name=None, ext=None, ra=None, dec=None, phi=0,
 
 
     #print("Demo warning: ADD FEATURE planets: https://github.com/skyfielders/python-skyfield/tree/master")
-    existing_catalog_name = output_name.replace(".fits", "_catalog.csv")
-    if os.path.exists(existing_catalog_name):
-        print("WARNING: Loading existing catalog! Remove " + existing_catalog_name + " if this is a mistake.")
-        input_catalog = pd.read_csv(existing_catalog_name)
 
+    #print("input_catalog")
+    #print(input_catalog)
+
+    if input_name is None:
+        source_catalog_filename = str(RA_PNT) + "_" + str(DEC_PNT) + "_source_catalog.csv"
+    else:
+        source_catalog_filename = input_name.replace(".fits", "_source_catalog.csv")
 
     if input_catalog is None:
-        if verbose: print("> Querying stars in the surroundings using ESA/Gaia Archive")
+        #print("input catalog is none!")
+        existing_catalog_name = output_name.replace(".fits", "_catalog.csv")
+        if os.path.exists(existing_catalog_name):
+            print("WARNING: Loading existing catalog! Remove " + existing_catalog_name + " if this is a mistake.")
+            input_catalog = pd.read_csv(existing_catalog_name)
 
-        if radius > 0.5:
-            print("INFO: radius parameter (minimum distance to search for individual stars) is > 0.5 degrees.")
-            print("Gaia/2MASS/WISE query database can take several minutes to process. Please be patient.")
-
-        # Find the stars around the central coordinate of the scene.
-        # Save the stellar catalog into a catalog object, and run main_offender as if input_catalog was set by the User.
-        loader = rs.plots.Loader("Querying Gaia/2MASS/WISE/JPL Horizons databases. This might take a few minutes...",
-                                 "All-sky source map constructed.", 0.05).start()
-        #gaia_query = rs.psf.find_sources_around(lambda_ref=lambda_ref,
-        #                                        observer=telescope,
-        #                                        input_name=None,
-        #                                        ext=None,
-        #                                        ra=RA_PNT, dec=DEC_PNT, MJD=MJD,
-        #                                        radius=radius,
-        #                                        g_mag_max=g_mag_max, verbose=verbose)["gaia_query"]
-
-        if input_name is None:
-            source_catalog_filename = str(RA_PNT) + "_" + str(DEC_PNT) + "_source_catalog.csv"
         else:
-            source_catalog_filename = input_name.replace(".fits", "_source_catalog.csv")
-        hybrid_catalog = rs.psf.get_hybrid_catalog(ra=RA_PNT, dec=DEC_PNT,
+            if verbose: print("> Querying stars in the surroundings using ESA/Gaia Archive")
+ 
+            if radius > 0.5:
+                print("INFO: radius parameter (minimum distance to search for individual stars) is > 0.5 degrees.")
+                print("Gaia/2MASS/WISE query database can take several minutes to process. Please be patient.")
+
+            # Find the stars around the central coordinate of the scene.
+            # Save the stellar catalog into a catalog object, and run main_offender as if input_catalog was set by the User.
+            loader = rs.plots.Loader("Querying Gaia/2MASS/WISE/JPL Horizons databases. This might take a few minutes...",
+                                     "All-sky source map constructed.", 0.05).start()
+
+            hybrid_catalog = rs.psf.get_hybrid_catalog(ra=RA_PNT, dec=DEC_PNT,
                                                    radius=radius,
                                                    lambda_ref=lambda_ref,
                                                    MJD=MJD,
@@ -612,7 +634,7 @@ def main_offender(input_name=None, ext=None, ra=None, dec=None, phi=0,
                                                    g_mag_max = g_mag_max,
                                                    verbose=verbose,
                                                    query_filename=source_catalog_filename)
-        loader.stop()
+            loader.stop()
     else:
         hybrid_catalog = input_catalog
 

@@ -633,6 +633,7 @@ def identify_stars_in_out_field(data_shape, wcs, catalog, ra=None, dec=None, ver
     #print("DEMO WARNING: This can be done way faster by prefiltering those stars at high angular distances.")
     region_detector = Sphericalpolygon.from_array(vertices_detector_dec_ra)
 
+
     distance_detector_corners = rs.utils.angular_distance(ra1=np.array(corners_world[:,0]),
                                                           dec1=np.array(corners_world[:,1]),
                                                           ra2=np.array(corners_world[:,0]),
@@ -640,25 +641,41 @@ def identify_stars_in_out_field(data_shape, wcs, catalog, ra=None, dec=None, ver
 
     aprox_size_detector = bn.nanmax(distance_detector_corners)
 
-    distance_detector_to_stars = bn.nanmax(rs.utils.angular_distance(ra1=np.array(corners_world[:,0]),
-                                                                     dec1=np.array(corners_world[:,1]),
-                                                                     ra2=catalog["ra"],
-                                                                     dec2=catalog["dec"]), axis=0)
 
-    isIn = np.zeros(len(catalog["ra"])).astype("bool")
-    far_away_stars = distance_detector_to_stars > 5*aprox_size_detector
-    isIn[far_away_stars] = False
+    distance_detector_to_stars = bn.nanmax(rs.utils.angular_distance(ra1=catalog["ra"],
+                                                                     dec1=catalog["dec"],
+                                                                     ra2=np.array(corners_world[:,0]),
+                                                                     dec2=np.array(corners_world[:,1])), axis=1)
 
-    close_stars_around_list_dec_ra = np.array([[j, i] for i, j in zip(catalog["ra"], catalog["dec"])])
+    
+    #if isinstance(catalog["ra"], (pd.Series, np.ndarray)):
+    if len(catalog["ra"]) > 1:
+        isIn = np.zeros(len(catalog["ra"])).astype("bool")
+        far_away_stars = distance_detector_to_stars > 5*aprox_size_detector
+        isIn[far_away_stars] = False
+        close_stars_around_list_dec_ra = np.array([[j, i] for i, j in zip(catalog["ra"], catalog["dec"])])
+        isIn[~far_away_stars] = region_detector.contains_points(close_stars_around_list_dec_ra[~far_away_stars])
+        catalog_inside = catalog[isIn]
+        if verbose: print(" Stars inside detector: " + str(catalog_inside))
+        if verbose: print(" All stars catalog: " + str(catalog))
+        return({"bool_isIn": isIn, "corners_pix": corners_pix, "corners_world": corners_world, "catalog_inside": catalog_inside})
+    
+    #elif isinstance(catalog["ra"], (np.floating, float)):
+    else:
+        isIn = region_detector.contains_points([[catalog["dec"].iloc[0], catalog["ra"].iloc[0]]])
+        if isIn:
+            return({"bool_isIn": True, 
+                    "corners_pix": corners_pix, 
+                    "corners_world": corners_world, 
+                    "catalog_inside": catalog})
+        else:
+            return({"bool_isIn": False, 
+                    "corners_pix": corners_pix, 
+                    "corners_world": corners_world, 
+                    "catalog_inside": catalog})
 
-    isIn[~far_away_stars] = region_detector.contains_points(close_stars_around_list_dec_ra[~far_away_stars])
+        
 
-    catalog_inside = catalog[isIn]
-    if verbose: print(" Stars inside detector: " + str(catalog_inside))
-    if verbose: print(" All stars catalog: " + str(catalog))
-
-
-    return({"bool_isIn": isIn, "corners_pix": corners_pix, "corners_world": corners_world, "catalog_inside": catalog_inside})
 
 
 def get_hybrid_catalog(ra, dec, radius, lambda_ref, MJD, observer, g_mag_max=False, verbose=False, query_filename="default_query.dat"):

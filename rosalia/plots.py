@@ -141,6 +141,7 @@ def main_offender_find_fraction_of_map(mainoff_name, catalog_name):
         dec = np.float32(catalog.iloc[catalog["cat_id"] == unique_id]["dec"])[0]
         mag_lambda = np.float32(catalog.iloc[catalog["cat_id"] == unique_id]["mag_lambda"])[0]
 
+
         # Try to find the name of the main_offender
         simbad_query = Simbad.query_region(SkyCoord(ra, dec, unit=(u.deg, u.deg), frame='icrs'), radius=1 * u.arcsec)
         if len(simbad_query)==0:
@@ -180,7 +181,7 @@ def main_offender_find_fraction_of_map(mainoff_name, catalog_name):
         dec = main_offender_db["dec"].iloc[i]
         mag_lambda = main_offender_db["mag_lambda"].iloc[i]
         source_id = main_offender_db["source_id"].iloc[i]
-        lines.append('' + str(name) + " " + str("{:.2f}".format(percen)) + "% - ("  + str("{:.2f}".format(ra)) + ", " + str("{:.2f}".format(dec)) +  "), m="  + str("{:.2f}".format(mag_lambda)) )
+        lines.append("" + str("{:.2f}".format(percen)) + "% - ("  + str("{:.2f}".format(ra)) + ", " + str("{:.2f}".format(dec)) +  "), m="  + str("{:.2f}".format(mag_lambda)) + ' - ' + str(name))
     multiline_text = "\n".join(lines)
     print(multiline_text)
 
@@ -191,7 +192,7 @@ def main_offender_find_fraction_of_map(mainoff_name, catalog_name):
 def make_stray_plot(input_name, ext, mode="normal", catalog_name=None, 
                     vmin=None, vmax=None, 
                     color_label = 'Surface brightness (mag arcsec$^{-2}$)',
-                    cmap="RdYlBu", output_name=None):
+                    cmap="RdYlBu", output_name=None, figsize=(10,7), mu_vmin=None, mu_vmax=None):
     import matplotlib.pyplot as plt
     from astropy.utils.data import get_pkg_data_filename
     from astropy.wcs import WCS as astropy_wcs
@@ -213,9 +214,10 @@ def make_stray_plot(input_name, ext, mode="normal", catalog_name=None,
     #                                            reference_name=flt_name, 
     #                                            reference_ext=np.linspace(1,18,18, dtype="int"))
     
-    fig, ax = plt.subplots(figsize=(10, 7), subplot_kw=dict(projection=wcs))
+    fig, ax = plt.subplots(figsize=figsize, subplot_kw=dict(projection=wcs))
 
     if mode == "fe2mu":
+        print("DEMO WARNING: make_stray_plot is Assuming F129.")
         data = rs.detectors.fe2mu(data, telescope="Roman", instrument="WFI", filter_name="F129")
 
 
@@ -224,6 +226,10 @@ def make_stray_plot(input_name, ext, mode="normal", catalog_name=None,
 
     vmin = np.nanpercentile(data, 5)
     vmax = np.nanpercentile(data, 95)
+
+    if mode == "fe2mu" and (mu_vmin is not None) and (mu_vmax is not None):
+        vmin = mu_vmin
+        vmax = mu_vmax
 
     print(vmin)
     print(vmax)
@@ -248,7 +254,7 @@ def make_stray_plot(input_name, ext, mode="normal", catalog_name=None,
     return(output_name)
 
 
-def make_stars_around_plot(flt_name, catalog_name, radius = 0.6, output_name=None):
+def make_stars_around_plot(flt_name, catalog_name, radius = 0.6, output_name=None, figsize=(10,7)):
     if output_name is None:
         output_name = flt_name.replace(".fits", "_stars_close.png")
         
@@ -282,10 +288,16 @@ def make_stars_around_plot(flt_name, catalog_name, radius = 0.6, output_name=Non
     separation = target.separation(hybrid)
 
     hybrid_catalog_close = hybrid_catalog[separation.value<2*radius]
-    fig, ax = plt.subplots(figsize=(9, 7))
-
-    plot_size, mag_lambda_range, plot_size_range = rs.plots.plot_stars_around(ax=ax, catalog=hybrid_catalog_close, 
+    fig, ax = plt.subplots(figsize=figsize)
+    
+    if len(hybrid_catalog_close) > 1:
+        plot_size, mag_lambda_range, plot_size_range = rs.plots.plot_stars_around(ax=ax, catalog=hybrid_catalog_close, 
                                            max_plot_size=50, min_plot_size=5, alpha=0.2)
+    else:
+        mag_lambda_range = hybrid_catalog_close["mag_lambda"].iloc[0]
+        plot_size_range = 5
+
+
     plot_radec_limits = rs.gaia.find_ra_dec_constraints(ra=RA_TARG, dec=DEC_TARG, radius=radius/4)
     for detector_square in detector_square_list:
         plt.plot(detector_square[:,0], detector_square[:,1], alpha=0.5, color="red")
@@ -306,7 +318,92 @@ def make_stars_around_plot(flt_name, catalog_name, radius = 0.6, output_name=Non
     return(output_name)
 
 
+###############
 
+
+
+def plot_ndi_main_offenders(input_name, scaled_main_off, catalog_name, ndi_level, figsize=(10,7)):
+    import os
+    import numpy as np
+    import matplotlib.pyplot as plt
+    from astropy.io import fits
+    import astropy.wcs as astropy_wcs
+    import matplotlib.colors as matplotlib_colors
+
+    main_offender_db, multiline_text = rs.plots.main_offender_find_fraction_of_map(scaled_main_off, catalog_name)
+    
+    # Plot level NDI 
+    ndi_name = os.environ["ROSALIACACHE"] + "CORE/NDI/RST/ndi_lvl" + str(ndi_level) + "_mean.fits"
+    input_fits = fits.open(input_name)
+    pa_point = input_fits[1].header["PA"]
+    ra_point = input_fits[1].header["RA_TARG"]
+    dec_point = input_fits[1].header["DEC_TARG"]
+
+    if ndi_level==1:
+        ndi_linthresh = 0.05
+    if ndi_level==2:
+        ndi_linthresh = 0.001
+    else:
+        ndi_linthresh = 0.01
+   
+    # Make the modified header based on the exposure properties.
+    ndi_fits = fits.open(ndi_name)
+    w = astropy_wcs.WCS(header=ndi_fits[0].header, fobj=ndi_fits, naxis=2)
+    w.wcs.crota = -pa_point,-pa_point
+    w.wcs.crval = ra_point,dec_point
+    w.wcs.cdelt = -ndi_fits[0].header["CDELT1"],ndi_fits[0].header["CDELT2"]
+    print(w)
+    ndi_fits[0].header = w.to_header()
+    
+    fig, ax = plt.subplots(1, 1, figsize=figsize, subplot_kw=dict(projection=w))
+
+
+    # ndi_header = fits.open(ndi_headerlet)[0].header
+    
+    # The transfer NDI maps units of 1/(superpixel size in mm2). 
+    # We need to correct by that factor. 
+    superpixel_mm2_area = (rs.telescopes.Roman.get_physical_pixelsize("WFI").to("mm").value * 512)**2
+    im = ax.imshow(ndi_fits[0].data/superpixel_mm2_area, origin='lower', cmap="RdYlBu_r",
+                           norm=matplotlib_colors.SymLogNorm(linthresh=ndi_linthresh, linscale=1,
+                                            base=10))
+    cbar = plt.colorbar(im, ax=ax, location='top', fraction=0.046, pad=0.04)
+    cbar.set_label(label='Normalized Detector Irradiance (unitless)',size=15)
+
+    ndi_w = astropy_wcs.WCS(header=ndi_fits[0].header, fobj=ndi_fits, naxis=2)
+    # star_catalog = star_catalog_list[i]
+    
+    # CAR locations 
+    alpha = 1
+    import matplotlib.cm as cm
+
+    for i in range(3):
+        # CAR 1 A
+        x_stars, y_stars = ndi_w.wcs_world2pix(main_offender_db["ra"].iloc[i], main_offender_db["dec"].iloc[i], 0)
+        ax.scatter(x_stars, y_stars, marker="h", edgecolor="black", color=cm.hot(i/3), alpha=alpha, s=150/(i+1), label=main_offender_db["source_name"].iloc[i])
+
+    max_extent_ndi = np.abs(ndi_fits[0].header["CDELT2"]) * ndi_fits[0].data.shape[0]/2# This is the radial extent of the NDI map
+    print(max_extent_ndi)
+    angle_ticks = np.round(np.linspace(-max_extent_ndi, max_extent_ndi, 5),1)
+    print(angle_ticks)
+    pixel_ticks = angle_ticks/np.abs(ndi_fits[0].header["CDELT2"])  + ndi_fits[0].data.shape[0]/2
+    print(pixel_ticks)
+    #ax.set_xticks(pixel_ticks, angle_ticks, size=12)
+    #ax.set_yticks(pixel_ticks, angle_ticks, size=12)
+    ax.set_xlabel("RA (degrees)", size=15)
+    ax.set_ylabel("Dec (degrees)", size=15)
+
+    plt.legend(title="Main offenders", fancybox=True, edgecolor="white", bbox_to_anchor=(1.3, 0.5))
+    ax.text(1.1, 0.95, multiline_text, 
+            fontsize=9,
+            color='black',
+            transform=ax.transAxes,
+            verticalalignment='top', 
+            bbox=dict(facecolor='white', alpha=0.5))
+
+    plt.tight_layout()
+    output_plot_name = input_name.replace(".fits","_ndi_mainoff_location.png")
+    plt.savefig(output_plot_name, dpi=300)
+    return(output_plot_name)
 
 
 #############
@@ -325,10 +422,10 @@ def plot_stars_around(ax, catalog, max_plot_size=50, min_plot_size=5, alpha=0.2)
                         u'$\u2640$', u'$\u2642$',u'$\u2643$', u'$\u2644$',
                         u'$\u26E2$', u'$\u2646$',  u'$\u2647$']
 
-    print(bn.nanmin(ra_stars))
-    print(bn.nanmax(ra_stars))
-    print(bn.nanmin(dec_stars))
-    print(bn.nanmax(dec_stars))
+    #print(bn.nanmin(ra_stars))
+    #print(bn.nanmax(ra_stars))
+    #print(bn.nanmin(dec_stars))
+    #print(bn.nanmax(dec_stars))
 
     for i, SSO_list_plain_i in zip(range(len(SSO_list_plain)), SSO_list_plain):
 
@@ -387,7 +484,7 @@ def plot_stray_and_ndi_map(stray_name, star_catalog, ra_point, dec_point, pa_poi
     # Axis 1 - Showing the Stray-light map
     stray_list_image[stray_list_image == 0] = np.nan
     im = axs[0].imshow(stray_list_image, origin='lower', cmap="inferno_r", vmin=vmin, vmax=vmax)
-    cbar = plt.colorbar(im, ax=axs[0], location='top', )
+    cbar = plt.colorbar(im, ax=axs[0], location='top', fraction=0.046, pad=0.04)
     cbar.set_label(label='Surface brightness (mag arcsec$^{-2}$)',size=15,weight='bold')
 
 

@@ -394,7 +394,10 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
 
     if exposure_identity["TELESCOP"] == "HST" or exposure_identity["TELESCOP"]=="Hubble":
         telescope_class = rs.telescopes.Hubble
-        exposure_identity["PA"] = input_fits[1].header["PA_APER"]
+        try: 
+            exposure_identity["PA"] = input_fits[1].header["PA_APER"]
+        except:
+            print("Warning: HST image - PA_APER not found.")
 
 
     if exposure_identity["TELESCOP"] == "Roman" or exposure_identity["TELESCOP"] == "ROMAN" or exposure_identity["TELESCOP"]=="RST" or exposure_identity["TELESCOP"]=="NGRST":
@@ -1240,6 +1243,13 @@ def angular_distance(ra1, dec1, ra2, dec2):
 
     """
     import numexpr
+
+    if isinstance(ra1, (np.floating, float)) or isinstance(ra2, (np.floating, float)):
+        radec1 = SkyCoord(ra1, dec1, unit="degree", frame="icrs")
+        radec2 = SkyCoord(ra2, dec2, unit="degree", frame="icrs")
+        separation = radec1.separation(radec2).value
+        return(separation)
+
 
     pi = np.pi
     ra1_rad  = numexpr.evaluate('ra1*pi/180')

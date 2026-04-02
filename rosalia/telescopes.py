@@ -86,11 +86,11 @@ def find_filter_in_svo(wavelength, telescope, instrument, detector, verbose=Fals
 
     # Handle exceptions with naming
     # ----------------------------------- #
-    if telescope== "Hubble":
+    if telescope== "Hubble" or telescope =="HST":
         telescope = "HST"
     if instrument== "ACS/WFC" or instrument== "acs" or instrument== "ACS/HRC" or instrument== "ACS/SBC":
         instrument = "ACS"
-    if telescope== "RST":
+    if telescope== "RST" or telescope =="Roman":
         telescope = "Roman"
 
     #if True:
@@ -560,7 +560,7 @@ class Roman:
         # Compute the sky coordinates of the WFI_CEN aperture reference position
         wfi_ra, wfi_dec = wfi_cen.idl_to_sky(0, 0)
         if verbose: print(f'' + name.iloc[i] + f' - WFI_CEN: RA = {wfi_ra:.5f} deg, Dec = {wfi_dec:.5f} deg')
-        return({"ra_wficen": wfi_ra, "dec_wficen": wfi_dec, "pa_wfi": pa - 60})
+        return({"ra_wficen": wfi_ra, "dec_wficen": wfi_dec, "pa_wfi": pa - 60, "V3PA": pa, "PA_v3": PA_v3})
     
 #################################################################
 
@@ -777,9 +777,9 @@ class SPHEREx:
         return(outname)
 
     def make_dummy_exposure(ra, dec, pa, outname):
-        exp1_name = "/Users/aborlaff/NASA/SPARKLES/notebooks/SATELLITES/SPHEREx_simdata_AAS2025/level2_2025W17_2A_0089_4D1_simu_HighLat.fits"
-        exp2_name = "/Users/aborlaff/NASA/SPARKLES/notebooks/SATELLITES/SPHEREx_simdata_AAS2025/level2_2025W17_2A_0089_4D2_simu_HighLat.fits"
-        exp3_name = "/Users/aborlaff/NASA/SPARKLES/notebooks/SATELLITES/SPHEREx_simdata_AAS2025/level2_2025W17_2A_0089_4D3_simu_HighLat.fits"
+        exp1_name = "/Users/aborlaff/NASA/PAPER_SPARKLES_1/notebooks/SATELLITES/SPHEREx_simdata_AAS2025/level2_2025W17_2A_0089_4D1_simu_HighLat.fits"
+        exp2_name = "/Users/aborlaff/NASA/PAPER_SPARKLES_1/notebooks/SATELLITES/SPHEREx_simdata_AAS2025/level2_2025W17_2A_0089_4D2_simu_HighLat.fits"
+        exp3_name = "/Users/aborlaff/NASA/PAPER_SPARKLES_1/notebooks/SATELLITES/SPHEREx_simdata_AAS2025/level2_2025W17_2A_0089_4D3_simu_HighLat.fits"
 
         exp1 = fits.open(exp1_name)
         exp2 = fits.open(exp2_name)
@@ -904,7 +904,7 @@ class ARRAKIHS:
 
 
     def make_dummy_exposure(ra, dec, pa, outname):
-        exp_name = "/Users/aborlaff/NASA/SPARKLES/notebooks/SATELLITES/ARRAKIHS_mock_es.fits"
+        exp_name = "/Users/aborlaff/NASA/PAPER_SPARKLES_1/notebooks/SATELLITES/ARRAKIHS_mock_es.fits"
 
         exp = fits.open(exp_name)
         canvas = exp[0].data

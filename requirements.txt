@@ -26,3 +26,6 @@ ipython
 pysiaf
 ephem
 pysolar
+numexpr
+reproject
+scipy

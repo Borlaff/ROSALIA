@@ -477,6 +477,10 @@ def roman_estimate_straylight_SCA(data, wcs, SCA, filter_identity, ra_stars,
     # This is the canvas array where we will store the ID of the largest stray-light contributor
     main_offender_SCA = np.zeros(data_shape).astype(np.float32)
 
+    # The transfer NDI maps units of 1/(superpixel size in mm2). 
+    # We need to correct by that factor. 
+    superpixel_mm2_area = (rs.telescopes.Roman.get_physical_pixelsize("WFI").to("mm").value * 512)**2
+
     if True:
         subarray_locations_db = rs.roman.get_subarray_locations(SCA=SCA, verbose=False)
         xmid = subarray_locations_db["xmid"]
@@ -522,9 +526,10 @@ def roman_estimate_straylight_SCA(data, wcs, SCA, filter_identity, ra_stars,
             # 1 - Estimate the stray-light at the SCA level for close-distance stars     #
             # -------------------------------------------------------------------------- #
             if len(ra_level_1_stars) > 0:
-                NDI_level_1 = roman_WFI_NDI_estimator_direct(ra_stars=ra_level_1_stars, dec_stars=dec_level_1_stars,
+                transfer_level_1 = roman_WFI_NDI_estimator_direct(ra_stars=ra_level_1_stars, dec_stars=dec_level_1_stars,
                                                              ra_point=ra_point, dec_point=dec_point, pa_point=pa_point,
                                                              SCA=SCA, X_label=X_label, Y_label=Y_label, level=1, verbose=True)
+                NDI_level_1 = transfer_level_1/superpixel_mm2_area
                 straylight_level_1 = (NDI_level_1*(pixsize**2)*filter_identity["filter_transmission_ref"]*filter_identity["filter_lambda_ref"]*irradiance_level_1_stars/const.c/const.h).decompose()
                 #id_main_offender_level_1 = id_level_1_stars[np.where(straylight_level_1.value == bn.nanmax(straylight_level_1))[0][0]]
                 where_max_stray = np.where(straylight_level_1.value == bn.nanmax(straylight_level_1))[0][0]
@@ -549,9 +554,11 @@ def roman_estimate_straylight_SCA(data, wcs, SCA, filter_identity, ra_stars,
             # 2 - Estimate the stray-light at the SCA level for mid-distance stars     #
             # -------------------------------------------------------------------------- #
             if len(ra_level_2_stars) > 0:
-                NDI_level_2 = roman_WFI_NDI_estimator_direct(ra_stars=ra_level_2_stars, dec_stars=dec_level_2_stars,
+                transfer_level_2 = roman_WFI_NDI_estimator_direct(ra_stars=ra_level_2_stars, dec_stars=dec_level_2_stars,
                                                      ra_point=ra_point, dec_point=dec_point, pa_point=pa_point,
                                                      SCA=SCA, X_label=X_label, Y_label=Y_label, level=2, verbose=True)
+                NDI_level_2 = transfer_level_2/superpixel_mm2_area
+
                 straylight_level_2 = (NDI_level_2*(pixsize**2)*filter_identity["filter_transmission_ref"]*filter_identity["filter_lambda_ref"]*irradiance_level_2_stars/const.c/const.h).decompose()  #
                 where_max_stray = np.where(straylight_level_2.value == bn.nanmax(straylight_level_2))[0][0]
                 id_main_offender_level_2 = id_level_2_stars[where_max_stray]
@@ -573,9 +580,10 @@ def roman_estimate_straylight_SCA(data, wcs, SCA, filter_identity, ra_stars,
             # -------------------------------------------------------------------------- #
 
             if len(ra_level_3_stars) > 0:
-                NDI_level_3 = roman_WFI_NDI_estimator_direct(ra_stars=ra_level_3_stars, dec_stars=dec_level_3_stars,
+                transfer_level_3 = roman_WFI_NDI_estimator_direct(ra_stars=ra_level_3_stars, dec_stars=dec_level_3_stars,
                                                      ra_point=ra_point, dec_point=dec_point, pa_point=pa_point,
                                                      SCA=SCA, X_label=X_label, Y_label=Y_label, level=3, verbose=True)
+                NDI_level_3 = transfer_level_3/superpixel_mm2_area
                 straylight_level_3 =     (NDI_level_3*(pixsize**2)*filter_identity["filter_transmission_ref"]*filter_identity["filter_lambda_ref"]*irradiance_level_3_stars/const.c/const.h).decompose()
                 where_max_stray = np.where(straylight_level_3.value == bn.nanmax(straylight_level_3))[0][0]
                 id_main_offender_level_3 = id_level_3_stars[where_max_stray]
