@@ -1,7 +1,7 @@
 # Alejandro S. Borlaff. NASA Ames Research Center. a.s.borlaff@nasa.gov / asborlaff@gmail.com
 # January 20, 2023.
 #
-# STRAYCOR/GNU module
+# ROSALIA/GNU module
 # This module will hold all the general programs strictly derived from MAST
 # including query wrappers, HST cleaning software, astrodrizle tasks.
 #
