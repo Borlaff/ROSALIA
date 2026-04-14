@@ -12,6 +12,7 @@
 
    albedo
    astrometry
+   attitude
    bootima
    constants
    correct
@@ -23,6 +24,7 @@
    mast
    ndi
    plots
+   point
    psf
    render
    roman

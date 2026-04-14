@@ -1,4 +1,4 @@
-﻿rosalia.utils
+rosalia.utils
 =============
 
 .. automodule:: rosalia.utils

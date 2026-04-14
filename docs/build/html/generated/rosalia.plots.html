@@ -19,7 +19,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="rosalia.psf" href="rosalia.psf.html" />
+    <link rel="next" title="rosalia.point" href="rosalia.point.html" />
     <link rel="prev" title="rosalia.ndi" href="rosalia.ndi.html" /> 
 </head>
 
@@ -55,6 +55,7 @@
 <li class="toctree-l2 current"><a class="reference internal" href="rosalia.html">rosalia</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="rosalia.albedo.html">rosalia.albedo</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.astrometry.html">rosalia.astrometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.attitude.html">rosalia.attitude</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.bootima.html">rosalia.bootima</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.constants.html">rosalia.constants</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.correct.html">rosalia.correct</a></li>
@@ -66,6 +67,7 @@
 <li class="toctree-l3"><a class="reference internal" href="rosalia.mast.html">rosalia.mast</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.ndi.html">rosalia.ndi</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">rosalia.plots</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.point.html">rosalia.point</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.psf.html">rosalia.psf</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.render.html">rosalia.render</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.roman.html">rosalia.roman</a></li>
@@ -122,16 +124,19 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.plots.make_stray_plot" title="rosalia.plots.make_stray_plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_stray_plot</span></code></a>(input_name, ext[, mode, ...])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.plots.plot_rosalia_logo" title="rosalia.plots.plot_rosalia_logo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_rosalia_logo</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.plots.plot_ndi_main_offenders" title="rosalia.plots.plot_ndi_main_offenders"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_ndi_main_offenders</span></code></a>(input_name, ...[, ...])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.plots.plot_stars_around" title="rosalia.plots.plot_stars_around"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_stars_around</span></code></a>(ax, catalog[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.plots.plot_rosalia_logo" title="rosalia.plots.plot_rosalia_logo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_rosalia_logo</span></code></a>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.plots.plot_stray_and_ndi_map" title="rosalia.plots.plot_stray_and_ndi_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_stray_and_ndi_map</span></code></a>(stray_name, ...[, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.plots.plot_stars_around" title="rosalia.plots.plot_stars_around"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_stars_around</span></code></a>(ax, catalog[, ...])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.plots.print_ascii_focal_plane" title="rosalia.plots.print_ascii_focal_plane"><code class="xref py py-obj docutils literal notranslate"><span class="pre">print_ascii_focal_plane</span></code></a>(x, y, SCA)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.plots.plot_stray_and_ndi_map" title="rosalia.plots.plot_stray_and_ndi_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_stray_and_ndi_map</span></code></a>(stray_name, ...[, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.plots.print_ascii_focal_plane" title="rosalia.plots.print_ascii_focal_plane"><code class="xref py py-obj docutils literal notranslate"><span class="pre">print_ascii_focal_plane</span></code></a>(x, y, SCA)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -157,7 +162,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="rosalia.ndi.html" class="btn btn-neutral float-left" title="rosalia.ndi" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="rosalia.psf.html" class="btn btn-neutral float-right" title="rosalia.psf" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="rosalia.point.html" class="btn btn-neutral float-right" title="rosalia.point" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

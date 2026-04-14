@@ -28,3 +28,11 @@ Anton Koekemoer (collaborator) - STScI, Baltimore, USA
 Fernando Buitrago (collaborator) - Universidad de Valladolid, Spain
 
 Sarah Caddy (collaborator) - Melbourne Space Laboratory, University of Melbourne, Australia
+
+Contributors: 
+
+Roman Space Telescope Attitude:
+
+Dr. Maxime Rizzo - NASA Goddard Space Flight Center. 
+
+Dr. Mario Gennaro - STScI, Baltimore, USA.
