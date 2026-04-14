@@ -213,6 +213,14 @@ Add this line to your .bashrc or .zshrc to set it up by default.
 
 That is it! We are ready to start analyzing Space Telescope images.
 
+### 🍎 Apple Silicon (M1/M2/M3) Note
+`astromatic-swarp` does not have a native arm64 build. Install it using Intel emulation:
+
+1. **Create the environment with the correct architecture:**
+   ```bash
+   CONDA_SUBDIR=osx-64 conda create -n rosalia python=3.12 conda-forge::astromatic-swarp
+   ```
+
 <!-- USAGE EXAMPLES -->
 ### Minimal Use Example - Simulating stray-light
 

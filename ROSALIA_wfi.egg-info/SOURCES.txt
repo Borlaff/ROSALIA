@@ -15,6 +15,7 @@ bin/test-rosalia-parser
 rosalia/__init__.py
 rosalia/albedo.py
 rosalia/astrometry.py
+rosalia/attitude.py
 rosalia/bootima.py
 rosalia/constants.py
 rosalia/correct.py
@@ -26,6 +27,7 @@ rosalia/irsa.py
 rosalia/mast.py
 rosalia/ndi.py
 rosalia/plots.py
+rosalia/point.py
 rosalia/psf.py
 rosalia/render.py
 rosalia/roman.py

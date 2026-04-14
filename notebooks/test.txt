@@ -1,0 +1,3 @@
+                                                     Sun_RA    Sun_Dec  separation good_angles nominal_roll    pa_obs_y pa_fpa_local_x pa_fpa_local_y    sunang_x sunang_y   sunang_z
+(RA, Dec)                         DOY                                                                                                                                                
+(6h25m09.81552s, -52d39m27.2808s) 2026-335.00000  246.67264 -21.704704  101.298021        True   207.921041  117.921041     177.921041      87.921041  101.298242     90.0  11.298242

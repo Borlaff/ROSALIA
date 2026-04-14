@@ -14,7 +14,7 @@ import rosalia as rs
 import skyfield as sf
 from skyfield import api as sf_api
 from astropy.convolution import Gaussian2DKernel
-
+from astropy.coordinates import SkyCoord
 #####################
 # TELESCOPE OBJECTS #
 #####################
@@ -453,7 +453,7 @@ class Roman:
         psf_wfi = wfi.calc_psf(fov_pixels = fov_pixels, oversample=oversample)
         return(psf_wfi[0])
 
-    def get_bestPA(ra, dec, mjd):
+    def DEPRECATED_get_bestPA(ra, dec, mjd):
         """
         get_bestPA calculates the best position angle for Roman's WFI given the target coordinates and the time of observation. It uses the galsim.roman.bestPA function to compute the optimal position angle that gets the Sun on the sunshield. The function takes in the right ascension (ra), declination (dec), and modified Julian date (mjd) as inputs and returns the best position angle in degrees.
        
@@ -481,8 +481,31 @@ class Roman:
     
         WFI_PA = galsim_roman.bestPA(targ_pos, dt)
         return(WFI_PA.deg)
+    
+
+    def get_bestPA(ra, dec, mjd):
+        # this sets up the basic class
+    
+        epoch = Time([mjd], format='mjd')
+
+        target = SkyCoord(ra*u.deg, dec*u.deg, frame="icrs")
+        pointing = rs.attitude.RomanPointing(epoch)
+        pointing.set_target(target)
+        pav3 = pointing.get_position_angle().value
+        return(pav3)
 
 
+    def get_Gennaro_bestPA(ra, dec, mjd):
+        target = SkyCoord(ra*u.deg, dec*u.deg, frame="icrs")
+        epoch = Time(mjd, format='mjd')
+        c = rs.point.compute_visibility(target, report=True, fileout='wfi_point.txt',interval_sampling_days=None,interval_start_time=epoch,interval_duration_days=1)
+        c.compute_and_display()
+
+        pav3 = np.float32(c.df_results["nominal_roll"])
+        if len(pav3) == 1:
+            return(pav3[0])
+        else:
+            return(pav3)
 
     def get_psf(detector_position, detector, filter_name):
         SCA = detector
@@ -560,7 +583,7 @@ class Roman:
         # Compute the sky coordinates of the WFI_CEN aperture reference position
         wfi_ra, wfi_dec = wfi_cen.idl_to_sky(0, 0)
         if verbose: print(f'' + name.iloc[i] + f' - WFI_CEN: RA = {wfi_ra:.5f} deg, Dec = {wfi_dec:.5f} deg')
-        return({"ra_wficen": wfi_ra, "dec_wficen": wfi_dec, "pa_wfi": pa - 60, "V3PA": pa, "PA_v3": PA_v3})
+        return({"ra_wficen": wfi_ra, "dec_wficen": wfi_dec, "PA_WFI_offset": pa - 60, "V3PA_offset": pa, "V3PA_origin": PA_v3})
     
 #################################################################
 
