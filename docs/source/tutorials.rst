@@ -5,7 +5,7 @@ This section contains some code examples and Jupyter notebook tutorials to help 
 
 Finding the nominal position angle
 -----------------------------
-Due to the asymmetric design of the Nancy Grace Roman Space Telescope, there is an optimal position angle for the observations that maximizes the power in the solar panels and minimizes the stray-light from the Sun.
+Due to the asymmetric design of the Nancy Grace Roman Space Telescope, there is an optimal position angle for the observations that maximizes the power in the solar panels and minimizes the stray-light from the Sun. Since the Sun moves across the sky as a function of time, the optimal position angle for a given target will change as well. ROSALIA includes a function to easily calculate the optimal position angle for the observatory a given target and date.   
 
 .. code-block:: python
 
@@ -23,6 +23,9 @@ Due to the asymmetric design of the Nancy Grace Roman Space Telescope, there is 
 
 .. image:: https://roman-docs.stsci.edu/files/131893097/131893098/2/1768494993154/Roman+FOV+modified.png
   :alt: Diagram defining the different coordinate systems of Roman Space Telescope and WFI. The position angle of the WFI focal plane is defined as the angle between the equatorial North direction and the Y-axis of the WFI focal plane. The nominal (best) V3 position angle is the one that minimizes the stray-light from the Sun and maximizes the power in the solar panels.
+
+.. image::   https://roman-docs.stsci.edu/files/131893097/131893100/2/1768494992608/WFI-FOV-SIAF.png
+  :alt: Diagram defining the different coordinate systems of Roman Space Telescope and WFI. 
 
 
 Transforming ASDF to FITS
