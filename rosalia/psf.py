@@ -29,6 +29,7 @@ import rosalia as rs
 import warnings
 warnings.filterwarnings('ignore')
 
+############################
 
 def scale_and_subtract_stars(input_name, ext, exposure_identity, g_mag_max=False, clean=False, verbose=False):
     ## TODO: Compute the scale factor for the object at (x,y)=(53,69) for
@@ -184,10 +185,9 @@ def scale_and_subtract_stars(input_name, ext, exposure_identity, g_mag_max=False
     subtracted_results_dataframe = pd.DataFrame(subtracted_results)
 
     return(output_name_list)
-############################
-
 
 ############################
+
 def astscript_psf_scale_factor(input_name, ra, dec, psf_name, clean=False, verbose=False):
     # Python wrapper of astscript-psf-scale-factor
     #
@@ -235,8 +235,8 @@ def astscript_psf_scale_factor(input_name, ra, dec, psf_name, clean=False, verbo
     scaling_factor = float(rs.utils.execute_cmd(cmd))
     if verbose: print("Scaling factor: " + str(scaling_factor))
     return(scaling_factor)
-############################
 
+############################
 
 def astscript_radial_profile(input_name, ra, dec, rmax, clean=False, verbose=False):
     # This is a wrapper for Gnuastro astcript_radial_profile
@@ -270,8 +270,6 @@ def astscript_radial_profile(input_name, ra, dec, rmax, clean=False, verbose=Fal
     return({"profile_name": output_name})
 
 ############################
-
-
 
 def measure_maxradii(input_name, ra, dec, rmax, saturation_level=None, clean=False, verbose=False, clean_profile=False):
     star_profile_dict = astscript_radial_profile(input_name=input_name, ra=ra, dec=dec, rmax=rmax, verbose=verbose)
@@ -344,6 +342,7 @@ def measure_maxradii(input_name, ra, dec, rmax, saturation_level=None, clean=Fal
     return({"rlim": rlim, "rsat": rsat})
 
 ############################
+
 def astscript_psf_subtract(input_name, ext, ra, dec, scaling_factor, psf_name, clean=True):
     # Python wrapper of astscript-psf-subtract
     #
@@ -372,7 +371,7 @@ def astscript_psf_subtract(input_name, ext, ra, dec, scaling_factor, psf_name, c
     output_from_shell = rs.utils.execute_cmd(cmd)
     return(output_name)
 
-
+############################
 
 def scale_and_subtract_stars_single_image(input_name, ext, ra, dec, psf_name, clean=True, extrapolate=False, verbose=False):
 
@@ -420,60 +419,6 @@ def scale_and_subtract_stars_single_image(input_name, ext, ra, dec, psf_name, cl
     rs.utils.save_fits(array=subtracted_image, name=output_residual_name, header=input_fits[ext].header, extname='STAR_SUBTRACTED')
 
     return({"star_model":output_starmodel_name, "residuals":output_residual_name})
-############################
-
-
-############################
-
-"""
-def find_sources_around(lambda_ref, observer=None, input_name=None,
-                        ext=None, ra=None, dec=None, MJD=None, radius=1,
-                        g_mag_max = False,
-                        verbose=False):
-
-    if input_name is not None:
-        # First identify where is the image pointing.
-        if verbose: print("Reading input image...")
-        input_fits = fits.open(input_name)
-        w = astropy_wcs.WCS(header=input_fits[ext].header, fobj=input_fits, naxis=2)
-        image_shape = input_fits[ext].data.shape
-        center = w.all_pix2world(image_shape[0]/2., image_shape[1]/2., 0)
-        center_ra = center[0]
-        center_dec = center[1]
-        gaia_query_filename = input_name.replace(".fits","_source_catalog.csv")
-        # if verbose: print("Running exposure inspector...")
-        # db_inspection_exposure = rs.utils.exposure_inspector(input_name, verbose)
-        # MJD = db_inspection_exposure["EXPSTART"]
-        # if observer==None:
-        #     observer = db_inspection_exposure["TELESCOP"]
-
-    else:
-        center_ra = ra
-        center_dec = dec
-        gaia_query_filename = str(ra) + "_" + str(dec) + "_source_catalog.csv"
-
-        if observer==None:
-            print("> Observer frame has not been set. Default is Hubble")
-            observer = "Hubble"
-
-    if verbose: print("Running get_hybrid_catalog...")
-    gaia_query = get_hybrid_catalog(ra=center_ra, dec=center_dec, radius=radius,
-                                    lambda_ref=lambda_ref, MJD=MJD, observer=observer,
-                                    g_mag_max = g_mag_max,
-                                    verbose=verbose, query_filename=gaia_query_filename)
-
-    gaia_query = gaia_query.sort_values(by=["mag_lambda"], ascending=False)
-    gaia_query["cat_id"] = np.linspace(0, len(gaia_query)-1, len(gaia_query), dtype="int64")
-
-    gaia_query_filename = input_name + "_ext" + str(ext) + "_source_catalog.csv"
-    gaia_query.to_csv(gaia_query_filename)
-
-    if verbose:
-        print("Query saved in " + gaia_query_filename)
-
-
-    return({"gaia_query": gaia_query, "gaia_query_filename": gaia_query_filename})
-"""
 
 ############################
 
@@ -531,7 +476,6 @@ def gaia_find_stars_in_and_out(input_name, ext, lambda_ref, ra=None, dec=None, r
         gaia_query_out_detector.to_csv(out_query_filename)
         return({"gaia_query_out_detector": gaia_query_out_detector, "out_query_filename": out_query_filename})
 
-
 ############################
 
 def find_stars_inside_detector(input_name, ext, lambda_ref, radius, g_mag_max=False,  MJD=None, clean=True, verbose=False):
@@ -583,15 +527,12 @@ def find_stars_inside_detector(input_name, ext, lambda_ref, radius, g_mag_max=Fa
             "matched_catalog_name": matched_catalog_name})
 ############################
 
-
 # Function to append n empty rows to a DataFrame
 def append_empty_rows(dataframe, n):
     for _ in range(n):
         dataframe.loc[len(dataframe)] = pd.Series(dtype='float64')
 
-
-
-
+############################
 
 def identify_stars_in_out_field(data_shape, wcs, catalog, ra=None, dec=None, verbose=False):
     # This program identifies the objects that are inside or outside an image in a fits file.
@@ -674,9 +615,7 @@ def identify_stars_in_out_field(data_shape, wcs, catalog, ra=None, dec=None, ver
                     "corners_world": corners_world, 
                     "catalog_inside": catalog})
 
-        
-
-
+############################
 
 def get_hybrid_catalog(ra, dec, radius, lambda_ref, MJD, observer, g_mag_max=False, verbose=False, query_filename="default_query.dat"):
     from scipy import interpolate
@@ -876,17 +815,7 @@ def get_hybrid_catalog(ra, dec, radius, lambda_ref, MJD, observer, g_mag_max=Fal
 
     return(high_resolution_catalog)
 
-
-
-
-
-def f_hst_attenuation(theta):
-    return(10**f_hst_attenuation_interpolator(np.log10(theta)))
-
-
-##############
-
-
+############################
 
 def psf_harvester_single_exposure(input_name, clean=True, verbose=False):
     # if True:
@@ -1079,7 +1008,6 @@ def psf_harvester_single_exposure(input_name, clean=True, verbose=False):
     cmd = "astfits -h0  " + input_name + " --update=PSFHARVS,1"
     stdout = rs.utils.execute_cmd(cmd)
 
-
 ##########################
 
 def find_stars_inside_detector(input_name, g_mag_max=15, verbose=False):
@@ -1138,8 +1066,6 @@ def find_stars_inside_detector(input_name, g_mag_max=15, verbose=False):
 
     return(hybrid_catalog)
 
-
-
 ##########################
 
 def getWCS_galsim_dict_style(file_name):
@@ -1151,9 +1077,7 @@ def getWCS_galsim_dict_style(file_name):
         galsim_wcs_dict[i+1] = galsim.GSFitsWCS(file_name=file_name, hdu=i+1)
     return(galsim_wcs_dict)
 
-
 ##########################
-
 
 def find_SCA_for_a_target(file_name, ra, dec, include_border=True):
     # This program returns the SCA ID for a target. If not in the detector, is nan.

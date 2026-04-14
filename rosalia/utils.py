@@ -22,9 +22,6 @@ from tqdm import tqdm
 import bottleneck as bn
 import rosalia as rs
 
-# print("CHECK THE FLUX OF THE ZODIACAL LIGHT IN A NORMAL IMAGE!!!!!")
-
-
 ###############################
 # MULTIORDER HEALPIX ROUTINES #
 ###############################
@@ -1545,33 +1542,6 @@ def get_data_and_wcs(input_name, ext):
 
 #####################################################################
 
-def sort_hst_flcs_by_filter(filelist):
-    #print(filelist)
-    filters_list_keywords = rs.utils.get_keys_from_header(filelist, ["FILTER1", "FILTER2"], ext=0)
-    filters = []
-    for i in tqdm(range(len(filelist))):
-        if not "CLEAR" in filters_list_keywords[0][i]:
-            exposure_filter = filters_list_keywords[0][i]
-        elif not "CLEAR" in filters_list_keywords[1][i]:
-            exposure_filter = filters_list_keywords[1][i]
-        else:
-            exposure_filter = "None"
-        filters.append(exposure_filter)
-
-    list_of_filters = np.array(list(set(filters)))
-    filters = np.array(filters)
-
-    for filter_name in tqdm(list_of_filters):
-        os.system("mkdir " + filter_name)
-        exposures_with_that_filter = np.array(filelist)[np.where(filters == filter_name)[0]]
-
-        if filter_name != "None":
-            for selected_exposure in exposures_with_that_filter:
-                os.system("mv " + selected_exposure + " " + filter_name)
-
-
-    return(list_of_filters)
-#####################################################################
 
 def find_max_angular_size_of_image(data, wcs):
     """

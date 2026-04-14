@@ -110,14 +110,6 @@
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.irsa.read_irsa_query"><code class="docutils literal notranslate"><span class="pre">read_irsa_query()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#module-rosalia.mast">rosalia.mast module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#rosalia.mast.bestrefs"><code class="docutils literal notranslate"><span class="pre">bestrefs()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#rosalia.mast.clean_wcs"><code class="docutils literal notranslate"><span class="pre">clean_wcs()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#rosalia.mast.download_mast"><code class="docutils literal notranslate"><span class="pre">download_mast()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#rosalia.mast.ensure_list"><code class="docutils literal notranslate"><span class="pre">ensure_list()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#rosalia.mast.heal_ACS_DQ_type"><code class="docutils literal notranslate"><span class="pre">heal_ACS_DQ_type()</span></code></a></li>
-</ul>
-</li>
 <li class="toctree-l2"><a class="reference internal" href="#module-rosalia.ndi">rosalia.ndi module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.ndi.make_ndi_polar_radial_profile"><code class="docutils literal notranslate"><span class="pre">make_ndi_polar_radial_profile()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.ndi.ndi_euclid"><code class="docutils literal notranslate"><span class="pre">ndi_euclid</span></code></a><ul>
@@ -190,7 +182,6 @@
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.psf.astscript_psf_scale_factor"><code class="docutils literal notranslate"><span class="pre">astscript_psf_scale_factor()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.psf.astscript_psf_subtract"><code class="docutils literal notranslate"><span class="pre">astscript_psf_subtract()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.psf.astscript_radial_profile"><code class="docutils literal notranslate"><span class="pre">astscript_radial_profile()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#rosalia.psf.f_hst_attenuation"><code class="docutils literal notranslate"><span class="pre">f_hst_attenuation()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.psf.find_SCA_for_a_target"><code class="docutils literal notranslate"><span class="pre">find_SCA_for_a_target()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.psf.find_stars_inside_detector"><code class="docutils literal notranslate"><span class="pre">find_stars_inside_detector()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.psf.gaia_find_stars_in_and_out"><code class="docutils literal notranslate"><span class="pre">gaia_find_stars_in_and_out()</span></code></a></li>
@@ -412,7 +403,6 @@
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.save_dict"><code class="docutils literal notranslate"><span class="pre">save_dict()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.save_fits"><code class="docutils literal notranslate"><span class="pre">save_fits()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.separation_and_position_angle"><code class="docutils literal notranslate"><span class="pre">separation_and_position_angle()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.sort_hst_flcs_by_filter"><code class="docutils literal notranslate"><span class="pre">sort_hst_flcs_by_filter()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.sphere_dist"><code class="docutils literal notranslate"><span class="pre">sphere_dist()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.thetaphi_2_radec"><code class="docutils literal notranslate"><span class="pre">thetaphi_2_radec()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.write_parameters_list"><code class="docutils literal notranslate"><span class="pre">write_parameters_list()</span></code></a></li>
@@ -726,34 +716,6 @@ If provided, skips querying Gaia/2MASS/WISE catalogs. Default is None.</p>
 <dd></dd></dl>
 
 </section>
-<section id="module-rosalia.mast">
-<span id="rosalia-mast-module"></span><h2>rosalia.mast module<a class="headerlink" href="#module-rosalia.mast" title="Link to this heading"></a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="rosalia.mast.bestrefs">
-<span class="sig-prename descclassname"><span class="pre">rosalia.mast.</span></span><span class="sig-name descname"><span class="pre">bestrefs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.mast.bestrefs" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="rosalia.mast.clean_wcs">
-<span class="sig-prename descclassname"><span class="pre">rosalia.mast.</span></span><span class="sig-name descname"><span class="pre">clean_wcs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.mast.clean_wcs" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="rosalia.mast.download_mast">
-<span class="sig-prename descclassname"><span class="pre">rosalia.mast.</span></span><span class="sig-name descname"><span class="pre">download_mast</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extension</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instrument_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_collection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'HST'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.mast.download_mast" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="rosalia.mast.ensure_list">
-<span class="sig-prename descclassname"><span class="pre">rosalia.mast.</span></span><span class="sig-name descname"><span class="pre">ensure_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_list_or_string</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.mast.ensure_list" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="rosalia.mast.heal_ACS_DQ_type">
-<span class="sig-prename descclassname"><span class="pre">rosalia.mast.</span></span><span class="sig-name descname"><span class="pre">heal_ACS_DQ_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.mast.heal_ACS_DQ_type" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-</section>
 <section id="module-rosalia.ndi">
 <span id="rosalia-ndi-module"></span><h2>rosalia.ndi module<a class="headerlink" href="#module-rosalia.ndi" title="Link to this heading"></a></h2>
 <dl class="py function">
@@ -1060,11 +1022,6 @@ NDI (θ_DEG,λ_nm) = A(θ_DEG,λ_nm)*1/((1+[(θ_DEG/θ_1s )]^2))*((1+[(θ_DEG/θ
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.psf.astscript_radial_profile">
 <span class="sig-prename descclassname"><span class="pre">rosalia.psf.</span></span><span class="sig-name descname"><span class="pre">astscript_radial_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rmax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.psf.astscript_radial_profile" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="rosalia.psf.f_hst_attenuation">
-<span class="sig-prename descclassname"><span class="pre">rosalia.psf.</span></span><span class="sig-name descname"><span class="pre">f_hst_attenuation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.psf.f_hst_attenuation" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -2447,11 +2404,6 @@ This program runs SWARP on the input pattern of files, and generates a mosaic wi
 <dd><p>Einsum version of the angular separation function by Astropy einsum_angular_distance_harversine
 v1: October 17, 2024 - Fastest version compared against numba, or astropy.</p>
 </dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="rosalia.utils.sort_hst_flcs_by_filter">
-<span class="sig-prename descclassname"><span class="pre">rosalia.utils.</span></span><span class="sig-name descname"><span class="pre">sort_hst_flcs_by_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filelist</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.utils.sort_hst_flcs_by_filter" title="Link to this definition"></a></dt>
-<dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.utils.sphere_dist">

@@ -68,13 +68,6 @@ rosalia.irsa module
    :show-inheritance:
    :undoc-members:
 
-rosalia.mast module
--------------------
-
-.. automodule:: rosalia.mast
-   :members:
-   :show-inheritance:
-   :undoc-members:
 
 rosalia.ndi module
 ------------------

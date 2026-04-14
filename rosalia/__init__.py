@@ -18,7 +18,6 @@ import rosalia.correct
 import rosalia.detectors
 import rosalia.horizons
 import rosalia.irsa
-import rosalia.mast
 import rosalia.ndi
 import rosalia.psf
 import rosalia.gaia

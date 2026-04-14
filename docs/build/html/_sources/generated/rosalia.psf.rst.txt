@@ -12,7 +12,6 @@ rosalia.psf
       astscript_psf_scale_factor
       astscript_psf_subtract
       astscript_radial_profile
-      f_hst_attenuation
       find_SCA_for_a_target
       find_stars_inside_detector
       gaia_find_stars_in_and_out

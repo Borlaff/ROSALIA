@@ -54,7 +54,6 @@ def launch_irsa_query(ra, dec, wavelength, year, day, obslocin=3):
 
     return(outfile)
 
-
 def read_irsa_query(xml_query_name):
     import xmltodict
     #print("Reading " + infile)
@@ -89,7 +88,6 @@ def irsa_query_single(ra, dec, wavelength, year, day, obslocin):
     irsa_query_file = launch_irsa_query(ra, dec, wavelength, year, day, obslocin)
     irsa_query_result = read_irsa_query(irsa_query_file)
     return(irsa_query_result)
-
 
 def irsa_query(ra, dec, wavelength, year, day, obslocin):
     # Check that ra and dec arguments are in array

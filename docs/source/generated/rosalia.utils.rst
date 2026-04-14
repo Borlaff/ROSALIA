@@ -62,7 +62,6 @@ rosalia.utils
       save_dict
       save_fits
       separation_and_position_angle
-      sort_hst_flcs_by_filter
       sphere_dist
       thetaphi_2_radec
       write_parameters_list
