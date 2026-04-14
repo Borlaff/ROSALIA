@@ -118,9 +118,9 @@
 </a>
 <p>The NDI is defined as the ratio of the stray-light irradiance (power per unit area) received at the detector to the irradiance of the source at the entrance of the telescope <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2003dclo.book.....B/abstract">(see Bely 2003)</a> . This function can be used to estimate the flux of photoelectrons that an off-axis source will generate in a certain region of the detector. Similarly to the Point Spread Function (PSF) defines the spread of point sources by diffraction effects, the sharpness of the NDI defines the effectiveness of the telescope’s baffling. This function is strongly dependent on the optical setup and wavelength. For a given telescope, the NDI depends on the angular distance between the optical axis and the source, the position angle of the source in the focal plane reference frame, the observation wavelength, and the position on the FOV (x,y),</p>
 <p>We can identify several points of interested were stray-light is expected to peak if illuminated:</p>
-<a class="reference internal image-reference" href="_images/ndi_2deg_CARs.png"><img alt="_images/ndi_2deg_CARs.png" src="_images/ndi_2deg_CARs.png" style="width: 49%;" />
+<a class="reference internal image-reference" href="../../notebooks/ndi_2deg_CARs.png"><img alt="../../notebooks/ndi_2deg_CARs.png" src="../../notebooks/ndi_2deg_CARs.png" style="width: 49%;" />
 </a>
-<a class="reference internal image-reference" href="_images/ndi_20deg_CARs.png"><img alt="_images/ndi_20deg_CARs.png" src="_images/ndi_20deg_CARs.png" style="width: 49%;" />
+<a class="reference internal image-reference" href="../../notebooks/ndi_20deg_CARs.png"><img alt="../../notebooks/ndi_20deg_CARs.png" src="../../notebooks/ndi_20deg_CARs.png" style="width: 49%;" />
 </a>
 <p>Now that we have found out where which orientations - defined as X and Y angular offsets from the center of the Roman WFI focal plane - should we use to produce stray-light, let’s find out where should we point Roman/WFI to get a particular target oriented to those locations. This can be done using <em>rs.telescopes.Roman.find_wfi_center_for_offset_targets</em>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># These are the coordinates of specially sensitive locations</span>

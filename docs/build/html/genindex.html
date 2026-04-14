@@ -97,6 +97,7 @@
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
  | <a href="#U"><strong>U</strong></a>
+ | <a href="#V"><strong>V</strong></a>
  | <a href="#W"><strong>W</strong></a>
  | <a href="#X"><strong>X</strong></a>
  | <a href="#Y"><strong>Y</strong></a>
@@ -182,6 +183,8 @@
 </li>
       <li><a href="rosalia.html#rosalia.roman.create_roman_dummy">create_roman_dummy() (in module rosalia.roman)</a>
 </li>
+      <li><a href="rosalia.html#rosalia.attitude.create_subplot_grid">create_subplot_grid() (in module rosalia.attitude)</a>
+</li>
       <li><a href="rosalia.html#rosalia.telescopes.CSST">CSST (class in rosalia.telescopes)</a>
 </li>
       <li><a href="rosalia.html#rosalia.plots.style.CYAN">CYAN (rosalia.plots.style attribute)</a>
@@ -194,14 +197,16 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rosalia.html#rosalia.utils.delta_angular_separation">delta_angular_separation() (in module rosalia.utils)</a>
 </li>
+      <li><a href="rosalia.html#rosalia.attitude.RomanPointing.delta_pitch_roll">delta_pitch_roll() (rosalia.attitude.RomanPointing method)</a>
+</li>
       <li><a href="rosalia.html#rosalia.telescopes.Roman.DEPRECATED_get_bestPA">DEPRECATED_get_bestPA() (rosalia.telescopes.Roman method)</a>
 </li>
       <li><a href="rosalia.html#rosalia.utils.detect_sci_extensions">detect_sci_extensions() (in module rosalia.utils)</a>
 </li>
-      <li><a href="rosalia.html#rosalia.utils.divide_array_in_chunks">divide_array_in_chunks() (in module rosalia.utils)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="rosalia.html#rosalia.utils.divide_array_in_chunks">divide_array_in_chunks() (in module rosalia.utils)</a>
+</li>
       <li><a href="rosalia.html#rosalia.correct.do_astrometry">do_astrometry() (in module rosalia.correct)</a>
 </li>
       <li><a href="rosalia.html#rosalia.utils.download_file">download_file() (in module rosalia.utils)</a>
@@ -334,9 +339,15 @@
 </li>
       <li><a href="rosalia.html#rosalia.utils.generate_image_interpolator">generate_image_interpolator() (in module rosalia.utils)</a>
 </li>
+      <li><a href="rosalia.html#rosalia.attitude.generate_power_law_sampling">generate_power_law_sampling() (in module rosalia.attitude)</a>
+</li>
       <li><a href="rosalia.html#rosalia.psf.generate_star_stamps">generate_star_stamps() (in module rosalia.psf)</a>
 </li>
       <li><a href="rosalia.html#rosalia.astrometry.generate_tweakreg_catfile">generate_tweakreg_catfile() (in module rosalia.astrometry)</a>
+</li>
+      <li><a href="rosalia.html#rosalia.attitude.RomanPointing.get_attitude_euler">get_attitude_euler() (rosalia.attitude.RomanPointing method)</a>
+</li>
+      <li><a href="rosalia.html#rosalia.attitude.RomanPointing.get_attitude_quaternion">get_attitude_quaternion() (rosalia.attitude.RomanPointing method)</a>
 </li>
       <li><a href="rosalia.html#rosalia.telescopes.Roman.get_bestPA">get_bestPA() (rosalia.telescopes.Roman method)</a>
 </li>
@@ -353,6 +364,8 @@
       <li><a href="rosalia.html#rosalia.utils.get_data_and_wcs">get_data_and_wcs() (in module rosalia.utils)</a>
 </li>
       <li><a href="rosalia.html#rosalia.detectors.get_detector_corners">get_detector_corners() (in module rosalia.detectors)</a>
+</li>
+      <li><a href="rosalia.html#rosalia.attitude.RomanPointing.get_ecliptic_coordinates">get_ecliptic_coordinates() (rosalia.attitude.RomanPointing method)</a>
 </li>
       <li><a href="rosalia.html#rosalia.sso.get_ephemeris">get_ephemeris() (in module rosalia.sso)</a>
 </li>
@@ -376,20 +389,22 @@
 </li>
       <li><a href="rosalia.html#rosalia.utils.get_keys_from_header">get_keys_from_header() (in module rosalia.utils)</a>
 </li>
+      <li><a href="rosalia.html#rosalia.attitude.get_large_aperture">get_large_aperture() (in module rosalia.attitude)</a>
+</li>
       <li><a href="rosalia.html#rosalia.telescopes.Hubble.get_location">get_location() (rosalia.telescopes.Hubble method)</a>
 
       <ul>
         <li><a href="rosalia.html#rosalia.telescopes.Roman.get_location">(rosalia.telescopes.Roman method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rosalia.html#rosalia.astrometry.get_parameters_list">get_parameters_list() (in module rosalia.astrometry)</a>
 
       <ul>
         <li><a href="rosalia.html#rosalia.utils.get_parameters_list">(in module rosalia.utils)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rosalia.html#rosalia.telescopes.CSST.get_physical_pixelsize">get_physical_pixelsize() (rosalia.telescopes.CSST method)</a>
 
       <ul>
@@ -398,6 +413,8 @@
         <li><a href="rosalia.html#rosalia.telescopes.Roman.get_physical_pixelsize">(rosalia.telescopes.Roman method)</a>
 </li>
       </ul></li>
+      <li><a href="rosalia.html#rosalia.attitude.RomanPointing.get_pitch_angle">get_pitch_angle() (rosalia.attitude.RomanPointing method)</a>
+</li>
       <li><a href="rosalia.html#rosalia.utils.get_pixscale">get_pixscale() (in module rosalia.utils)</a>
 
       <ul>
@@ -412,6 +429,8 @@
         <li><a href="rosalia.html#rosalia.telescopes.SPHEREx.get_pixscale">(rosalia.telescopes.SPHEREx method)</a>
 </li>
       </ul></li>
+      <li><a href="rosalia.html#rosalia.attitude.RomanPointing.get_position_angle">get_position_angle() (rosalia.attitude.RomanPointing method)</a>
+</li>
       <li><a href="rosalia.html#rosalia.telescopes.ARRAKIHS.get_PSF">get_PSF() (rosalia.telescopes.ARRAKIHS method)</a>
 
       <ul>
@@ -424,11 +443,19 @@
 </li>
       <li><a href="rosalia.html#rosalia.telescopes.SPHEREx.get_PSF">get_PSF() (rosalia.telescopes.SPHEREx method)</a>
 </li>
+      <li><a href="rosalia.html#rosalia.attitude.get_radec">get_radec() (in module rosalia.attitude)</a>
+</li>
       <li><a href="rosalia.html#rosalia.sso.get_SS0s_loc_magnitude">get_SS0s_loc_magnitude() (in module rosalia.sso)</a>
 </li>
       <li><a href="rosalia.html#rosalia.sso.get_SSOs_ephemeris">get_SSOs_ephemeris() (in module rosalia.sso)</a>
 </li>
       <li><a href="rosalia.html#rosalia.roman.get_subarray_locations">get_subarray_locations() (in module rosalia.roman)</a>
+</li>
+      <li><a href="rosalia.html#rosalia.attitude.RomanPointing.get_sun_angle">get_sun_angle() (rosalia.attitude.RomanPointing method)</a>
+</li>
+      <li><a href="rosalia.html#rosalia.attitude.RomanPointing.get_target_new_pitch">get_target_new_pitch() (rosalia.attitude.RomanPointing method)</a>
+</li>
+      <li><a href="rosalia.html#rosalia.attitude.get_vector">get_vector() (in module rosalia.attitude)</a>
 </li>
       <li><a href="rosalia.html#rosalia.sky.get_zodiacal_background">get_zodiacal_background() (in module rosalia.sky)</a>
 </li>
@@ -473,6 +500,8 @@
       <li><a href="rosalia.html#rosalia.irsa.irsa_query">irsa_query() (in module rosalia.irsa)</a>
 </li>
       <li><a href="rosalia.html#rosalia.irsa.irsa_query_single">irsa_query_single() (in module rosalia.irsa)</a>
+</li>
+      <li><a href="rosalia.html#rosalia.attitude.RomanPointing.is_visible">is_visible() (rosalia.attitude.RomanPointing method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -522,6 +551,8 @@
 </li>
       <li><a href="rosalia.html#rosalia.skysurf.load_skysurf_filter">load_skysurf_filter() (in module rosalia.skysurf)</a>
 </li>
+      <li><a href="rosalia.html#rosalia.attitude.load_targets">load_targets() (in module rosalia.attitude)</a>
+</li>
       <li><a href="rosalia.html#rosalia.telescopes.Hubble.load_TLE_tuple">load_TLE_tuple() (rosalia.telescopes.Hubble method)</a>
 </li>
       <li><a href="rosalia.html#rosalia.plots.Loader">Loader (class in rosalia.plots)</a>
@@ -535,6 +566,8 @@
       <li><a href="rosalia.html#rosalia.roman.mag2fe">mag2fe() (in module rosalia.roman)</a>
 </li>
       <li><a href="rosalia.html#rosalia.plots.style.MAGENTA">MAGENTA (rosalia.plots.style attribute)</a>
+</li>
+      <li><a href="rosalia.html#rosalia.attitude.main">main() (in module rosalia.attitude)</a>
 </li>
       <li><a href="rosalia.html#rosalia.correct.main_offender">main_offender() (in module rosalia.correct)</a>
 </li>
@@ -578,8 +611,6 @@
 </li>
       <li><a href="rosalia.html#rosalia.psf.measure_maxradii">measure_maxradii() (in module rosalia.psf)</a>
 </li>
-      <li><a href="rosalia.html#rosalia.sky.measure_sky_level_HST_ACS">measure_sky_level_HST_ACS() (in module rosalia.sky)</a>
-</li>
       <li><a href="rosalia.html#rosalia.telescopes.ARRAKIHS.mirror_radius">mirror_radius (rosalia.telescopes.ARRAKIHS attribute)</a>
 
       <ul>
@@ -598,10 +629,10 @@
 </li>
       <li><a href="rosalia.html#rosalia.telescopes.ARRAKIHS.modified_make_dummy_exposure">modified_make_dummy_exposure() (rosalia.telescopes.ARRAKIHS method)</a>
 </li>
-      <li><a href="rosalia.html#rosalia.utils.modify_keyword_hdr">modify_keyword_hdr() (in module rosalia.utils)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="rosalia.html#rosalia.utils.modify_keyword_hdr">modify_keyword_hdr() (in module rosalia.utils)</a>
+</li>
       <li>
     module
 
@@ -612,7 +643,7 @@
 </li>
         <li><a href="generated/rosalia.astrometry.html#module-rosalia.astrometry">rosalia.astrometry</a>, <a href="rosalia.html#module-rosalia.astrometry">[1]</a>
 </li>
-        <li><a href="generated/rosalia.attitude.html#module-rosalia.attitude">rosalia.attitude</a>
+        <li><a href="generated/rosalia.attitude.html#module-rosalia.attitude">rosalia.attitude</a>, <a href="rosalia.html#module-rosalia.attitude">[1]</a>
 </li>
         <li><a href="generated/rosalia.bootima.html#module-rosalia.bootima">rosalia.bootima</a>
 </li>
@@ -635,8 +666,6 @@
         <li><a href="generated/rosalia.ndi.html#module-rosalia.ndi">rosalia.ndi</a>, <a href="rosalia.html#module-rosalia.ndi">[1]</a>
 </li>
         <li><a href="generated/rosalia.plots.html#module-rosalia.plots">rosalia.plots</a>, <a href="rosalia.html#module-rosalia.plots">[1]</a>
-</li>
-        <li><a href="generated/rosalia.point.html#module-rosalia.point">rosalia.point</a>
 </li>
         <li><a href="generated/rosalia.psf.html#module-rosalia.psf">rosalia.psf</a>, <a href="rosalia.html#module-rosalia.psf">[1]</a>
 </li>
@@ -749,10 +778,10 @@
 </li>
       <li><a href="rosalia.html#rosalia.telescopes.Passbands.WISE.W1">Passbands.WISE.W1 (class in rosalia.telescopes)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rosalia.html#rosalia.telescopes.Passbands.WISE.W2">Passbands.WISE.W2 (class in rosalia.telescopes)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rosalia.html#rosalia.telescopes.Passbands.WISE.W3">Passbands.WISE.W3 (class in rosalia.telescopes)</a>
 </li>
       <li><a href="rosalia.html#rosalia.telescopes.Passbands.WISE.W4">Passbands.WISE.W4 (class in rosalia.telescopes)</a>
@@ -767,9 +796,13 @@
 </li>
       <li><a href="rosalia.html#rosalia.plots.plot_stray_and_ndi_map">plot_stray_and_ndi_map() (in module rosalia.plots)</a>
 </li>
+      <li><a href="rosalia.html#rosalia.attitude.plot_targets_by_magnitude">plot_targets_by_magnitude() (in module rosalia.attitude)</a>
+</li>
       <li><a href="rosalia.html#rosalia.utils.position_angle">position_angle() (in module rosalia.utils)</a>
 </li>
       <li><a href="rosalia.html#rosalia.plots.print_ascii_focal_plane">print_ascii_focal_plane() (in module rosalia.plots)</a>
+</li>
+      <li><a href="rosalia.html#rosalia.attitude.RomanPointing.print_roman_pointing_attributes">print_roman_pointing_attributes() (rosalia.attitude.RomanPointing method)</a>
 </li>
       <li><a href="rosalia.html#rosalia.psf.psf_harvester_single_exposure">psf_harvester_single_exposure() (in module rosalia.psf)</a>
 </li>
@@ -821,6 +854,8 @@
 </li>
       <li><a href="rosalia.html#rosalia.roman.roman_WFI_NDI_estimator_direct">roman_WFI_NDI_estimator_direct() (in module rosalia.roman)</a>
 </li>
+      <li><a href="rosalia.html#rosalia.attitude.RomanPointing">RomanPointing (class in rosalia.attitude)</a>
+</li>
       <li>
     rosalia
 
@@ -846,7 +881,7 @@
     rosalia.attitude
 
       <ul>
-        <li><a href="generated/rosalia.attitude.html#module-rosalia.attitude">module</a>
+        <li><a href="generated/rosalia.attitude.html#module-rosalia.attitude">module</a>, <a href="rosalia.html#module-rosalia.attitude">[1]</a>
 </li>
       </ul></li>
       <li>
@@ -891,6 +926,8 @@
         <li><a href="generated/rosalia.gnu.html#module-rosalia.gnu">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     rosalia.horizons
 
@@ -898,8 +935,6 @@
         <li><a href="generated/rosalia.horizons.html#module-rosalia.horizons">module</a>, <a href="rosalia.html#module-rosalia.horizons">[1]</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     rosalia.hst
 
@@ -926,13 +961,6 @@
 
       <ul>
         <li><a href="generated/rosalia.plots.html#module-rosalia.plots">module</a>, <a href="rosalia.html#module-rosalia.plots">[1]</a>
-</li>
-      </ul></li>
-      <li>
-    rosalia.point
-
-      <ul>
-        <li><a href="generated/rosalia.point.html#module-rosalia.point">module</a>
 </li>
       </ul></li>
       <li>
@@ -1039,10 +1067,14 @@
 </li>
       <li><a href="rosalia.html#rosalia.utils.separation_and_position_angle">separation_and_position_angle() (in module rosalia.utils)</a>
 </li>
-      <li><a href="rosalia.html#rosalia.horizons.single_horizons_query">single_horizons_query() (in module rosalia.horizons)</a>
+      <li><a href="rosalia.html#rosalia.attitude.RomanPointing.set_target">set_target() (rosalia.attitude.RomanPointing method)</a>
+</li>
+      <li><a href="rosalia.html#rosalia.attitude.RomanPointing.set_target_using_radec">set_target_using_radec() (rosalia.attitude.RomanPointing method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="rosalia.html#rosalia.horizons.single_horizons_query">single_horizons_query() (in module rosalia.horizons)</a>
+</li>
       <li><a href="rosalia.html#rosalia.astrometry.source_extractor">source_extractor() (in module rosalia.astrometry)</a>
 </li>
       <li><a href="rosalia.html#rosalia.utils.sphere_dist">sphere_dist() (in module rosalia.utils)</a>
@@ -1126,6 +1158,14 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rosalia.html#rosalia.plots.style.UNDERLINE">UNDERLINE (rosalia.plots.style attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="V">V</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="rosalia.html#rosalia.attitude.RomanPointing.visualize_pointing">visualize_pointing() (rosalia.attitude.RomanPointing method)</a>
 </li>
   </ul></td>
 </tr></table>

@@ -20,6 +20,15 @@ rosalia.astrometry module
    :show-inheritance:
    :undoc-members:
 
+rosalia.attitude module
+---------------------
+
+.. automodule:: rosalia.attitude
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+
 rosalia.constants module
 ------------------------
 

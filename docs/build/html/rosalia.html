@@ -68,6 +68,33 @@
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.astrometry.source_extractor"><code class="docutils literal notranslate"><span class="pre">source_extractor()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#rosalia-attitude-module">rosalia.attitude module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#rosalia.attitude.RomanPointing"><code class="docutils literal notranslate"><span class="pre">RomanPointing</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#rosalia.attitude.RomanPointing.delta_pitch_roll"><code class="docutils literal notranslate"><span class="pre">RomanPointing.delta_pitch_roll()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rosalia.attitude.RomanPointing.get_attitude_euler"><code class="docutils literal notranslate"><span class="pre">RomanPointing.get_attitude_euler()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rosalia.attitude.RomanPointing.get_attitude_quaternion"><code class="docutils literal notranslate"><span class="pre">RomanPointing.get_attitude_quaternion()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rosalia.attitude.RomanPointing.get_ecliptic_coordinates"><code class="docutils literal notranslate"><span class="pre">RomanPointing.get_ecliptic_coordinates()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rosalia.attitude.RomanPointing.get_pitch_angle"><code class="docutils literal notranslate"><span class="pre">RomanPointing.get_pitch_angle()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rosalia.attitude.RomanPointing.get_position_angle"><code class="docutils literal notranslate"><span class="pre">RomanPointing.get_position_angle()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rosalia.attitude.RomanPointing.get_sun_angle"><code class="docutils literal notranslate"><span class="pre">RomanPointing.get_sun_angle()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rosalia.attitude.RomanPointing.get_target_new_pitch"><code class="docutils literal notranslate"><span class="pre">RomanPointing.get_target_new_pitch()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rosalia.attitude.RomanPointing.is_visible"><code class="docutils literal notranslate"><span class="pre">RomanPointing.is_visible()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rosalia.attitude.RomanPointing.print_roman_pointing_attributes"><code class="docutils literal notranslate"><span class="pre">RomanPointing.print_roman_pointing_attributes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rosalia.attitude.RomanPointing.set_target"><code class="docutils literal notranslate"><span class="pre">RomanPointing.set_target()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rosalia.attitude.RomanPointing.set_target_using_radec"><code class="docutils literal notranslate"><span class="pre">RomanPointing.set_target_using_radec()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rosalia.attitude.RomanPointing.visualize_pointing"><code class="docutils literal notranslate"><span class="pre">RomanPointing.visualize_pointing()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#rosalia.attitude.create_subplot_grid"><code class="docutils literal notranslate"><span class="pre">create_subplot_grid()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rosalia.attitude.generate_power_law_sampling"><code class="docutils literal notranslate"><span class="pre">generate_power_law_sampling()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rosalia.attitude.get_large_aperture"><code class="docutils literal notranslate"><span class="pre">get_large_aperture()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rosalia.attitude.get_radec"><code class="docutils literal notranslate"><span class="pre">get_radec()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rosalia.attitude.get_vector"><code class="docutils literal notranslate"><span class="pre">get_vector()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rosalia.attitude.load_targets"><code class="docutils literal notranslate"><span class="pre">load_targets()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rosalia.attitude.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rosalia.attitude.plot_targets_by_magnitude"><code class="docutils literal notranslate"><span class="pre">plot_targets_by_magnitude()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#module-rosalia.constants">rosalia.constants module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-rosalia.correct">rosalia.correct module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.correct.correct_zody"><code class="docutils literal notranslate"><span class="pre">correct_zody()</span></code></a></li>
@@ -214,7 +241,6 @@
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.sky.correct_flat_sky"><code class="docutils literal notranslate"><span class="pre">correct_flat_sky()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.sky.get_zodiacal_background"><code class="docutils literal notranslate"><span class="pre">get_zodiacal_background()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.sky.gunagala_zody"><code class="docutils literal notranslate"><span class="pre">gunagala_zody()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#rosalia.sky.measure_sky_level_HST_ACS"><code class="docutils literal notranslate"><span class="pre">measure_sky_level_HST_ACS()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.sky.rebin"><code class="docutils literal notranslate"><span class="pre">rebin()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.sky.rebin_transmission_curve"><code class="docutils literal notranslate"><span class="pre">rebin_transmission_curve()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.sky.remove_zodiacal_light_acs"><code class="docutils literal notranslate"><span class="pre">remove_zodiacal_light_acs()</span></code></a></li>
@@ -500,6 +526,367 @@
 <dd></dd></dl>
 
 </section>
+<section id="rosalia-attitude-module">
+<h2>rosalia.attitude module<a class="headerlink" href="#rosalia-attitude-module" title="Link to this heading"></a></h2>
+<p id="module-rosalia.attitude">File: Roman_Attitude.py
+Author: Maxime J Rizzo
+Email: <a class="reference external" href="mailto:maxime&#46;j&#46;rizzo&#37;&#52;&#48;nasa&#46;gov">maxime<span>&#46;</span>j<span>&#46;</span>rizzo<span>&#64;</span>nasa<span>&#46;</span>gov</a>
+Date: 2025-11-18</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="rosalia.attitude.RomanPointing">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">rosalia.attitude.</span></span><span class="sig-name descname"><span class="pre">RomanPointing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">observation_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.attitude.RomanPointing" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Spacecraft orientation and pointing for celestial targets.</p>
+<p>This module provides functionality for calculating and visualizing
+spacecraft attitude, target coordinates, and sun angles for
+astronomical observations. It supports operations in various
+coordinate systems including ICRS, ecliptic, and galactic.</p>
+<p>Key features:
+- Calculate spacecraft attitude for given celestial targets
+- Convert between different coordinate systems
+- Visualize pointing and attitude in 3D and 2D projections
+- Handle pitch and roll maneuvers
+- Check visibility constraints</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="rosalia.attitude.RomanPointing.delta_pitch_roll">
+<span class="sig-name descname"><span class="pre">delta_pitch_roll</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dpitch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">droll</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.attitude.RomanPointing.delta_pitch_roll" title="Link to this definition"></a></dt>
+<dd><p>Calculate new pointing coordinates after applying pitch and roll offsets.</p>
+<section id="parameters">
+<h3>Parameters:<a class="headerlink" href="#parameters" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>dpitch<span class="classifier">float, optional</span></dt><dd><p>Change in pitch angle in degrees. Default is 0.0.</p>
+</dd>
+<dt>droll<span class="classifier">float, optional</span></dt><dd><p>Change in roll angle in degrees. Default is 0.0.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns:<a class="headerlink" href="#returns" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ra<span class="classifier">float</span></dt><dd><p>New Right Ascension in degrees.</p>
+</dd>
+<dt>dec<span class="classifier">float</span></dt><dd><p>New Declination in degrees.</p>
+</dd>
+<dt>pa<span class="classifier">float</span></dt><dd><p>New Position Angle in degrees.</p>
+</dd>
+<dt>new_pitch<span class="classifier">float</span></dt><dd><p>New pitch angle in degrees.</p>
+</dd>
+</dl>
+</section>
+<section id="notes">
+<h3>Notes:<a class="headerlink" href="#notes" title="Link to this heading"></a></h3>
+<p>This method applies a pitch rotation followed by a roll rotation to the
+current spacecraft attitude. It then calculates the new pointing coordinates,
+position angle, and pitch angle based on the resulting attitude.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosalia.attitude.RomanPointing.get_attitude_euler">
+<span class="sig-name descname"><span class="pre">get_attitude_euler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attitude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ZYX'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">degrees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.attitude.RomanPointing.get_attitude_euler" title="Link to this definition"></a></dt>
+<dd><p>Get attitude as Euler angles
+Parameters:
+———–
+attitude: 3x3 numpy array, optional spacecraft attitude matrix
+sequence: str, rotation sequence
+degrees: bool, if True return angles in degrees, else in radians</p>
+<section id="id1">
+<h3>Returns:<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<p>numpy array, Euler angles</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosalia.attitude.RomanPointing.get_attitude_quaternion">
+<span class="sig-name descname"><span class="pre">get_attitude_quaternion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attitude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.attitude.RomanPointing.get_attitude_quaternion" title="Link to this definition"></a></dt>
+<dd><p>Get attitude as quaternion [w, x, y, z]
+Parameters:
+———–
+attitude: 3x3 numpy array, optional spacecraft attitude matrix</p>
+<section id="id2">
+<h3>Returns:<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<p>numpy array, quaternion representation of attitude</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosalia.attitude.RomanPointing.get_ecliptic_coordinates">
+<span class="sig-name descname"><span class="pre">get_ecliptic_coordinates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coord</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.attitude.RomanPointing.get_ecliptic_coordinates" title="Link to this definition"></a></dt>
+<dd><p>Convert coordinates to ecliptic longitude and latitude</p>
+<section id="id3">
+<h3>Parameters:<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<p>coord: SkyCoord object</p>
+</section>
+<section id="id4">
+<h3>Returns:<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<p>tuple, (ecliptic longitude, ecliptic latitude) in degrees</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosalia.attitude.RomanPointing.get_pitch_angle">
+<span class="sig-name descname"><span class="pre">get_pitch_angle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.attitude.RomanPointing.get_pitch_angle" title="Link to this definition"></a></dt>
+<dd><p>Get the pitch angle between the spacecraft pointing and the Sun.</p>
+<section id="id5">
+<h3>Parameters:<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>target<span class="classifier">astropy.coordinates.SkyCoord, optional</span></dt><dd><p>The target coordinates. If not provided, uses the current target_coord.</p>
+</dd>
+</dl>
+</section>
+<section id="id6">
+<h3>Returns:<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>astropy.units.Quantity</dt><dd><p>The pitch angle in degrees. Positive values indicate the spacecraft is
+pitched up relative to the Sun, negative values indicate it’s pitched down.</p>
+</dd>
+</dl>
+</section>
+<section id="id7">
+<h3>Notes:<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<p>The pitch angle is defined as the angle between the spacecraft-Sun vector
+and the spacecraft pointing direction, minus 90 degrees. This means a pitch
+of 0 degrees corresponds to the Sun being perpendicular to the pointing direction.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosalia.attitude.RomanPointing.get_position_angle">
+<span class="sig-name descname"><span class="pre">get_position_angle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attitude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.attitude.RomanPointing.get_position_angle" title="Link to this definition"></a></dt>
+<dd><p>Compute the position angle (V3PA) of the spacecraft.</p>
+<p>Position Angle is the angle from the plane containing the +X axis and 
+the vector to Celestial North to the plane containing the +X and +Z axes,
+measured in the direction of celestial east as viewed from the spacecraft origin.</p>
+<section id="id8">
+<h3>Parameters:<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>x_axis<span class="classifier">array_like</span></dt><dd><p>Spacecraft +X axis direction vector (3D)</p>
+</dd>
+<dt>z_axis<span class="classifier">array_like  </span></dt><dd><p>Spacecraft +Z axis direction vector (3D)</p>
+</dd>
+<dt>north_vector<span class="classifier">array_like, optional</span></dt><dd><p>Celestial North direction vector (default: [0,0,1] for +Z celestial)</p>
+</dd>
+</dl>
+</section>
+<section id="id9">
+<h3>Returns:<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>position_angle<span class="classifier">float</span></dt><dd><p>Position angle in radians</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosalia.attitude.RomanPointing.get_sun_angle">
+<span class="sig-name descname"><span class="pre">get_sun_angle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.attitude.RomanPointing.get_sun_angle" title="Link to this definition"></a></dt>
+<dd><p>Get angle between spacecraft pointing direction and Sun.</p>
+<section id="id10">
+<h3>Parameters:<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>target<span class="classifier">astropy.coordinates.SkyCoord, optional</span></dt><dd><p>The target coordinates. If not provided, uses the current target_coord.</p>
+</dd>
+</dl>
+</section>
+<section id="id11">
+<h3>Returns:<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float or None</dt><dd><p>The angular separation between the target and the Sun in degrees.
+Returns None if no target is set and no target is provided.</p>
+</dd>
+</dl>
+</section>
+<section id="id12">
+<h3>Notes:<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+<p>This method calculates the angular separation between the spacecraft’s
+pointing direction (or provided target) and the Sun’s position.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosalia.attitude.RomanPointing.get_target_new_pitch">
+<span class="sig-name descname"><span class="pre">get_target_new_pitch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">delta_pitch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.attitude.RomanPointing.get_target_new_pitch" title="Link to this definition"></a></dt>
+<dd><p>Compute the RA and DEC of a new target offset in pitch angle.</p>
+<section id="id13">
+<h3>Parameters:<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>delta_pitch<span class="classifier">float, optional</span></dt><dd><p>The pitch angle offset in degrees. Positive values pitch away from Sun, negative values
+pitch towards Sun. Default is 0.0.</p>
+</dd>
+</dl>
+</section>
+<section id="id14">
+<h3>Returns:<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>target<span class="classifier">astropy.coordinates.SkyCoord</span></dt><dd><p>A SkyCoord object representing the new target’s position in ICRS coordinates.</p>
+</dd>
+<dt>new_attitude<span class="classifier">numpy.ndarray</span></dt><dd><p>A 3x3 array representing the new spacecraft attitude matrix.</p>
+</dd>
+</dl>
+</section>
+<section id="id15">
+<h3>Notes:<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
+<p>The function uses the current spacecraft attitude and applies a rotation
+around the Y-axis (pitch) to determine the new pointing direction.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosalia.attitude.RomanPointing.is_visible">
+<span class="sig-name descname"><span class="pre">is_visible</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.attitude.RomanPointing.is_visible" title="Link to this definition"></a></dt>
+<dd><p>Check if the current target is within the pitch limits and thus visible.</p>
+<section id="id16">
+<h3>Returns:<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if the target is within the pitch limits, False otherwise.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosalia.attitude.RomanPointing.print_roman_pointing_attributes">
+<span class="sig-name descname"><span class="pre">print_roman_pointing_attributes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.attitude.RomanPointing.print_roman_pointing_attributes" title="Link to this definition"></a></dt>
+<dd><p>Prints all attributes of the RomanPointing class cleanly.</p>
+<section id="id17">
+<h3>Parameters:<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
+<p>pointing: RomanPointing object</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosalia.attitude.RomanPointing.set_target">
+<span class="sig-name descname"><span class="pre">set_target</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roll</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.attitude.RomanPointing.set_target" title="Link to this definition"></a></dt>
+<dd><p>Set target using SkyCoord object</p>
+<section id="id18">
+<h3>Parameters:<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
+<p>target: SkyCoord object
+roll: float, Sun roll angle from nominal in degrees</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosalia.attitude.RomanPointing.set_target_using_radec">
+<span class="sig-name descname"><span class="pre">set_target_using_radec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roll</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'icrs'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'deg'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.attitude.RomanPointing.set_target_using_radec" title="Link to this definition"></a></dt>
+<dd><p>Set target star coordinates</p>
+<section id="id19">
+<h3>Parameters:<a class="headerlink" href="#id19" title="Link to this heading"></a></h3>
+<p>ra: float, right ascension
+dec: float, declination  
+roll: float, Sun roll angle from nominal in degrees
+frame: str, coordinate frame (‘icrs’, ‘fk5’, etc.)
+unit: str, angular unit (‘deg’, ‘hour’ for RA, etc.)</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosalia.attitude.RomanPointing.visualize_pointing">
+<span class="sig-name descname"><span class="pre">visualize_pointing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">show_ecliptic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_sun</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_constellation_grid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(15,</span> <span class="pre">10)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.attitude.RomanPointing.visualize_pointing" title="Link to this definition"></a></dt>
+<dd><p>Visualize spacecraft pointing in celestial sphere context</p>
+<p>Parameters:
+show_ecliptic: bool, show ecliptic plane
+show_sun: bool, show Sun position
+show_constellation_grid: bool, show RA/DEC grid
+fig_size: tuple, figure size</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosalia.attitude.create_subplot_grid">
+<span class="sig-prename descclassname"><span class="pre">rosalia.attitude.</span></span><span class="sig-name descname"><span class="pre">create_subplot_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_plots</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize_per_plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(4,</span> <span class="pre">3)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spacing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'hspace':</span> <span class="pre">0.3,</span> <span class="pre">'wspace':</span> <span class="pre">0.3}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sharey</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sharex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.attitude.create_subplot_grid" title="Link to this definition"></a></dt>
+<dd><p>Create an optimal grid layout for an arbitrary number of plots</p>
+<section id="id20">
+<h3>Parameters:<a class="headerlink" href="#id20" title="Link to this heading"></a></h3>
+<p>n_plots: Number of plots to create
+figsize_per_plot: Size of each individual plot (width, height)
+max_cols: Maximum number of columns (None for automatic)
+spacing: Dictionary with hspace and wspace for subplot spacing</p>
+</section>
+<section id="id21">
+<h3>Returns:<a class="headerlink" href="#id21" title="Link to this heading"></a></h3>
+<p>fig: Figure object
+axes: Array of axes objects (flattened)</p>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosalia.attitude.generate_power_law_sampling">
+<span class="sig-prename descclassname"><span class="pre">rosalia.attitude.</span></span><span class="sig-name descname"><span class="pre">generate_power_law_sampling</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">14</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">36</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">power</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.attitude.generate_power_law_sampling" title="Link to this definition"></a></dt>
+<dd><p>Uses power law transformation for strong edge emphasis
+Higher power = more edge clustering</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosalia.attitude.get_large_aperture">
+<span class="sig-prename descclassname"><span class="pre">rosalia.attitude.</span></span><span class="sig-name descname"><span class="pre">get_large_aperture</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attitude_matrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">named_aperture</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'WFI_CEN'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scalex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaley</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.4</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.attitude.get_large_aperture" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosalia.attitude.get_radec">
+<span class="sig-prename descclassname"><span class="pre">rosalia.attitude.</span></span><span class="sig-name descname"><span class="pre">get_radec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attitude_matrix</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.attitude.get_radec" title="Link to this definition"></a></dt>
+<dd><p>Compute RA and DEC from spacecraft attitude matrix in icrs.</p>
+<section id="id22">
+<h3>Parameters:<a class="headerlink" href="#id22" title="Link to this heading"></a></h3>
+<p>attitude_matrix: 3x3 numpy array, spacecraft attitude matrix in icrs</p>
+</section>
+<section id="id23">
+<h3>Returns:<a class="headerlink" href="#id23" title="Link to this heading"></a></h3>
+<p>ra: float, Right Ascension in degrees
+dec: float, Declination in degrees</p>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosalia.attitude.get_vector">
+<span class="sig-prename descclassname"><span class="pre">rosalia.attitude.</span></span><span class="sig-name descname"><span class="pre">get_vector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.attitude.get_vector" title="Link to this definition"></a></dt>
+<dd><p>Convert SkyCoord object to unit vector.
+Parameters:
+———–
+target: SkyCoord object</p>
+<blockquote>
+<div><p>Returns:</p>
+</div></blockquote>
+<p>vector: numpy array, unit vector representation of target</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosalia.attitude.load_targets">
+<span class="sig-prename descclassname"><span class="pre">rosalia.attitude.</span></span><span class="sig-name descname"><span class="pre">load_targets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.attitude.load_targets" title="Link to this definition"></a></dt>
+<dd><p>Load target coordinates from Excel file.
+Parameters:
+———–
+target_list: str, path to Excel file containing target coordinates</p>
+<blockquote>
+<div><p>Returns:</p>
+</div></blockquote>
+<p>tgt_list: list of SkyCoord objects</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosalia.attitude.main">
+<span class="sig-prename descclassname"><span class="pre">rosalia.attitude.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.attitude.main" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosalia.attitude.plot_targets_by_magnitude">
+<span class="sig-prename descclassname"><span class="pre">rosalia.attitude.</span></span><span class="sig-name descname"><span class="pre">plot_targets_by_magnitude</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">magnitudes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Target</span> <span class="pre">Distribution</span> <span class="pre">by</span> <span class="pre">Magnitude'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_colorbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minmag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxmag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">17</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.attitude.plot_targets_by_magnitude" title="Link to this definition"></a></dt>
+<dd><p>Create a scatter plot with marker sizes based on astronomical magnitudes.</p>
+<p>Parameters:
+x_coords: list or array of X coordinates
+y_coords: list or array of Y coordinates  
+magnitudes: list or array of astronomical magnitudes
+ax: matplotlib axis object (if None, creates new figure)
+title: plot title
+show_colorbar: whether to show colorbar (default True)
+show_legend: whether to show magnitude legend (default True)
+show_stats: whether to print statistics (default True)</p>
+<p>Returns:
+ax: the axis object used for plotting
+scatter: the scatter plot object (useful for external colorbar creation)</p>
+</dd></dl>
+
+</section>
 <section id="module-rosalia.constants">
 <span id="rosalia-constants-module"></span><h2>rosalia.constants module<a class="headerlink" href="#module-rosalia.constants" title="Link to this heading"></a></h2>
 </section>
@@ -774,7 +1161,7 @@ If provided, skips querying Gaia/2MASS/WISE catalogs. Default is None.</p>
 <dd><p>This method calculates a as a function the position on the detector x,y
 the theta = distance from the straylight source and the n_lambda (wavelength in nm)
 Required by the method ndi_envelope to calculate the NDI profile
-A(θ_DEG, λ_nm ) = A(0, 550) <a href="#id1"><span class="problematic" id="id2">*</span></a>([λ_nm/550)]^(n(θ_DEG))</p>
+A(θ_DEG, λ_nm ) = A(0, 550) <a href="#id24"><span class="problematic" id="id25">*</span></a>([λ_nm/550)]^(n(θ_DEG))</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -1161,11 +1548,6 @@ day = day of the observation</p>
 <p>Output:
 mu_zody = surface brightness in Jy arcsec-2</p>
 </dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="rosalia.sky.measure_sky_level_HST_ACS">
-<span class="sig-prename descclassname"><span class="pre">rosalia.sky.</span></span><span class="sig-name descname"><span class="pre">measure_sky_level_HST_ACS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exposure_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.sky.measure_sky_level_HST_ACS" title="Link to this definition"></a></dt>
-<dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.sky.rebin">
@@ -1941,8 +2323,8 @@ v1: October 17, 2024 - Fastest version compared against numba, or astropy.</p>
 <dt class="sig sig-object py" id="rosalia.utils.circular_hist">
 <span class="sig-prename descclassname"><span class="pre">rosalia.utils.</span></span><span class="sig-name descname"><span class="pre">circular_hist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">density</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gaps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dodgerblue'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edgecolor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'C0'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.utils.circular_hist" title="Link to this definition"></a></dt>
 <dd><p>Produce a circular histogram of angles on ax.</p>
-<section id="parameters">
-<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h3>
+<section id="id26">
+<h3>Parameters<a class="headerlink" href="#id26" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>ax<span class="classifier">matplotlib.axes._subplots.PolarAxesSubplot</span></dt><dd><p>axis instance created with subplot_kw=dict(projection=’polar’).</p>
 </dd>
@@ -1961,8 +2343,8 @@ forced to partition the entire [-pi, pi] range. The default is True.</p>
 </dd>
 </dl>
 </section>
-<section id="returns">
-<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h3>
+<section id="id27">
+<h3>Returns<a class="headerlink" href="#id27" title="Link to this heading"></a></h3>
 <dl>
 <dt>n<span class="classifier">array or list of arrays</span></dt><dd><p>The number of values in each bin.</p>
 </dd>
@@ -2064,7 +2446,7 @@ or list of such containers if there are multiple input datasets.</p>
 <span class="sig-prename descclassname"><span class="pre">rosalia.utils.</span></span><span class="sig-name descname"><span class="pre">exposure_inspector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.utils.exposure_inspector" title="Link to this definition"></a></dt>
 <dd><p>exposure_inspector: 
 Inspects and returns critical information about the contents of an exposure telescope.
-:param input_name: Exposure file to be inspected. It can be a string with the name of the file, a list of files, or a pattern with <a href="#id3"><span class="problematic" id="id4">*</span></a>.
+:param input_name: Exposure file to be inspected. It can be a string with the name of the file, a list of files, or a pattern with <a href="#id28"><span class="problematic" id="id29">*</span></a>.
 :type input_name: str, list
 :return: Exposure identity - A dictionary with critical information about the exposure, including pointing (right ascension and declination), position angle, telescope, instrument, detector, filter, and a WCS (Astropy and GWCS).
 :rtype: dict, pd.DataFrame</p>
@@ -2278,8 +2660,8 @@ Adapted from Great Circle navigation: <a class="reference external" href="https:
 <span class="sig-prename descclassname"><span class="pre">rosalia.utils.</span></span><span class="sig-name descname"><span class="pre">measure_maglim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mu_sky</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instrument</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">telescope</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exptime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.utils.measure_maglim" title="Link to this definition"></a></dt>
 <dd><p>Measure the limiting magnitude of an image given the sky background level, the instrument, 
 filter, telescope and exposure time.</p>
-<section id="id5">
-<h3>Parameters<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<section id="id30">
+<h3>Parameters<a class="headerlink" href="#id30" title="Link to this heading"></a></h3>
 <blockquote>
 <div><dl class="simple">
 <dt>mu_sky<span class="classifier">float</span></dt><dd><p>Sky background level in AB magnitudes per square arcsecond.</p>
@@ -2301,8 +2683,8 @@ filter, telescope and exposure time.</p>
 </dl>
 </div></blockquote>
 </section>
-<section id="id6">
-<h3>Returns<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<section id="id31">
+<h3>Returns<a class="headerlink" href="#id31" title="Link to this heading"></a></h3>
 <blockquote>
 <div><dl class="simple">
 <dt>mu_lim<span class="classifier">float</span></dt><dd><p>Limiting surface brightness in AB magnitudes per square arcsecond for the 
@@ -2354,11 +2736,11 @@ v1: October 17, 2024</p>
 <dt class="sig sig-object py" id="rosalia.utils.run_swarp">
 <span class="sig-prename descclassname"><span class="pre">rosalia.utils.</span></span><span class="sig-name descname"><span class="pre">run_swarp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coveredfrac</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.utils.run_swarp" title="Link to this definition"></a></dt>
 <dd><p>run_swarp:
-This program runs SWARP on the input pattern of files, and generates a mosaic with the output name specified in outname. The pattern can be a string with the name of the file, a list of files, or a pattern with <a href="#id7"><span class="problematic" id="id8">*</span></a>. The output mosaic will be saved as outname, and if scale is different from 1, a scaled version of the mosaic will be saved as outname with the suffix “_scaled.fits”.</p>
+This program runs SWARP on the input pattern of files, and generates a mosaic with the output name specified in outname. The pattern can be a string with the name of the file, a list of files, or a pattern with <a href="#id32"><span class="problematic" id="id33">*</span></a>. The output mosaic will be saved as outname, and if scale is different from 1, a scaled version of the mosaic will be saved as outname with the suffix “_scaled.fits”.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>pattern</strong> (<em>str</em><em>, </em><em>list</em>) – Pattern of files to be mosaicked. It can be a string with the name of the file, a list of files, or a pattern with <a href="#id9"><span class="problematic" id="id10">*</span></a>.</p></li>
+<li><p><strong>pattern</strong> (<em>str</em><em>, </em><em>list</em>) – Pattern of files to be mosaicked. It can be a string with the name of the file, a list of files, or a pattern with <a href="#id34"><span class="problematic" id="id35">*</span></a>.</p></li>
 <li><p><strong>outname</strong> (<em>str</em>) – Name of the output mosaic file. It should end with .fits</p></li>
 <li><p><strong>scale</strong> (<em>float</em>) – Scale factor for the output mosaic. If scale is different from 1, a scaled version of the mosaic will be saved as outname with the suffix “_scaled.fits”. The scale factor is applied to the pixel scale of the mosaic, so that the output mosaic will have a pixel scale that is scale times the original pixel scale. For example, if scale=0.1, the output mosaic will have a pixel scale that is 10 times the original pixel scale, and the output mosaic will be 10 times smaller in size than the original mosaic. The default value is 1 (no scaling).</p></li>
 <li><p><strong>coveredfrac</strong> (<em>float</em>) – Fraction of the mosaic that must be covered by input images. The default value is 1 (all pixels must be covered).</p></li>

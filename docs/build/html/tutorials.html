@@ -20,7 +20,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="How to use" href="usage.html" />
-    <link rel="prev" title="Installation" href="installation.html" /> 
+    <link rel="prev" title="Measuring Stray Light" href="measuringstray.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -46,7 +46,9 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="mission.html">What is ROSALIA?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="measuringstray.html">Measuring Stray Light</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Additional Tools</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#finding-the-nominal-position-angle">Finding the nominal position angle</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#transforming-asdf-to-fits">Transforming ASDF to FITS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#generating-some-mock-roman-wfi-observations">Generating some mock Roman / WFI observations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#estimating-the-surface-brigthness-limit-of-roman-wfi-observations">Estimating the surface brigthness limit of Roman WFI observations</a></li>
@@ -85,6 +87,23 @@
   <section id="additional-tools">
 <h1>Additional Tools<a class="headerlink" href="#additional-tools" title="Link to this heading"></a></h1>
 <p>This section contains some code examples and Jupyter notebook tutorials to help you get started with ROSALIA and its functionalities.</p>
+<section id="finding-the-nominal-position-angle">
+<h2>Finding the nominal position angle<a class="headerlink" href="#finding-the-nominal-position-angle" title="Link to this heading"></a></h2>
+<p>Due to the asymmetric design of the Nancy Grace Roman Space Telescope, there is an optimal position angle for the observations that maximizes the power in the solar panels and minimizes the stray-light from the Sun.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">rosalia</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">rs</span>
+<span class="c1"># Let&#39;s say that we want to observe a target at the following coordinates:</span>
+<span class="n">ra</span> <span class="o">=</span> <span class="mf">56.6583333</span>  <span class="c1"># Right ascension, in degrees.</span>
+<span class="n">dec</span> <span class="o">=</span> <span class="o">+</span><span class="mf">24.1780556</span> <span class="c1"># Declination, in degrees.</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">astropy.time</span><span class="w"> </span><span class="kn">import</span> <span class="n">Time</span>
+
+<span class="n">date</span> <span class="o">=</span> <span class="n">Time</span><span class="p">(</span><span class="s2">&quot;2027-06-01T00:00:00&quot;</span><span class="p">)</span> <span class="c1"># Date of the observation, in Astropy Time YYYY-MM-DDTHH:MM:SS format.</span>
+
+<span class="n">nominal_PA</span> <span class="o">=</span> <span class="n">rs</span><span class="o">.</span><span class="n">telescopes</span><span class="o">.</span><span class="n">Roman</span><span class="o">.</span><span class="n">get_bestPA</span><span class="p">(</span><span class="n">ra</span><span class="o">=</span><span class="n">ra_star</span><span class="p">,</span> <span class="n">dec</span><span class="o">=</span><span class="n">dec_star</span><span class="p">,</span> <span class="n">mjd</span><span class="o">=</span><span class="n">date</span><span class="o">.</span><span class="n">mjd</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">rs.telescopes.Roman.get_bestPA</span></code> will return the optimal V3 position angle for the observation of a target at the given coordinates and date. The V3 position angle is defined as the angle between the equatorial North direction and the perpendicular vector to the spacecraft sun-shield, measured in degrees. The nominal (best) V3 position angle is the one that minimizes the stray-light from the Sun and maximizes the power in the solar panels. Notice that this angle is different from the position angle of the WFI focal plane, which is defined as the angle between the equatorial North direction and the Y-axis of the WFI focal plane.</p>
+<img alt="Diagram defining the different coordinate systems of Roman Space Telescope and WFI. The position angle of the WFI focal plane is defined as the angle between the equatorial North direction and the Y-axis of the WFI focal plane. The nominal (best) V3 position angle is the one that minimizes the stray-light from the Sun and maximizes the power in the solar panels." src="https://roman-docs.stsci.edu/files/131893097/131893098/2/1768494993154/Roman+FOV+modified.png" />
+</section>
 <section id="transforming-asdf-to-fits">
 <h2>Transforming ASDF to FITS<a class="headerlink" href="#transforming-asdf-to-fits" title="Link to this heading"></a></h2>
 <p><a class="reference external" href="https://asdf.readthedocs.io/en/latest/">ASDF</a> is the successor of <a class="reference external" href="https://www.stsci.edu/hst/wfpc2/Wfpc2_dhb/intro_ch23.html">FITS</a> format and has been adopted since JWST. While GUI visualizers like SAO DS9 are not yet compatible with ASDF (<a class="reference external" href="https://www.stsci.edu/files/live/sites/www/files/home/jwst/science-planning/user-committees/jwst-users-committee/_documents/jstuc-0919-data-analysis-tool-ferguson.pdf">see JWST Users Committee note</a>), ROSALIA provides an easy way to extract useful information from ASDF files through <code class="docutils literal notranslate"><span class="pre">exposure-inspector</span></code>:</p>
@@ -151,7 +170,7 @@ romanisim-make-image<span class="w"> </span>--radec<span class="w"> </span><span
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="measuringstray.html" class="btn btn-neutral float-left" title="Measuring Stray Light" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="usage.html" class="btn btn-neutral float-right" title="How to use" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

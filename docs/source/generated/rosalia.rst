@@ -24,7 +24,6 @@
    irsa
    ndi
    plots
-   point
    psf
    render
    roman
