@@ -5,7 +5,7 @@ This section contains some code examples and Jupyter notebook tutorials to help 
 
 Finding the nominal position angle
 -----------------------------
-Due to the asymmetric design of the Nancy Grace Roman Space Telescope, there is an optimal position angle for the observations that maximizes the power in the solar panels and minimizes the stray-light from the Sun. Since the Sun moves across the sky as a function of time, the optimal position angle for a given target will change as well. ROSALIA includes a function to easily calculate the optimal position angle for the observatory a given target and date.   
+Due to the asymmetric design of the Nancy Grace Roman Space Telescope, there is an optimal position angle for the observations that maximizes the power in the solar panels and minimizes the stray-light from the Sun. Since the Sun moves across the sky as a function of time, the optimal position angle for a given target will change as well. ROSALIA includes a function based on `PySIAF <https://roman-docs.stsci.edu/simulation-tools/additional-simulation-tools/pysiaf-for-roman#PySIAFforRoman-fig1>`_  to easily calculate the optimal position angle for the observatory a given target and date. *Note: This function has a known discrepancy of ~0.1 degrees with the nominal PAV3 values estimated by the Roman APT. We are still working on this issue, but the results are sufficiently accurate for most purposes.   
 
 .. code-block:: python
 
