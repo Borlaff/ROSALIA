@@ -49,6 +49,7 @@
 <li class="toctree-l1"><a class="reference internal" href="measuringstray.html">Measuring Stray Light</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Additional Tools</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#finding-the-nominal-position-angle">Finding the nominal position angle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#planning-offset-observations">Planning offset observations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#transforming-asdf-to-fits">Transforming ASDF to FITS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#generating-some-mock-roman-wfi-observations">Generating some mock Roman / WFI observations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#estimating-the-surface-brigthness-limit-of-roman-wfi-observations">Estimating the surface brigthness limit of Roman WFI observations</a></li>
@@ -104,6 +105,24 @@
 <p><code class="docutils literal notranslate"><span class="pre">rs.telescopes.Roman.get_bestPA</span></code> will return the optimal V3 position angle for the observation of a target at the given coordinates and date. The V3 position angle is defined as the angle between the equatorial North direction and the perpendicular vector to the spacecraft sun-shield, measured in degrees. The nominal (best) V3 position angle is the one that minimizes the stray-light from the Sun and maximizes the power in the solar panels. Notice that this angle is different from the position angle of the WFI focal plane, which is defined as the angle between the equatorial North direction and the Y-axis of the WFI focal plane.</p>
 <img alt="Diagram defining the different coordinate systems of Roman Space Telescope and WFI. The position angle of the WFI focal plane is defined as the angle between the equatorial North direction and the Y-axis of the WFI focal plane. The nominal (best) V3 position angle is the one that minimizes the stray-light from the Sun and maximizes the power in the solar panels." src="https://roman-docs.stsci.edu/files/131893097/131893098/2/1768494993154/Roman+FOV+modified.png" />
 <img alt="Diagram defining the different coordinate systems of Roman Space Telescope and WFI." src="https://roman-docs.stsci.edu/files/131893097/131893100/2/1768494992608/WFI-FOV-SIAF.png" />
+</section>
+<section id="planning-offset-observations">
+<h2>Planning offset observations<a class="headerlink" href="#planning-offset-observations" title="Link to this heading"></a></h2>
+<p>A more complicated case is the need to observe a target with a custom offset. For example, if we want to place a bright star with coordinates (RA1, Dec1) in the top west corner of the WFI focal plane, we would need to place the target at approximately [dX, dY] = [-0.4118, 0.20625] degrees from the center of the focal plane. To calculate the new coordinates of the center of the focal plane (RA2, Dec2) and still be able to use the nominal position angle (which depends on the epoch), we can use the following function:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">rosalia</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">rs</span>
+<span class="c1"># Let&#39;s say that we want to observe a target at the following coordinates:</span>
+<span class="n">ra</span> <span class="o">=</span> <span class="mf">56.6583333</span>  <span class="c1"># Right ascension, in degrees.</span>
+<span class="n">dec</span> <span class="o">=</span> <span class="o">+</span><span class="mf">24.1780556</span> <span class="c1"># Declination, in degrees.</span>
+<span class="n">dX</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.4118</span>
+<span class="n">dY</span> <span class="o">=</span> <span class="mf">0.</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">astropy.time</span><span class="w"> </span><span class="kn">import</span> <span class="n">Time</span>
+
+<span class="n">date</span> <span class="o">=</span> <span class="n">Time</span><span class="p">(</span><span class="s2">&quot;2027-06-01T00:00:00&quot;</span><span class="p">)</span> <span class="c1"># Date of the observation, in Astropy Time YYYY-MM-DDTHH:MM:SS format.</span>
+
+<span class="n">offset_pointing</span> <span class="o">=</span> <span class="n">rs</span><span class="o">.</span><span class="n">telescopes</span><span class="o">.</span><span class="n">Roman</span><span class="o">.</span><span class="n">find_wfi_center_for_offset_target</span><span class="p">(</span><span class="n">ra_target</span><span class="o">=</span><span class="n">ra</span><span class="p">,</span> <span class="n">dec_target</span><span class="o">=</span><span class="n">dec</span><span class="p">,</span> <span class="n">mjd</span><span class="o">=</span><span class="n">date</span><span class="o">.</span><span class="n">mjd</span><span class="p">,</span> <span class="n">dX</span><span class="o">=</span><span class="n">dX</span><span class="p">,</span> <span class="n">dY</span><span class="o">=</span><span class="n">dY</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">rs.telescopes.Roman.find_wfi_center_for_offset_target</span></code> will return the new coordinates of the center of the focal plane (ra_wficen, dec_wficen), the position angle of the WFI focal plane (PA_WFI_offset), the V3 position angle (V3PA_offset), and the V3 position angle for the non-offset pointing (V3PA_origin).</p>
 </section>
 <section id="transforming-asdf-to-fits">
 <h2>Transforming ASDF to FITS<a class="headerlink" href="#transforming-asdf-to-fits" title="Link to this heading"></a></h2>

@@ -23,11 +23,10 @@ rosalia/detectors.py
 rosalia/gaia.py
 rosalia/gnu.py
 rosalia/horizons.py
+rosalia/hst.py
 rosalia/irsa.py
-rosalia/mast.py
 rosalia/ndi.py
 rosalia/plots.py
-rosalia/point.py
 rosalia/psf.py
 rosalia/render.py
 rosalia/roman.py

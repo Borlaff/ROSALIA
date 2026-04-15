@@ -117,8 +117,11 @@ def main_offender_find_fraction_of_map(mainoff_name, catalog_name):
     data_flat = data_flat[~np.isnan(data_flat)] 
 
     unique_ids, unique_counts = np.unique(data_flat.astype("int64"), return_counts=True)
+    print("Unique IDs:")
+    print(unique_ids)
     unique_ids = unique_ids[unique_counts>1]
-    # print(unique_ids)
+    print("Unique IDs with counts > 1:")
+    print(unique_ids)
     fraction_by_offender = np.zeros(len(unique_ids))
 
     import bottleneck as bn

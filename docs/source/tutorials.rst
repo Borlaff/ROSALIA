@@ -28,6 +28,30 @@ Due to the asymmetric design of the Nancy Grace Roman Space Telescope, there is 
   :alt: Diagram defining the different coordinate systems of Roman Space Telescope and WFI. 
 
 
+Planning offset observations
+-----------------------------
+
+A more complicated case is the need to observe a target with a custom offset. For example, if we want to place a bright star with coordinates (RA1, Dec1) in the top west corner of the WFI focal plane, we would need to place the target at approximately [dX, dY] = [-0.4118, 0.20625] degrees from the center of the focal plane. To calculate the new coordinates of the center of the focal plane (RA2, Dec2) and still be able to use the nominal position angle (which depends on the epoch), we can use the following function:
+
+.. code-block:: python
+
+    import rosalia as rs
+    # Let's say that we want to observe a target at the following coordinates:
+    ra = 56.6583333  # Right ascension, in degrees. 
+    dec = +24.1780556 # Declination, in degrees.    
+    dX = -0.4118
+    dY = 0.
+    from astropy.time import Time
+
+    date = Time("2027-06-01T00:00:00") # Date of the observation, in Astropy Time YYYY-MM-DDTHH:MM:SS format.
+ 
+    offset_pointing = rs.telescopes.Roman.find_wfi_center_for_offset_target(ra_target=ra, dec_target=dec, mjd=date.mjd, dX=dX, dY=dY)
+
+
+``rs.telescopes.Roman.find_wfi_center_for_offset_target`` will return the new coordinates of the center of the focal plane (ra_wficen, dec_wficen), the position angle of the WFI focal plane (PA_WFI_offset), the V3 position angle (V3PA_offset), and the V3 position angle for the non-offset pointing (V3PA_origin).
+
+
+
 Transforming ASDF to FITS
 -----------------------------
 `ASDF <https://asdf.readthedocs.io/en/latest/>`_ is the successor of `FITS <https://www.stsci.edu/hst/wfpc2/Wfpc2_dhb/intro_ch23.html>`_ format and has been adopted since JWST. While GUI visualizers like SAO DS9 are not yet compatible with ASDF (`see JWST Users Committee note <https://www.stsci.edu/files/live/sites/www/files/home/jwst/science-planning/user-committees/jwst-users-committee/_documents/jstuc-0919-data-analysis-tool-ferguson.pdf>`_), ROSALIA provides an easy way to extract useful information from ASDF files through ``exposure-inspector``:

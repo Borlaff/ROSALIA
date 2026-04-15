@@ -92,6 +92,16 @@ def rosalia_stray(ra, dec, PA, date, bandpass, exptime, prefix="", input_fits=No
     logger = logging.getLogger()
     logger.setLevel(logging.CRITICAL)
 
+    if catalog is not None:
+        if len(catalog)==1:
+            # If the catalog has only one star, add a mag = inf at the same location to avoid problems with the plotting code. 
+            dummy_catalog = catalog.copy()
+            dummy_catalog["mag_lambda"]=np.inf
+            dummy_catalog["cat_id"]=999
+            dummy_catalog["source_id"]="Dummy star"
+            catalog = pd.concat([catalog, dummy_catalog])
+
+
     if input_fits is None:
         # Make the Roman Dummy image
         roman_dummy_name = os.getcwd() + "/" + prefix + "WFI_" + bandpass +\
