@@ -44,6 +44,7 @@ Contents
     measuringstray
     zodiacal
     PSF
+    SSOs
     tutorials
     usage
     whoarewe
