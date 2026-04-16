@@ -46,7 +46,9 @@
               <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">What is ROSALIA?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="measuringstray.html">Measuring Stray Light</a></li>
+<li class="toctree-l1"><a class="reference internal" href="zodiacal.html">Zodiacal Light</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Additional Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">How to use</a></li>
 <li class="toctree-l1"><a class="reference internal" href="whoarewe.html">Who is ROSALIA?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rosalia.html">ROSALIA package</a></li>
@@ -80,6 +82,7 @@
   <section id="what-is-rosalia">
 <h1>What is ROSALIA?<a class="headerlink" href="#what-is-rosalia" title="Link to this heading"></a></h1>
 <p>The primary mission of <em>ROSALIA</em> is to provide an estimate of the sky background level of an image obtained with a space telescope. Most researchers combine multiple images obtained with telescopes to generate <em>deeper</em> images (more precise). However, due to tiny - but noticeable - differences in the conditions of the observation (i.e., zodiacal light level, stray-light contamination, thermal background) the baseline level of the images (empty regions that we would expect to be zero) can present a certain level of light that must be removed. This is called <strong>sky background correction</strong> and it is one of the most critical steps in astronomical imaging.</p>
+<img alt="NASA Ames Research Center - Code S - RACCOONS team" src="https://raw.githubusercontent.com/Borlaff/ROSALIA/main/images/rosalia_star_on_the_edge.gif" />
 <p>Until now, most astronomers attempted to model and correct the background level using the science images themselves. However, this method has a number of problems associated, like <em>sky background oversubtraction</em>. <strong>ROSALIA</strong> takes a different approach: Use all the information available from other telescopes to predict the sky background level as a combination of stray-light, zodiacal light, and thermal background.</p>
 </section>
 
