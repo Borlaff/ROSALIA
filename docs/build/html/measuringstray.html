@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Measuring Stray Light &mdash; ROSALIA 0.9.5 documentation</title>
+  <title>Stray Light &mdash; ROSALIA 0.9.5 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
 
@@ -46,12 +46,14 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="mission.html">What is ROSALIA?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Measuring Stray Light</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Stray Light</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#in-field-vs-out-field-stray-light">In-field vs. out-field stray-light</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#quickstart-stray-light-analysis-example-with-rosalia">Quickstart: Stray Light Analysis Example with ROSALIA</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#case-study-calibrating-stray-light-with-a-bright-star">Case study: Calibrating stray-light with a bright star</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="zodiacal.html">Zodiacal Light</a></li>
+<li class="toctree-l1"><a class="reference internal" href="PSF.html">In-field Stars</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials.html">Additional Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">How to use</a></li>
 <li class="toctree-l1"><a class="reference internal" href="whoarewe.html">Who is ROSALIA?</a></li>
@@ -73,7 +75,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Measuring Stray Light</li>
+      <li class="breadcrumb-item active">Stray Light</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/measuringstray.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -83,8 +85,12 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="measuring-stray-light">
-<h1>Measuring Stray Light<a class="headerlink" href="#measuring-stray-light" title="Link to this heading"></a></h1>
+  <section id="stray-light">
+<h1>Stray Light<a class="headerlink" href="#stray-light" title="Link to this heading"></a></h1>
+<section id="in-field-vs-out-field-stray-light">
+<h2>In-field vs. out-field stray-light<a class="headerlink" href="#in-field-vs-out-field-stray-light" title="Link to this heading"></a></h2>
+<p>Stray-light is the light that reaches the detector without following the nominal optical path. It can be produced by a variety of sources, like bright stars, planets, the Moon, or even the Earth. On first approximation, stray-light can be classified into two main categories: <strong>in-field</strong> and <strong>out-field</strong> stray-light.</p>
+</section>
 <section id="quickstart-stray-light-analysis-example-with-rosalia">
 <h2>Quickstart: Stray Light Analysis Example with ROSALIA<a class="headerlink" href="#quickstart-stray-light-analysis-example-with-rosalia" title="Link to this heading"></a></h2>
 <p>The following Jupyter-notebook shows a quick example to estimate stray-light with ROSALIA.</p>

@@ -43,6 +43,7 @@ Contents
     installation
     measuringstray
     zodiacal
+    PSF
     tutorials
     usage
     whoarewe

@@ -1,5 +1,12 @@
-Measuring Stray Light
+Stray Light
 =========
+
+In-field vs. out-field stray-light
+-----------------------------
+
+Stray-light is the light that reaches the detector without following the nominal optical path. It can be produced by a variety of sources, like bright stars, planets, the Moon, or even the Earth. On first approximation, stray-light can be classified into two main categories: **in-field** and **out-field** stray-light.
+
+
 
 Quickstart: Stray Light Analysis Example with ROSALIA
 -----------------------------
