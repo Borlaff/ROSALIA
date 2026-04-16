@@ -122,21 +122,28 @@ def main_offender_find_fraction_of_map(mainoff_name, catalog_name):
     unique_ids = unique_ids[unique_counts>1]
     print("Unique IDs with counts > 1:")
     print(unique_ids)
-    fraction_by_offender = np.zeros(len(unique_ids))
+    fraction_by_offender = [] 
 
     import bottleneck as bn
     source_name_list = []
     ra_list = []
     dec_list = []
     mag_lambda_list = []
+    unique_id_valid = []
     for i in range(len(unique_ids)): 
         unique_id = unique_ids[i]
+        
+        if np.where(catalog["cat_id"] == unique_id)[0].size == 0:
+            print("Catalog does not have information for cat_id: " + str(unique_id) + ". Skipping")
+            continue
+        
+        unique_id_valid.append(unique_ud)
         # print(unique_id)
         pixels_with_id = bn.nansum(data == unique_id)
         #print("pixels_with_id: " + str(unique_id) + " - " + str(pixels_with_id))
         total_valid_pixels = len(data.flatten())-bn.nansum(np.isnan(data.flatten()))
         #print("total_valid_pixels: " + str(total_valid_pixels)) 
-        fraction_by_offender[i] = pixels_with_id/total_valid_pixels
+        fraction_by_offender.append(pixels_with_id/total_valid_pixels)
         #print(pixels_with_id/total_valid_pixels)
         #print(fraction_by_offender[i])
 
@@ -163,7 +170,7 @@ def main_offender_find_fraction_of_map(mainoff_name, catalog_name):
         mag_lambda_list.append(mag_lambda)
         source_name_list.append(source_name)
     
-    main_offender_db = pd.DataFrame({"source_id":unique_ids, "ra": ra_list, "dec": dec_list, "mag_lambda": mag_lambda_list,
+    main_offender_db = pd.DataFrame({"source_id":unique_id_valid, "ra": ra_list, "dec": dec_list, "mag_lambda": mag_lambda_list,
                                      "source_name":source_name_list,
                                     "fraction_by_offender":fraction_by_offender})
     main_offender_db = main_offender_db.sort_values(by=["fraction_by_offender"], ascending=False)

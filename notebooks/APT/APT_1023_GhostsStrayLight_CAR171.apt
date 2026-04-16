@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<RomanProgram schemaVersion="28" APTVersion="Version 2025.6.1  JWST PRD: PRDAPTSOC-071-002, Roman PRD: RPRDDEVSOC-021" xmlns="http://www.stsci.edu/Roman/APT">
+    <ProgramInformation>
+        <ProgramPhase>Approved</ProgramPhase>
+        <Title>CAR-171: Ghosts and Scattered Light</Title>
+        <Abstract>TBD</Abstract>
+        <ProgramID>1023</ProgramID>
+        <StsciEditNumber>0</StsciEditNumber>
+        <ProgramCategory>COM</ProgramCategory>
+        <ProgramCategorySubtype>WFI</ProgramCategorySubtype>
+        <AllowRestricted>true</AllowRestricted>
+        <IncludesCalibrations>false</IncludesCalibrations>
+        <PureParallelProgram>false</PureParallelProgram>
+        <Cycle>0</Cycle>
+        <ObservingDescription>TBD</ObservingDescription>
+        <PrincipalInvestigator>
+            <InvestigatorAddress>
+                <UniqueID>24856</UniqueID>
+                <Country>USA</Country>
+                <Institution>NASA Goddard Space Flight Center</Institution>
+                <USState>MD</USState>
+                <ESAMember>false</ESAMember>
+                <CSAMember>false</CSAMember>
+                <FirstName>Maxime</FirstName>
+                <Honorific>Dr.</Honorific>
+                <LastName>Rizzo</LastName>
+                <Retired>false</Retired>
+            </InvestigatorAddress>
+            <Contact>true</Contact>
+        </PrincipalInvestigator>
+        <CoInvestigator>
+            <CoPI>false</CoPI>
+            <InvestigatorAddress>
+                <UniqueID>43054</UniqueID>
+                <Country>USA</Country>
+                <Institution>NASA Goddard Space Flight Center</Institution>
+                <USState>MD</USState>
+                <ESAMember>false</ESAMember>
+                <CSAMember>false</CSAMember>
+                <FirstName>Eric</FirstName>
+                <LastName>Switzer</LastName>
+                <Retired>false</Retired>
+            </InvestigatorAddress>
+            <AdminUSPI>false</AdminUSPI>
+            <Contact>false</Contact>
+        </CoInvestigator>
+        <CoInvestigator>
+            <CoPI>false</CoPI>
+            <InvestigatorAddress>
+                <UniqueID>42463</UniqueID>
+                <Country>USA</Country>
+                <Institution>NASA Goddard Space Flight Center</Institution>
+                <USState>MD</USState>
+                <ESAMember>false</ESAMember>
+                <CSAMember>false</CSAMember>
+                <FirstName>Scott</FirstName>
+                <Honorific>Dr.</Honorific>
+                <LastName>Rohrbach</LastName>
+                <MiddleInitial>Owens</MiddleInitial>
+                <Retired>false</Retired>
+            </InvestigatorAddress>
+            <AdminUSPI>false</AdminUSPI>
+            <Contact>false</Contact>
+        </CoInvestigator>
+    </ProgramInformation>
+    <Targets>
+        <FixedTarget>
+            <Number>1</Number>
+            <TargetName>Target_1</TargetName>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Aperture location</Keywords>
+            <EquatorialCoordinates Value="00 00 0.0000 +00 00 0.00"/>
+        </FixedTarget>
+    </Targets>
+    <MosaicPatterns/>
+    <PassPlans>
+        <PassPlan Number="1">
+            <Label>Target_1</Label>
+            <TargetSelection>Fixed: 1</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Resultant>10</Resultant>
+                <Dither>NONE</Dither>
+                <SubpixelDither>NONE</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+    </PassPlans>
+    <SurveyPlan>
+        <Links/>
+        <SurveyPlanStep>
+            <PassPlan>1</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="0 Degrees" OrientMax="1 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+    </SurveyPlan>
+    <Activities/>
+    <ExecutionPlans/>
+    <Cycles>
+        <CycleInfo CycleNumber="0" StartDate="2026-08-20 00:00:00" EndDate="2027-04-18 00:00:00" Active="true"/>
+        <CycleInfo CycleNumber="1" StartDate="2026-11-18 00:00:00" EndDate="2028-04-18 00:00:00" Active="true"/>
+    </Cycles>
+    <ProgramHistory>
+        <HistoryEntry Date="Sat Jan 18 00:23:15 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1006.apt"/>
+        <HistoryEntry Date="Sat Jan 18 00:23:48 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1007.apt"/>
+        <HistoryEntry Date="Sat Jan 18 00:24:09 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1008.apt"/>
+        <HistoryEntry Date="Sat Jan 18 00:26:03 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1008.apt"/>
+        <HistoryEntry Date="Sat Jan 18 00:26:15 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1009.apt"/>
+        <HistoryEntry Date="Sat Jan 18 00:26:29 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1010.apt"/>
+        <HistoryEntry Date="Sat Jan 18 00:26:44 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1011.apt"/>
+        <HistoryEntry Date="Sat Jan 18 00:27:01 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1012.apt"/>
+        <HistoryEntry Date="Sat Jan 18 00:27:21 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1013.apt"/>
+        <HistoryEntry Date="Sat Jan 18 00:27:30 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1013.apt"/>
+        <HistoryEntry Date="Sat Jan 18 00:28:00 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1014.apt"/>
+        <HistoryEntry Date="Sat Jan 18 00:28:15 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1015.apt"/>
+        <HistoryEntry Date="Sat Jan 18 00:28:51 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1016.apt"/>
+        <HistoryEntry Date="Sat Jan 18 00:29:04 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1017.apt"/>
+        <HistoryEntry Date="Sat Jan 18 00:29:18 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1018.apt"/>
+        <HistoryEntry Date="Sat Jan 18 00:29:37 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1019.apt"/>
+        <HistoryEntry Date="Sat Jan 18 00:29:50 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1020.apt"/>
+        <HistoryEntry Date="Sat Jan 18 00:30:15 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1021.apt"/>
+        <HistoryEntry Date="Sat Jan 18 00:30:27 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1022.apt"/>
+        <HistoryEntry Date="Sat Jan 18 00:30:39 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1023.apt"/>
+        <HistoryEntry Date="Sat Jan 18 00:53:47 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1023.apt"/>
+        <HistoryEntry Date="Sat Jan 18 01:15:44 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1023.apt"/>
+        <HistoryEntry Date="Sat Jan 18 01:15:49 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1023.apt"/>
+        <HistoryEntry Date="Fri Dec 05 04:54:24 GMT 2025" APTVersion="Version 2025.6.1  JWST PRD: PRDAPTSOC-071-002, Roman PRD: RPRDDEVSOC-021" SchemaVersion="28" ProgramPhase="Approved" User="mrizzo" Platform="Mac OS X - aarch64" FileLocation="/Users/mrizzo/Library/CloudStorage/Box-Box/WFI/Commissioning/APT_1023_GhostsStrayLight_CAR171.apt"/>
+        <HistoryEntry Date="Fri Dec 05 05:10:50 GMT 2025" APTVersion="Version 2025.6.1  JWST PRD: PRDAPTSOC-071-002, Roman PRD: RPRDDEVSOC-021" SchemaVersion="28" ProgramPhase="Approved" User="mrizzo" Platform="Mac OS X - aarch64" FileLocation="/Users/mrizzo/Library/CloudStorage/Box-Box/WFI/Commissioning/APT_1023_GhostsStrayLight_CAR171.apt"/>
+    </ProgramHistory>
+    <ToolData>
+        <ToolData Name="Phase2SubmissionData"/>
+        <ToolData Name="SubmissionData">
+            <ToolValue Name="AssignedID">00000</ToolValue>
+            <ToolValue Name="SubmissionLog">
+Assuming assigned ID: 00000</ToolValue>
+        </ToolData>
+    </ToolData>
+    <Properties/>
+</RomanProgram>
