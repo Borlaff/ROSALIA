@@ -114,7 +114,7 @@
 <span class="n">ra</span> <span class="o">=</span> <span class="mf">56.6583333</span>  <span class="c1"># Right ascension, in degrees.</span>
 <span class="n">dec</span> <span class="o">=</span> <span class="o">+</span><span class="mf">24.1780556</span> <span class="c1"># Declination, in degrees.</span>
 <span class="n">dX</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.4118</span>
-<span class="n">dY</span> <span class="o">=</span> <span class="mf">0.</span>
+<span class="n">dY</span> <span class="o">=</span> <span class="mf">0.20625</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">astropy.time</span><span class="w"> </span><span class="kn">import</span> <span class="n">Time</span>
 
 <span class="n">date</span> <span class="o">=</span> <span class="n">Time</span><span class="p">(</span><span class="s2">&quot;2027-06-01T00:00:00&quot;</span><span class="p">)</span> <span class="c1"># Date of the observation, in Astropy Time YYYY-MM-DDTHH:MM:SS format.</span>
@@ -178,7 +178,7 @@ romanisim-make-image<span class="w"> </span>--radec<span class="w"> </span><span
 <section id="estimating-the-surface-brigthness-limit-of-roman-wfi-observations">
 <h2>Estimating the surface brigthness limit of Roman WFI observations<a class="headerlink" href="#estimating-the-surface-brigthness-limit-of-roman-wfi-observations" title="Link to this heading"></a></h2>
 <p>In this tutorial you can find an example of use of a very approximate function to estimate the surface brightness limit of Roman/WFI observations as a function of the exposure time and the level of stray light in the field. This is not meant to be a rigorous calculation, but rather an example of how to use ROSALIA to quickly estimate the impact of stray light on the surface brightness limit of Roman/WFI observations.</p>
-<p>This is a very crude solution that does not take into account systematic effects like flat field, CTE, bias, or gradients. The only limiting factor is photon noise from Zodiacal light. However, Zodiacal light is 95% of the limit, so it will work sufficiently well for most purposes.</p>
+<p>This is a very crude solution that should be considered as maximum surface brightness limit. Real surface brightness limits will be brighter (worse) than this estimate, as it does not take into account systematic effects like flat field, CTE, bias, or gradients due to stray-light. The only limiting factor is photon noise from Zodiacal light. However, for most observations, Zodiacal light is 95% of the limit, so it will work sufficiently well for the vast majority of purposes.</p>
 <p>For a more realistic simulation, we recommend to simulate the individual exposures with Romanisim: <a class="reference external" href="https://romanisim.readthedocs.io/en/latest/">https://romanisim.readthedocs.io/en/latest/</a>, and then combine the individual exposures. The resulting noise then will include the systematic effects mentioned above.</p>
 <ul class="simple">
 <li><p><a class="reference download internal" download="" href="_downloads/308e237f88ff2e8512047f2d3a42b4e0/R0_Surface_brightness_limit.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">R0_Surface_brightness_limit.ipynb</span></code></a></p></li>

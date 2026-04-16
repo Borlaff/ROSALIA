@@ -40,7 +40,7 @@ A more complicated case is the need to observe a target with a custom offset. Fo
     ra = 56.6583333  # Right ascension, in degrees. 
     dec = +24.1780556 # Declination, in degrees.    
     dX = -0.4118
-    dY = 0.
+    dY = 0.20625
     from astropy.time import Time
 
     date = Time("2027-06-01T00:00:00") # Date of the observation, in Astropy Time YYYY-MM-DDTHH:MM:SS format.
@@ -128,7 +128,7 @@ Estimating the surface brigthness limit of Roman WFI observations
 
 In this tutorial you can find an example of use of a very approximate function to estimate the surface brightness limit of Roman/WFI observations as a function of the exposure time and the level of stray light in the field. This is not meant to be a rigorous calculation, but rather an example of how to use ROSALIA to quickly estimate the impact of stray light on the surface brightness limit of Roman/WFI observations. 
 
-This is a very crude solution that does not take into account systematic effects like flat field, CTE, bias, or gradients. The only limiting factor is photon noise from Zodiacal light. However, Zodiacal light is 95% of the limit, so it will work sufficiently well for most purposes.
+This is a very crude solution that should be considered as maximum surface brightness limit. Real surface brightness limits will be brighter (worse) than this estimate, as it does not take into account systematic effects like flat field, CTE, bias, or gradients due to stray-light. The only limiting factor is photon noise from Zodiacal light. However, for most observations, Zodiacal light is 95% of the limit, so it will work sufficiently well for the vast majority of purposes.
 
 For a more realistic simulation, we recommend to simulate the individual exposures with Romanisim: https://romanisim.readthedocs.io/en/latest/, and then combine the individual exposures. The resulting noise then will include the systematic effects mentioned above. 
 
