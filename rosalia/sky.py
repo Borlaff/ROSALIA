@@ -333,7 +333,7 @@ def get_zodiacal_background(input_name, ext, wavelength=None, telescope=None, in
         zody_interp = zody_MJysr
 
     zody_interp = zody_interp*(u.MJy * u.steradian**-1) 
-    print(telescope)
+    # print(telescope)
 
     if output_units == "e/s":
         if verbose: print("Output units:" + output_units)

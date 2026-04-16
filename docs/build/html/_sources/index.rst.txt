@@ -42,6 +42,7 @@ Contents
     mission
     installation
     measuringstray
+    zodiacal
     tutorials
     usage
     whoarewe

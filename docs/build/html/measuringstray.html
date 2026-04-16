@@ -19,7 +19,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Additional Tools" href="tutorials.html" />
+    <link rel="next" title="Zodiacal Light" href="zodiacal.html" />
     <link rel="prev" title="Installation" href="installation.html" /> 
 </head>
 
@@ -51,6 +51,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#case-study-calibrating-stray-light-with-a-bright-star">Case study: Calibrating stray-light with a bright star</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="zodiacal.html">Zodiacal Light</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials.html">Additional Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">How to use</a></li>
 <li class="toctree-l1"><a class="reference internal" href="whoarewe.html">Who is ROSALIA?</a></li>
@@ -106,15 +107,15 @@
 <a class="reference internal image-reference" href="_images/rosalia_loading.gif"><img alt="ROSALIA Stray-light loading bar" height="512" src="_images/rosalia_loading.gif" width="802" />
 </a>
 <p>The notebook is available in the <code class="docutils literal notranslate"><span class="pre">notebooks</span></code> directory of the ROSALIA repository, and can be downloaded from the link below:
-* <a class="reference download internal" download="" href="_downloads/dbb566f73eac06baa2f399716a62bc1f/R1_Rosalia_stray_example.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">R1_Rosalia_stray_example.ipynb</span></code></a>. To run this notebook locally, make sure you have Jupyter installed and then:</p>
+* <code class="xref download docutils literal notranslate"><span class="pre">R1_Rosalia_stray_example.ipynb</span></code>. To run this notebook locally, make sure you have Jupyter installed and then:</p>
 </section>
 <section id="case-study-calibrating-stray-light-with-a-bright-star">
 <h2>Case study: Calibrating stray-light with a bright star<a class="headerlink" href="#case-study-calibrating-stray-light-with-a-bright-star" title="Link to this heading"></a></h2>
 <p>A particular case of interest would be to produce an intense stray-light background signal on purpose, to calibrate the models against real observations. To gather sufficient signal-to-noise and minimize contamination from other background sources like the Zodiacal light, the selected star (<em>offending</em> source) would need to be as bright as possible. In addition, we need to place it in positions around Roman Space Telescope WFI that are known to produce the maximum stray light if hit by a source. With ROSALIA, it is possible to find out where should we point our telescope and which roll (position) angle we should have to maximize or minimize the stray-light from a star.</p>
 <p>First, let’s visualize the Normalized Detector Irradiance (NDI) map for Roman Space Telescope Wide Field Instrument.</p>
-<a class="reference internal image-reference" href="_images/ndi_2deg_CARs_no_points.png"><img alt="_images/ndi_2deg_CARs_no_points.png" src="_images/ndi_2deg_CARs_no_points.png" style="width: 49%;" />
+<a class="reference internal image-reference" href="../../notebooks/ndi_2deg_CARs_no_points.png"><img alt="../../notebooks/ndi_2deg_CARs_no_points.png" src="../../notebooks/ndi_2deg_CARs_no_points.png" style="width: 49%;" />
 </a>
-<a class="reference internal image-reference" href="_images/ndi_20deg_CARs_no_points.png"><img alt="_images/ndi_20deg_CARs_no_points.png" src="_images/ndi_20deg_CARs_no_points.png" style="width: 49%;" />
+<a class="reference internal image-reference" href="../../notebooks/ndi_20deg_CARs_no_points.png"><img alt="../../notebooks/ndi_20deg_CARs_no_points.png" src="../../notebooks/ndi_20deg_CARs_no_points.png" style="width: 49%;" />
 </a>
 <p>The NDI is defined as the ratio of the stray-light irradiance (power per unit area) received at the detector to the irradiance of the source at the entrance of the telescope <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2003dclo.book.....B/abstract">(see Bely 2003)</a> . This function can be used to estimate the flux of photoelectrons that an off-axis source will generate in a certain region of the detector. Similarly to the Point Spread Function (PSF) defines the spread of point sources by diffraction effects, the sharpness of the NDI defines the effectiveness of the telescope’s baffling. This function is strongly dependent on the optical setup and wavelength. For a given telescope, the NDI depends on the angular distance between the optical axis and the source, the position angle of the source in the focal plane reference frame, the observation wavelength, and the position on the FOV (x,y),</p>
 <p>We can identify several points of interested were stray-light is expected to peak if illuminated:</p>
@@ -176,7 +177,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="tutorials.html" class="btn btn-neutral float-right" title="Additional Tools" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="zodiacal.html" class="btn btn-neutral float-right" title="Zodiacal Light" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

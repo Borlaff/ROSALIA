@@ -299,6 +299,16 @@ def rosalia_zody(ra, dec, PA, date, bandpass, exptime, verbose=False, output_nam
     rs.utils.save_fits(array=data_output, name=output_name, header=header_output,
                        extname=None, overwrite=True, output_verify='silentfix')
 
+    # Make the scaled model and the summary plot.
+    drz_name, scaled_drz_name = rs.utils.run_swarp(pattern=output_name, 
+                                                   outname=output_name.replace(".fits","_drz.fits"), scale=0.1)
+    
+    ext = 1
+    rs.plots.make_stray_plot(input_name=scaled_drz_name, ext=ext, mode="fe2mu", catalog_name=None, 
+                    vmin=None, vmax=None, 
+                    color_label = 'Surface brightness (mag arcsec$^{-2}$)',
+                    cmap="RdYlBu", output_name=None, figsize=(10,7), mu_vmin=None, mu_vmax=None)
+
     print("Output saved in: " + output_name)
 
     return({"image_identity":exposure_identity,
