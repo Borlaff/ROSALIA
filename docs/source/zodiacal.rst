@@ -4,6 +4,8 @@ Zodiacal Light
 Modeling the Zodiacal light background with ROSALIA
 -----------------------------
 
+*This is a work in progress section. We are currently (April 16, 2026) implementing a new Zodiacal light model from STScI team in place. However, the currently in place model is usable an it will provide reasonable solutions for most uses*.
+
 The Zodiacal light is the dominant source of background for most of the observations with the Roman Space Telescope, with exception of the thermal background at the reddest filters. It is produced by the scattering of sunlight by interplanetary dust particles in the Solar System. The intensity of the Zodiacal light depends on the line of sight through the Solar System, and therefore on the position of the target in the sky, the time of the observation, and the wavelength. 
 
 There are several models to estimate the Zodiacal light background, with different levels of complexity and accuracy. ROSALIA implements the model by  `COSMOGLOBE / Zodipy <https://cosmoglobe.github.io/zodipy/usage/>`_. If you use this model, please cite the following papers: `(San et al. 2022) <https://arxiv.org/abs/2205.12962>`_  and  `(San 2024) <https://joss.theoj.org/papers/10.21105/joss.06648#>`_.

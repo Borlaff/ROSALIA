@@ -47,6 +47,7 @@ Contents
     SSOs
     tutorials
     usage
+    nexus
     whoarewe
     rosalia
     api
