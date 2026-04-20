@@ -24,3 +24,4 @@ skyfield
 pytest
 ipython
 pysiaf
+pyarrow

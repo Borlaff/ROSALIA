@@ -549,6 +549,7 @@ def correct_zody(input_name, verbose=False):
 
         output_list.append(corrected_image)
     return(output_list)
+########################################
 
 def main_offender(input_name=None, ext=None, ra=None, dec=None, phi=0,
                   filter_name=None, instrument=None, telescope=None, detector=None,
@@ -852,8 +853,6 @@ def main_offender(input_name=None, ext=None, ra=None, dec=None, phi=0,
             "detector_square": detector_square_list})
 
 ########################################
-########################################
-########################################
 
 def estimate_straylight_in_detector_locations(input_name, ext, ra, dec,
                                               stars_world_location, synthetic_mag,
@@ -949,3 +948,4 @@ def estimate_straylight_in_detector_locations(input_name, ext, ra, dec,
         rs.utils.save_fits(array=straylight_image_interp, name=straylight_output_name, header=input_fits[ext].header, extname="OFS")
 
     return(straylight_image_interp)
+########################################
