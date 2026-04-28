@@ -788,7 +788,7 @@ def MJysr_to_jyarcsec2(flux_mjy_sr):
 
 
 ###############################################
-
+"""
 def get_pixscale(fits_name, ext):
     # We look for the pixsize in the ext 0, if it doesnt work, go to ext 1.
     input_fits = fits.open(fits_name)
@@ -799,7 +799,7 @@ def get_pixscale(fits_name, ext):
         pixsize = np.abs(input_fits[ext].header["CD2_2"])*60*60
 
     return(pixsize)
-
+"""
 #################################
 
 def radec_to_xy(ra, dec, fits_name, ext):
@@ -1543,7 +1543,7 @@ def get_data_and_wcs(input_name, ext):
 #####################################################################
 
 
-def find_max_angular_size_of_image(data, wcs):
+def find_max_angular_size_of_image(wcs, ra_cen=None, dec_cen=None):
     """
     Returns the maximum angular extension of an image.
 
@@ -1553,13 +1553,22 @@ def find_max_angular_size_of_image(data, wcs):
     :type wcs: :class:`astropy.wcs.wcs.WCS`
     :return: :float: The maximum angular extension of the image in sky coordinates in degrees.
     """
-
-    data_shape = wcs.array_shape
-    ra_cen, dec_cen = wcs.wcs_pix2world(data_shape[0]/2, data_shape[1]/2, 0)
-    corners = rs.detectors.get_detector_corners(data=data, wcs=wcs)
-    distance = rs.utils.sphere_dist(ra1=ra_cen, dec1=dec_cen, ra2=corners["corners_world"][:,0], dec2=corners["corners_world"][:,1])
-    return(np.nanmax(distance))
-
+    
+    if isinstance(wcs, (astropy_wcs.WCS,)):  
+        data_shape = wcs.array_shape
+        ra_cen, dec_cen = wcs.wcs_pix2world(data_shape[0]/2, data_shape[1]/2, 0)
+        corners = rs.detectors.get_detector_corners(wcs=wcs)
+        distance = rs.utils.sphere_dist(ra1=ra_cen, dec1=dec_cen, ra2=corners["corners_world"][:,0], dec2=corners["corners_world"][:,1])
+        return(np.nanmax(distance))
+    
+    if isinstance(wcs, (list,)) and (ra_cen is not None) and (dec_cen is not None):
+        distance_per_detector = []
+        for i in range(len(wcs)):
+            data_shape = wcs[i].array_shape
+            corners = rs.detectors.get_detector_corners(wcs=wcs[i])
+            distance = rs.utils.sphere_dist(ra1=ra_cen, dec1=dec_cen, ra2=corners["corners_world"][:,0], dec2=corners["corners_world"][:,1])
+            distance_per_detector.append(np.nanmax(distance))
+        return(np.nanmax(distance_per_detector))
 
 
 def check_fits_integrity(input):

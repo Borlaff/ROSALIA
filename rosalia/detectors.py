@@ -220,10 +220,12 @@ def fe2mag(fe, instrument, filter_name, telescope, verbose=False):
     return(mag)
 """
 
-def get_detector_corners(data_shape, wcs):
+def get_detector_corners(wcs):
     #input_fits = fits.open(input_name)
     #w = wcs.WCS(header=input_fits[ext].header, fobj=input_fits, naxis=2)
     w = wcs
+    data_shape = w.array_shape
+
     x_min = 0
     x_max = data_shape[1]
     y_min = 0
