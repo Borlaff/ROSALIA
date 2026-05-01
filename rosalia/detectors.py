@@ -304,13 +304,14 @@ def make_array_grid(array, step, mode="random", nborder_points=64):
 
 
 
-def make_detector_grid(input_name, ext, step, mode="random"):
-    input_fits = fits.open(input_name)
-    w = wcs.WCS(header=input_fits[ext].header, fobj=input_fits, naxis=2)
+def make_detector_grid(w, step, mode="random"):
+    #input_fits = fits.open(input_name)
+    #w = wcs.WCS(header=input_fits[ext].header, fobj=input_fits, naxis=2)
+    data_shape = w.array_shape
     x_min = 0
-    x_max = input_fits[ext].data.shape[1]
+    x_max = data_shape[1] #input_fits[ext].data.shape[1]
     y_min = 0
-    y_max = input_fits[ext].data.shape[0]
+    y_max = data_shape[0]
 
     x_mid = int((x_max - x_min)/2)
     y_mid = int((y_max - y_min)/2)

@@ -171,7 +171,7 @@ def rebin_transmission_curve(filter_transmission_curve, nbins, verbose=False):
 
 
 
-def get_zodiacal_background(input_name, ext, wavelength=None, telescope=None, instrument=None,
+def get_zodiacal_background(input_name=None, ext=None, exposure_identity=None, wavelength=None, telescope=None, instrument=None,
                             detector=None, expstart=None, step=1000, zody_mode="zodipy",
                             nbins_wavelength=20, obslocin=3, grid_method="random",
                             output_units=None, verbose=False, interpolate=True):
@@ -189,25 +189,12 @@ def get_zodiacal_background(input_name, ext, wavelength=None, telescope=None, in
     # obsverin 	char 	1 or 4 	Code version (optional, defaults to 4).
     # ido_viewin 	char 	0 or 1 	0 = find zodiacal on Day; 1 = find median zodiacal over a likely viewing range (defaults to 1, see Help).
 
-    switch_filter_curve = 0
-
-    if (wavelength == None) or (expstart == None) or (output_units == None) or (zody_mode=="zodipy"):
-        exposure_identity = rs.utils.exposure_inspector(input_name, lite=True)
-
-    if wavelength == None:
-        wavelength = exposure_identity["FILTER"]
-
-    if telescope == None:
-        telescope = exposure_identity["TELESCOP"]
-
-    if instrument == None:
-        instrument = exposure_identity["INSTRUME"]
-
-    if detector == None:
-        detector = exposure_identity["DETECTOR"]
-
-    if expstart == None:
-        expstart = exposure_identity["EXPSTART"]
+    if exposure_identity is None:
+        input_fits = fits.open(input_name)
+        astropywcs = wcs.WCS(header=input_fits[ext].header, fobj=input_fits, naxis=2)
+        
+        if (wavelength == None) or (expstart == None) or (output_units == None) or (zody_mode=="zodipy"):
+            exposure_identity = rs.utils.exposure_inspector(input_name, lite=True)
 
     # print(exposure_identity)
     #if output_units == None:
@@ -218,7 +205,12 @@ def get_zodiacal_background(input_name, ext, wavelength=None, telescope=None, in
     # Look for it in the library FILTERS
     # Check that ra and dec arguments are in array
     if isinstance(wavelength, (str)):
-        filter_curve_name = rs.telescopes.find_filter_in_svo(wavelength, telescope, instrument, detector, verbose=verbose)
+        filter_curve_name = rs.telescopes.find_filter_in_svo(wavelength=exposure_identity["FILTER"], 
+                                                             telescope=exposure_identity["TELESCOP"], 
+                                                             instrument=exposure_identity["INSTRUME"], 
+                                                             detector=exposure_identity["DETECTOR"], 
+                                                             verbose=verbose)
+        
         rebinned_filter_curve = rebin_transmission_curve(filter_transmission_curve=filter_curve_name["filter_transmission_curve"],
                                                          nbins=nbins_wavelength, verbose=verbose)
         rebinned_transmission = rebinned_filter_curve["rebinned_transmission"]
@@ -228,7 +220,7 @@ def get_zodiacal_background(input_name, ext, wavelength=None, telescope=None, in
         dlambda = rebinned_filter_curve["rebinned_dlambda"]
 
     # If the input is just a wavelength, then emulate the output of rebin_transmission_curve
-    if isinstance(wavelength, (float)):
+    if isinstance(exposure_identity["FILTER"], (float)):
         if verbose:
             print("Input wavelength " + str(wavelength))
         rebinned_transmission = np.array([1])
@@ -237,7 +229,7 @@ def get_zodiacal_background(input_name, ext, wavelength=None, telescope=None, in
     ###############################
 
     # We calculate the expstart
-    t = Time(expstart, format='mjd', scale='utc')
+    t = Time(exposure_identity["EXPSTART"], format='mjd', scale='utc')
     year = t.yday.split(":")[0]
     day = t.yday.split(":")[1]
 
@@ -245,7 +237,7 @@ def get_zodiacal_background(input_name, ext, wavelength=None, telescope=None, in
     ########################################
 
     # First we get the detector grid for interpolating the zodiacal measurements
-    detector_grid = rs.detectors.make_detector_grid(input_name=input_name, ext=ext, step=step, mode=grid_method)
+    detector_grid = rs.detectors.make_detector_grid(w=astropywcs, step=step, mode=grid_method)
     npoints_grid = len(detector_grid["grid_world"][0])
     # Then we query IRSA to get the Zody surface brightness at those positions and time
     if verbose:
@@ -267,35 +259,6 @@ def get_zodiacal_background(input_name, ext, wavelength=None, telescope=None, in
 
             db_irsa[:,i] = np.array(db["zody"])
 
-    """
-    if zody_mode == "gunagala":
-        #gunagala_zody(ra, dec, wavelength, year, day)
-        if verbose:
-            print("Estimating zodiacal light with Gunagala...")
-        for i in tqdm(range(len(rebinned_wavelength))):
-            # IRSA queries must go in um so we need to multiply by 1E+7 the m above
-            db = gunagala_zody(ra=detector_grid["grid_world"][0], dec=detector_grid["grid_world"][1],
-                                    wavelength=rebinned_wavelength[i].to("AA").value, year=year, day=day)
-
-            db_irsa[:,i] = np.array(db["zody"])
-
-
-    if zody_mode == "IRSA" or zody_mode == "gunagala":
-        # Now we calculate the integrated Zodiacal light
-        # https://www.aanda.org/articles/aa/pdf/2022/01/aa41935-21.pdf
-        # μVIS,AB = −2.5 log10( ∑ f (νi) (h νi)−1 e(νi) ∆νi/A ∑(h νi)−1 e(νi) ∆νi)+ 8.90.
-
-        # T_array = np.loadtxt("VIS_full_transmission_IRSA_bins_v2.txt", delimiter=",")
-        # evdv = (T_array[:,2]) * evp.cs*T_array[:,1]/(T_array[:,0]**2)
-        # evdv = Transmission * c lambda / dlambda**2
-        evdv = rebinned_transmission*rebinned_wavelength*constants.c/dlambda**2
-
-        # We integrate the flux
-        zodiacal_flux_convolved_by_filter = np.zeros(npoints_grid)*np.nan
-
-        for i in range(npoints_grid):
-            zodiacal_flux_convolved_by_filter[i] = np.sum(db_irsa[i,:]*evdv)/np.sum(evdv)
-    """
 
     if zody_mode == "zodipy":
         #gunagala_zody(ra, dec, wavelength, year, day)
