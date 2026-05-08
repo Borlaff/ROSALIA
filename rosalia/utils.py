@@ -328,7 +328,7 @@ def exposure_inspector_asdf(input_name, verbose=False, lite=False):
 
     ##############################################################
 
-    exposure_identity["PHYSPIX"] = telescope_class.get_physical_pixelsize(instrument=exposure_identity["INSTRUME"])
+    # exposure_identity["PHYSPIX"] = telescope_class.get_physical_pixelsize(instrument=exposure_identity["INSTRUME"])
     exposure_identity["PIXSCALE"] = np.sqrt(exposure_identity["pixel_area"])
 
     # ------------- #
@@ -436,14 +436,19 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
 
 
 
-    # Get the right filter
-    filter_1 = input_fits[0].header["FILTER1"]
-    filter_2 = input_fits[0].header["FILTER2"]
-
-    if "CLEAR" in filter_1:
-        exposure_identity["FILTER"] = filter_2
+    # Get the right filter. 
+    if "FILTER1" in input_fits[0].header: 
+        if "CLEAR" not in filter_1:
+            filter = input_fits[0].header["FILTER1"]
+    elif "FILTER2" in input_fits[0].header: 
+        if "CLEAR" not in filter_2:
+            filter = input_fits[0].header["FILTER2"]
     else:
-        exposure_identity["FILTER"] = filter_1
+        try: 
+            filter = input_fits[0].header["FILTER"]
+        except: 
+            print("ERROR! The FITS does not have a FILTER keyword in the header of EXT 0. ")
+    exposure_identity["FILTER"] = filter
 
     # Get the filter identity
     exposure_identity["FILTER_IDENTITY"] = rs.telescopes.find_filter_in_svo(wavelength=exposure_identity["FILTER"],
@@ -453,8 +458,8 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
                                                               verbose=False)
 
     # Get pixel size
-    exposure_identity["PHYSPIX"] = telescope_class.get_physical_pixelsize(instrument=exposure_identity["INSTRUME"])
-    exposure_identity["PIXSCALE"] = telescope_class.get_pixscale(instrument=exposure_identity["INSTRUME"])
+    # exposure_identity["PHYSPIX"] = telescope_class.get_physical_pixelsize(instrument=exposure_identity["INSTRUME"])
+    # exposure_identity["PIXSCALE"] = telescope_class.get_pixscale(instrument=exposure_identity["INSTRUME"])
 
     # Find which extensions are SCI
     exposure_identity["SCIEXTS"] = detect_sci_extensions(input_name)
@@ -478,7 +483,7 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
     exposure_identity["DATA_SHAPE"] = data_shape
     exposure_identity["ASTROPYWCS"] = astropywcs
 
-
+    exposure_identity["PIXSCALE"] = np.abs(astropywcs[0].proj_plane_pixel_scales()[0])
 
     # If not lite, do one more loop with the data to make a swarp coadd.
     if not lite: # Avoid generating the mosaic header.

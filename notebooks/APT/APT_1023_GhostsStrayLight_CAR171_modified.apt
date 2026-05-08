@@ -1,0 +1,465 @@
+<ns0:RomanProgram xmlns:ns0="http://www.stsci.edu/Roman/APT" schemaVersion="28" APTVersion="Version 2025.6.1  JWST PRD: PRDAPTSOC-071-002, Roman PRD: RPRDDEVSOC-021">
+    <ns0:ProgramInformation>
+        <ns0:ProgramPhase>Approved</ns0:ProgramPhase>
+        <ns0:Title>CAR-171: Ghosts and Scattered Light</ns0:Title>
+        <ns0:Abstract>TBD</ns0:Abstract>
+        <ns0:ProgramID>1023</ns0:ProgramID>
+        <ns0:StsciEditNumber>0</ns0:StsciEditNumber>
+        <ns0:ProgramCategory>COM</ns0:ProgramCategory>
+        <ns0:ProgramCategorySubtype>WFI</ns0:ProgramCategorySubtype>
+        <ns0:AllowRestricted>true</ns0:AllowRestricted>
+        <ns0:IncludesCalibrations>false</ns0:IncludesCalibrations>
+        <ns0:PureParallelProgram>false</ns0:PureParallelProgram>
+        <ns0:Cycle>0</ns0:Cycle>
+        <ns0:ObservingDescription>TBD</ns0:ObservingDescription>
+        <ns0:PrincipalInvestigator>
+            <ns0:InvestigatorAddress>
+                <ns0:UniqueID>24856</ns0:UniqueID>
+                <ns0:Country>USA</ns0:Country>
+                <ns0:Institution>NASA Goddard Space Flight Center</ns0:Institution>
+                <ns0:USState>MD</ns0:USState>
+                <ns0:ESAMember>false</ns0:ESAMember>
+                <ns0:CSAMember>false</ns0:CSAMember>
+                <ns0:FirstName>Maxime</ns0:FirstName>
+                <ns0:Honorific>Dr.</ns0:Honorific>
+                <ns0:LastName>Rizzo</ns0:LastName>
+                <ns0:Retired>false</ns0:Retired>
+            </ns0:InvestigatorAddress>
+            <ns0:Contact>true</ns0:Contact>
+        </ns0:PrincipalInvestigator>
+        <ns0:CoInvestigator>
+            <ns0:CoPI>false</ns0:CoPI>
+            <ns0:InvestigatorAddress>
+                <ns0:UniqueID>43054</ns0:UniqueID>
+                <ns0:Country>USA</ns0:Country>
+                <ns0:Institution>NASA Goddard Space Flight Center</ns0:Institution>
+                <ns0:USState>MD</ns0:USState>
+                <ns0:ESAMember>false</ns0:ESAMember>
+                <ns0:CSAMember>false</ns0:CSAMember>
+                <ns0:FirstName>Eric</ns0:FirstName>
+                <ns0:LastName>Switzer</ns0:LastName>
+                <ns0:Retired>false</ns0:Retired>
+            </ns0:InvestigatorAddress>
+            <ns0:AdminUSPI>false</ns0:AdminUSPI>
+            <ns0:Contact>false</ns0:Contact>
+        </ns0:CoInvestigator>
+        <ns0:CoInvestigator>
+            <ns0:CoPI>false</ns0:CoPI>
+            <ns0:InvestigatorAddress>
+                <ns0:UniqueID>42463</ns0:UniqueID>
+                <ns0:Country>USA</ns0:Country>
+                <ns0:Institution>NASA Goddard Space Flight Center</ns0:Institution>
+                <ns0:USState>MD</ns0:USState>
+                <ns0:ESAMember>false</ns0:ESAMember>
+                <ns0:CSAMember>false</ns0:CSAMember>
+                <ns0:FirstName>Scott</ns0:FirstName>
+                <ns0:Honorific>Dr.</ns0:Honorific>
+                <ns0:LastName>Rohrbach</ns0:LastName>
+                <ns0:MiddleInitial>Owens</ns0:MiddleInitial>
+                <ns0:Retired>false</ns0:Retired>
+            </ns0:InvestigatorAddress>
+            <ns0:AdminUSPI>false</ns0:AdminUSPI>
+            <ns0:Contact>false</ns0:Contact>
+        </ns0:CoInvestigator>
+    </ns0:ProgramInformation>
+    <ns0:Targets>
+        <ns0:FixedTarget>
+            <ns0:Number>1</ns0:Number>
+            <ns0:TargetName>OUT_pos_1_a</ns0:TargetName>
+            <ns0:RAProperMotion />
+            <ns0:DecProperMotion />
+            <ns0:RAProperMotionUnits />
+            <ns0:DecProperMotionUnits />
+            <ns0:Epoch />
+            <ns0:AnnualParallax />
+            <ns0:Category>Calibration</ns0:Category>
+            <ns0:Keywords>Stray light test</ns0:Keywords>
+            <ns0:EquatorialCoordinates Value="05 48 42.0949 -49 24 15.39" />
+        </ns0:FixedTarget>
+    <ns0:FixedTarget>
+            <ns0:Number>2</ns0:Number>
+            <ns0:TargetName>OUT_pos_1_b</ns0:TargetName>
+            <ns0:RAProperMotion />
+            <ns0:DecProperMotion />
+            <ns0:RAProperMotionUnits />
+            <ns0:DecProperMotionUnits />
+            <ns0:Epoch />
+            <ns0:AnnualParallax />
+            <ns0:Category>Calibration</ns0:Category>
+            <ns0:Keywords>Stray light test</ns0:Keywords>
+            <ns0:EquatorialCoordinates Value="06 21 11.3896 -58 50 38.70" />
+        </ns0:FixedTarget>
+    <ns0:FixedTarget>
+            <ns0:Number>3</ns0:Number>
+            <ns0:TargetName>OUT_pos_1_c</ns0:TargetName>
+            <ns0:RAProperMotion />
+            <ns0:DecProperMotion />
+            <ns0:RAProperMotionUnits />
+            <ns0:DecProperMotionUnits />
+            <ns0:Epoch />
+            <ns0:AnnualParallax />
+            <ns0:Category>Calibration</ns0:Category>
+            <ns0:Keywords>Stray light test</ns0:Keywords>
+            <ns0:EquatorialCoordinates Value="07 00 33.9297 -54 05 12.62" />
+        </ns0:FixedTarget>
+    <ns0:FixedTarget>
+            <ns0:Number>4</ns0:Number>
+            <ns0:TargetName>OUT_pos_1_d</ns0:TargetName>
+            <ns0:RAProperMotion />
+            <ns0:DecProperMotion />
+            <ns0:RAProperMotionUnits />
+            <ns0:DecProperMotionUnits />
+            <ns0:Epoch />
+            <ns0:AnnualParallax />
+            <ns0:Category>Calibration</ns0:Category>
+            <ns0:Keywords>Stray light test</ns0:Keywords>
+            <ns0:EquatorialCoordinates Value="06 52 46.5787 -49 20 52.32" />
+        </ns0:FixedTarget>
+    <ns0:FixedTarget>
+            <ns0:Number>5</ns0:Number>
+            <ns0:TargetName>OUT_pos_1_e</ns0:TargetName>
+            <ns0:RAProperMotion />
+            <ns0:DecProperMotion />
+            <ns0:RAProperMotionUnits />
+            <ns0:DecProperMotionUnits />
+            <ns0:Epoch />
+            <ns0:AnnualParallax />
+            <ns0:Category>Calibration</ns0:Category>
+            <ns0:Keywords>Stray light test</ns0:Keywords>
+            <ns0:EquatorialCoordinates Value="06 12 21.9957 -46 49 19.68" />
+        </ns0:FixedTarget>
+    <ns0:FixedTarget>
+            <ns0:Number>6</ns0:Number>
+            <ns0:TargetName>OUT_pos_1_f</ns0:TargetName>
+            <ns0:RAProperMotion />
+            <ns0:DecProperMotion />
+            <ns0:RAProperMotionUnits />
+            <ns0:DecProperMotionUnits />
+            <ns0:Epoch />
+            <ns0:AnnualParallax />
+            <ns0:Category>Calibration</ns0:Category>
+            <ns0:Keywords>Stray light test</ns0:Keywords>
+            <ns0:EquatorialCoordinates Value="05 49 24.6292 -56 47 01.68" />
+        </ns0:FixedTarget>
+    <ns0:FixedTarget>
+            <ns0:Number>7</ns0:Number>
+            <ns0:TargetName>OUT_pos_2_a</ns0:TargetName>
+            <ns0:RAProperMotion />
+            <ns0:DecProperMotion />
+            <ns0:RAProperMotionUnits />
+            <ns0:DecProperMotionUnits />
+            <ns0:Epoch />
+            <ns0:AnnualParallax />
+            <ns0:Category>Calibration</ns0:Category>
+            <ns0:Keywords>Stray light test</ns0:Keywords>
+            <ns0:EquatorialCoordinates Value="05 43 17.0519 -51 06 36.45" />
+        </ns0:FixedTarget>
+    <ns0:FixedTarget>
+            <ns0:Number>8</ns0:Number>
+            <ns0:TargetName>OUT_pos_2_b</ns0:TargetName>
+            <ns0:RAProperMotion />
+            <ns0:DecProperMotion />
+            <ns0:RAProperMotionUnits />
+            <ns0:DecProperMotionUnits />
+            <ns0:Epoch />
+            <ns0:AnnualParallax />
+            <ns0:Category>Calibration</ns0:Category>
+            <ns0:Keywords>Stray light test</ns0:Keywords>
+            <ns0:EquatorialCoordinates Value="05 43 08.1472 -55 05 46.51" />
+        </ns0:FixedTarget>
+    <ns0:FixedTarget>
+            <ns0:Number>9</ns0:Number>
+            <ns0:TargetName>OUT_pos_3_a</ns0:TargetName>
+            <ns0:RAProperMotion />
+            <ns0:DecProperMotion />
+            <ns0:RAProperMotionUnits />
+            <ns0:DecProperMotionUnits />
+            <ns0:Epoch />
+            <ns0:AnnualParallax />
+            <ns0:Category>Calibration</ns0:Category>
+            <ns0:Keywords>Stray light test</ns0:Keywords>
+            <ns0:EquatorialCoordinates Value="06 16 26.9165 -51 31 41.01" />
+        </ns0:FixedTarget>
+    <ns0:FixedTarget>
+            <ns0:Number>10</ns0:Number>
+            <ns0:TargetName>OUT_pos_3_b</ns0:TargetName>
+            <ns0:RAProperMotion />
+            <ns0:DecProperMotion />
+            <ns0:RAProperMotionUnits />
+            <ns0:DecProperMotionUnits />
+            <ns0:Epoch />
+            <ns0:AnnualParallax />
+            <ns0:Category>Calibration</ns0:Category>
+            <ns0:Keywords>Stray light test</ns0:Keywords>
+            <ns0:EquatorialCoordinates Value="06 18 23.5477 -54 06 39.92" />
+        </ns0:FixedTarget>
+    </ns0:Targets>
+    <ns0:MosaicPatterns />
+    <ns0:PassPlans>
+        <ns0:PassPlan Number="1">
+            <ns0:Label>Target_1</ns0:Label>
+            <ns0:TargetSelection>Fixed: 1</ns0:TargetSelection>
+            <ns0:ReferenceCoords />
+            <ns0:Observation>
+                <ns0:Target />
+                <ns0:Sector>NONE</ns0:Sector>
+                <ns0:OpticalElement>F158</ns0:OpticalElement>
+                <ns0:MultiAccumTable>IM_171_10</ns0:MultiAccumTable>
+                <ns0:Resultant>10</ns0:Resultant>
+                <ns0:Dither>NONE</ns0:Dither>
+                <ns0:SubpixelDither>NONE</ns0:SubpixelDither>
+            </ns0:Observation>
+            <ns0:ToolData />
+        </ns0:PassPlan>
+    <ns0:PassPlan Number="2">
+            <ns0:Label>Target_2</ns0:Label>
+            <ns0:TargetSelection>Fixed: 2</ns0:TargetSelection>
+            <ns0:ReferenceCoords />
+            <ns0:Observation>
+                <ns0:Target />
+                <ns0:Sector>NONE</ns0:Sector>
+                <ns0:OpticalElement>F158</ns0:OpticalElement>
+                <ns0:MultiAccumTable>IM_171_10</ns0:MultiAccumTable>
+                <ns0:Resultant>10</ns0:Resultant>
+                <ns0:Dither>NONE</ns0:Dither>
+                <ns0:SubpixelDither>NONE</ns0:SubpixelDither>
+            </ns0:Observation>
+            <ns0:ToolData />
+        </ns0:PassPlan>
+    <ns0:PassPlan Number="3">
+            <ns0:Label>Target_3</ns0:Label>
+            <ns0:TargetSelection>Fixed: 3</ns0:TargetSelection>
+            <ns0:ReferenceCoords />
+            <ns0:Observation>
+                <ns0:Target />
+                <ns0:Sector>NONE</ns0:Sector>
+                <ns0:OpticalElement>F158</ns0:OpticalElement>
+                <ns0:MultiAccumTable>IM_171_10</ns0:MultiAccumTable>
+                <ns0:Resultant>10</ns0:Resultant>
+                <ns0:Dither>NONE</ns0:Dither>
+                <ns0:SubpixelDither>NONE</ns0:SubpixelDither>
+            </ns0:Observation>
+            <ns0:ToolData />
+        </ns0:PassPlan>
+    <ns0:PassPlan Number="4">
+            <ns0:Label>Target_4</ns0:Label>
+            <ns0:TargetSelection>Fixed: 4</ns0:TargetSelection>
+            <ns0:ReferenceCoords />
+            <ns0:Observation>
+                <ns0:Target />
+                <ns0:Sector>NONE</ns0:Sector>
+                <ns0:OpticalElement>F158</ns0:OpticalElement>
+                <ns0:MultiAccumTable>IM_171_10</ns0:MultiAccumTable>
+                <ns0:Resultant>10</ns0:Resultant>
+                <ns0:Dither>NONE</ns0:Dither>
+                <ns0:SubpixelDither>NONE</ns0:SubpixelDither>
+            </ns0:Observation>
+            <ns0:ToolData />
+        </ns0:PassPlan>
+    <ns0:PassPlan Number="5">
+            <ns0:Label>Target_5</ns0:Label>
+            <ns0:TargetSelection>Fixed: 5</ns0:TargetSelection>
+            <ns0:ReferenceCoords />
+            <ns0:Observation>
+                <ns0:Target />
+                <ns0:Sector>NONE</ns0:Sector>
+                <ns0:OpticalElement>F158</ns0:OpticalElement>
+                <ns0:MultiAccumTable>IM_171_10</ns0:MultiAccumTable>
+                <ns0:Resultant>10</ns0:Resultant>
+                <ns0:Dither>NONE</ns0:Dither>
+                <ns0:SubpixelDither>NONE</ns0:SubpixelDither>
+            </ns0:Observation>
+            <ns0:ToolData />
+        </ns0:PassPlan>
+    <ns0:PassPlan Number="6">
+            <ns0:Label>Target_6</ns0:Label>
+            <ns0:TargetSelection>Fixed: 6</ns0:TargetSelection>
+            <ns0:ReferenceCoords />
+            <ns0:Observation>
+                <ns0:Target />
+                <ns0:Sector>NONE</ns0:Sector>
+                <ns0:OpticalElement>F158</ns0:OpticalElement>
+                <ns0:MultiAccumTable>IM_171_10</ns0:MultiAccumTable>
+                <ns0:Resultant>10</ns0:Resultant>
+                <ns0:Dither>NONE</ns0:Dither>
+                <ns0:SubpixelDither>NONE</ns0:SubpixelDither>
+            </ns0:Observation>
+            <ns0:ToolData />
+        </ns0:PassPlan>
+    <ns0:PassPlan Number="7">
+            <ns0:Label>Target_7</ns0:Label>
+            <ns0:TargetSelection>Fixed: 7</ns0:TargetSelection>
+            <ns0:ReferenceCoords />
+            <ns0:Observation>
+                <ns0:Target />
+                <ns0:Sector>NONE</ns0:Sector>
+                <ns0:OpticalElement>F158</ns0:OpticalElement>
+                <ns0:MultiAccumTable>IM_171_10</ns0:MultiAccumTable>
+                <ns0:Resultant>10</ns0:Resultant>
+                <ns0:Dither>NONE</ns0:Dither>
+                <ns0:SubpixelDither>NONE</ns0:SubpixelDither>
+            </ns0:Observation>
+            <ns0:ToolData />
+        </ns0:PassPlan>
+    <ns0:PassPlan Number="8">
+            <ns0:Label>Target_8</ns0:Label>
+            <ns0:TargetSelection>Fixed: 8</ns0:TargetSelection>
+            <ns0:ReferenceCoords />
+            <ns0:Observation>
+                <ns0:Target />
+                <ns0:Sector>NONE</ns0:Sector>
+                <ns0:OpticalElement>F158</ns0:OpticalElement>
+                <ns0:MultiAccumTable>IM_171_10</ns0:MultiAccumTable>
+                <ns0:Resultant>10</ns0:Resultant>
+                <ns0:Dither>NONE</ns0:Dither>
+                <ns0:SubpixelDither>NONE</ns0:SubpixelDither>
+            </ns0:Observation>
+            <ns0:ToolData />
+        </ns0:PassPlan>
+    <ns0:PassPlan Number="9">
+            <ns0:Label>Target_9</ns0:Label>
+            <ns0:TargetSelection>Fixed: 9</ns0:TargetSelection>
+            <ns0:ReferenceCoords />
+            <ns0:Observation>
+                <ns0:Target />
+                <ns0:Sector>NONE</ns0:Sector>
+                <ns0:OpticalElement>F158</ns0:OpticalElement>
+                <ns0:MultiAccumTable>IM_171_10</ns0:MultiAccumTable>
+                <ns0:Resultant>10</ns0:Resultant>
+                <ns0:Dither>NONE</ns0:Dither>
+                <ns0:SubpixelDither>NONE</ns0:SubpixelDither>
+            </ns0:Observation>
+            <ns0:ToolData />
+        </ns0:PassPlan>
+    <ns0:PassPlan Number="10">
+            <ns0:Label>Target_10</ns0:Label>
+            <ns0:TargetSelection>Fixed: 10</ns0:TargetSelection>
+            <ns0:ReferenceCoords />
+            <ns0:Observation>
+                <ns0:Target />
+                <ns0:Sector>NONE</ns0:Sector>
+                <ns0:OpticalElement>F158</ns0:OpticalElement>
+                <ns0:MultiAccumTable>IM_171_10</ns0:MultiAccumTable>
+                <ns0:Resultant>10</ns0:Resultant>
+                <ns0:Dither>NONE</ns0:Dither>
+                <ns0:SubpixelDither>NONE</ns0:SubpixelDither>
+            </ns0:Observation>
+            <ns0:ToolData />
+        </ns0:PassPlan>
+    </ns0:PassPlans>
+    <ns0:SurveyPlan>
+        <ns0:Links />
+        <ns0:SurveyPlanStep>
+            <ns0:PassPlan>1</ns0:PassPlan>
+            <ns0:SpecialRequirements>
+                <ns0:OrientRange OrientMin="142.2123 Degrees" OrientMax="142.2123 Degrees" />
+            </ns0:SpecialRequirements>
+            <ns0:ToolData />
+        </ns0:SurveyPlanStep>
+    <ns0:SurveyPlanStep>
+            <ns0:PassPlan>2</ns0:PassPlan>
+            <ns0:SpecialRequirements>
+                <ns0:OrientRange OrientMin="142.2123 Degrees" OrientMax="142.2123 Degrees" />
+            </ns0:SpecialRequirements>
+            <ns0:ToolData />
+        </ns0:SurveyPlanStep>
+    <ns0:SurveyPlanStep>
+            <ns0:PassPlan>3</ns0:PassPlan>
+            <ns0:SpecialRequirements>
+                <ns0:OrientRange OrientMin="142.2123 Degrees" OrientMax="142.2123 Degrees" />
+            </ns0:SpecialRequirements>
+            <ns0:ToolData />
+        </ns0:SurveyPlanStep>
+    <ns0:SurveyPlanStep>
+            <ns0:PassPlan>4</ns0:PassPlan>
+            <ns0:SpecialRequirements>
+                <ns0:OrientRange OrientMin="142.2123 Degrees" OrientMax="142.2123 Degrees" />
+            </ns0:SpecialRequirements>
+            <ns0:ToolData />
+        </ns0:SurveyPlanStep>
+    <ns0:SurveyPlanStep>
+            <ns0:PassPlan>5</ns0:PassPlan>
+            <ns0:SpecialRequirements>
+                <ns0:OrientRange OrientMin="142.2123 Degrees" OrientMax="142.2123 Degrees" />
+            </ns0:SpecialRequirements>
+            <ns0:ToolData />
+        </ns0:SurveyPlanStep>
+    <ns0:SurveyPlanStep>
+            <ns0:PassPlan>6</ns0:PassPlan>
+            <ns0:SpecialRequirements>
+                <ns0:OrientRange OrientMin="142.2123 Degrees" OrientMax="142.2123 Degrees" />
+            </ns0:SpecialRequirements>
+            <ns0:ToolData />
+        </ns0:SurveyPlanStep>
+    <ns0:SurveyPlanStep>
+            <ns0:PassPlan>7</ns0:PassPlan>
+            <ns0:SpecialRequirements>
+                <ns0:OrientRange OrientMin="142.2123 Degrees" OrientMax="142.2123 Degrees" />
+            </ns0:SpecialRequirements>
+            <ns0:ToolData />
+        </ns0:SurveyPlanStep>
+    <ns0:SurveyPlanStep>
+            <ns0:PassPlan>8</ns0:PassPlan>
+            <ns0:SpecialRequirements>
+                <ns0:OrientRange OrientMin="142.2123 Degrees" OrientMax="142.2123 Degrees" />
+            </ns0:SpecialRequirements>
+            <ns0:ToolData />
+        </ns0:SurveyPlanStep>
+    <ns0:SurveyPlanStep>
+            <ns0:PassPlan>9</ns0:PassPlan>
+            <ns0:SpecialRequirements>
+                <ns0:OrientRange OrientMin="142.2123 Degrees" OrientMax="142.2123 Degrees" />
+            </ns0:SpecialRequirements>
+            <ns0:ToolData />
+        </ns0:SurveyPlanStep>
+    <ns0:SurveyPlanStep>
+            <ns0:PassPlan>10</ns0:PassPlan>
+            <ns0:SpecialRequirements>
+                <ns0:OrientRange OrientMin="142.2123 Degrees" OrientMax="142.2123 Degrees" />
+            </ns0:SpecialRequirements>
+            <ns0:ToolData />
+        </ns0:SurveyPlanStep>
+    </ns0:SurveyPlan>
+    <ns0:Activities />
+    <ns0:ExecutionPlans />
+    <ns0:Cycles>
+        <ns0:CycleInfo CycleNumber="0" StartDate="2026-08-20 00:00:00" EndDate="2027-04-18 00:00:00" Active="true" />
+        <ns0:CycleInfo CycleNumber="1" StartDate="2026-11-18 00:00:00" EndDate="2028-04-18 00:00:00" Active="true" />
+    </ns0:Cycles>
+    <ns0:ProgramHistory>
+        <ns0:HistoryEntry Date="Sat Jan 18 00:23:15 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1006.apt" />
+        <ns0:HistoryEntry Date="Sat Jan 18 00:23:48 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1007.apt" />
+        <ns0:HistoryEntry Date="Sat Jan 18 00:24:09 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1008.apt" />
+        <ns0:HistoryEntry Date="Sat Jan 18 00:26:03 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1008.apt" />
+        <ns0:HistoryEntry Date="Sat Jan 18 00:26:15 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1009.apt" />
+        <ns0:HistoryEntry Date="Sat Jan 18 00:26:29 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1010.apt" />
+        <ns0:HistoryEntry Date="Sat Jan 18 00:26:44 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1011.apt" />
+        <ns0:HistoryEntry Date="Sat Jan 18 00:27:01 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1012.apt" />
+        <ns0:HistoryEntry Date="Sat Jan 18 00:27:21 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1013.apt" />
+        <ns0:HistoryEntry Date="Sat Jan 18 00:27:30 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1013.apt" />
+        <ns0:HistoryEntry Date="Sat Jan 18 00:28:00 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1014.apt" />
+        <ns0:HistoryEntry Date="Sat Jan 18 00:28:15 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1015.apt" />
+        <ns0:HistoryEntry Date="Sat Jan 18 00:28:51 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1016.apt" />
+        <ns0:HistoryEntry Date="Sat Jan 18 00:29:04 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1017.apt" />
+        <ns0:HistoryEntry Date="Sat Jan 18 00:29:18 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1018.apt" />
+        <ns0:HistoryEntry Date="Sat Jan 18 00:29:37 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1019.apt" />
+        <ns0:HistoryEntry Date="Sat Jan 18 00:29:50 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1020.apt" />
+        <ns0:HistoryEntry Date="Sat Jan 18 00:30:15 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1021.apt" />
+        <ns0:HistoryEntry Date="Sat Jan 18 00:30:27 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1022.apt" />
+        <ns0:HistoryEntry Date="Sat Jan 18 00:30:39 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1023.apt" />
+        <ns0:HistoryEntry Date="Sat Jan 18 00:53:47 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1023.apt" />
+        <ns0:HistoryEntry Date="Sat Jan 18 01:15:44 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1023.apt" />
+        <ns0:HistoryEntry Date="Sat Jan 18 01:15:49 GMT 2025" APTVersion="Version 2024.8  JWST PRD: PRDAPTSOC-067-002, Roman PRD: RPRDDEVSOC-017" SchemaVersion="24" ProgramPhase="Approved" User="cmannfolk" Platform="Mac OS X - x86_64" FileLocation="/System/Volumes/Data/solaris/user1/cmannfolk/roman-work/1023.apt" />
+        <ns0:HistoryEntry Date="Fri Dec 05 04:54:24 GMT 2025" APTVersion="Version 2025.6.1  JWST PRD: PRDAPTSOC-071-002, Roman PRD: RPRDDEVSOC-021" SchemaVersion="28" ProgramPhase="Approved" User="mrizzo" Platform="Mac OS X - aarch64" FileLocation="/Users/mrizzo/Library/CloudStorage/Box-Box/WFI/Commissioning/APT_1023_GhostsStrayLight_CAR171.apt" />
+        <ns0:HistoryEntry Date="Fri Dec 05 05:10:50 GMT 2025" APTVersion="Version 2025.6.1  JWST PRD: PRDAPTSOC-071-002, Roman PRD: RPRDDEVSOC-021" SchemaVersion="28" ProgramPhase="Approved" User="mrizzo" Platform="Mac OS X - aarch64" FileLocation="/Users/mrizzo/Library/CloudStorage/Box-Box/WFI/Commissioning/APT_1023_GhostsStrayLight_CAR171.apt" />
+    </ns0:ProgramHistory>
+    <ns0:ToolData>
+        <ns0:ToolData Name="Phase2SubmissionData" />
+        <ns0:ToolData Name="SubmissionData">
+            <ns0:ToolValue Name="AssignedID">00000</ns0:ToolValue>
+            <ns0:ToolValue Name="SubmissionLog">
+Assuming assigned ID: 00000</ns0:ToolValue>
+        </ns0:ToolData>
+    </ns0:ToolData>
+    <ns0:Properties />
+</ns0:RomanProgram>
