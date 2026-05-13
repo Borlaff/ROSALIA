@@ -356,6 +356,8 @@ def exposure_inspector_asdf(input_name, verbose=False, lite=False):
 
 
 def exposure_inspector_fits(input_name, verbose=False, lite=False):
+    from astropy.wcs import WCS
+
     exposure_identity = {}
 
     # Setting up keywords to store the info from the file
@@ -438,10 +440,10 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
 
     # Get the right filter. 
     if "FILTER1" in input_fits[0].header: 
-        if "CLEAR" not in filter_1:
+        if "CLEAR" not in input_fits[0].header["FILTER1"]:
             filter = input_fits[0].header["FILTER1"]
-    elif "FILTER2" in input_fits[0].header: 
-        if "CLEAR" not in filter_2:
+    if "FILTER2" in input_fits[0].header: 
+        if "CLEAR" not in input_fits[0].header["FILTER2"]:
             filter = input_fits[0].header["FILTER2"]
     else:
         try: 
@@ -478,7 +480,7 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
         header_i = input_fits[sci_ext_i].header
         header_i["EXTNAME"] = "SCI"
         header_i["SCA"] = sci_ext_i       
-        astropywcs_i = astropy_wcs.WCS(header_i)
+        astropywcs_i = WCS(fobj=input_fits[sci_ext_i])
         astropywcs.append(astropywcs_i)
     exposure_identity["DATA_SHAPE"] = data_shape
     exposure_identity["ASTROPYWCS"] = astropywcs

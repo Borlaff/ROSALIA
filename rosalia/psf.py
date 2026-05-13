@@ -558,7 +558,7 @@ def identify_stars_in_out_field(data_shape, wcs, catalog, ra=None, dec=None, ver
                 "catalog_inside": None})
 
 
-    detector_corners = rs.detectors.get_detector_corners(data_shape, wcs)
+    detector_corners = rs.detectors.get_detector_corners(wcs)
     corners_pix = detector_corners["corners_pix"]
     corners_world = detector_corners["corners_world"]
 

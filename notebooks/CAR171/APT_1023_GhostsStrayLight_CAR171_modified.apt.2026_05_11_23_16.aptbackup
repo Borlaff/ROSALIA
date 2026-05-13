@@ -1,0 +1,2914 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<RomanProgram schemaVersion="29" APTVersion="Version 2026.2.1  " xmlns="http://www.stsci.edu/Roman/APT">
+    <ProgramInformation>
+        <ProgramPhase>Approved</ProgramPhase>
+        <Title>CAR171 - Ghosts and Scattered light</Title>
+        <Abstract>The purpose of this CAR is to:
+A ) Map the wings of the optical PSF: 
+1) know how far from bright sources to point to achieve target background (operational) 
+2) to provide a map of outer PSF for low surface brightness science users
+3) test upstream mirrors for scattering (not probed as part of SCIPA or PFAC). Perform tests on both sides of the field to map out PSF scattering with field dependence, such as from the tertiary.
+
+and 
+
+B) Assess scattering of bright sources on the FPA and outer structure, use to validate ray-tracing models that enable predictive modeling. Features here include secondary mirror support legs, baffle edge scatter and the rogue path, aperture stop scatter, light shield scatter (equivalent of “Dragon’s breath”). These will be quantified as normalized detector irradiance (NDI).</Abstract>
+        <ProgramID>1023</ProgramID>
+        <StsciEditNumber>1</StsciEditNumber>
+        <ProgramCategory>NASA</ProgramCategory>
+        <ProgramCategorySubtype></ProgramCategorySubtype>
+        <AllowRestricted>true</AllowRestricted>
+        <IncludesCalibrations>false</IncludesCalibrations>
+        <PureParallelProgram>false</PureParallelProgram>
+        <Cycle>0</Cycle>
+        <ObservingDescription>This CAR is dedicated to the study of optical ghosts and scattered light in Roman / WFI. There are two main objectives:
+
+CAR171.1 - Map the wings of the optical PSF:
+▪ 1) Know how far from bright sources to point to achieve target background (operational)
+▪ 2) To provide a map of outer PSF for low surface brightness science users
+▪ 3) Test upstream mirrors for scattering (not probed as part of SCIPA or PFAC). Perform tests on both sides of the field to map out PSF scattering with field dependence, such as from the tertiary.
+
+CAR171.2 - Stray-light from sources outside the field of view:
+o Assess scattering of bright sources on the FPA and outer structure, use to validate ray-tracing models that enable predictive modeling. Features here include secondary mirror support legs, baffle edge scatter and the rogue path, aperture stop scatter, light shield scatter (equivalent of “Dragon’s breath”). These will be quantified as normalized detector irradiance (NDI).
+
+o NOTES:
+
+- WARNING: All the observations in this APT require specific V3PA angles. There is a discrepancy between the internally calculated V3PA angles and the scheduling windows calculated by the APT. This is being investigated in the Roman HelpDesk INC0221379. - A.S.Borlaff - NASA/ARC 
+
+▪ We have identified a reduced set of activities to perform as a risk reduction earlier in Commissioning. These will facilitate exposure time adjustment or possibly source selection.
+▪ All target sources are stellar and selected in the CVZ to facilitate scheduling and APT implementation</ObservingDescription>
+        <PrincipalInvestigator>
+            <InvestigatorAddress>
+                <UniqueID>24856</UniqueID>
+                <Country>USA</Country>
+                <Institution>NASA Goddard Space Flight Center</Institution>
+                <USState>MD</USState>
+                <ESAMember>false</ESAMember>
+                <CSAMember>false</CSAMember>
+                <FirstName>Maxime</FirstName>
+                <Honorific>Dr.</Honorific>
+                <LastName>Rizzo</LastName>
+                <Retired>false</Retired>
+            </InvestigatorAddress>
+            <Contact>true</Contact>
+        </PrincipalInvestigator>
+        <CoInvestigator>
+            <CoPI>true</CoPI>
+            <InvestigatorAddress>
+                <UniqueID>43054</UniqueID>
+                <Country>USA</Country>
+                <Institution>NASA Goddard Space Flight Center</Institution>
+                <USState>MD</USState>
+                <ESAMember>false</ESAMember>
+                <CSAMember>false</CSAMember>
+                <FirstName>Eric</FirstName>
+                <LastName>Switzer</LastName>
+                <Retired>false</Retired>
+            </InvestigatorAddress>
+            <AdminUSPI>true</AdminUSPI>
+            <Contact>false</Contact>
+        </CoInvestigator>
+        <CoInvestigator>
+            <CoPI>false</CoPI>
+            <InvestigatorAddress>
+                <UniqueID>42463</UniqueID>
+                <Country>USA</Country>
+                <Institution>NASA Goddard Space Flight Center</Institution>
+                <USState>MD</USState>
+                <ESAMember>false</ESAMember>
+                <CSAMember>false</CSAMember>
+                <FirstName>Scott</FirstName>
+                <Honorific>Dr.</Honorific>
+                <LastName>Rohrbach</LastName>
+                <MiddleInitial>Owens</MiddleInitial>
+                <Retired>false</Retired>
+            </InvestigatorAddress>
+            <AdminUSPI>false</AdminUSPI>
+            <Contact>false</Contact>
+        </CoInvestigator>
+        <CoInvestigator>
+            <CoPI>false</CoPI>
+            <InvestigatorAddress>
+                <UniqueID>27893</UniqueID>
+                <Country>USA</Country>
+                <Institution>NASA Ames Research Center</Institution>
+                <USState>CA</USState>
+                <ESAMember>false</ESAMember>
+                <CSAMember>false</CSAMember>
+                <FirstName>Alejandro</FirstName>
+                <Honorific>Dr.</Honorific>
+                <LastName>Serrano Borlaff</LastName>
+                <Retired>false</Retired>
+            </InvestigatorAddress>
+            <AdminUSPI>false</AdminUSPI>
+            <Contact>false</Contact>
+        </CoInvestigator>
+    </ProgramInformation>
+    <Targets>
+        <FixedTarget>
+            <Number>1</Number>
+            <TargetName>OUT_pos_1_a_001</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="05 52 57.4530 -48 31 57.98"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>2</Number>
+            <TargetName>OUT_pos_1_b_002</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="05 45 15.4397 -55 47 22.60"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>3</Number>
+            <TargetName>OUT_pos_1_c_003</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="06 12 49.5949 -58 39 28.07"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>4</Number>
+            <TargetName>OUT_pos_1_d_004</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="06 58 44.2942 -55 01 45.73"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>5</Number>
+            <TargetName>OUT_pos_1_e_005</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="06 56 16.1683 -50 10 17.81"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>6</Number>
+            <TargetName>OUT_pos_1_f_006</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="06 18 35.4823 -46 35 35.41"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>7</Number>
+            <TargetName>OUT_pos_2_a_007</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="05 46 1.5060 -50 04 25.11"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>8</Number>
+            <TargetName>OUT_pos_2_b_008</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="05 41 27.0482 -53 58 31.37"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>9</Number>
+            <TargetName>OUT_pos_3_a_009</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="06 17 53.6858 -51 20 45.36"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>10</Number>
+            <TargetName>OUT_pos_3_b_010</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="06 16 47.7651 -53 56 23.63"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>11</Number>
+            <TargetName>IN_pos_4_a_011</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="06 24 10.5540 -52 37 41.48"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>12</Number>
+            <TargetName>IN_pos_4_b_012</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="06 24 8.3529 -52 45 56.44"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>13</Number>
+            <TargetName>IN_pos_5_a_013</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="06 24 0.7296 -52 33 28.52"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>14</Number>
+            <TargetName>IN_pos_5_b_014</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="06 23 56.7612 -52 50 1.47"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>15</Number>
+            <TargetName>SCAN_RCHANNEL_015</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="05 54 51.8343 -48 04 20.73"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>16</Number>
+            <TargetName>SCAN_RCHANNEL_016</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="05 54 1.8826 -48 13 19.38"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>17</Number>
+            <TargetName>SCAN_RCHANNEL_017</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="05 53 11.9493 -48 22 13.26"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>18</Number>
+            <TargetName>SCAN_RCHANNEL_018</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="05 52 21.4294 -48 31 8.78"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>19</Number>
+            <TargetName>SCAN_RCHANNEL_019</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="05 51 30.6194 -48 40 2.69"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>20</Number>
+            <TargetName>SCAN_RCHANNEL_020</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="05 50 40.7436 -48 48 42.23"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>21</Number>
+            <TargetName>SCAN_RCHANNEL_021</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="05 49 48.4247 -48 57 42.39"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>22</Number>
+            <TargetName>SCAN_ROGUEPATH_022</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="05 46 1.8019 -50 04 25.57"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>23</Number>
+            <TargetName>SCAN_ROGUEPATH_023</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="05 48 6.2269 -49 33 23.04"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>24</Number>
+            <TargetName>SCAN_ROGUEPATH_024</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="05 44 34.3715 -50 56 11.37"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>25</Number>
+            <TargetName>SCAN_ROGUEPATH_025</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="05 41 21.8610 -50 46 25.53"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>26</Number>
+            <TargetName>SCAN_ROGUEPATH_026</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="05 43 41.7910 -49 50 48.63"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>27</Number>
+            <TargetName>SCAN_ROGUEPATH_027</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="05 46 8.0805 -49 21 4.92"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>28</Number>
+            <TargetName>SCAN_ROGUEPATH_028</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="05 46 24.3936 -51 01 57.51"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>29</Number>
+            <TargetName>SCAN_ROGUEPATH_029</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="05 48 34.7348 -50 16 6.60"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>30</Number>
+            <TargetName>SCAN_ROGUEPATH_030</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="05 50 27.1664 -49 47 12.33"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>31</Number>
+            <TargetName>SCAN_ROGUEPATH_031</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="05 42 17.4154 -50 18 33.52"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>32</Number>
+            <TargetName>SCAN_ROGUEPATH_032</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="05 45 17.7984 -50 31 2.00"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>33</Number>
+            <TargetName>SCAN_ROGUEPATH_033</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="05 47 23.6677 -50 38 33.60"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>34</Number>
+            <TargetName>SCAN_ROGUEPATH_034</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="05 38 52.1710 -51 53 15.48"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>35</Number>
+            <TargetName>SCAN_ROGUEPATH_035</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="05 42 39.6246 -51 59 43.82"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>36</Number>
+            <TargetName>SCAN_ROGUEPATH_036</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="05 44 37.4427 -52 02 54.72"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>37</Number>
+            <TargetName>SCAN_ROGUEPATH_037</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="05 41 27.3686 -53 58 31.91"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>38</Number>
+            <TargetName>SCAN_ROGUEPATH_038</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="05 42 22.7634 -54 34 19.63"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>39</Number>
+            <TargetName>SCAN_ROGUEPATH_039</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="05 42 1.9177 -53 05 21.89"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>40</Number>
+            <TargetName>SCAN_ROGUEPATH_040</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="05 38 29.7709 -53 03 47.17"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>41</Number>
+            <TargetName>SCAN_ROGUEPATH_041</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="05 38 31.2376 -54 03 24.60"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>42</Number>
+            <TargetName>SCAN_ROGUEPATH_042</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="05 39 49.1092 -54 39 20.76"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>43</Number>
+            <TargetName>SCAN_ROGUEPATH_043</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="05 44 3.4357 -53 05 46.60"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>44</Number>
+            <TargetName>SCAN_ROGUEPATH_044</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="05 44 30.7362 -53 55 40.77"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>45</Number>
+            <TargetName>SCAN_ROGUEPATH_045</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="05 45 22.3813 -54 28 41.73"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>46</Number>
+            <TargetName>SCAN_ROGUEPATH_046</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="05 38 15.3068 -53 32 49.35"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>47</Number>
+            <TargetName>SCAN_ROGUEPATH_047</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="05 41 45.8731 -53 31 15.13"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>48</Number>
+            <TargetName>SCAN_ROGUEPATH_048</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="05 44 9.4410 -53 30 51.97"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>49</Number>
+            <TargetName>SCAN_DRAGON1_049</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="06 24 11.3503 -52 34 41.63"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>50</Number>
+            <TargetName>SCAN_DRAGON1_050</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="06 24 10.9524 -52 36 11.55"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>51</Number>
+            <TargetName>SCAN_DRAGON1_051</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="06 24 10.5540 -52 37 41.48"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>52</Number>
+            <TargetName>SCAN_DRAGON1_052</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="06 24 10.1551 -52 39 11.41"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>53</Number>
+            <TargetName>SCAN_DRAGON1_053</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="06 24 9.7558 -52 40 41.33"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>54</Number>
+            <TargetName>SCAN_DRAGON1_054</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="06 24 11.4232 -52 37 41.80"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>55</Number>
+            <TargetName>SCAN_DRAGON1_055</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="06 24 11.1861 -52 37 41.71"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>56</Number>
+            <TargetName>SCAN_DRAGON1_056</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="06 24 10.9491 -52 37 41.62"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>57</Number>
+            <TargetName>SCAN_DRAGON1_057</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="06 24 10.6725 -52 37 41.52"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>58</Number>
+            <TargetName>SCAN_DRAGON1_058</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="06 24 10.4355 -52 37 41.44"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>59</Number>
+            <TargetName>SCAN_DRAGON1_059</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="06 24 10.1589 -52 37 41.33"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>60</Number>
+            <TargetName>SCAN_DRAGON1_060</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="06 24 9.9219 -52 37 41.25"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>61</Number>
+            <TargetName>SCAN_DRAGON1_061</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="06 24 9.6848 -52 37 41.16"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>62</Number>
+            <TargetName>SCAN_DRAGON2_062</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="06 24 0.6392 -52 33 48.66"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>63</Number>
+            <TargetName>SCAN_DRAGON2_063</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="06 23 58.7910 -52 33 37.88"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>64</Number>
+            <TargetName>SCAN_DRAGON2_064</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="06 23 58.8817 -52 33 17.74"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>65</Number>
+            <TargetName>SCAN_DRAGON2_065</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="06 24 0.8200 -52 33 8.37"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>66</Number>
+            <TargetName>SCAN_DRAGON2_066</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="06 24 2.6679 -52 33 19.15"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>67</Number>
+            <TargetName>SCAN_DRAGON2_067</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="06 24 2.5778 -52 33 39.29"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>68</Number>
+            <TargetName>SCAN_DRAGON2_068</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="06 24 0.6392 -52 33 48.66"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>69</Number>
+            <TargetName>NEGATIVE_GAP_1_069</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="06 25 5.5439 -52 46 8.30"/>
+        </FixedTarget>
+        <FixedTarget>
+            <Number>70</Number>
+            <TargetName>NEGATIVE_GAP_2_070</TargetName>
+            <TargetArchiveName>SCA14_vertical_001</TargetArchiveName>
+            <Comments>142.6795759497793</Comments>
+            <RAProperMotion></RAProperMotion>
+            <DecProperMotion></DecProperMotion>
+            <RAProperMotionUnits></RAProperMotionUnits>
+            <DecProperMotionUnits></DecProperMotionUnits>
+            <Epoch></Epoch>
+            <AnnualParallax></AnnualParallax>
+            <Category>Calibration</Category>
+            <Keywords>Stray light test</Keywords>
+            <EquatorialCoordinates Value="06 25 7.4973 -52 38 9.83"/>
+        </FixedTarget>
+    </Targets>
+    <MosaicPatterns/>
+    <PassPlans>
+        <PassPlan Number="1">
+            <Label>Target_1</Label>
+            <TargetSelection>Fixed: 1</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Resultant>10</Resultant>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="2">
+            <Label>Target_2</Label>
+            <TargetSelection>Fixed: 2</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="3">
+            <Label>Target_3</Label>
+            <TargetSelection>Fixed: 3</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="4">
+            <Label>Target_4</Label>
+            <TargetSelection>Fixed: 4</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="5">
+            <Label>Target_5</Label>
+            <TargetSelection>Fixed: 5</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="6">
+            <Label>Target_6</Label>
+            <TargetSelection>Fixed: 6</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="7">
+            <Label>Target_7</Label>
+            <TargetSelection>Fixed: 7</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="8">
+            <Label>Target_8</Label>
+            <TargetSelection>Fixed: 8</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="9">
+            <Label>Target_9</Label>
+            <TargetSelection>Fixed: 9</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="10">
+            <Label>Target_10</Label>
+            <TargetSelection>Fixed: 10</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Resultant>10</Resultant>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="11">
+            <Label>Target_11</Label>
+            <TargetSelection>Fixed: 11</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="12">
+            <Label>Target_12</Label>
+            <TargetSelection>Fixed: 12</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="13">
+            <Label>Target_13</Label>
+            <TargetSelection>Fixed: 13</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="14">
+            <Label>Target_14</Label>
+            <TargetSelection>Fixed: 14</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="15">
+            <Label>Target_15</Label>
+            <TargetSelection>Fixed: 15</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="16">
+            <Label>Target_16</Label>
+            <TargetSelection>Fixed: 16</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="17">
+            <Label>Target_17</Label>
+            <TargetSelection>Fixed: 17</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="18">
+            <Label>Target_18</Label>
+            <TargetSelection>Fixed: 18</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="19">
+            <Label>Target_19</Label>
+            <TargetSelection>Fixed: 19</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="20">
+            <Label>Target_20</Label>
+            <TargetSelection>Fixed: 20</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="21">
+            <Label>Target_21</Label>
+            <TargetSelection>Fixed: 21</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="22">
+            <Label>Target_22</Label>
+            <TargetSelection>Fixed: 22</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="23">
+            <Label>Target_23</Label>
+            <TargetSelection>Fixed: 23</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="24">
+            <Label>Target_24</Label>
+            <TargetSelection>Fixed: 24</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="25">
+            <Label>Target_25</Label>
+            <TargetSelection>Fixed: 25</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="26">
+            <Label>Target_26</Label>
+            <TargetSelection>Fixed: 26</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="27">
+            <Label>Target_27</Label>
+            <TargetSelection>Fixed: 27</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="28">
+            <Label>Target_28</Label>
+            <TargetSelection>Fixed: 28</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="29">
+            <Label>Target_29</Label>
+            <TargetSelection>Fixed: 29</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="30">
+            <Label>Target_30</Label>
+            <TargetSelection>Fixed: 30</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="31">
+            <Label>Target_31</Label>
+            <TargetSelection>Fixed: 31</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="32">
+            <Label>Target_32</Label>
+            <TargetSelection>Fixed: 32</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="33">
+            <Label>Target_33</Label>
+            <TargetSelection>Fixed: 33</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="34">
+            <Label>Target_34</Label>
+            <TargetSelection>Fixed: 34</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="35">
+            <Label>Target_35</Label>
+            <TargetSelection>Fixed: 35</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="36">
+            <Label>Target_36</Label>
+            <TargetSelection>Fixed: 36</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="37">
+            <Label>Target_37</Label>
+            <TargetSelection>Fixed: 37</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="38">
+            <Label>Target_38</Label>
+            <TargetSelection>Fixed: 38</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="39">
+            <Label>Target_39</Label>
+            <TargetSelection>Fixed: 39</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="40">
+            <Label>Target_40</Label>
+            <TargetSelection>Fixed: 40</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="41">
+            <Label>Target_41</Label>
+            <TargetSelection>Fixed: 41</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="42">
+            <Label>Target_42</Label>
+            <TargetSelection>Fixed: 42</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="43">
+            <Label>Target_43</Label>
+            <TargetSelection>Fixed: 43</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="44">
+            <Label>Target_44</Label>
+            <TargetSelection>Fixed: 44</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="45">
+            <Label>Target_45</Label>
+            <TargetSelection>Fixed: 45</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="46">
+            <Label>Target_46</Label>
+            <TargetSelection>Fixed: 46</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="47">
+            <Label>Target_47</Label>
+            <TargetSelection>Fixed: 47</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="48">
+            <Label>Target_48</Label>
+            <TargetSelection>Fixed: 48</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="49">
+            <Label>Target_49</Label>
+            <TargetSelection>Fixed: 49</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="50">
+            <Label>Target_50</Label>
+            <TargetSelection>Fixed: 50</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="51">
+            <Label>Target_51</Label>
+            <TargetSelection>Fixed: 51</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="52">
+            <Label>Target_52</Label>
+            <TargetSelection>Fixed: 52</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="53">
+            <Label>Target_53</Label>
+            <TargetSelection>Fixed: 53</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="54">
+            <Label>Target_54</Label>
+            <TargetSelection>Fixed: 54</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="55">
+            <Label>Target_55</Label>
+            <TargetSelection>Fixed: 55</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="56">
+            <Label>Target_56</Label>
+            <TargetSelection>Fixed: 56</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="57">
+            <Label>Target_57</Label>
+            <TargetSelection>Fixed: 57</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="58">
+            <Label>Target_58</Label>
+            <TargetSelection>Fixed: 58</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="59">
+            <Label>Target_59</Label>
+            <TargetSelection>Fixed: 59</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="60">
+            <Label>Target_60</Label>
+            <TargetSelection>Fixed: 60</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="61">
+            <Label>Target_61</Label>
+            <TargetSelection>Fixed: 61</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="62">
+            <Label>Target_62</Label>
+            <TargetSelection>Fixed: 62</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="63">
+            <Label>Target_63</Label>
+            <TargetSelection>Fixed: 63</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="64">
+            <Label>Target_64</Label>
+            <TargetSelection>Fixed: 64</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="65">
+            <Label>Target_65</Label>
+            <TargetSelection>Fixed: 65</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="66">
+            <Label>Target_66</Label>
+            <TargetSelection>Fixed: 66</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="67">
+            <Label>Target_67</Label>
+            <TargetSelection>Fixed: 67</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="68">
+            <Label>Target_68</Label>
+            <TargetSelection>Fixed: 68</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="69">
+            <Label>Target_69</Label>
+            <TargetSelection>Fixed: 69</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+        <PassPlan Number="70">
+            <Label>Target_70</Label>
+            <TargetSelection>Fixed: 70</TargetSelection>
+            <ReferenceCoords></ReferenceCoords>
+            <Observation>
+                <Target></Target>
+                <Sector>NONE</Sector>
+                <OpticalElement>F158</OpticalElement>
+                <MultiAccumTable>IM_171_10</MultiAccumTable>
+                <Dither>NONE</Dither>
+                <SubpixelDither>SUB2</SubpixelDither>
+            </Observation>
+            <ToolData/>
+        </PassPlan>
+    </PassPlans>
+    <SurveyPlan>
+        <Links/>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>1</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="158.2251 Degrees" OrientMax="158.2251 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>2</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="160.2742 Degrees" OrientMax="160.2742 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>3</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="154.8384 Degrees" OrientMax="154.8384 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>4</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="145.1836 Degrees" OrientMax="145.1836 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>5</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="145.9884 Degrees" OrientMax="145.9884 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>6</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="153.4721 Degrees" OrientMax="153.4721 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>7</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="159.6100 Degrees" OrientMax="159.6100 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>8</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="160.8411 Degrees" OrientMax="160.8411 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>9</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="153.5475 Degrees" OrientMax="153.5475 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>10</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="153.8056 Degrees" OrientMax="153.8056 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>11</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="152.3112 Degrees" OrientMax="152.3112 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>12</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="152.3187 Degrees" OrientMax="152.3187 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>13</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="152.3437 Degrees" OrientMax="152.3437 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>14</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="152.3575 Degrees" OrientMax="152.3575 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>15</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="157.8538 Degrees" OrientMax="157.8538 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>16</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="158.0132 Degrees" OrientMax="158.0132 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>17</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="158.1731 Degrees" OrientMax="158.1731 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>18</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="158.3356 Degrees" OrientMax="158.3356 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>19</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="158.4996 Degrees" OrientMax="158.4996 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>20</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="158.6611 Degrees" OrientMax="158.6611 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>21</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="158.8312 Degrees" OrientMax="158.8312 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>22</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="159.6090 Degrees" OrientMax="159.6090 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>23</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="159.1846 Degrees" OrientMax="159.1846 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>24</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="159.9511 Degrees" OrientMax="159.9511 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>25</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="160.5462 Degrees" OrientMax="160.5462 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>26</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="160.0301 Degrees" OrientMax="160.0301 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>27</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="159.5386 Degrees" OrientMax="159.5386 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>28</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="159.6096 Degrees" OrientMax="159.6096 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>29</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="159.1422 Degrees" OrientMax="159.1422 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>30</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="158.7585 Degrees" OrientMax="158.7585 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>31</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="160.3314 Degrees" OrientMax="160.3314 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>32</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="159.7806 Degrees" OrientMax="159.7806 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>33</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="159.3925 Degrees" OrientMax="159.3925 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>34</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="161.1277 Degrees" OrientMax="161.1277 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>35</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="160.4089 Degrees" OrientMax="160.4089 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>36</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="160.0351 Degrees" OrientMax="160.0351 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>37</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="160.8401 Degrees" OrientMax="160.8401 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>38</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="160.7207 Degrees" OrientMax="160.7207 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>39</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="160.6358 Degrees" OrientMax="160.6358 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>40</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="161.3231 Degrees" OrientMax="161.3231 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>41</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="161.4286 Degrees" OrientMax="161.4286 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>42</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="161.2395 Degrees" OrientMax="161.2395 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>43</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="160.2407 Degrees" OrientMax="160.2407 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>44</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="160.2316 Degrees" OrientMax="160.2316 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>45</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="160.1155 Degrees" OrientMax="160.1155 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>46</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="161.4234 Degrees" OrientMax="161.4234 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>47</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="160.7318 Degrees" OrientMax="160.7318 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>48</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="160.2612 Degrees" OrientMax="160.2612 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>49</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="152.3085 Degrees" OrientMax="152.3085 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>50</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="152.3098 Degrees" OrientMax="152.3098 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>51</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="152.3112 Degrees" OrientMax="152.3112 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>52</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="152.3125 Degrees" OrientMax="152.3125 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>53</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="152.3139 Degrees" OrientMax="152.3139 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>54</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="152.3083 Degrees" OrientMax="152.3083 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>55</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="152.3091 Degrees" OrientMax="152.3091 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>56</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="152.3099 Degrees" OrientMax="152.3099 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>57</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="152.3108 Degrees" OrientMax="152.3108 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>58</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="152.3116 Degrees" OrientMax="152.3116 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>59</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="152.3125 Degrees" OrientMax="152.3125 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>60</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="152.3133 Degrees" OrientMax="152.3133 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>61</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="152.3141 Degrees" OrientMax="152.3141 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>62</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="152.3440 Degrees" OrientMax="152.3440 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>63</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="152.3502 Degrees" OrientMax="152.3502 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>64</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="152.3499 Degrees" OrientMax="152.3499 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>65</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="152.3434 Degrees" OrientMax="152.3434 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>66</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="152.3373 Degrees" OrientMax="152.3373 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>67</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="152.3376 Degrees" OrientMax="152.3376 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>68</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="152.3440 Degrees" OrientMax="152.3440 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>69</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="152.1284 Degrees" OrientMax="152.1284 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+        <SurveyPlanStep uid="2c46693f">
+            <PassPlan>70</PassPlan>
+            <SpecialRequirements>
+                <OrientRange OrientMin="152.1219 Degrees" OrientMax="152.1219 Degrees"/>
+            </SpecialRequirements>
+            <ToolData/>
+        </SurveyPlanStep>
+    </SurveyPlan>
+    <Activities>
+        <Segment ID="0000001057001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301067001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001028001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0000001034001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301021001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001011001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301015001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0102301038001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001005001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301044001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0102301073001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001063001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301029001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0102301030001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001019001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0000001020001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0000001043001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301006001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001066001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301076001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0102301082001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0102301053001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0102301070001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001052001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301064001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001008001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0000001031001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0000001025001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301001001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0102301058001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0102301079001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001046001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301033001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001014001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301009001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0102301050001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0102301026001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0102301012001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0102301047001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001039001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301017001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0102301042001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0102301065001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001055001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301071001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001007001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0000001013001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0000001049001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301036001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001061001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301023001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0102301059001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0102301078001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001070001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0000001022001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0000001041001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301008001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0102301051001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001036001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301020001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0102301045001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001027001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301014001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0102301039001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001033001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301062001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001064001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0000001069001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0000001044001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301031001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0102301003001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001016001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301056001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0102301028001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001050001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0000001002001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0000001058001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0000001009001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0000001053001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301040001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0102301063001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001030001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301019001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001047001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301002001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0102301057001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0102301025001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0102301034001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001015001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0000001024001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0000001001001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301048001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001038001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301011001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001029001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0000001056001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301068001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001004001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0000001010001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0000001035001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301016001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0102301037001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0102301043001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001062001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301022001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0102301074001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0102301005001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0102301054001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001018001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0000001067001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301081001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001021001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0000001042001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301060001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001003001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0000001026001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0000001051001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301046001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001032001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301075001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001065001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0000001068001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301055001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0102301080001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001045001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301004001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0102301032001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001017001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301027001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0102301061001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0102301013001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0102301069001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001059001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301066001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001054001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0000001060001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301041001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001006001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301018001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0102301024001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001012001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301072001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001048001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301077001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0102301007001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001023001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0000001040001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301035001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0102301052001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0000001037001" Status="UNKNOWN" Withdraw="false"/>
+        <Segment ID="0102301010001" Status="DRAFT" Withdraw="false"/>
+        <Segment ID="0102301049001" Status="DRAFT" Withdraw="false"/>
+    </Activities>
+    <ExecutionPlans/>
+    <Cycles>
+        <CycleInfo CycleNumber="0" StartDate="2026-07-14 00:00:00" EndDate="2027-04-01 00:00:00" Active="true"/>
+        <CycleInfo CycleNumber="1" StartDate="2026-11-01 00:00:00" EndDate="2029-04-01 00:00:00" Active="true"/>
+    </Cycles>
+    <ProgramHistory>
+        <HistoryEntry Date="Wed Apr 01 18:54:50 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/Untitled.apt"/>
+        <HistoryEntry Date="Wed Apr 01 18:55:45 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/Untitled.apt"/>
+        <HistoryEntry Date="Wed Apr 01 20:11:51 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/Untitled.apt"/>
+        <HistoryEntry Date="Wed Apr 01 20:12:09 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171.apt"/>
+        <HistoryEntry Date="Wed Apr 01 20:12:21 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171.apt"/>
+        <HistoryEntry Date="Wed Apr 01 20:18:02 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171.apt"/>
+        <HistoryEntry Date="Wed Apr 01 22:56:52 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171.apt"/>
+        <HistoryEntry Date="Wed Apr 01 23:02:35 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171.apt"/>
+        <HistoryEntry Date="Wed Apr 01 23:22:10 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171.apt"/>
+        <HistoryEntry Date="Wed Apr 01 23:22:30 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171.apt"/>
+        <HistoryEntry Date="Wed Apr 01 23:22:41 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171.apt"/>
+        <HistoryEntry Date="Wed Apr 01 23:23:57 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171.apt"/>
+        <HistoryEntry Date="Wed Apr 01 23:27:09 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171.apt"/>
+        <HistoryEntry Date="Wed Apr 01 23:27:22 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171.apt"/>
+        <HistoryEntry Date="Wed Apr 01 23:28:27 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171.apt"/>
+        <HistoryEntry Date="Wed Apr 01 23:28:35 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171.apt"/>
+        <HistoryEntry Date="Wed Apr 01 23:28:43 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171.apt"/>
+        <HistoryEntry Date="Wed Apr 01 23:28:55 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171.apt"/>
+        <HistoryEntry Date="Wed Apr 01 23:32:06 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171.apt"/>
+        <HistoryEntry Date="Wed Apr 01 23:32:11 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171.apt"/>
+        <HistoryEntry Date="Wed Apr 01 23:32:23 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171.apt"/>
+        <HistoryEntry Date="Wed Apr 01 23:33:34 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171.apt"/>
+        <HistoryEntry Date="Wed Apr 01 23:33:45 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171.apt"/>
+        <HistoryEntry Date="Wed Apr 01 23:33:51 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171.apt"/>
+        <HistoryEntry Date="Wed Apr 01 23:34:00 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171.apt"/>
+        <HistoryEntry Date="Wed Apr 01 23:34:12 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171.apt"/>
+        <HistoryEntry Date="Wed Apr 01 23:34:26 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171.apt"/>
+        <HistoryEntry Date="Wed Apr 01 23:34:38 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171.apt"/>
+        <HistoryEntry Date="Wed Apr 01 23:34:42 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171.apt"/>
+        <HistoryEntry Date="Thu Apr 02 18:17:14 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171.apt"/>
+        <HistoryEntry Date="Thu Apr 02 18:40:43 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171.apt"/>
+        <HistoryEntry Date="Fri Apr 03 18:32:13 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171.apt"/>
+        <HistoryEntry Date="Fri Apr 03 18:38:50 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171.apt"/>
+        <HistoryEntry Date="Fri Apr 03 19:08:12 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171_one_target.apt"/>
+        <HistoryEntry Date="Fri Apr 03 19:08:23 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171_all_targets.apt"/>
+        <HistoryEntry Date="Fri Apr 03 21:26:20 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171_all_targets.apt"/>
+        <HistoryEntry Date="Fri Apr 03 21:28:12 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171_all_targets.apt"/>
+        <HistoryEntry Date="Fri Apr 03 21:37:34 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171_all_targets.apt"/>
+        <HistoryEntry Date="Fri Apr 03 21:45:43 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171_all_targets.apt"/>
+        <HistoryEntry Date="Fri Apr 03 21:46:35 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171_all_targets.apt"/>
+        <HistoryEntry Date="Fri Apr 03 21:46:41 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171_all_targets.apt"/>
+        <HistoryEntry Date="Fri Apr 03 21:47:53 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171_all_targets.apt"/>
+        <HistoryEntry Date="Fri Apr 03 21:48:54 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171_all_targets.apt"/>
+        <HistoryEntry Date="Fri Apr 03 21:49:10 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171_all_targets.apt"/>
+        <HistoryEntry Date="Fri Apr 03 21:49:13 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171_all_targets.apt"/>
+        <HistoryEntry Date="Fri Apr 03 21:49:21 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171_all_targets.apt"/>
+        <HistoryEntry Date="Fri Apr 03 21:52:11 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171_all_targets.apt"/>
+        <HistoryEntry Date="Fri Apr 03 21:53:37 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171_all_targets.apt"/>
+        <HistoryEntry Date="Fri Apr 03 22:10:48 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171_all_targets.apt"/>
+        <HistoryEntry Date="Fri Apr 03 22:10:54 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171_all_targets_v1.apt"/>
+        <HistoryEntry Date="Fri Apr 03 22:10:59 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171_all_targets_v2.apt"/>
+        <HistoryEntry Date="Fri Apr 03 22:11:21 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171_all_targets_v2.apt"/>
+        <HistoryEntry Date="Fri Apr 03 22:26:34 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171_all_targets_v2.apt"/>
+        <HistoryEntry Date="Fri Apr 03 22:26:58 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171_all_targets_v2.apt"/>
+        <HistoryEntry Date="Fri Apr 03 22:40:51 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171_all_targets_v2.apt"/>
+        <HistoryEntry Date="Fri Apr 03 22:41:37 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171_all_targets_v2.apt"/>
+        <HistoryEntry Date="Fri Apr 03 23:09:42 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Approved" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171_all_targets_v2.apt"/>
+        <HistoryEntry Date="Fri Apr 03 23:12:06 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Approved" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171_all_targets_v2.apt"/>
+        <HistoryEntry Date="Fri Apr 03 23:13:38 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Approved" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171_all_targets_v2.apt"/>
+        <HistoryEntry Date="Fri Apr 03 23:14:17 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Approved" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171_all_targets_v2.apt"/>
+        <HistoryEntry Date="Fri Apr 03 23:14:43 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Approved" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171_all_targets_v2.apt"/>
+        <HistoryEntry Date="Fri Apr 03 23:15:33 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Approved" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171_all_targets_v2.apt"/>
+        <HistoryEntry Date="Fri Apr 03 23:16:11 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Approved" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171_all_targets_v2.apt"/>
+        <HistoryEntry Date="Fri Apr 03 23:16:26 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Approved" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171_all_targets_v2.apt"/>
+        <HistoryEntry Date="Fri Apr 03 23:17:07 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Approved" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171_all_targets_v2.apt"/>
+        <HistoryEntry Date="Fri Apr 03 23:17:09 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Approved" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171_all_targets_v2.apt"/>
+        <HistoryEntry Date="Fri Apr 03 23:24:23 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Approved" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171_all_targets_v2.apt"/>
+        <HistoryEntry Date="Fri Apr 03 23:49:52 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Approved" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171_all_targets_v2.apt"/>
+        <HistoryEntry Date="Sat Apr 04 00:11:16 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Approved" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171_all_targets_v2.apt"/>
+        <HistoryEntry Date="Sat Apr 04 00:11:27 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Approved" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/CAR171_all_targets_v2.apt"/>
+        <HistoryEntry Date="Tue May 05 16:32:46 GMT 2026" APTVersion="Version 2026.2.1  JWST PRD: PRDAPTSOC-072-002, Roman PRD: PRDDEVRSOC-002" SchemaVersion="29" ProgramPhase="Approved" User="bporterfield" Platform="Mac OS X - aarch64" FileLocation="/System/Volumes/Data/solaris/user1/bporterfield/roman-work/1023.apt"/>
+        <HistoryEntry Date="Tue May 05 16:33:41 GMT 2026" APTVersion="Version 2026.2.1  JWST PRD: PRDAPTSOC-072-002, Roman PRD: PRDOPSRSOC-002" SchemaVersion="29" ProgramPhase="Approved" User="bporterfield" Platform="Mac OS X - aarch64" FileLocation="/System/Volumes/Data/solaris/user1/bporterfield/roman-work/1023.apt"/>
+        <HistoryEntry Date="Tue May 05 16:33:41 GMT 2026" APTVersion="Version 2026.2.1  JWST PRD: PRDAPTSOC-072-002, Roman PRD: PRDOPSRSOC-002" SchemaVersion="29" ProgramPhase="Approved" User="bporterfield" Platform="Mac OS X - aarch64" FileLocation="/System/Volumes/Data/solaris/user1/bporterfield/roman-work/1023.apt"/>
+        <HistoryEntry Date="Mon May 11 21:21:43 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Approved" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA/notebooks/CAR171/CAR171.apt"/>
+        <HistoryEntry Date="Mon May 11 23:16:24 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Approved" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA/notebooks/CAR171/APT_1023_GhostsStrayLight_CAR171_modified.apt"/>
+    </ProgramHistory>
+    <ToolData>
+        <ToolData Name="Phase2SubmissionData">
+            <ToolValue Name="AptVersion">Version 2026.2.1  </ToolValue>
+            <ToolValue Name="Cycle">0</ToolValue>
+            <ToolValue Name="ErrorText">The list of Investigators does not match the STScI records for this program.
+</ToolValue>
+            <ToolValue Name="HasErrors">true</ToolValue>
+            <ToolValue Name="NotificationAddress">a.s.borlaff@nasa.gov</ToolValue>
+            <ToolValue Name="Phase2DiagnosticJustification">There is one author to be included in the program. Alejandro Serrano Borlaff (NASA/Ames) a.s.borlaff@nasa.gov
+</ToolValue>
+            <ToolValue Name="SubmissionComments">v.1.1: April 3rd 2026, A.S.Borlaff - NASA/ARC 
+- PAV3 bug fixed. RA DEC PAV3 calculated for Dec 1st, 2026. 
+
+v.1.0: April 3rd 2026, A.S.Borlaff - NASA/ARC 
+- WARNING: All the observations in this APT require specific V3PA angles. There is a discrepancy between the internally calculated V3PA angles and the scheduling windows calculated by the APT. This is being investigated in the Roman HelpDesk INC0221379.</ToolValue>
+            <ToolValue Name="SubmissionCommentsCheckSum">1615639502</ToolValue>
+            <ToolValue Name="SubmissionCounter">2</ToolValue>
+            <ToolValue Name="SubmissionLog">----- Attempting Submission 1 (Fri Apr 03 23:17:07 GMT 2026) -----
+Roman Approved Proposal 1023 successfully submitted.
+Receipt: # 1023-1
+
+----- Attempting Submission 2 (Sat Apr 04 00:11:27 GMT 2026) -----</ToolValue>
+            <ToolValue Name="SubmissionMode"></ToolValue>
+            <ToolValue Name="SubmissionSuccessCounter">1</ToolValue>
+            <ToolData Name="SystemInformation">
+                <ToolValue Name="Runtime.maxMemory">6000</ToolValue>
+                <ToolValue Name="java.version">21.0.3</ToolValue>
+                <ToolValue Name="linux.distribution">not available</ToolValue>
+                <ToolValue Name="linux.version">not available</ToolValue>
+                <ToolValue Name="os.arch">aarch64</ToolValue>
+                <ToolValue Name="os.name">Mac OS X</ToolValue>
+                <ToolValue Name="os.version">15.7.5</ToolValue>
+                <ToolValue Name="screens">1728x1117,2560x1440,2560x1440</ToolValue>
+            </ToolData>
+        </ToolData>
+        <ToolData Name="SubmissionData">
+            <ToolValue Name="AssignedID">00000</ToolValue>
+            <ToolValue Name="SubmissionLog">
+Assuming assigned ID: 00000</ToolValue>
+        </ToolData>
+    </ToolData>
+    <Properties/>
+</RomanProgram>
