@@ -177,6 +177,8 @@ def get_zodiacal_background(input_name=None, ext=None, exposure_identity=None, w
                             output_units=None, verbose=False, interpolate=True):
 
     from scipy import interpolate
+    import astropy.wcs as astropy_wcs
+
     # Keywords for IRSA background query:
     # Check: https://irsa.ipac.caltech.edu/applications/BackgroundModel/docs/dustProgramInterface.html
     #
@@ -191,7 +193,7 @@ def get_zodiacal_background(input_name=None, ext=None, exposure_identity=None, w
 
     if exposure_identity is None:
         input_fits = fits.open(input_name)
-        astropywcs = wcs.WCS(header=input_fits[ext].header, fobj=input_fits, naxis=2)
+        astropywcs = astropy_wcs.WCS(header=input_fits[ext].header, fobj=input_fits, naxis=2)
         
         if (wavelength == None) or (expstart == None) or (output_units == None) or (zody_mode=="zodipy"):
             exposure_identity = rs.utils.exposure_inspector(input_name, lite=True)

@@ -46,31 +46,36 @@ def telescope_class_finder(telescope):
                             "CSST": CSST,
                             "SPHEREx": SPHEREx,
                             "ARRAKIHS": ARRAKIHS,
-                            "Euclid": Euclid}
+                            "Euclid": Euclid,
+                            "MESSIER": MESSIER}
 
     if ("Hubble" in telescope) or ("HST" in telescope) or ("hst" in telescope):
-        telescope_classname = "Hubble"
+        return(supported_telescopes["Hubble"])
 
     elif ("Roman" in telescope) or ("ROMAN" in telescope) or ("RST" in telescope) or ("NGRST" in telescope):
-        telescope_classname = "Roman"
+        return(supported_telescopes["Roman"])
 
     elif ("CSST" in telescope):
-        telescope_classname = "CSST"
+        return(supported_telescopes["CSST"])
 
     elif ("SPHEREx" in telescope):
-        telescope_classname = "SPHEREx"
+        return(supported_telescopes["SPHEREx"])
 
     elif ("ARRAKIHS" in telescope):
-        telescope_classname = "ARRAKIHS"
+        return(supported_telescopes["ARRAKIHS"])
 
     elif ("Euclid" in telescope):
-        telescope_classname = "Euclid"
+        return(supported_telescopes["Euclid"])
+    
+    elif ("MESSIER" in telescope):
+        return(supported_telescopes["MESSIER"])
+       
     else:
         print("Telescope " + telescope + " not supported.")
         print("Try 'Hubble', 'Roman', 'SPHEREx', 'ARRAKIHS' or 'CSST' instead")
-        telescope = None
+        return(None)
 
-    return(supported_telescopes[telescope_classname])
+    # return(supported_telescopes[telescope_classname])
 #################################################################
 
 #############################
@@ -969,3 +974,152 @@ class Euclid:
     """ Euclid Telescope properties class"""
     TELESCOP = "Euclid"
     mirror_radius = 0.6*u.meter
+
+
+class MESSIER:
+    """ MESSIES Telescope properties class"""
+    TELESCOP = "MESSIER"
+    mirror_radius = 0.25*u.meter
+
+    def TLE_exposure(epoch):
+        #return(rs.satellites.find_closest_TLE(epoch=epoch, TLE_history=CSST.load_CSST_TLE()))
+        return(rs.telescopes.MESSIER.load_example_TLE())
+
+    def load_example_TLE():
+        from skyfield.api import EarthSatellite
+        ts = sf_api.load.timescale()
+        line1 = '1 99999U 12345A   30001.09252315  .00000000  00000-0  00000+0 0    14'
+        line2 = '2 99999  99.0335  10.7830 0000000   0.0000   0.0000 13.98211265    03'
+        satellite = EarthSatellite(line1, line2, 'MESSIER', ts)
+        return(satellite)
+    
+    def TLE_tuple():
+        line0 = b'0 MESSIER\n'
+        line1 = b'1 99999U 12345A   30001.09252315  .00000000  00000-0  00000+0 0    14\n'
+        line2 = b'2 99999  99.0335  10.7830 0000000   0.0000   0.0000 13.98211265    03\n'
+        return((line0, line1, line2))
+
+    def get_canvas_shape(instrument):
+        canvas_shape = np.array(np.array([4.4, 1.6])*60*60/1*u.arcsec).astype("int")
+        return(canvas_shape)
+
+
+    def get_pixscale(instrument):
+        pixscale = 1.0*u.arcsec
+        return(pixscale)
+
+
+    def get_filter(filter_name, verbose=False):
+        """
+        Filter    w1    wc    w2  
+        N200    180.0 200.0 220.0
+        M200    158.0 200.0 242.0
+        M310    255.0 310.0 365.0
+        M480    375.0 480.0 585.0
+        M690    590.0 690.0 790.0
+        M890    800.0 890.0 980.0
+        """
+        peak_UV_filter_transmission = 0.15 # HST/UVIS filters range around 8 - 30 %  https://svo2.cab.inta-csic.es/svo/theory/fps/index.php?id=HST/WFC3_UVIS1.F390M&&mode=browse&gname=HST&gname2=WFC3_UVIS1#filter
+        N200 = {'instrument': 'MESSIER', 'filter_name': 'N200',
+                'wavelength_bins': np.array([160, 180, 200, 220, 240])*u.Angstrom,
+                'transmission_bins': peak_UV_filter_transmission*np.array([0, 0.5, 1, 0.5, 0]),
+                'average_wave_filter': 200*u.Angstrom,
+                'lambda_min': 180*u.Angstrom,
+                'lambda_max': 220*u.Angstrom,
+                'lambda_ref': 200*u.Angstrom,
+                'transmission_ref': peak_UV_filter_transmission*np.array([1])}
+
+        M200 = {'instrument': 'MESSIER', 'filter_name': 'M200',
+                'wavelength_bins': np.array([140, 158.0, 200.0, 242.0, 260])*u.Angstrom,
+                'transmission_bins': peak_UV_filter_transmission*np.array([0, 0.5, 1, 0.5, 0]),
+                'average_wave_filter': 200*u.Angstrom,
+                'lambda_min': 158*u.Angstrom,
+                'lambda_max': 242*u.Angstrom,
+                'lambda_ref': 200*u.Angstrom,
+                'transmission_ref': peak_UV_filter_transmission*np.array([1])}
+
+        M310 = {'instrument': 'MESSIER', 'filter_name': 'M310',
+                'wavelength_bins': np.array([230, 255.0, 310.0, 365.0, 380])*u.Angstrom,
+                'transmission_bins': peak_UV_filter_transmission*np.array([0, 0.5, 1, 0.5, 0]),
+                'average_wave_filter': 310*u.Angstrom,
+                'lambda_min': 255*u.Angstrom,
+                'lambda_max': 365*u.Angstrom,
+                'lambda_ref': 310*u.Angstrom,
+                'transmission_ref': peak_UV_filter_transmission*np.array([1])}
+
+        M480 = {'instrument': 'MESSIER', 'filter_name': 'M480',
+                'wavelength_bins': np.array([350, 375.0, 480.0, 585.0, 600])*u.Angstrom,
+                'transmission_bins': peak_UV_filter_transmission*np.array([0, 0.5, 1, 0.5, 0]),
+                'average_wave_filter': 480*u.Angstrom,
+                'lambda_min': 375*u.Angstrom,
+                'lambda_max': 585*u.Angstrom,
+                'lambda_ref': 480*u.Angstrom,
+                'transmission_ref': peak_UV_filter_transmission*np.array([1])}
+        
+        M690 = {'instrument': 'MESSIER', 'filter_name': 'M690',
+                'wavelength_bins': np.array([570, 590.0, 690.0, 790.0, 810])*u.Angstrom,
+                'transmission_bins': peak_UV_filter_transmission*np.array([0, 0.5, 1, 0.5, 0]),
+                'average_wave_filter': 690*u.Angstrom,
+                'lambda_min': 590*u.Angstrom,
+                'lambda_max': 790*u.Angstrom,
+                'lambda_ref': 690*u.Angstrom,
+                'transmission_ref': peak_UV_filter_transmission*np.array([1])}
+        
+
+        M890 = {'instrument': 'MESSIER', 'filter_name': 'M890',
+                'wavelength_bins': np.array([780, 800.0, 890.0, 980.0, 1000])*u.Angstrom,
+                'transmission_bins': peak_UV_filter_transmission*np.array([0, 0.5, 1, 0.5, 0]),
+                'average_wave_filter': 890*u.Angstrom,
+                'lambda_min': 800*u.Angstrom,
+                'lambda_max': 980*u.Angstrom,
+                'lambda_ref': 890*u.Angstrom,
+                'transmission_ref': peak_UV_filter_transmission*np.array([1])}
+        """
+        Filter    w1    wc    w2  
+        N200    180.0 200.0 220.0
+        M200    158.0 200.0 242.0
+        M310    255.0 310.0 365.0
+        M480    375.0 480.0 585.0
+        M690    590.0 690.0 790.0
+        M890    800.0 890.0 980.0
+        """
+        if filter_name == "N200": return(N200)
+        if filter_name == "M200": return(M200)
+        if filter_name == "M310": return(M310)
+        if filter_name == "M480": return(M480)
+        if filter_name == "M690": return(M690)
+        if filter_name == "M890": return(M890)
+        return(None)
+
+    def make_dummy_exposure(ra, dec, pa, outname):
+        canvas_shape = rs.telescopes.MESSIER.get_canvas_shape(instrument="MESSIER")
+        canvas = np.zeros(canvas_shape)
+        header = rs.utils.create_custom_wcs(crpix=[int(canvas_shape[1]/2), int(canvas_shape[0]/2)],
+                                            crval=[ra,dec],
+                                            cdelt=[-rs.telescopes.MESSIER.get_pixscale(instrument="MESSIER").to("degree").value,
+                                                    rs.telescopes.MESSIER.get_pixscale(instrument="MESSIER").to("degree").value],
+                                            crota=[-pa,-pa])
+        rs.utils.save_fits(canvas, outname, header)
+        return(outname)
+
+
+    def get_PSF():
+        sigma_MESSIER_psf = 0.4/1.0
+        print("MESSIER Moffat 2D PSF")
+        #from astropy.convolution import Gaussian2DKernel
+        #gaussian_2D_kernel = Gaussian2DKernel(sigma_ARRAKIHS_psf, x_size=101, y_size=101)
+        from astropy.modeling.functional_models import Moffat2D
+
+        a = Moffat2D(amplitude=1, gamma=1)
+        x = np.linspace(-20,20,41)
+        y = np.linspace(-20,20,41)
+        X, Y = np.meshgrid(y,x)
+        psf = a.evaluate(amplitude=1, gamma=sigma_MESSIER_psf, x_0=0, y_0=0, alpha=2.5, x=X, y=Y)
+        return(psf)
+        #return(gaussian_2D_kernel.array)
+
+    def mu2fe(mu):
+        return(rs.detectors.mu2fe(mu=mu, instrument="MESSIER", filter_name="M310", telescope="MESSIER", verbose=False))
+
+    def fe2mu(fe):
+        return(rs.detectors.fe2mu(fe=fe, instrument="MESSIER", filter_name="M310", telescope="MESSIER", verbose=False))

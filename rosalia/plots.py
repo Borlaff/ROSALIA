@@ -137,7 +137,7 @@ def main_offender_find_fraction_of_map(mainoff_name, catalog_name):
             print("Catalog does not have information for cat_id: " + str(unique_id) + ". Skipping")
             continue
         
-        unique_id_valid.append(unique_ud)
+        unique_id_valid.append(unique_id)
         # print(unique_id)
         pixels_with_id = bn.nansum(data == unique_id)
         #print("pixels_with_id: " + str(unique_id) + " - " + str(pixels_with_id))

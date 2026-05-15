@@ -693,8 +693,7 @@ def main_offender(input_name=None, ext=None, ra=None, dec=None, phi=0,
         hybrid_catalog[name_column_is_star_inside_this_detector] = infield_stars["bool_isIn"]
 
         # If verbose, make a plot of the stars with the footprint.
-        detector_corners = rs.detectors.get_detector_corners(data_shape=image_identity["DATA"][SCIEXT_i-1].shape,
-                                                             wcs=image_identity["ASTROPYWCS"][SCIEXT_i-1])
+        detector_corners = rs.detectors.get_detector_corners(wcs=image_identity["ASTROPYWCS"][SCIEXT_i-1])
         detector_square_list.append(np.concatenate([detector_corners["corners_world"], detector_corners["corners_world"]]))
     # Once you are done checking if the stars are inside each detector,
     # find out which stars are outside ALL detectors.

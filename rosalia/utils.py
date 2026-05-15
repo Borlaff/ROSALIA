@@ -276,8 +276,13 @@ def exposure_inspector_single(input_name, verbose=False, lite=False):
         exposure_identity["SCIEXTS"] = np.array([0])
 
     # Add the position of the telescope to the identity.
-    telescope = rs.telescopes.telescope_class_finder(exposure_identity["TELESCOP"])
-    exposure_identity["XYZ_HELIO_POS"] = telescope.get_location(mjd=exposure_identity["EXPSTART"])
+    try:
+        telescope = rs.telescopes.telescope_class_finder(exposure_identity["TELESCOP"])
+        exposure_identity["XYZ_HELIO_POS"] = telescope.get_location(mjd=exposure_identity["EXPSTART"])
+    except:
+        telescope = None
+        print("Telescope " + exposure_identity["TELESCOP"] + " Class not found!")
+        print("Some functions might not work")
 
     return(exposure_identity)
 
@@ -319,13 +324,17 @@ def exposure_inspector_asdf(input_name, verbose=False, lite=False):
 
 
     ############## Get the filter identity #######################
-
-    exposure_identity["FILTER_IDENTITY"] = rs.telescopes.find_filter_in_svo(wavelength=exposure_identity["FILTER"],
+    try: 
+        exposure_identity["FILTER_IDENTITY"] = rs.telescopes.find_filter_in_svo(wavelength=exposure_identity["FILTER"],
                                                                             telescope=exposure_identity["TELESCOP"],
                                                                             instrument=exposure_identity["INSTRUME"],
                                                                             detector=detector_svo,
                                                                             verbose=False)
-
+        
+    except:
+        print("The filter " + exposure_identity["FILTER"] + "/" + exposure_identity["TELESCOP"] +  "/" +  exposure_identity["INSTRUME"] + "/" + detector_svo + " was not found. Photometric calculations can be compromised.")
+        print("Check FILTER keyword in the Science Headers and / or proceed with caution.")
+        exposure_identity["FILTER_IDENTITY"] = None
     ##############################################################
 
     # exposure_identity["PHYSPIX"] = telescope_class.get_physical_pixelsize(instrument=exposure_identity["INSTRUME"])
@@ -452,12 +461,19 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
             print("ERROR! The FITS does not have a FILTER keyword in the header of EXT 0. ")
     exposure_identity["FILTER"] = filter
 
-    # Get the filter identity
-    exposure_identity["FILTER_IDENTITY"] = rs.telescopes.find_filter_in_svo(wavelength=exposure_identity["FILTER"],
-                                                              telescope=exposure_identity["TELESCOP"],
-                                                              instrument=exposure_identity["INSTRUME"],
-                                                              detector=exposure_identity["DETECTOR"],
-                                                              verbose=False)
+    ############## Get the filter identity #######################
+    try: 
+        exposure_identity["FILTER_IDENTITY"] = rs.telescopes.find_filter_in_svo(wavelength=exposure_identity["FILTER"],
+                                                                            telescope=exposure_identity["TELESCOP"],
+                                                                            instrument=exposure_identity["INSTRUME"],
+                                                                            detector=exposure_identity["DETECTOR"],
+                                                                            verbose=False)
+        
+    except:
+        print("The filter " + exposure_identity["FILTER"] + "/" + exposure_identity["TELESCOP"] +  "/" +  exposure_identity["INSTRUME"] + "/" + exposure_identity["DETECTOR"] + " was not found. Photometric calculations can be compromised.")
+        print("Check FILTER keyword in the Science Headers and / or proceed with caution.")
+        exposure_identity["FILTER_IDENTITY"] = None
+    ##############################################################
 
     # Get pixel size
     # exposure_identity["PHYSPIX"] = telescope_class.get_physical_pixelsize(instrument=exposure_identity["INSTRUME"])
@@ -473,21 +489,35 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
     data_shape = []
     astropywcs = []
     science_extension_hdulist = []
+    header_list = []
 
     # If LITE, fill this anyways.
     for sci_ext_i in exposure_identity["SCIEXTS"]:
         data_shape.append(input_fits[sci_ext_i].data.shape)
         header_i = input_fits[sci_ext_i].header
         header_i["EXTNAME"] = "SCI"
-        header_i["SCA"] = sci_ext_i       
-        astropywcs_i = WCS(fobj=input_fits[sci_ext_i])
+        header_i["SCA"] = sci_ext_i      
+        # print("Hey!")
+        # print(input_fits[sci_ext_i].header) 
+        header_list.append(input_fits[sci_ext_i].header)
+        astropywcs_i = WCS(header=input_fits[sci_ext_i], fobj=input_fits, naxis=2)
         astropywcs.append(astropywcs_i)
+    exposure_identity["HEADERS"] = header_list
     exposure_identity["DATA_SHAPE"] = data_shape
     exposure_identity["ASTROPYWCS"] = astropywcs
-
     exposure_identity["PIXSCALE"] = np.abs(astropywcs[0].proj_plane_pixel_scales()[0])
 
     # If not lite, do one more loop with the data to make a swarp coadd.
+    if not "RA_TARG" in exposure_identity:
+        lite = False
+        print("RA_TARG and DEC_TARG keywords not present in header")
+        print("Enabling mosaic generator to find the central coordinates of the image")
+
+    if not "PA" in exposure_identity:
+        wcs = exposure_identity["ASTROPYWCS"][0]
+        exposure_identity["PA"] = np.arctan2(-wcs.wcs.cd[1, 0], wcs.wcs.cd[1, 1])*180.0/np.pi
+
+
     if not lite: # Avoid generating the mosaic header.
         for sci_ext_i in exposure_identity["SCIEXTS"]:
             #data_shape.append(input_fits[sci_ext_i].data.shape)
@@ -526,8 +556,12 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
 
         exposure_identity["RA_PNT"]  = reference_header["CRVAL1"]
         exposure_identity["DEC_PNT"] = reference_header["CRVAL2"]
+        exposure_identity["RA_TARG"]  = reference_header["CRVAL1"]
+        exposure_identity["DEC_TARG"] = reference_header["CRVAL2"]
         exposure_identity["X_PNT"]  = reference_header["CRPIX1"]
         exposure_identity["Y_PNT"]  = reference_header["CRPIX2"]
+
+    
     ################
 
     return(exposure_identity)
@@ -552,7 +586,7 @@ def reproject_roman_wfi_fits(input_name, input_ext, reference_name, reference_ex
     
 
 
-def run_swarp(pattern, outname, scale=1, coveredfrac=1, verbose=False):
+def run_swarp(pattern, outname, scale=1, coveredfrac=1, resample=True, verbose=False):
     """
     run_swarp:
     This program runs SWARP on the input pattern of files, and generates a mosaic with the output name specified in outname. The pattern can be a string with the name of the file, a list of files, or a pattern with *. The output mosaic will be saved as outname, and if scale is different from 1, a scaled version of the mosaic will be saved as outname with the suffix "_scaled.fits". 
@@ -572,9 +606,12 @@ def run_swarp(pattern, outname, scale=1, coveredfrac=1, verbose=False):
     :return: List with the names of the output mosaic files. The first element is the name of the mosaic with the original pixel scale, and the second element is the name of the mosaic with the scaled pixel scale (if scale is different from 1). If scale is 1, the second element will be None.
     :rtype: list
     """
-
+    if resample:
+        resample_str = "Y"
+    else:
+        resample_str = "N"
     rs.utils.execute_cmd("swarp -d > swarp.conf", verbose=verbose) # Generate a default config file for swarp
-    rs.utils.execute_cmd("swarp -c swarp.conf -SUBTRACT_BACK N -BLANK_BADPIXELS Y -VERBOSE_TYPE QUIET " + pattern, verbose=verbose) # Run swarp on all the SCAs
+    rs.utils.execute_cmd("swarp -c swarp.conf -RESAMPLE " + resample_str + " -SUBTRACT_BACK N -BLANK_BADPIXELS Y -VERBOSE_TYPE QUIET " + pattern, verbose=verbose) # Run swarp on all the SCAs
 
     # Mask all the 0s as NANs
     hdu = fits.open("coadd.fits")

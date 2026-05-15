@@ -417,8 +417,8 @@ def query_healpix_ra_slices(healpix_lvl=7, verbose=False):
 def find_ra_dec_constraints(ra, dec, radius, verbose=False):
 
     coord = SkyCoord(ra*u.deg, dec*u.deg, frame='icrs')
-    hp = astro_hp.HEALPix(nside=128, order='nested', frame=ICRS())
-    healpix_ids_bounding_circle = hp.cone_search_skycoord(coord, radius=radius*5*u.deg)
+    hp = astro_hp.HEALPix(nside=1024, order='nested', frame=ICRS())
+    healpix_ids_bounding_circle = hp.cone_search_skycoord(coord, radius=radius*2*u.deg)
     #print(healpix_ids_bounding_circle)
 
     healpix_radec_bounding_circle = hp.healpix_to_skycoord(healpix_ids_bounding_circle)

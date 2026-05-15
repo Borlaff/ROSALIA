@@ -223,8 +223,7 @@ def fe2mag(fe, instrument, filter_name, telescope, verbose=False):
 def get_detector_corners(wcs):
     #input_fits = fits.open(input_name)
     #w = wcs.WCS(header=input_fits[ext].header, fobj=input_fits, naxis=2)
-    w = wcs
-    data_shape = w.array_shape
+    data_shape = wcs.array_shape
 
     x_min = 0
     x_max = data_shape[1]
@@ -234,10 +233,10 @@ def get_detector_corners(wcs):
     corners_pix = np.array([[x_min, y_min], [x_max, y_min], [x_max, y_max], [x_min, y_max]])
     #print(corners_pix)
 
-    corners_world = np.array([w.all_pix2world(x_min, y_min, 0),
-                              w.all_pix2world(x_max, y_min, 0),
-                              w.all_pix2world(x_max, y_max, 0),
-                              w.all_pix2world(x_min, y_max, 0)])
+    corners_world = np.array([wcs.all_pix2world(x_min, y_min, 0),
+                              wcs.all_pix2world(x_max, y_min, 0),
+                              wcs.all_pix2world(x_max, y_max, 0),
+                              wcs.all_pix2world(x_min, y_max, 0)])
 
     # Fix RA if needed
     for i in range(4):
