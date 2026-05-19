@@ -15,6 +15,7 @@
    attitude
    bootima
    constants
+   core
    correct
    detectors
    gaia

@@ -18,6 +18,7 @@ rosalia/astrometry.py
 rosalia/attitude.py
 rosalia/bootima.py
 rosalia/constants.py
+rosalia/core.py
 rosalia/correct.py
 rosalia/detectors.py
 rosalia/gaia.py

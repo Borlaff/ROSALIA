@@ -15,6 +15,7 @@ import rosalia.utils
 import rosalia.astrometry
 import rosalia.bootima
 import rosalia.correct
+import rosalia.core
 import rosalia.detectors
 import rosalia.horizons
 import rosalia.irsa

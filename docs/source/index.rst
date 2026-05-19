@@ -48,6 +48,7 @@ Contents
     tutorials
     usage
     nexus
+    commissioning
     whoarewe
     rosalia
     api

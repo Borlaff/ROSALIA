@@ -60,6 +60,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">How to use</a></li>
 <li class="toctree-l1"><a class="reference internal" href="nexus.html">Roman Research Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="commissioning.html">Roman Commissioning Stray-light Activities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="whoarewe.html">Who is ROSALIA?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rosalia.html">ROSALIA package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
@@ -94,7 +95,7 @@
 <p>This section contains some code examples and Jupyter notebook tutorials to help you get started with ROSALIA and its functionalities.</p>
 <section id="finding-the-nominal-position-angle">
 <h2>Finding the nominal position angle<a class="headerlink" href="#finding-the-nominal-position-angle" title="Link to this heading"></a></h2>
-<p>Due to the asymmetric design of the Nancy Grace Roman Space Telescope, there is an optimal position angle for the observations that maximizes the power in the solar panels and minimizes the stray-light from the Sun. Since the Sun moves across the sky as a function of time, the optimal position angle for a given target will change as well. ROSALIA includes a function based on <a class="reference external" href="https://roman-docs.stsci.edu/simulation-tools/additional-simulation-tools/pysiaf-for-roman#PySIAFforRoman-fig1">PySIAF</a>  to easily calculate the optimal position angle for the observatory a given target and date. <a href="#id1"><span class="problematic" id="id2">*</span></a>Note: This function has a known discrepancy of ~0.1 degrees with the nominal PAV3 values estimated by the Roman APT. We are still working on this issue, but the results are sufficiently accurate for most purposes.</p>
+<p id="id1">Due to the asymmetric design of the Nancy Grace Roman Space Telescope, there is an optimal position angle for the observations that maximizes the power in the solar panels and minimizes the stray-light from the Sun. Since the Sun moves across the sky as a function of time, the optimal position angle for a given target will change as well. ROSALIA includes a function based on <a class="reference external" href="https://roman-docs.stsci.edu/simulation-tools/additional-simulation-tools/pysiaf-for-roman#PySIAFforRoman-fig1">PySIAF</a>  to easily calculate the optimal position angle for the observatory a given target and date. <a href="#id2"><span class="problematic" id="id3">*</span></a>Note: This function has a known discrepancy of ~0.1 degrees with the nominal PAV3 values estimated by the Roman APT. We are still working on this issue, but the results are sufficiently accurate for most purposes.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">rosalia</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">rs</span>
 <span class="c1"># Let&#39;s say that we want to observe a target at the following coordinates:</span>
 <span class="n">ra</span> <span class="o">=</span> <span class="mf">56.6583333</span>  <span class="c1"># Right ascension, in degrees.</span>
@@ -185,7 +186,7 @@ romanisim-make-image<span class="w"> </span>--radec<span class="w"> </span><span
 <p>This is a very crude solution that should be considered as maximum surface brightness limit. Real surface brightness limits will be brighter (worse) than this estimate, as it does not take into account systematic effects like flat field, CTE, bias, or gradients due to stray-light. The only limiting factor is photon noise from Zodiacal light. However, for most observations, Zodiacal light is 95% of the limit, so it will work sufficiently well for the vast majority of purposes.</p>
 <p>For a more realistic simulation, we recommend to simulate the individual exposures with Romanisim: <a class="reference external" href="https://romanisim.readthedocs.io/en/latest/">https://romanisim.readthedocs.io/en/latest/</a>, and then combine the individual exposures. The resulting noise then will include the systematic effects mentioned above.</p>
 <ul class="simple">
-<li><p><code class="xref download docutils literal notranslate"><span class="pre">R0_Surface_brightness_limit.ipynb</span></code></p></li>
+<li><p><a class="reference download internal" download="" href="_downloads/1cbc5af7060c83c82cc230615b120e0b/R0_Surface_brightness_limit.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">R0_Surface_brightness_limit.ipynb</span></code></a></p></li>
 </ul>
 </section>
 </section>

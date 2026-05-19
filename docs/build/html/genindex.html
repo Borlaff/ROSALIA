@@ -50,6 +50,7 @@
 <li class="toctree-l1"><a class="reference internal" href="tutorials.html">Additional Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">How to use</a></li>
 <li class="toctree-l1"><a class="reference internal" href="nexus.html">Roman Research Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="commissioning.html">Roman Commissioning Stray-light Activities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="whoarewe.html">Who is ROSALIA?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rosalia.html">ROSALIA package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
@@ -268,6 +269,8 @@
 </li>
         <li><a href="rosalia.html#rosalia.telescopes.Hubble.fe2mu">(rosalia.telescopes.Hubble method)</a>
 </li>
+        <li><a href="rosalia.html#rosalia.telescopes.MESSIER.fe2mu">(rosalia.telescopes.MESSIER method)</a>
+</li>
         <li><a href="rosalia.html#rosalia.telescopes.SPHEREx.fe2mu">(rosalia.telescopes.SPHEREx method)</a>
 </li>
       </ul></li>
@@ -362,6 +365,8 @@
 </li>
         <li><a href="rosalia.html#rosalia.telescopes.Hubble.get_canvas_shape">(rosalia.telescopes.Hubble method)</a>
 </li>
+        <li><a href="rosalia.html#rosalia.telescopes.MESSIER.get_canvas_shape">(rosalia.telescopes.MESSIER method)</a>
+</li>
         <li><a href="rosalia.html#rosalia.telescopes.SPHEREx.get_canvas_shape">(rosalia.telescopes.SPHEREx method)</a>
 </li>
       </ul></li>
@@ -381,6 +386,8 @@
         <li><a href="rosalia.html#rosalia.telescopes.CSST.get_filter">(rosalia.telescopes.CSST method)</a>
 </li>
         <li><a href="rosalia.html#rosalia.telescopes.Hubble.get_filter">(rosalia.telescopes.Hubble method)</a>
+</li>
+        <li><a href="rosalia.html#rosalia.telescopes.MESSIER.get_filter">(rosalia.telescopes.MESSIER method)</a>
 </li>
         <li><a href="rosalia.html#rosalia.telescopes.Roman.get_filter">(rosalia.telescopes.Roman method)</a>
 </li>
@@ -428,6 +435,8 @@
 </li>
         <li><a href="rosalia.html#rosalia.telescopes.Hubble.get_pixscale">(rosalia.telescopes.Hubble method)</a>
 </li>
+        <li><a href="rosalia.html#rosalia.telescopes.MESSIER.get_pixscale">(rosalia.telescopes.MESSIER method)</a>
+</li>
         <li><a href="rosalia.html#rosalia.telescopes.Roman.get_pixscale">(rosalia.telescopes.Roman method)</a>
 </li>
         <li><a href="rosalia.html#rosalia.telescopes.SPHEREx.get_pixscale">(rosalia.telescopes.SPHEREx method)</a>
@@ -441,6 +450,8 @@
         <li><a href="rosalia.html#rosalia.telescopes.CSST.get_PSF">(rosalia.telescopes.CSST method)</a>
 </li>
         <li><a href="rosalia.html#rosalia.telescopes.Hubble.get_PSF">(rosalia.telescopes.Hubble method)</a>
+</li>
+        <li><a href="rosalia.html#rosalia.telescopes.MESSIER.get_PSF">(rosalia.telescopes.MESSIER method)</a>
 </li>
       </ul></li>
       <li><a href="rosalia.html#rosalia.telescopes.Roman.get_psf">get_psf() (rosalia.telescopes.Roman method)</a>
@@ -535,15 +546,17 @@
         <li><a href="rosalia.html#rosalia.telescopes.Passbands.WISE.W4.lambda_ref">(rosalia.telescopes.Passbands.WISE.W4 attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rosalia.html#rosalia.irsa.launch_irsa_query">launch_irsa_query() (in module rosalia.irsa)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rosalia.html#rosalia.utils.load_dict">load_dict() (in module rosalia.utils)</a>
 </li>
       <li><a href="rosalia.html#rosalia.telescopes.ARRAKIHS.load_example_TLE">load_example_TLE() (rosalia.telescopes.ARRAKIHS method)</a>
 
       <ul>
+        <li><a href="rosalia.html#rosalia.telescopes.MESSIER.load_example_TLE">(rosalia.telescopes.MESSIER method)</a>
+</li>
         <li><a href="rosalia.html#rosalia.telescopes.SPHEREx.load_example_TLE">(rosalia.telescopes.SPHEREx method)</a>
 </li>
       </ul></li>
@@ -592,6 +605,8 @@
 </li>
         <li><a href="rosalia.html#rosalia.telescopes.Hubble.make_dummy_exposure">(rosalia.telescopes.Hubble method)</a>
 </li>
+        <li><a href="rosalia.html#rosalia.telescopes.MESSIER.make_dummy_exposure">(rosalia.telescopes.MESSIER method)</a>
+</li>
         <li><a href="rosalia.html#rosalia.telescopes.SPHEREx.make_dummy_exposure">(rosalia.telescopes.SPHEREx method)</a>
 </li>
       </ul></li>
@@ -615,6 +630,8 @@
 </li>
       <li><a href="rosalia.html#rosalia.psf.measure_maxradii">measure_maxradii() (in module rosalia.psf)</a>
 </li>
+      <li><a href="rosalia.html#rosalia.telescopes.MESSIER">MESSIER (class in rosalia.telescopes)</a>
+</li>
       <li><a href="rosalia.html#rosalia.telescopes.ARRAKIHS.mirror_radius">mirror_radius (rosalia.telescopes.ARRAKIHS attribute)</a>
 
       <ul>
@@ -623,6 +640,8 @@
         <li><a href="rosalia.html#rosalia.telescopes.Euclid.mirror_radius">(rosalia.telescopes.Euclid attribute)</a>
 </li>
         <li><a href="rosalia.html#rosalia.telescopes.Hubble.mirror_radius">(rosalia.telescopes.Hubble attribute)</a>
+</li>
+        <li><a href="rosalia.html#rosalia.telescopes.MESSIER.mirror_radius">(rosalia.telescopes.MESSIER attribute)</a>
 </li>
         <li><a href="rosalia.html#rosalia.telescopes.Roman.mirror_radius">(rosalia.telescopes.Roman attribute)</a>
 </li>
@@ -652,6 +671,8 @@
         <li><a href="generated/rosalia.bootima.html#module-rosalia.bootima">rosalia.bootima</a>
 </li>
         <li><a href="generated/rosalia.constants.html#module-rosalia.constants">rosalia.constants</a>, <a href="rosalia.html#module-rosalia.constants">[1]</a>
+</li>
+        <li><a href="generated/rosalia.core.html#module-rosalia.core">rosalia.core</a>
 </li>
         <li><a href="generated/rosalia.correct.html#module-rosalia.correct">rosalia.correct</a>, <a href="rosalia.html#module-rosalia.correct">[1]</a>
 </li>
@@ -700,6 +721,8 @@
         <li><a href="rosalia.html#rosalia.telescopes.CSST.mu2fe">(rosalia.telescopes.CSST method)</a>
 </li>
         <li><a href="rosalia.html#rosalia.telescopes.Hubble.mu2fe">(rosalia.telescopes.Hubble method)</a>
+</li>
+        <li><a href="rosalia.html#rosalia.telescopes.MESSIER.mu2fe">(rosalia.telescopes.MESSIER method)</a>
 </li>
         <li><a href="rosalia.html#rosalia.telescopes.SPHEREx.mu2fe">(rosalia.telescopes.SPHEREx method)</a>
 </li>
@@ -900,6 +923,13 @@
 
       <ul>
         <li><a href="generated/rosalia.constants.html#module-rosalia.constants">module</a>, <a href="rosalia.html#module-rosalia.constants">[1]</a>
+</li>
+      </ul></li>
+      <li>
+    rosalia.core
+
+      <ul>
+        <li><a href="generated/rosalia.core.html#module-rosalia.core">module</a>
 </li>
       </ul></li>
       <li>
@@ -1112,6 +1142,8 @@
 </li>
         <li><a href="rosalia.html#rosalia.telescopes.Hubble.TELESCOP">(rosalia.telescopes.Hubble attribute)</a>
 </li>
+        <li><a href="rosalia.html#rosalia.telescopes.MESSIER.TELESCOP">(rosalia.telescopes.MESSIER attribute)</a>
+</li>
         <li><a href="rosalia.html#rosalia.telescopes.Roman.TELESCOP">(rosalia.telescopes.Roman attribute)</a>
 </li>
         <li><a href="rosalia.html#rosalia.telescopes.SPHEREx.TELESCOP">(rosalia.telescopes.SPHEREx attribute)</a>
@@ -1144,6 +1176,8 @@
 </li>
         <li><a href="rosalia.html#rosalia.telescopes.Hubble.TLE_exposure">(rosalia.telescopes.Hubble method)</a>
 </li>
+        <li><a href="rosalia.html#rosalia.telescopes.MESSIER.TLE_exposure">(rosalia.telescopes.MESSIER method)</a>
+</li>
         <li><a href="rosalia.html#rosalia.telescopes.SPHEREx.TLE_exposure">(rosalia.telescopes.SPHEREx method)</a>
 </li>
       </ul></li>
@@ -1151,6 +1185,8 @@
 
       <ul>
         <li><a href="rosalia.html#rosalia.telescopes.CSST.TLE_tuple">(rosalia.telescopes.CSST method)</a>
+</li>
+        <li><a href="rosalia.html#rosalia.telescopes.MESSIER.TLE_tuple">(rosalia.telescopes.MESSIER method)</a>
 </li>
         <li><a href="rosalia.html#rosalia.telescopes.SPHEREx.TLE_tuple">(rosalia.telescopes.SPHEREx method)</a>
 </li>

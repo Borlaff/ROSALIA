@@ -46,9 +46,14 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="mission.html">What is ROSALIA?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="measuringstray.html">Measuring Stray Light</a></li>
+<li class="toctree-l1"><a class="reference internal" href="measuringstray.html">Stray Light</a></li>
+<li class="toctree-l1"><a class="reference internal" href="zodiacal.html">Zodiacal Light</a></li>
+<li class="toctree-l1"><a class="reference internal" href="PSF.html">In-field Stars</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SSOs.html">Solar System Objects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials.html">Additional Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">How to use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nexus.html">Roman Research Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="commissioning.html">Roman Commissioning Stray-light Activities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="whoarewe.html">Who is ROSALIA?</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">ROSALIA package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
@@ -320,6 +325,21 @@
 <li class="toctree-l4"><a class="reference internal" href="#rosalia.telescopes.Hubble.mirror_radius"><code class="docutils literal notranslate"><span class="pre">Hubble.mirror_radius</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#rosalia.telescopes.Hubble.mu2fe"><code class="docutils literal notranslate"><span class="pre">Hubble.mu2fe()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#rosalia.telescopes.Hubble.ndi_estimator"><code class="docutils literal notranslate"><span class="pre">Hubble.ndi_estimator()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#rosalia.telescopes.MESSIER"><code class="docutils literal notranslate"><span class="pre">MESSIER</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#rosalia.telescopes.MESSIER.TELESCOP"><code class="docutils literal notranslate"><span class="pre">MESSIER.TELESCOP</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rosalia.telescopes.MESSIER.TLE_exposure"><code class="docutils literal notranslate"><span class="pre">MESSIER.TLE_exposure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rosalia.telescopes.MESSIER.TLE_tuple"><code class="docutils literal notranslate"><span class="pre">MESSIER.TLE_tuple()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rosalia.telescopes.MESSIER.fe2mu"><code class="docutils literal notranslate"><span class="pre">MESSIER.fe2mu()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rosalia.telescopes.MESSIER.get_PSF"><code class="docutils literal notranslate"><span class="pre">MESSIER.get_PSF()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rosalia.telescopes.MESSIER.get_canvas_shape"><code class="docutils literal notranslate"><span class="pre">MESSIER.get_canvas_shape()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rosalia.telescopes.MESSIER.get_filter"><code class="docutils literal notranslate"><span class="pre">MESSIER.get_filter()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rosalia.telescopes.MESSIER.get_pixscale"><code class="docutils literal notranslate"><span class="pre">MESSIER.get_pixscale()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rosalia.telescopes.MESSIER.load_example_TLE"><code class="docutils literal notranslate"><span class="pre">MESSIER.load_example_TLE()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rosalia.telescopes.MESSIER.make_dummy_exposure"><code class="docutils literal notranslate"><span class="pre">MESSIER.make_dummy_exposure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rosalia.telescopes.MESSIER.mirror_radius"><code class="docutils literal notranslate"><span class="pre">MESSIER.mirror_radius</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rosalia.telescopes.MESSIER.mu2fe"><code class="docutils literal notranslate"><span class="pre">MESSIER.mu2fe()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.telescopes.Passbands"><code class="docutils literal notranslate"><span class="pre">Passbands</span></code></a><ul>
@@ -1025,7 +1045,7 @@ If provided, skips querying Gaia/2MASS/WISE catalogs. Default is None.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.detectors.get_detector_corners">
-<span class="sig-prename descclassname"><span class="pre">rosalia.detectors.</span></span><span class="sig-name descname"><span class="pre">get_detector_corners</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wcs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.detectors.get_detector_corners" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">rosalia.detectors.</span></span><span class="sig-name descname"><span class="pre">get_detector_corners</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wcs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.detectors.get_detector_corners" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -1035,7 +1055,7 @@ If provided, skips querying Gaia/2MASS/WISE catalogs. Default is None.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.detectors.make_detector_grid">
-<span class="sig-prename descclassname"><span class="pre">rosalia.detectors.</span></span><span class="sig-name descname"><span class="pre">make_detector_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'random'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.detectors.make_detector_grid" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">rosalia.detectors.</span></span><span class="sig-name descname"><span class="pre">make_detector_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'random'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.detectors.make_detector_grid" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -1530,7 +1550,7 @@ it case by case.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.sky.get_zodiacal_background">
-<span class="sig-prename descclassname"><span class="pre">rosalia.sky.</span></span><span class="sig-name descname"><span class="pre">get_zodiacal_background</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavelength</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">telescope</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instrument</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expstart</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zody_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'zodipy'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbins_wavelength</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obslocin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'random'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interpolate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.sky.get_zodiacal_background" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">rosalia.sky.</span></span><span class="sig-name descname"><span class="pre">get_zodiacal_background</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exposure_identity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavelength</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">telescope</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instrument</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expstart</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zody_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'zodipy'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbins_wavelength</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obslocin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'random'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interpolate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.sky.get_zodiacal_background" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -1897,6 +1917,80 @@ Current version:   HST_TLE_history_sat000020580.txt - From launch (1990) - up to
 <dl class="py method">
 <dt class="sig sig-object py" id="rosalia.telescopes.Hubble.ndi_estimator">
 <span class="sig-name descname"><span class="pre">ndi_estimator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavelength</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'legacy'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.telescopes.Hubble.ndi_estimator" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rosalia.telescopes.MESSIER">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">rosalia.telescopes.</span></span><span class="sig-name descname"><span class="pre">MESSIER</span></span><a class="headerlink" href="#rosalia.telescopes.MESSIER" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>MESSIES Telescope properties class</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosalia.telescopes.MESSIER.TELESCOP">
+<span class="sig-name descname"><span class="pre">TELESCOP</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'MESSIER'</span></span><a class="headerlink" href="#rosalia.telescopes.MESSIER.TELESCOP" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosalia.telescopes.MESSIER.TLE_exposure">
+<span class="sig-name descname"><span class="pre">TLE_exposure</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.telescopes.MESSIER.TLE_exposure" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosalia.telescopes.MESSIER.TLE_tuple">
+<span class="sig-name descname"><span class="pre">TLE_tuple</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.telescopes.MESSIER.TLE_tuple" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosalia.telescopes.MESSIER.fe2mu">
+<span class="sig-name descname"><span class="pre">fe2mu</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.telescopes.MESSIER.fe2mu" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosalia.telescopes.MESSIER.get_PSF">
+<span class="sig-name descname"><span class="pre">get_PSF</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.telescopes.MESSIER.get_PSF" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosalia.telescopes.MESSIER.get_canvas_shape">
+<span class="sig-name descname"><span class="pre">get_canvas_shape</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.telescopes.MESSIER.get_canvas_shape" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosalia.telescopes.MESSIER.get_filter">
+<span class="sig-name descname"><span class="pre">get_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.telescopes.MESSIER.get_filter" title="Link to this definition"></a></dt>
+<dd><p>Filter    w1    wc    w2  
+N200    180.0 200.0 220.0
+M200    158.0 200.0 242.0
+M310    255.0 310.0 365.0
+M480    375.0 480.0 585.0
+M690    590.0 690.0 790.0
+M890    800.0 890.0 980.0</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosalia.telescopes.MESSIER.get_pixscale">
+<span class="sig-name descname"><span class="pre">get_pixscale</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.telescopes.MESSIER.get_pixscale" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosalia.telescopes.MESSIER.load_example_TLE">
+<span class="sig-name descname"><span class="pre">load_example_TLE</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.telescopes.MESSIER.load_example_TLE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosalia.telescopes.MESSIER.make_dummy_exposure">
+<span class="sig-name descname"><span class="pre">make_dummy_exposure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.telescopes.MESSIER.make_dummy_exposure" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosalia.telescopes.MESSIER.mirror_radius">
+<span class="sig-name descname"><span class="pre">mirror_radius</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;Quantity</span> <span class="pre">0.25</span> <span class="pre">m&gt;</span></span><a class="headerlink" href="#rosalia.telescopes.MESSIER.mirror_radius" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosalia.telescopes.MESSIER.mu2fe">
+<span class="sig-name descname"><span class="pre">mu2fe</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.telescopes.MESSIER.mu2fe" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -2487,7 +2581,7 @@ exposure, stored as a FITS or ADSF file.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.utils.find_max_angular_size_of_image">
-<span class="sig-prename descclassname"><span class="pre">rosalia.utils.</span></span><span class="sig-name descname"><span class="pre">find_max_angular_size_of_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wcs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.utils.find_max_angular_size_of_image" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">rosalia.utils.</span></span><span class="sig-name descname"><span class="pre">find_max_angular_size_of_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wcs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ra_cen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec_cen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.utils.find_max_angular_size_of_image" title="Link to this definition"></a></dt>
 <dd><p>Returns the maximum angular extension of an image.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -2734,7 +2828,7 @@ v1: October 17, 2024</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.utils.run_swarp">
-<span class="sig-prename descclassname"><span class="pre">rosalia.utils.</span></span><span class="sig-name descname"><span class="pre">run_swarp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coveredfrac</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.utils.run_swarp" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">rosalia.utils.</span></span><span class="sig-name descname"><span class="pre">run_swarp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coveredfrac</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.utils.run_swarp" title="Link to this definition"></a></dt>
 <dd><p>run_swarp:
 This program runs SWARP on the input pattern of files, and generates a mosaic with the output name specified in outname. The pattern can be a string with the name of the file, a list of files, or a pattern with <a href="#id32"><span class="problematic" id="id33">*</span></a>. The output mosaic will be saved as outname, and if scale is different from 1, a scaled version of the mosaic will be saved as outname with the suffix “_scaled.fits”.</p>
 <dl class="field-list simple">

@@ -1,5 +1,5 @@
 Stray Light
-=========
+==========================
 
 In-field vs. out-field stray-light
 -----------------------------
@@ -36,7 +36,7 @@ The following Jupyter-notebook shows a quick example to estimate stray-light wit
   :alt: ROSALIA Stray-light loading bar
 
 The notebook is available in the ``notebooks`` directory of the ROSALIA repository, and can be downloaded from the link below:
-* :download:`R1_Rosalia_stray_example.ipynb <../../notebooks/R1_Rosalia_stray_example.ipynb>`. To run this notebook locally, make sure you have Jupyter installed and then:
+* :download:`R1_Rosalia_stray_example.ipynb <../../notebooks/tutorials/R1_Rosalia_stray_example.ipynb>`. To run this notebook locally, make sure you have Jupyter installed and then:
 
 .. code-block:: bash
     jupyter notebook notebooks/R1_Rosalia_stray_example.ipynb
@@ -49,18 +49,18 @@ A particular case of interest would be to produce an intense stray-light backgro
 
 First, let's visualize the Normalized Detector Irradiance (NDI) map for Roman Space Telescope Wide Field Instrument. 
 
-.. image:: ../../notebooks/ndi_2deg_CARs_no_points.png
+.. image:: ../../notebooks/tutorials/ndi_2deg_CARs_no_points.png
     :width: 49 %
-.. image:: ../../notebooks/ndi_20deg_CARs_no_points.png
+.. image:: ../../notebooks/tutorials/ndi_20deg_CARs_no_points.png
     :width: 49 %
 
 The NDI is defined as the ratio of the stray-light irradiance (power per unit area) received at the detector to the irradiance of the source at the entrance of the telescope `(see Bely 2003) <https://ui.adsabs.harvard.edu/abs/2003dclo.book.....B/abstract>`_ . This function can be used to estimate the flux of photoelectrons that an off-axis source will generate in a certain region of the detector. Similarly to the Point Spread Function (PSF) defines the spread of point sources by diffraction effects, the sharpness of the NDI defines the effectiveness of the telescope's baffling. This function is strongly dependent on the optical setup and wavelength. For a given telescope, the NDI depends on the angular distance between the optical axis and the source, the position angle of the source in the focal plane reference frame, the observation wavelength, and the position on the FOV (x,y),
 
 We can identify several points of interested were stray-light is expected to peak if illuminated: 
 
-.. image:: ../../notebooks/ndi_2deg_CARs.png
+.. image:: ../../notebooks/tutorials/ndi_2deg_CARs.png
     :width: 49 %
-.. image:: ../../notebooks/ndi_20deg_CARs.png
+.. image:: ../../notebooks/tutorials/ndi_20deg_CARs.png
     :width: 49 %
 
 

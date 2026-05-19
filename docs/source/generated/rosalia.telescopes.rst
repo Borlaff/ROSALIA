@@ -22,6 +22,7 @@ rosalia.telescopes
       CSST
       Euclid
       Hubble
+      MESSIER
       Passbands
       Roman
       SPHEREx
