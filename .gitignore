@@ -8,11 +8,10 @@ subprocess.out
 temp*
 *temp
 *csv
-<<<<<<< HEAD
-*pyc
-=======
 *.pyc
- 
+notebooks/DEVEL/snap*.png
+notebooks/CAR171/CAR171*.png
+
  
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -230,4 +229,3 @@ cython_debug/
 *.swp
  
  
->>>>>>> 0ecae2cd99581408664ec41aeb70a954817cecb8
