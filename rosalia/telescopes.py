@@ -20,6 +20,17 @@ from astropy.coordinates import SkyCoord
 #####################
 
 def ndi_estimator(theta, phi=None, wavelength=None, mode="legacy"):
+    """
+    ndi_estimator estimates the NDI for a given angle theta (and optionally phi) and wavelength. It uses either the legacy values from Bely 2003 for the HST NDI or the Euclid NDI envelope depending on the mode selected. The function returns an interpolated NDI value for the given theta.
+    Input parameters:
+        - theta: The angle in degrees for which to estimate the NDI.
+        - phi: (Optional) The azimuthal angle in degrees. Not used in the current implementation but can be included for future improvements.
+        - wavelength: (Optional) The wavelength in microns
+        - mode: A string that determines which NDI values to use. "legacy" uses the Bely 2003 values for HST, while "euclid" uses the Euclid NDI envelope.
+    Output:
+        - f_NDI_interpolator(theta): The interpolated NDI value for the given theta.
+
+    """
     if mode == "legacy":
         #print("DEMO WARNING: Using legacy values of Bely 2003 for the HST NDI")
         ndi_db = pd.read_csv(os.environ["ROSALIACACHE"] + "/CORE/ndi_HST_legacy_bely2003.csv")

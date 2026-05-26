@@ -131,6 +131,8 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-rosalia.horizons">rosalia.horizons module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.horizons.find_moon_and_jupiter_in_HST_history"><code class="docutils literal notranslate"><span class="pre">find_moon_and_jupiter_in_HST_history()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rosalia.horizons.get_jpl_observer_name"><code class="docutils literal notranslate"><span class="pre">get_jpl_observer_name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rosalia.horizons.get_mpc_observer_name"><code class="docutils literal notranslate"><span class="pre">get_mpc_observer_name()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.horizons.horizons_query"><code class="docutils literal notranslate"><span class="pre">horizons_query()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.horizons.single_horizons_query"><code class="docutils literal notranslate"><span class="pre">single_horizons_query()</span></code></a></li>
 </ul>
@@ -1090,6 +1092,16 @@ If provided, skips querying Gaia/2MASS/WISE catalogs. Default is None.</p>
 <dd></dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="rosalia.horizons.get_jpl_observer_name">
+<span class="sig-prename descclassname"><span class="pre">rosalia.horizons.</span></span><span class="sig-name descname"><span class="pre">get_jpl_observer_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">observer_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.horizons.get_jpl_observer_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosalia.horizons.get_mpc_observer_name">
+<span class="sig-prename descclassname"><span class="pre">rosalia.horizons.</span></span><span class="sig-name descname"><span class="pre">get_mpc_observer_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">observer_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.horizons.get_mpc_observer_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="rosalia.horizons.horizons_query">
 <span class="sig-prename descclassname"><span class="pre">rosalia.horizons.</span></span><span class="sig-name descname"><span class="pre">horizons_query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mjd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'301'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'&#64;jwst'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.horizons.horizons_query" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -1800,7 +1812,23 @@ mu_zody = surface brightness in Jy arcsec-2</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="rosalia.telescopes.CSST.ndi_estimator">
 <span class="sig-name descname"><span class="pre">ndi_estimator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavelength</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'legacy'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.telescopes.CSST.ndi_estimator" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>ndi_estimator estimates the NDI for a given angle theta (and optionally phi) and wavelength. It uses either the legacy values from Bely 2003 for the HST NDI or the Euclid NDI envelope depending on the mode selected. The function returns an interpolated NDI value for the given theta.
+Input parameters:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>theta: The angle in degrees for which to estimate the NDI.</p></li>
+<li><p>phi: (Optional) The azimuthal angle in degrees. Not used in the current implementation but can be included for future improvements.</p></li>
+<li><p>wavelength: (Optional) The wavelength in microns</p></li>
+<li><p>mode: A string that determines which NDI values to use. “legacy” uses the Bely 2003 values for HST, while “euclid” uses the Euclid NDI envelope.</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Output:</dt><dd><ul class="simple">
+<li><p>f_NDI_interpolator(theta): The interpolated NDI value for the given theta.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="rosalia.telescopes.CSST.old_make_dummy_exposure">
@@ -1917,7 +1945,23 @@ Current version:   HST_TLE_history_sat000020580.txt - From launch (1990) - up to
 <dl class="py method">
 <dt class="sig sig-object py" id="rosalia.telescopes.Hubble.ndi_estimator">
 <span class="sig-name descname"><span class="pre">ndi_estimator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavelength</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'legacy'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.telescopes.Hubble.ndi_estimator" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>ndi_estimator estimates the NDI for a given angle theta (and optionally phi) and wavelength. It uses either the legacy values from Bely 2003 for the HST NDI or the Euclid NDI envelope depending on the mode selected. The function returns an interpolated NDI value for the given theta.
+Input parameters:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>theta: The angle in degrees for which to estimate the NDI.</p></li>
+<li><p>phi: (Optional) The azimuthal angle in degrees. Not used in the current implementation but can be included for future improvements.</p></li>
+<li><p>wavelength: (Optional) The wavelength in microns</p></li>
+<li><p>mode: A string that determines which NDI values to use. “legacy” uses the Bely 2003 values for HST, while “euclid” uses the Euclid NDI envelope.</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Output:</dt><dd><ul class="simple">
+<li><p>f_NDI_interpolator(theta): The interpolated NDI value for the given theta.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -2259,7 +2303,23 @@ M890    800.0 890.0 980.0</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="rosalia.telescopes.Roman.ndi_estimator">
 <span class="sig-name descname"><span class="pre">ndi_estimator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavelength</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'legacy'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.telescopes.Roman.ndi_estimator" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>ndi_estimator estimates the NDI for a given angle theta (and optionally phi) and wavelength. It uses either the legacy values from Bely 2003 for the HST NDI or the Euclid NDI envelope depending on the mode selected. The function returns an interpolated NDI value for the given theta.
+Input parameters:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>theta: The angle in degrees for which to estimate the NDI.</p></li>
+<li><p>phi: (Optional) The azimuthal angle in degrees. Not used in the current implementation but can be included for future improvements.</p></li>
+<li><p>wavelength: (Optional) The wavelength in microns</p></li>
+<li><p>mode: A string that determines which NDI values to use. “legacy” uses the Bely 2003 values for HST, while “euclid” uses the Euclid NDI envelope.</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Output:</dt><dd><ul class="simple">
+<li><p>f_NDI_interpolator(theta): The interpolated NDI value for the given theta.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="rosalia.telescopes.Roman.stpsf_get_psf">
@@ -2353,7 +2413,23 @@ M890    800.0 890.0 980.0</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.telescopes.ndi_estimator">
 <span class="sig-prename descclassname"><span class="pre">rosalia.telescopes.</span></span><span class="sig-name descname"><span class="pre">ndi_estimator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavelength</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'legacy'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.telescopes.ndi_estimator" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>ndi_estimator estimates the NDI for a given angle theta (and optionally phi) and wavelength. It uses either the legacy values from Bely 2003 for the HST NDI or the Euclid NDI envelope depending on the mode selected. The function returns an interpolated NDI value for the given theta.
+Input parameters:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>theta: The angle in degrees for which to estimate the NDI.</p></li>
+<li><p>phi: (Optional) The azimuthal angle in degrees. Not used in the current implementation but can be included for future improvements.</p></li>
+<li><p>wavelength: (Optional) The wavelength in microns</p></li>
+<li><p>mode: A string that determines which NDI values to use. “legacy” uses the Bely 2003 values for HST, while “euclid” uses the Euclid NDI envelope.</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Output:</dt><dd><ul class="simple">
+<li><p>f_NDI_interpolator(theta): The interpolated NDI value for the given theta.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.telescopes.telescope_class_finder">

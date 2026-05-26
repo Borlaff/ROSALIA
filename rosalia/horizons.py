@@ -1,13 +1,32 @@
 import time
 import numpy as np
 import pandas as pd
-import bottleneck as bn
+import ephessos as ep
 from tqdm import tqdm
-from astropy.time import Time
 import astropy.units as u
-import matplotlib.pyplot as plt
 from astropy.coordinates import SkyCoord
 from rosalia.utils import divide_array_in_chunks
+
+def get_jpl_observer_name(observer_name):
+    obs_center = ep.core.jpl_name_translation(observer_name)
+    return(obs_center)
+
+
+
+def get_mpc_observer_name(observer_name):
+    from astroquery.mpc import MPC
+
+    if observer_name == "HST" or observer_name == "Hubble": return("250")
+    if observer_name == "RST" or observer_name == "Roman": return("289")
+    if observer_name == "Euclid": return("273")
+
+    try:
+        obs = MPC.get_observatory_codes()
+        return(obs[obs["Name"] == observer_name]["Code"][0])
+    except:
+        print("MPC Code not found!")
+    
+
 
 # ROLO lunar model
 # https://iopscience.iop.org/article/10.1086/430185/pdf

@@ -7,54 +7,61 @@ import astropy.units as u
 import numpy as np
 import matplotlib.pyplot as plt
 import rosalia as rs
-import ephessos as ep
+from astropy.coordinates import SkyCoord
+from rosalia.correct import rosalia_stray
+import os
 
 class exposure():
     
-    def __init__(self, filename=None, telescope=None):
+    def __init__(self, filename=None, observer=None, telescope=None):
+        import os 
+        from astropy.wcs import WCS   
 
-        if telescope is not None: 
+        if observer is not None:
+            if observer["TELESCOP"] == "Roman/WFI":
+                self = self.roman_wfi_exposure(observer)
+
+            if telescope is not None: 
+                self.TELESCOP = telescope['TELESCOP']
+                self.INSTRUME = telescope['INSTRUME']
+                self.DETECTOR = telescope['DETECTOR']
+                self.DATA_SHAPE = telescope['DATA_SHAPE']
+                self.RA_TARG = telescope["pointing"][0]
+                self.DEC_TARG = telescope["pointing"][1]
+                self.PA = telescope['PA_Y']
+                self.EXPSTART = telescope['EXPSTART']
+                self.EXPTIME = telescope['EXPTIME']
+                self.EXPMID = (Time(self.EXPSTART, format="mjd") + self.EXPTIME*u.s/2).mjd
+                self.EXPEND = (Time(self.EXPSTART, format="mjd") + self.EXPTIME*u.s).mjd
+                # self.PHYSPIX = telescope['PHYSPIX']
+                self.PIXSCALE = telescope['PIXSCALE']
+                # self.EXPSTART_ISOT = 
+                self.MPC_OBSLOC = self.get_mpc_observer_location()
+                self.JPL_OBSLOC = self.get_jpl_observer_location()
+                self.FILTER_IDENTITY = rs.telescopes.find_filter_in_svo(wavelength=telescope["FILTER_PARAMS"]["NAME"],
+                                                                        telescope=telescope["FILTER_PARAMS"]["TELESCOPE"],
+                                                                        instrument=telescope["FILTER_PARAMS"]["INSTRUMENT"],
+                                                                        detector=telescope["FILTER_PARAMS"]["DETECTOR"], verbose=False)
+                # self.XYZ_HELIO_POS = exposure_identity['XYZ_HELIO_POS']
+
+
+                self.SCIEXTS = [0]
+                header = rs.utils.create_custom_wcs(crpix=np.array(self.DATA_SHAPE)/2, 
+                                                            crval=[self.RA_TARG, self.DEC_TARG], 
+                                                            cdelt=[-self.PIXSCALE,self.PIXSCALE], 
+                                                            crota=[-self.PA,-self.PA], 
+                                                            projection="TAN")
             
-            self.TELESCOP = telescope['TELESCOP']
-            self.INSTRUME = telescope['INSTRUME']
-            self.DETECTOR = telescope['DETECTOR']
-            self.DATA_SHAPE = telescope['DATA_SHAPE']
-            self.RA_TARG = telescope["pointing"][0]
-            self.DEC_TARG = telescope["pointing"][1]
-            self.PA = telescope['PA_Y']
-            self.EXPSTART = telescope['EXPSTART']
-            self.EXPTIME = telescope['EXPTIME']
-            self.EXPMID = (Time(self.EXPSTART, format="mjd") + self.EXPTIME*u.s/2).mjd
-            self.EXPEND = (Time(self.EXPSTART, format="mjd") + self.EXPTIME*u.s).mjd
-            # self.PHYSPIX = telescope['PHYSPIX']
-            self.PIXSCALE = telescope['PIXSCALE']
-            # self.EXPSTART_ISOT = 
-            self.MPC_OBSLOC = self.get_mpc_observer_location()
-            self.JPL_OBSLOC = self.get_jpl_observer_location()
-            self.FILTER_IDENTITY = rs.telescopes.find_filter_in_svo(wavelength=telescope["FILTER_PARAMS"]["NAME"],
-                                                                    telescope=telescope["FILTER_PARAMS"]["TELESCOPE"],
-                                                                    instrument=telescope["FILTER_PARAMS"]["INSTRUMENT"],
-                                                                    detector=telescope["FILTER_PARAMS"]["DETECTOR"], verbose=False)
-            # self.XYZ_HELIO_POS = exposure_identity['XYZ_HELIO_POS']
-            self.SCIEXTS = [0]
+                header["NAXIS1"] = self.DATA_SHAPE[0]
+                header["NAXIS2"] = self.DATA_SHAPE[1]
 
-            header = rs.utils.create_custom_wcs(crpix=np.array(self.DATA_SHAPE)/2, 
-                                                         crval=[self.RA_TARG, self.DEC_TARG], 
-                                                         cdelt=[-self.PIXSCALE,self.PIXSCALE], 
-                                                         crota=[-self.PA,-self.PA], 
-                                                         projection="TAN")
-            
-            header["NAXIS1"] = self.DATA_SHAPE[0]
-            header["NAXIS2"] = self.DATA_SHAPE[1]
+                self.ASTROPYWCS = [WCS(header)]
+                self.FPA_NEAR_RADIUS = self.get_max_angular_size()
 
-            from astropy.wcs import WCS
-            self.ASTROPYWCS = [WCS(header)]
-            self.FPA_NEAR_RADIUS = self.get_max_angular_size()
-            import os 
-            self.FILENAME = os.getcwd() + "/" + self.TELESCOP + "_RA_" + '{:07.3f}'.format(self.RA_TARG) +\
-                                     "_DEC_" + '{:07.3f}'.format(self.DEC_TARG) +\
-                                     "_MJD_" + '{:07.5f}'.format(self.EXPSTART) +\
-                                     "_PA_" + '{:06.2f}'.format(self.PA) + ".fits"
+                self.FILENAME = os.getcwd() + "/" + self.TELESCOP + "_RA_" + '{:07.3f}'.format(self.RA_TARG) +\
+                                                "_DEC_" + '{:07.3f}'.format(self.DEC_TARG) +\
+                                                "_MJD_" + '{:07.5f}'.format(self.EXPSTART) +\
+                                                "_PA_" + '{:06.2f}'.format(self.PA) + ".fits"
 
         if filename is not None:
             exposure_identity = rs.utils.exposure_inspector(filename, lite=False)
@@ -82,31 +89,67 @@ class exposure():
             self.DATA_SHAPE = exposure_identity['DATA_SHAPE']
             self.ASTROPYWCS = exposure_identity['ASTROPYWCS']
             self.FILETYPE = exposure_identity['FILETYPE']
-            self.MPC_OBSLOC = self.get_mpc_observer_location()
-            self.JPL_OBSLOC = self.get_jpl_observer_location()
+            self.MPC_OBSLOC = rs.horizons.get_mpc_observer_name(self.TELESCOP)
+            self.JPL_OBSLOC = rs.horizons.get_jpl_observer_name(self.TELESCOP)
             # self.XYZ_HELIO_POS = exposure_identity['XYZ_HELIO_POS']
             self.FPA_NEAR_RADIUS = self.get_max_angular_size()
 
 
-    def get_jpl_observer_location(self):
-        obs_center = ep.core.jpl_name_translation(self.TELESCOP)
-        return(obs_center)
 
 
-    def get_mpc_observer_location(self):
-        from astroquery.mpc import MPC
-
-        if self.TELESCOP == "HST" or self.TELESCOP == "Hubble": return("250")
-        if self.TELESCOP == "RST" or self.TELESCOP == "Roman": return("289")
-        if self.TELESCOP == "Euclid": return("273")
-
-        try:
-            obs = MPC.get_observatory_codes()
-            return(obs[obs["Name"] == self.TELESCOP]["Code"][0])
-        except:
-            print("MPC Code not found!")
+    def roman_wfi_exposure(self, observer):
+        # Here we expect observer={"TELESCOP": "Roman/WFI", "pointing": [RA_TARG, DEC_TARG], "FILTER":FILTER, "PA_Y": PA_Y, "EXPSTART": EXPSTART, "EXPTIME": EXPTIME}
+        # Fixed parameters for Roman/WFI 
+        observer['TELESCOP'] = "Roman"
+        observer['INSTRUME'] = "WFI"
+        observer['DETECTOR'] = "WFI"
+        observer['DATA_SHAPE'] = [4088, 4088]
+        observer['PIXSCALE'] = rs.telescopes.Roman.get_pixscale(instrument=observer['INSTRUME']).to("degree").value
+        observer['FILTER_PARAMS'] = {"NAME": observer["FILTER"], "TELESCOPE": "RST", "INSTRUMENT": "WFI", "DETECTOR": "WFI"}
         
+        # Generic derived definitions. 
+        self.TELESCOP = observer['TELESCOP']
+        self.INSTRUME = observer['INSTRUME']
+        self.DETECTOR = observer['DETECTOR']
+        self.DATA_SHAPE = observer['DATA_SHAPE']
+        self.RA_TARG = observer["pointing"][0]
+        self.DEC_TARG = observer["pointing"][1]
+        self.PA = observer['PA_Y']
+        self.EXPSTART = observer['EXPSTART']
+        self.EXPTIME = observer['EXPTIME']
+        self.EXPTIME = observer['EXPTIME']
+        self.EXPMID = (Time(self.EXPSTART, format="mjd") + self.EXPTIME*u.s/2).mjd
+        self.EXPEND = (Time(self.EXPSTART, format="mjd") + self.EXPTIME*u.s).mjd
+        self.PHYSPIX = rs.telescopes.Roman.get_physical_pixelsize(instrument=observer['INSTRUME'])
+        self.PIXSCALE = rs.telescopes.Roman.get_pixscale(instrument=observer['INSTRUME'])
+        self.EXPSTART_ASTROPY = Time(self.EXPSTART, format="mjd")
+        self.EXPSTART_ISOT = self.EXPSTART_ASTROPY.isot
+        self.MPC_OBSLOC = rs.horizons.get_mpc_observer_name(observer['TELESCOP'])
+        self.JPL_OBSLOC = rs.horizons.get_jpl_observer_name(observer['TELESCOP'])
 
+        self.FILTER_IDENTITY = rs.telescopes.find_filter_in_svo(wavelength=observer["FILTER_PARAMS"]["NAME"],
+                                                                telescope=observer["FILTER_PARAMS"]["TELESCOPE"],
+                                                                instrument=observer["FILTER_PARAMS"]["INSTRUMENT"],
+                                                                detector=observer["FILTER_PARAMS"]["DETECTOR"], verbose=False)
+        # self.XYZ_HELIO_POS = exposure_identity['XYZ_HELIO_POS']
+
+        if "FILENAME" not in observer:
+            # If the user did not define an output filename, do it for them
+            observer["FILENAME"] = os.getcwd() + "/WFI_" + observer["FILTER"] +\
+                                    "_RA_" + '{:07.3f}'.format(self.RA_TARG) +\
+                                    "_DEC_" + '{:07.3f}'.format(self.DEC_TARG) +\
+                                    "_MJD_" + '{:07.5f}'.format(self.EXPSTART) +\
+                                    "_PA_" + '{:06.2f}'.format(self.PA) + ".fits"
+            
+        central_coords = SkyCoord(self.RA_TARG, self.DEC_TARG, frame="icrs", unit="deg")
+        print(self.EXPTIME)
+        print(self.EXPSTART)
+        observer["FILENAME"] = rs.roman.create_roman_dummy(point=central_coords, date=self.EXPSTART_ASTROPY,
+                                                            band=observer["FILTER_PARAMS"]["NAME"],
+                                                            PA=self.PA, exptime=self.EXPTIME,
+                                                            output=observer["FILENAME"])
+        return(self)
+    
 
     def get_detector_corners(self):
         detector_corners = []
@@ -171,7 +214,7 @@ class exposure():
         return(cone_search, ephessos_df)
     
 
-    def make_dummy(self, binning=1):
+    def make_generic_dummy(self, binning=1):
         data = []
         headers = []
         for SCIEXT in self.SCIEXTS:
@@ -202,5 +245,22 @@ class exposure():
         
         rs.utils.save_fits(data, self.FILENAME, headers)
         return(self.FILENAME)
+    
+
+    def straylight(self, prefix="default", radius=1, g_mag_max=15, sun_block=False, verbose=False, catalog=None, figsize=(10,7), mu_vmin=None, mu_vmax=None):
+        
+        if self.TELESCOP == "Roman" or self.TELESCOP == "RST":
+            stray_db = rosalia_stray(ra=self.RA_TARG, dec=self.DEC_TARG, PA=self.PA,
+                      date=self.EXPSTART, bandpass=self.FILTER_IDENTITY["NAME"], 
+                      exptime=self.EXPTIME, prefix=prefix, input_fits=input_fits, radius=radius,
+                      g_mag_max=g_mag_max, sun_block=sun_block, verbose=verbose, catalog=catalog, 
+                      figsize=figsize, mu_vmin=mu_vmin, mu_vmax=mu_vmax)
+        else:
+            print("Straylight modeling is currently only available for Roman/WFI exposures.")
+            return(None)
+        
+        return(stray_db)
+    
 
     
+

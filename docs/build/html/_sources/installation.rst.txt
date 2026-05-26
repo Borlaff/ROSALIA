@@ -32,7 +32,7 @@ Once in a clean conda environment, we can install ROSALIA. The preferred method 
 
 ROSALIA needs a series of cache files to work. If they are not installed, most of the functions will work, but you won't be able to estimate the surface brightness of the stray light, which is one of the main functionalities of ROSALIA. To install the cache files, download the following folder:
 
-`ROSALIA Cache <https://zenodo.org/records/18882110/files/rosalia-cache.tar.gz>`_,
+`ROSALIA Cache <https://zenodo.org/records/20335392/files/rosalia-cache.tar.gz>`_,
 
 Then, extract the contents of the downloaded file and move the resulting folder to a location of your choice. Finally, set the environment variable ``ROSALIACACHE`` to point to the location of the extracted folder. For example, if you extracted the folder to ``/path/to/rosalia-cache``, you can set the environment variable as follows:
 .. code-block:: sh

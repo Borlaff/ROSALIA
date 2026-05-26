@@ -53,6 +53,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Additional Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../usage.html">How to use</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../nexus.html">Roman Research Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../commissioning.html">Roman Commissioning Stray-light Activities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../whoarewe.html">Who is ROSALIA?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../rosalia.html">ROSALIA package</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
@@ -129,7 +130,7 @@
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.telescopes.ndi_estimator" title="rosalia.telescopes.ndi_estimator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndi_estimator</span></code></a>(theta[, phi, wavelength, mode])</p></td>
-<td><p></p></td>
+<td><p>ndi_estimator estimates the NDI for a given angle theta (and optionally phi) and wavelength. It uses either the legacy values from Bely 2003 for the HST NDI or the Euclid NDI envelope depending on the mode selected. The function returns an interpolated NDI value for the given theta. Input parameters:     - theta: The angle in degrees for which to estimate the NDI. - phi: (Optional) The azimuthal angle in degrees. Not used in the current implementation but can be included for future improvements. - wavelength: (Optional) The wavelength in microns     - mode: A string that determines which NDI values to use. &quot;legacy&quot; uses the Bely 2003 values for HST, while &quot;euclid&quot; uses the Euclid NDI envelope. Output:     - f_NDI_interpolator(theta): The interpolated NDI value for the given theta.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.telescopes.telescope_class_finder" title="rosalia.telescopes.telescope_class_finder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">telescope_class_finder</span></code></a>(telescope)</p></td>
 <td><p></p></td>
