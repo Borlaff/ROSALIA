@@ -388,8 +388,8 @@ def plot_ndi_main_offenders(input_name, scaled_main_off, catalog_name, ndi_level
 
     for i in range(3):
         # CAR 1 A
-        x_stars, y_stars = ndi_w.wcs_world2pix(main_offender_db["ra"].iloc[i], main_offender_db["dec"].iloc[i], 0)
-        ax.scatter(x_stars, y_stars, marker="h", edgecolor="black", color=cm.hot(i/3), alpha=alpha, s=150/(i+1), label=main_offender_db["source_name"].iloc[i])
+        #x_stars, y_stars = ndi_w.wcs_world2pix(main_offender_db["ra"].iloc[i], main_offender_db["dec"].iloc[i], 0)
+        ax.scatter(main_offender_db["ra"].iloc[i], main_offender_db["dec"].iloc[i], marker="h", edgecolor="black", color=cm.hot(i/3), alpha=alpha, s=150/(i+1), label=main_offender_db["source_name"].iloc[i])
 
     max_extent_ndi = np.abs(ndi_fits[0].header["CDELT2"]) * ndi_fits[0].data.shape[0]/2# This is the radial extent of the NDI map
     print(max_extent_ndi)

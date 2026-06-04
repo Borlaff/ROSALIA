@@ -113,8 +113,8 @@ def rosalia_stray(ra, dec, PA, date, bandpass, exptime, prefix="", input_fits=No
         central_coords = SkyCoord(ra, dec, frame="icrs", unit="deg")
 
         input_name = rs.roman.create_roman_dummy(point=central_coords, date=date,
-                                               band=bandpass, PA=PA, exptime=exptime,
-                                               output=roman_dummy_name)
+                                                 band=bandpass, PA=PA, exptime=exptime,
+                                                 output=roman_dummy_name)
         print(input_name)
     else: 
         input_name = input_fits
@@ -131,13 +131,13 @@ def rosalia_stray(ra, dec, PA, date, bandpass, exptime, prefix="", input_fits=No
     bandpass = exposure_dict["FILTER"]
     exptime = exposure_dict["EXPTIME"]
  
-    if input_name is None:
-        input_name = rs.roman.create_roman_dummy(point=exposure_dict["point"],
-                                                 date=date,
-                                                 band=bandpass,
-                                                 PA=PA,
-                                                 exptime=exptime,
-                                                 output=output_name.replace(".fits", "_dummy.fits"))
+    #if input_name is None:
+    #    input_name = rs.roman.create_roman_dummy(point=exposure_dict["point"],
+    #                                             date=date,
+    #                                             band=bandpass,
+    #                                             PA=PA,
+    #                                             exptime=exptime,
+    #                                             output=output_name.replace(".fits", "_dummy.fits"))
 
     # If the input name is an ASDF, transform it to a compiled FITS.
     if isinstance(input_name, (list, np.ndarray, pd.Series)):
@@ -699,21 +699,6 @@ def main_offender(input_name=None, ext=None, ra=None, dec=None, phi=0,
     # find out which stars are outside ALL detectors.
     hybrid_catalog["is_inside_FPA"] = hybrid_catalog[names_of_bool_columns_if_star_is_inside].any(axis=1)
 
-    #### TODO: INDEPENDIZE THIS INTO STRAYCOR.PLOTS ##########
-    ############# IF VERBOSE, MAKE AN INFIELD - OUTFIELD PLOT ###################
-
-    if verbose:
-
-        plt.figure(figsize=(1.618*10,10))
-        plot_size = rs.plots.plot_stars_around(catalog=hybrid_catalog, max_plot_size=100, min_plot_size=5, alpha=0.2)
-        plot_radec_limits = rs.gaia.find_ra_dec_constraints(ra=RA_PNT, dec=DEC_PNT, radius=2*radius)
-        for detector_square in detector_square_list:
-            plt.plot(detector_square[:,0], detector_square[:,1], alpha=0.5, color="red")
-        plt.xlim((plot_radec_limits["ra_max"], plot_radec_limits["ra_min"]))
-        plt.ylim((plot_radec_limits["dec_min"], plot_radec_limits["dec_max"]))
-        plt.show()
-
-    ########################################################
 
     straylevel_list = []
     main_offender_list = []

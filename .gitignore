@@ -9,7 +9,7 @@ temp*
 *temp
 *csv
 *.pyc
-notebooks/DEVEL/snap*.png
+notebooks/DEVEL/snap/snap*.png
 notebooks/CAR171/CAR171*.png
 
  

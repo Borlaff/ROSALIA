@@ -1821,3 +1821,25 @@ def write_parameters_list(fits_list, index, value, ext=0):
         raw_fits.close()
     return()
 
+def get_astropywcs_info_from_sciexts(filename, sciexts):
+    data_shape = []
+    astropywcs = []
+    header_list = []
+    
+    input_fits = fits.open(filename)
+    # If LITE, fill this anyways.
+    for sci_ext_i in sciexts:
+        data_shape.append(input_fits[sci_ext_i].data.shape)
+        header_i = input_fits[sci_ext_i].header
+        header_i["EXTNAME"] = "SCI"
+        header_i["SCA"] = sci_ext_i      
+        # print("Hey!")
+        # print(input_fits[sci_ext_i].header) 
+        header_list.append(input_fits[sci_ext_i].header)
+        astropywcs_i = astropy_wcs.WCS(header=input_fits[sci_ext_i], fobj=input_fits, naxis=2)
+        astropywcs.append(astropywcs_i)
+    
+    return({"HEADERS": header_list,
+            "DATA_SHAPE": data_shape,
+            "ASTROPYWCS": astropywcs,
+            "PIXSCALE": np.abs(astropywcs[0].proj_plane_pixel_scales()[0])})

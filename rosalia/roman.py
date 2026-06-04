@@ -14,7 +14,6 @@ from astropy import constants as const
 from datetime import datetime
 import logging
 
-
 # --------------------- #
 def create_roman_dummy(point, date, band, PA=None, exptime=500, output="default_roman_dummy.fits"):
     # create_roman_dummy:
@@ -57,6 +56,9 @@ def create_roman_dummy(point, date, band, PA=None, exptime=500, output="default_
     #    WFI_PA = None
     from romanisim import ris_make_utils as ris
     from romanisim import wcs as ris_wcs
+    from romanisim.models import parameters
+
+    import roman_datamodels
 
     # Starting the loop for the 18 SCAs
     temp_out_sca_filename_list = []
@@ -79,6 +81,14 @@ def create_roman_dummy(point, date, band, PA=None, exptime=500, output="default_
                             usecrds=True,
                             truncate=None,
                             scale_factor=1)
+
+        # Add this to include the distortion: 
+        #distortion_file = parameters.reference_data["distortion"]
+        #dist_model = roman_datamodels.datamodels.DistortionRefModel(distortion_file)
+        #if distortion_file is not None:
+        #    distortion = dist_model.coordinate_distortion_transform
+        #else:
+        #    distortion = None
 
         ris_wcs.fill_in_parameters(metadata, point, boresight=False, pa_aper=PA)
         sca_gwcs = ris_wcs.get_wcs(image=metadata, usecrds=True, distortion=None)
@@ -375,13 +385,12 @@ def fe2mag(fe, bandpass, sca):
 #######################################
 #################################################
 
-def roman_estimate_straylight_SCA(data, wcs, SCA, filter_identity, ra_stars,
+def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_stars,
                                   dec_stars, irradiance_stars, cat_id,
                                   source_id, ra_point, dec_point, pa_point,
                                   verbose=False, dry_mode=False):
 
     from tqdm import tqdm
-    import numexpr
     import bottleneck as bn
     from IPython.display import clear_output
     # Level 1 stars are the closest. R to the center of the SCA of 1 degree.
@@ -391,14 +400,13 @@ def roman_estimate_straylight_SCA(data, wcs, SCA, filter_identity, ra_stars,
     level_1_critical_distance_to_star = 1 # degree
     level_2_critical_distance_to_star = 10 # degree
 
-    data_shape = data.shape
     pixsize = rs.telescopes.Roman.get_physical_pixelsize(instrument="WFI") # Physical pixel size, in meters
 
     # Find the coordinates of each pixel in the sky.
     if verbose > 1: print(datetime.now().isoformat() + ": Finding coordinates of SCA pixels in the Sky...")
     SCA_pixel_radec = wcs.pixel_to_world(int(data_shape[0])/2,int(data_shape[1])/2)
-    ra_SCA = SCA_pixel_radec.ra.value   # Right ascension of the center of the SCA
-    dec_SCA = SCA_pixel_radec.dec.value # Declination of the center of the SCA
+    #ra_SCA = SCA_pixel_radec.ra.value   # Right ascension of the center of the SCA
+    #dec_SCA = SCA_pixel_radec.dec.value # Declination of the center of the SCA
     if verbose > 1: print(datetime.now().isoformat() + ": Done")
 
     radec_stars =  SkyCoord(ra_stars, dec_stars, frame="icrs", unit="deg")
@@ -487,8 +495,8 @@ def roman_estimate_straylight_SCA(data, wcs, SCA, filter_identity, ra_stars,
         ymid = subarray_locations_db["ymid"]
 
         # Estimating the coordinates of the center of the subarrays
-        RA_mid_subarrays =       SCA_pixel_radec.ra.value#[ymid, xmid]
-        DEC_mid_subarrays =      SCA_pixel_radec.dec.value#[ymid, xmid]
+        RA_mid_subarrays =       SCA_pixel_radec.ra.value #[ymid, xmid]
+        DEC_mid_subarrays =      SCA_pixel_radec.dec.value #[ymid, xmid]
         mid_subarrays_Skycoord = SkyCoord(RA_mid_subarrays, DEC_mid_subarrays, frame="icrs", unit="deg")
 
         if verbose > 1: print(datetime.now().isoformat() + ": Done")
@@ -638,10 +646,10 @@ def roman_estimate_straylight_SCA(data, wcs, SCA, filter_identity, ra_stars,
 
 
         main_offender_db = pd.DataFrame({"xmid": xmid, "ymid": ymid,
-                                        "xmin": xmin, "ymin": ymin,
-                                        "xmax": xmax, "ymid": ymax,
-                                        "RA_mid": RA_mid_subarrays, "DEC_mid": DEC_mid_subarrays,
-                                        "stray": col_stray, "main_off_id": col_main_off_id})
+                                         "xmin": xmin, "ymin": ymin,
+                                         "xmax": xmax, "ymid": ymax,
+                                         "RA_mid": RA_mid_subarrays, "DEC_mid": DEC_mid_subarrays,
+                                         "stray": col_stray, "main_off_id": col_main_off_id})
         # -------------------------------------------------------------------------- #
         # 4 - TO-DO - Interpolate the values across the SCA to smooth it out         #
         # -------------------------------------------------------------------------- #
