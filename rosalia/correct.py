@@ -550,7 +550,7 @@ def correct_zody(input_name, verbose=False):
         output_list.append(corrected_image)
     return(output_list)
 ########################################
-
+"""
 def main_offender(input_name=None, ext=None, ra=None, dec=None, phi=0,
                   filter_name=None, instrument=None, telescope=None, detector=None,
                   exptime=None, expstart=None, radius=1, g_mag_max=False,
@@ -671,14 +671,12 @@ def main_offender(input_name=None, ext=None, ra=None, dec=None, phi=0,
     names_of_bool_columns_if_star_is_inside = []
     detector_square_list = []
 
-    """
-    If the input file is a multi-extension fits, then exposure_inspector will scan for extensions with EXTNAME = SCI.
-    The extension ID in the FITS file will be stored in SCIEXTS = image_identity["SCIEXTS"].
+    
+    #If the input file is a multi-extension fits, then exposure_inspector will scan for extensions with EXTNAME = SCI.
+    #The extension ID in the FITS file will be stored in SCIEXTS = image_identity["SCIEXTS"].
 
-    In that case, hybrid_catalog, the catalog of stars, will have a set of N columns called in_SCI[i] (boolean), where the catalog
-    stores if that particular star is inside each detector or not.
-
-    """
+    #In that case, hybrid_catalog, the catalog of stars, will have a set of N columns called in_SCI[i] (boolean), where the catalog
+    #stores if that particular star is inside each detector or not.
 
     for SCIEXT_i in tqdm(SCIEXTS):
         if verbose: print("> Identifying which stars are inside the FOV and which are outside...")
@@ -835,7 +833,7 @@ def main_offender(input_name=None, ext=None, ra=None, dec=None, phi=0,
             "output_name": output_name,
             "main_offender_output": main_offender_output_name,
             "detector_square": detector_square_list})
-
+"""
 ########################################
 
 def estimate_straylight_in_detector_locations(input_name, ext, ra, dec,

@@ -96,7 +96,7 @@ class Loader:
 
 
 
-def main_offender_find_fraction_of_map(mainoff_name, catalog_name):
+def main_offender_find_fraction_of_map(mainoff_name, catalog):
     from astropy.io import fits
     import numpy as np
     import pandas as pd
@@ -110,8 +110,6 @@ def main_offender_find_fraction_of_map(mainoff_name, catalog_name):
         data[data == 0] = np.nan
     except:
         pass
-
-    catalog = pd.read_csv(catalog_name)
         
     data_flat = data.flatten()
     data_flat = data_flat[~np.isnan(data_flat)] 
@@ -199,7 +197,7 @@ def main_offender_find_fraction_of_map(mainoff_name, catalog_name):
     return(main_offender_db, multiline_text)
 
 
-def make_stray_plot(input_name, ext, mode="normal", catalog_name=None, 
+def make_stray_plot(input_name, ext, mode="normal", catalog=None, 
                     vmin=None, vmax=None, 
                     color_label = 'Surface brightness (mag arcsec$^{-2}$)',
                     cmap="RdYlBu", output_name=None, figsize=(10,7), mu_vmin=None, mu_vmax=None):
@@ -249,7 +247,7 @@ def make_stray_plot(input_name, ext, mode="normal", catalog_name=None,
     cbar.set_label(label=color_label,weight='bold')
 
     if mode == "main_offender":
-        main_offender_db, multiline_text = main_offender_find_fraction_of_map(input_name, catalog_name)
+        main_offender_db, multiline_text = main_offender_find_fraction_of_map(input_name, catalog)
         # 3. Add the text box
         # x, y coordinates are in data units by default
         ax.text(1.25, 0.95, multiline_text, 
@@ -264,51 +262,44 @@ def make_stray_plot(input_name, ext, mode="normal", catalog_name=None,
     return(output_name)
 
 
-def make_stars_around_plot(flt_name, catalog_name, radius = 0.6, output_name=None, figsize=(10,7)):
+def make_stars_around_plot(flt_name, catalog,  astropywcs_list, RA_TARG, DEC_TARG, radius = 0.6, output_name=None, figsize=(10,7)):
     if output_name is None:
         output_name = flt_name.replace(".fits", "_stars_close.png")
         
     # if True:
-    import rosalia as rs
-    import pandas as pd
     import matplotlib.pyplot as plt
-    from astropy.io import fits
     import numpy as np
+    from astropy.coordinates import SkyCoord
+    import astropy.units as u
+
     # Open the original flt file
-    image_identity = rs.utils.exposure_inspector(input_name=flt_name, verbose=False, lite=True)
+    # image_identity = rs.utils.exposure_inspector(input_name=flt_name, verbose=False, lite=True)
     
     # Get the detector corners: 
     detector_square_list = []
     for SCIEXT_i in rs.telescopes.Roman.WFI_SCAs:
-        detector_corners = rs.detectors.get_detector_corners(data_shape=image_identity["DATA_SHAPE"][SCIEXT_i-1],
-                                                             wcs=image_identity["ASTROPYWCS"][SCIEXT_i-1])
+        detector_corners = rs.detectors.get_detector_corners(wcs=astropywcs_list[SCIEXT_i-1])
         detector_square_list.append(np.concatenate([detector_corners["corners_world"], detector_corners["corners_world"]]))
 
-    
-    
-    RA_TARG = image_identity["RA_TARG"]
-    DEC_TARG = image_identity["DEC_TARG"]
-    hybrid_catalog = pd.read_csv(catalog_name)    
-    from astropy.coordinates import SkyCoord
-    import astropy.units as u
 
     # Make a cut in the plot for the stars closer than radius
     target = SkyCoord(RA_TARG*u.deg, DEC_TARG*u.deg, unit="degree", frame="icrs")
-    hybrid = SkyCoord(hybrid_catalog["ra"]*u.deg, hybrid_catalog["dec"]*u.deg, unit="degree", frame="icrs")
-    separation = target.separation(hybrid)
+    catalog_SkyCoord = SkyCoord(catalog["ra"]*u.deg, catalog["dec"]*u.deg, unit="degree", frame="icrs")
+    separation = target.separation(catalog_SkyCoord)
 
-    hybrid_catalog_close = hybrid_catalog[separation.value<2*radius]
+    hybrid_catalog_close = catalog[separation.value<5*radius]
+
+    if len(hybrid_catalog_close)==0:
+        print(rs.plots.style.YELLOW + "WARNING: No stars found within " + str(radius) + " degrees. Plotting all stars." + rs.plots.style.RESET)
+        hybrid_catalog_close = catalog
+
     fig, ax = plt.subplots(figsize=figsize)
     
-    if len(hybrid_catalog_close) > 1:
-        plot_size, mag_lambda_range, plot_size_range = rs.plots.plot_stars_around(ax=ax, catalog=hybrid_catalog_close, 
+    plot_size, mag_lambda_range, plot_size_range = plot_stars_around(ax=ax, catalog=hybrid_catalog_close, 
                                            max_plot_size=50, min_plot_size=5, alpha=0.2)
-    else:
-        mag_lambda_range = hybrid_catalog_close["mag_lambda"].iloc[0]
-        plot_size_range = 5
 
 
-    plot_radec_limits = rs.gaia.find_ra_dec_constraints(ra=RA_TARG, dec=DEC_TARG, radius=radius/4)
+    plot_radec_limits = rs.gaia.find_ra_dec_constraints(ra=RA_TARG, dec=DEC_TARG, radius=radius)
     for detector_square in detector_square_list:
         plt.plot(detector_square[:,0], detector_square[:,1], alpha=0.5, color="red")
     ax.set_xlim((plot_radec_limits["ra_max"], plot_radec_limits["ra_min"]))
@@ -327,12 +318,11 @@ def make_stars_around_plot(flt_name, catalog_name, radius = 0.6, output_name=Non
     plt.show()
     return(output_name)
 
-
 ###############
 
 
 
-def plot_ndi_main_offenders(input_name, scaled_main_off, catalog_name, ndi_level, figsize=(10,7)):
+def plot_ndi_main_offenders(input_name, scaled_main_off, catalog, ndi_level, figsize=(10,7)):
     import os
     import numpy as np
     import matplotlib.pyplot as plt
@@ -340,7 +330,7 @@ def plot_ndi_main_offenders(input_name, scaled_main_off, catalog_name, ndi_level
     import astropy.wcs as astropy_wcs
     import matplotlib.colors as matplotlib_colors
 
-    main_offender_db, multiline_text = rs.plots.main_offender_find_fraction_of_map(scaled_main_off, catalog_name)
+    main_offender_db, multiline_text = rs.plots.main_offender_find_fraction_of_map(scaled_main_off, catalog)
     
     # Plot level NDI 
     ndi_name = os.environ["ROSALIACACHE"] + "CORE/NDI/RST/ndi_lvl" + str(ndi_level) + "_mean.fits"
@@ -386,17 +376,17 @@ def plot_ndi_main_offenders(input_name, scaled_main_off, catalog_name, ndi_level
     alpha = 1
     import matplotlib.cm as cm
 
-    for i in range(3):
+    for i in range(np.min([len(main_offender_db["ra"]), 3])):
         # CAR 1 A
-        #x_stars, y_stars = ndi_w.wcs_world2pix(main_offender_db["ra"].iloc[i], main_offender_db["dec"].iloc[i], 0)
-        ax.scatter(main_offender_db["ra"].iloc[i], main_offender_db["dec"].iloc[i], marker="h", edgecolor="black", color=cm.hot(i/3), alpha=alpha, s=150/(i+1), label=main_offender_db["source_name"].iloc[i])
-
+        x_stars, y_stars = ndi_w.wcs_world2pix(main_offender_db["ra"].iloc[i], main_offender_db["dec"].iloc[i], 0)
+        #ax.scatter(main_offender_db["ra"].iloc[i], main_offender_db["dec"].iloc[i], marker="h", edgecolor="black", color=cm.hot(i/3), alpha=alpha, s=150/(i+1), label=main_offender_db["source_name"].iloc[i])
+        ax.scatter(x_stars, y_stars, marker="h", edgecolor="black", color=cm.hot(i/3), alpha=alpha, s=150/(i+1), label=main_offender_db["source_name"].iloc[i])
     max_extent_ndi = np.abs(ndi_fits[0].header["CDELT2"]) * ndi_fits[0].data.shape[0]/2# This is the radial extent of the NDI map
-    print(max_extent_ndi)
+    # print(max_extent_ndi)
     angle_ticks = np.round(np.linspace(-max_extent_ndi, max_extent_ndi, 5),1)
-    print(angle_ticks)
+    # print(angle_ticks)
     pixel_ticks = angle_ticks/np.abs(ndi_fits[0].header["CDELT2"])  + ndi_fits[0].data.shape[0]/2
-    print(pixel_ticks)
+    # print(pixel_ticks)
     #ax.set_xticks(pixel_ticks, angle_ticks, size=12)
     #ax.set_yticks(pixel_ticks, angle_ticks, size=12)
     ax.set_xlabel("RA (degrees)", size=15)
@@ -420,6 +410,21 @@ def plot_ndi_main_offenders(input_name, scaled_main_off, catalog_name, ndi_level
 
 def plot_stars_around(ax, catalog, max_plot_size=50, min_plot_size=5, alpha=0.2):
     # Auxiliary function to merge some plotting steps in the stray-ligth mapping
+    mag_lambda = catalog["mag_lambda"]
+
+    if len(mag_lambda[np.isfinite(mag_lambda)]) == 1:
+        the_only_mag = mag_lambda[np.isfinite(mag_lambda)][0]
+        plot_size = (max_plot_size + min_plot_size)/2
+        mag_lambda_range = np.array([the_only_mag-2, the_only_mag-1, the_only_mag, the_only_mag+1, the_only_mag+2])
+        plot_size_range = np.array([10*plot_size, 2*plot_size, plot_size, 0.5*plot_size, 0.1*plot_size])
+        
+        ra_stars = np.array(catalog["ra"][np.isfinite(mag_lambda)])
+        dec_stars = np.array(catalog["dec"][np.isfinite(mag_lambda)])
+        ax.scatter(ra_stars, dec_stars, marker="o", facecolor="grey", edgecolor="black",
+                   alpha=alpha, s=plot_size)
+        ax.set_xlabel("RA (ICRS)")
+        ax.set_ylabel("DEC (ICRS)")
+        return(plot_size, mag_lambda_range, plot_size_range)
 
     flux_for_plot = 10**(0.4*(8.9-np.array(catalog["mag_lambda"])))
     ra_stars = np.array(catalog["ra"])
@@ -462,14 +467,12 @@ def plot_stars_around(ax, catalog, max_plot_size=50, min_plot_size=5, alpha=0.2)
 
 
     ### Give the plot sizes and representative magnitudes. 
-    mag_lambda = catalog["mag_lambda"]
-    mag_lambda_range = np.unique(mag_lambda.astype("int"))
+    mag_lambda_range = np.unique(mag_lambda[np.isfinite(mag_lambda)].astype("int"))
     from scipy import interpolate
-    plot_size_interpolator = interpolate.interp1d(x=mag_lambda,
+    plot_size_interpolator = interpolate.interp1d(x=mag_lambda[np.isfinite(mag_lambda)],
                                               y=plot_size, kind="linear",
                                               fill_value="extrapolate")
     plot_size_range = plot_size_interpolator(mag_lambda_range)
-
 
     return(plot_size,mag_lambda_range, plot_size_range)
 

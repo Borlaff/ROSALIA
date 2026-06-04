@@ -436,9 +436,9 @@ class exposure():
             header_output.append(self.ASTROPYWCS[SCIEXT_i-1].to_header())
         
 
-        output_name = self.FILENAME.replace(".fits", "_stray.fits")
-
-        rs.utils.save_fits(array=data_output, name=output_name, header=header_output,
+        self.output_name = self.FILENAME.replace(".fits", "_stray.fits")
+        
+        rs.utils.save_fits(array=data_output, name=self.output_name, header=header_output,
                         extname=None, overwrite=True, output_verify='silentfix')
         # Main-offender
         data_output = []
@@ -448,9 +448,9 @@ class exposure():
             header_output.append(self.ASTROPYWCS[SCIEXT_i-1].to_header())
 
 
-        main_offender_output_name = output_name.replace(".fits", "_main_off.fits")
+        self.main_offender_output_name = self.output_name.replace(".fits", "_main_off.fits")
         rs.utils.save_fits(array=data_output, 
-                        name=main_offender_output_name, 
+                        name=self.main_offender_output_name, 
                         header=header_output,
                         extname=None, 
                         overwrite=True, 
@@ -458,8 +458,8 @@ class exposure():
 
 
         # Let's do one more step to include the needed metadata from the dummy file. 
-        stray_image = fits.open(output_name)
-        main_offender_image = fits.open(main_offender_output_name)
+        stray_image = fits.open(self.output_name)
+        main_offender_image = fits.open(self.main_offender_output_name)
         #exposure_identity_keys_to_copy = ["TELESCOP", "INSTRUME", "DETECTOR", "FILTER", "RA_TARG", "DEC_TARG", 
         #                                  "RA_PNT", "DEC_PNT", "X_PNT", "Y_PNT", "PA",
         #                                  "EXPTIME", "EXPSTART", "EXPSTART_ISOT"]
@@ -491,13 +491,13 @@ class exposure():
         # Verify, save and close
         stray_image.verify("silentfix")
         main_offender_image.verify("silentfix")
-        stray_image.writeto(output_name, overwrite=True)
-        main_offender_image.writeto(main_offender_output_name, overwrite=True)
+        stray_image.writeto(self.output_name, overwrite=True)
+        main_offender_image.writeto(self.main_offender_output_name, overwrite=True)
         
 
-        print("Output saved in: " + output_name)
+        print("Output saved in: " + self.output_name)
 
-        return({"output_name": output_name,
-                "main_offender_output": main_offender_output_name})
+        return({"output_name": self.output_name,
+                "main_offender_output": self.main_offender_output_name})
     
 
