@@ -13,13 +13,13 @@ import os
 
 class exposure():
     
-    def __init__(self, filename=None, observer=None, telescope=None):
+    def __init__(self, filename=None, prefix="", observer=None, telescope=None):
         import os 
         from astropy.wcs import WCS   
 
         if observer is not None:
             if observer["TELESCOP"] == "Roman/WFI":
-                self = self.roman_wfi_exposure(observer)
+                self = self.roman_wfi_exposure(observer, prefix=prefix)
 
             if telescope is not None: 
                 self.TELESCOP = telescope['TELESCOP']
@@ -58,7 +58,9 @@ class exposure():
                 self.ASTROPYWCS = [WCS(header)]
                 self.FPA_NEAR_RADIUS = self.get_max_angular_size()
 
-                self.FILENAME = os.getcwd() + "/" + self.TELESCOP + "_RA_" + '{:07.3f}'.format(self.RA_TARG) +\
+                if prefix != "":
+                    prefix = prefix + "_"
+                self.FILENAME = os.getcwd() + "/" + prefix + self.TELESCOP + "_RA_" + '{:07.3f}'.format(self.RA_TARG) +\
                                                 "_DEC_" + '{:07.3f}'.format(self.DEC_TARG) +\
                                                 "_MJD_" + '{:07.5f}'.format(self.EXPSTART) +\
                                                 "_PA_" + '{:06.2f}'.format(self.PA) + ".fits"
@@ -94,7 +96,7 @@ class exposure():
             # self.XYZ_HELIO_POS = exposure_identity['XYZ_HELIO_POS']
             self.FPA_NEAR_RADIUS = self.get_max_angular_size()
 
-    def roman_wfi_exposure(self, observer):
+    def roman_wfi_exposure(self, observer, prefix=""):
         # Here we expect observer={"TELESCOP": "Roman/WFI", "pointing": [RA_TARG, DEC_TARG], "FILTER":FILTER, "PA_Y": PA_Y, "EXPSTART": EXPSTART, "EXPTIME": EXPTIME}
         # Fixed parameters for Roman/WFI 
         observer['TELESCOP'] = "Roman"
@@ -132,7 +134,9 @@ class exposure():
 
         if "FILENAME" not in observer:
             # If the user did not define an output filename, do it for them
-            observer["FILENAME"] = os.getcwd() + "/WFI_" + observer["FILTER"] +\
+            if prefix != "":
+                prefix = prefix + "_"
+            observer["FILENAME"] = os.getcwd() + "/" + prefix + self.TELESCOP +\
                                     "_RA_" + '{:07.3f}'.format(self.RA_TARG) +\
                                     "_DEC_" + '{:07.3f}'.format(self.DEC_TARG) +\
                                     "_MJD_" + '{:07.5f}'.format(self.EXPSTART) +\
@@ -367,7 +371,7 @@ class exposure():
         if catalog is None:
             self.source_catalog = self.get_source_catalog(g_mag_max=15, verbose=False)
         else:
-            self.source_catalog = catalog
+            self.source_catalog = rs.utils.fix_custom_catalog(catalog)
 
         self.source_catalog = self.find_which_stars_are_inside_each_detector(verbose=False)
 
@@ -466,16 +470,12 @@ class exposure():
         #for key in exposure_identity_keys_to_copy:
         
         stray_image[0].header["TELESCOP"] = self.TELESCOP
-        stray_image[0].header["INSTRUME"] = self.TELESCOP
-        stray_image[0].header["DETECTOR"] = self.TELESCOP
-        stray_image[0].header["FILTER"] = self.TELESCOP
-        stray_image[0].header["RA_TARG"] = self.TELESCOP
-        stray_image[0].header["DEC_TARG"] = self.TELESCOP
-        stray_image[0].header["RA_PNT"] = self.TELESCOP
-        stray_image[0].header["DEC_PNT"] = self.TELESCOP
-        stray_image[0].header["X_PNT"] = self.TELESCOP
-        stray_image[0].header["Y_PNT"] = self.TELESCOP
-        stray_image[0].header["PA"] = self.TELESCOP
+        stray_image[0].header["INSTRUME"] = self.INSTRUME
+        stray_image[0].header["DETECTOR"] = self.DETECTOR
+        stray_image[0].header["FILTER"] = self.FILTER_IDENTITY["wavelength"]
+        stray_image[0].header["RA_TARG"] = self.RA_TARG
+        stray_image[0].header["DEC_TARG"] = self.DEC_TARG
+        stray_image[0].header["PA"] = self.PA
         stray_image[0].header["EXPTIME"] = self.EXPTIME
         stray_image[0].header["EXPSTART"] = self.EXPSTART
         stray_image[0].header["EXPSTART_ISOT"] = self.EXPSTART_ISOT
@@ -494,10 +494,45 @@ class exposure():
         stray_image.writeto(self.output_name, overwrite=True)
         main_offender_image.writeto(self.main_offender_output_name, overwrite=True)
         
+        # Generate the drizzled and scaled version of the images
+        scaled_drz_names = rs.utils.generate_scaled_drz(stray_flc_name=self.output_name,
+                                                        mainoff_flc_name=self.main_offender_output_name,
+                                                        verbose=verbose)
+        self.stray_drz_name = scaled_drz_names["stray_drz_name"]
+        self.scaled_stray_drz_name = scaled_drz_names["scaled_stray_drz_name"]
+        self.scaled_main_off_name = scaled_drz_names["scaled_main_off_name"]
 
+        # Writing necessary keywords in the output mosaics. 
+        keywords = ["RA_TARG", "DEC_TARG", "EXPSTART", "EXPTIME", "FILTER", "WAVEREF", "WAVEMIN", "WAVEMAX", "TELESCOP", "INSTRUME", "DETECTOR"]
+        key_values = rs.utils.get_keys_from_header([self.output_name], keywords, ext=0)
+        rs.utils.write_parameters_list([self.stray_drz_name], keywords, key_values, ext=0)
+        rs.utils.write_parameters_list([self.scaled_stray_drz_name], keywords, key_values, ext=0)
+        rs.utils.write_parameters_list([self.scaled_stray_drz_name], ["PIXSCALE"], [[1]], ext=0)
+        rs.utils.write_parameters_list([self.scaled_stray_drz_name], ["REBINNED"], [[10]], ext=0)
+
+        rs.utils.write_parameters_list([self.main_offender_output_name], keywords, key_values, ext=0)
+        rs.utils.write_parameters_list([self.scaled_main_off_name], keywords, key_values, ext=0)
+        rs.utils.write_parameters_list([self.scaled_main_off_name], ["PIXSCALE"], [[1]], ext=0)
+        rs.utils.write_parameters_list([self.scaled_main_off_name], ["REBINNED"], [[10]], ext=0)
+
+
+        ### Generate the straylight report pdf
+
+        self.pdf_report_name = rs.plots.make_straylight_plots(RA_TARG=self.RA_TARG, 
+                                       DEC_TARG=self.DEC_TARG, 
+                                       PA=self.PA, 
+                                       source_catalog=self.source_catalog, 
+                                       ASTROPYWCS=self.ASTROPYWCS, 
+                                       stray_flc_name=self.output_name, 
+                                       scaled_stray_drz_name=self.scaled_stray_drz_name, 
+                                       scaled_main_off_name=self.scaled_main_off_name, 
+                                       figsize=(10,7), mu_vmin = 25, 
+                                       mu_vmax = 35, verbose=1)   
+        
         print("Output saved in: " + self.output_name)
+        print("Report saved in: " + self.pdf_report_name)
 
-        return({"output_name": self.output_name,
-                "main_offender_output": self.main_offender_output_name})
+        return({"stray_flc_name": self.output_name,
+                "mainoff_flc_name": self.scaled_main_off_name})
     
 

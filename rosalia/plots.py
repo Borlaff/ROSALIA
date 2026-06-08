@@ -322,7 +322,7 @@ def make_stars_around_plot(flt_name, catalog,  astropywcs_list, RA_TARG, DEC_TAR
 
 
 
-def plot_ndi_main_offenders(input_name, scaled_main_off, catalog, ndi_level, figsize=(10,7)):
+def plot_ndi_main_offenders(RA_TARG, DEC_TARG, PA, scaled_main_off, catalog, ndi_level, figsize=(10,7)):
     import os
     import numpy as np
     import matplotlib.pyplot as plt
@@ -334,10 +334,9 @@ def plot_ndi_main_offenders(input_name, scaled_main_off, catalog, ndi_level, fig
     
     # Plot level NDI 
     ndi_name = os.environ["ROSALIACACHE"] + "CORE/NDI/RST/ndi_lvl" + str(ndi_level) + "_mean.fits"
-    input_fits = fits.open(input_name)
-    pa_point = input_fits[1].header["PA"]
-    ra_point = input_fits[1].header["RA_TARG"]
-    dec_point = input_fits[1].header["DEC_TARG"]
+    pa_point = PA
+    ra_point = RA_TARG
+    dec_point = DEC_TARG
 
     if ndi_level==1:
         ndi_linthresh = 0.05
@@ -349,9 +348,9 @@ def plot_ndi_main_offenders(input_name, scaled_main_off, catalog, ndi_level, fig
     # Make the modified header based on the exposure properties.
     ndi_fits = fits.open(ndi_name)
     w = astropy_wcs.WCS(header=ndi_fits[0].header, fobj=ndi_fits, naxis=2)
-    w.wcs.crota = -pa_point,-pa_point
-    w.wcs.crval = ra_point,dec_point
-    w.wcs.cdelt = -ndi_fits[0].header["CDELT1"],ndi_fits[0].header["CDELT2"]
+    w.wcs.crota = -pa_point, -pa_point
+    w.wcs.crval = ra_point, dec_point
+    w.wcs.cdelt = -ndi_fits[0].header["CDELT1"], ndi_fits[0].header["CDELT2"]
     print(w)
     ndi_fits[0].header = w.to_header()
     
@@ -401,7 +400,7 @@ def plot_ndi_main_offenders(input_name, scaled_main_off, catalog, ndi_level, fig
             bbox=dict(facecolor='white', alpha=0.5))
 
     plt.tight_layout()
-    output_plot_name = input_name.replace(".fits","_ndi_mainoff_location.png")
+    output_plot_name = scaled_main_off.replace(".fits","_ndi_mainoff_location.png")
     plt.savefig(output_plot_name, dpi=300)
     return(output_plot_name)
 
@@ -549,6 +548,74 @@ def plot_stray_and_ndi_map(stray_name, star_catalog, ra_point, dec_point, pa_poi
     plt.tight_layout()
     plt.savefig(stray_name.replace(".fits", ".png"), dpi=300)
     plt.show()
+
+
+
+def make_straylight_plots(RA_TARG, DEC_TARG, PA, source_catalog, ASTROPYWCS, stray_flc_name, scaled_stray_drz_name, scaled_main_off_name, figsize=(10,7), mu_vmin = 25, mu_vmax = 35, verbose=1): 
+    # Make the plots. 
+    if verbose > 0: print("Plot: Stray-light surface brightness magnitude.")
+    fe2mu_png = rs.plots.make_stray_plot(input_name=scaled_stray_drz_name,
+                                         ext=1, mode="fe2mu",
+                                         color_label = "Surface brightness (mag arcsec$^{-2}$)",
+                                         figsize=figsize, mu_vmin=mu_vmin, mu_vmax=mu_vmax)
+
+    if verbose > 0: print("Plot: Stray-light surface brightness flux.")
+    fe_png = rs.plots.make_stray_plot(input_name=scaled_stray_drz_name, ext=1, mode="fe", 
+                                      color_label = "Flux (e/s/px)", cmap="RdYlBu_r", figsize=figsize)
+
+    if verbose > 0: print("Plot: Main offender map.")
+    main_offender_png = rs.plots.make_stray_plot(input_name=scaled_main_off_name, 
+                                                 ext=0, 
+                                                 mode="main_offender", 
+                                                 catalog=source_catalog, 
+                                                 color_label = "Main offending source (ID)", 
+                                                 figsize=figsize)
+
+    
+    if verbose > 0: print("Plot: Source environment map.")
+    #try:
+    if True:
+        stars_around_png = rs.plots.make_stars_around_plot(stray_flc_name,
+                                                           catalog=source_catalog, 
+                                                           astropywcs_list = ASTROPYWCS, 
+                                                           RA_TARG=RA_TARG, 
+                                                           DEC_TARG=DEC_TARG, 
+                                                           output_name=None, 
+                                                           figsize=figsize)
+        # def make_stars_around_plot(flt_name, catalog,  astropywcs_list, RA_TARG, DEC_TARG, radius = 0.6, output_name=None, figsize=(10,7)):
+
+    #except:
+    #    print(rs.plots.style.YELLOW + "WARNING: Could not make stars around plot. Check if the catalog has the right columns." + rs.plots.style.RESET)
+    #    stars_around_png = ""
+
+
+    if verbose > 0: print("Plot: Location of Main offenders on NDI map.")
+    #try:
+    if True:
+        ndi_mainoff_name = rs.plots.plot_ndi_main_offenders(RA_TARG=RA_TARG, 
+                                                            DEC_TARG=DEC_TARG, 
+                                                            PA=PA,
+                                                            scaled_main_off=scaled_main_off_name, 
+                                                            catalog=source_catalog, 
+                                                            ndi_level=2, 
+                                                            figsize=figsize)
+    # except:
+    #    print(rs.plots.style.YELLOW + "WARNING: Could not make stars Main offender plot. Check if the catalog has the right columns." + rs.plots.style.RESET)
+    #    ndi_mainoff_name = ""
+ 
+    pdf_report_name = stray_flc_name.replace(".fits", ".pdf")
+    rs.utils.execute_cmd("magick -adjoin " +\
+                        fe2mu_png + " " +\
+                        fe_png + " "+\
+                        main_offender_png + " " +\
+                        stars_around_png + " "+\
+                        ndi_mainoff_name + " "+\
+                        pdf_report_name)
+
+    return(pdf_report_name)
+
+
+
 
 
 import numpy as np

@@ -568,22 +568,59 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
 
 
 def reproject_roman_wfi_fits(input_name, input_ext, reference_name, reference_ext):
-    from astropy.wcs import WCS as astropy_wcs
     from reproject import reproject_interp
     from tqdm import tqdm
     
-    hdu = fits.open(input_name)
-    hdu_mainoff = fits.open(reference_name)
-    data = hdu[input_ext].data
-    wcs = astropy_wcs(hdu[input_ext].header)
+    hdu_reference = fits.open(reference_name)
+    hdu_input     = fits.open(input_name)
 
-    canvas = np.zeros(data.shape)
+    canvas = np.zeros(hdu_reference[reference_ext].data.shape)
         
-    for SCAi in tqdm(reference_ext-1):
-        array, footprint = reproject_interp(hdu_mainoff[SCAi+1], hdu[input_ext].header, parallel=True)
+    for SCAi in tqdm(input_ext-1):
+        array, footprint = reproject_interp(hdu_input[SCAi+1], 
+                                            hdu_reference[reference_ext].header, 
+                                            parallel=True)
+        
         canvas = np.nansum(np.array([canvas, array]), axis=0)
-    return([canvas, hdu[input_ext].header])
+    return([canvas, hdu_reference[reference_ext].header])
     
+
+def fix_custom_catalog(catalog):
+
+    if isinstance(catalog, dict):
+        catalog = pd.DataFrame(catalog)
+    
+    if len(catalog) == 1:
+        import copy
+        catalog_dummy = copy.deepcopy(catalog) 
+        catalog_dummy["mag_lambda"] = [np.inf]
+        catalog_dummy["source_id"] = ["Dummy"]
+        catalog = pd.concat([catalog, catalog_dummy], ignore_index=True)
+    return(catalog)
+
+
+def generate_scaled_drz(stray_flc_name, mainoff_flc_name, verbose=False):
+    if verbose > 0: print("Generating ROSALIA summary report...")
+
+    # Make the drizzle image of the straylight image
+    stray_drz_name = stray_flc_name.replace(".fits","_drz.fits")
+    stray_drz_name, scaled_stray_drz_name = rs.utils.run_swarp(pattern=stray_flc_name, 
+                                                             outname=stray_drz_name, 
+                                                             scale=0.1)
+    
+    # Then reproject the main offender image to the same WCS as the straylight image.
+    data, header = rs.utils.reproject_roman_wfi_fits(input_name=mainoff_flc_name, 
+                                                     input_ext=rs.telescopes.Roman.WFI_SCAs,
+                                                     reference_name=scaled_stray_drz_name, 
+                                                     reference_ext=1)
+    
+    scaled_main_off_name = mainoff_flc_name.replace(".fits", "_scaled.fits")
+    rs.utils.save_fits(array=data, name=scaled_main_off_name, header=header, overwrite=True)
+
+    return({"stray_drz_name": stray_drz_name,
+            "scaled_stray_drz_name": scaled_stray_drz_name,
+            "scaled_main_off_name": scaled_main_off_name})
+
 
 
 def run_swarp(pattern, outname, scale=1, coveredfrac=1, resample=True, verbose=False):
