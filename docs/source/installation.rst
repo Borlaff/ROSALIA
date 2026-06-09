@@ -14,21 +14,25 @@ Downloading Miniforge for Linux
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: sh
+
        wget -O Miniforge3.sh "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
 
 Downloading Miniforge for MacOS
 
 .. code-block:: sh
+
        curl -fsSLo Miniforge3.sh "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-MacOSX-$(uname -m).sh"
 
 This will download a ``Miniforge.sh`` file. Run it to install Miniforge:
 
 .. code-block:: sh
+
        bash Miniforge3.sh -b -p "${HOME}/conda"
 
 To finish the installation, run the following scripts:
 
 .. code-block:: sh
+
        source "${HOME}/conda/etc/profile.d/conda.sh"
        # For mamba support also run the following command
        source "${HOME}/conda/etc/profile.d/mamba.sh"
@@ -36,6 +40,7 @@ To finish the installation, run the following scripts:
 That is it! You can activate your Miniforge installation with:
 
 .. code-block:: sh
+       
        conda activate
 
 
@@ -76,6 +81,7 @@ CRDS installation
 ROSALIA relies on the `CRDS <https://roman-crds.stsci.edu/>`_ package to access the calibration reference files for the Roman Space Telescope. CRDS is installed by default as a ROSALIA dependency, but it needs to be configured to work properly. If - for any reason - it is not installed, you can manually install CRDS with:
 
 .. code-block:: sh
+
     pip install crds
 
 
