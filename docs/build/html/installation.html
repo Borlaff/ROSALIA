@@ -108,15 +108,15 @@
 <section id="installing-rosalia">
 <h2>Installing ROSALIA<a class="headerlink" href="#installing-rosalia" title="Link to this heading"></a></h2>
 <p>Create a clean environment for ROSALIA</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">create</span> <span class="o">-</span><span class="n">n</span> <span class="n">rosalia</span> <span class="n">python</span><span class="o">=</span><span class="mf">3.12</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span><span class="p">::</span><span class="n">astromatic</span><span class="o">-</span><span class="n">swarp</span>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>rosalia<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.12<span class="w"> </span>conda-forge::astromatic-swarp
 </pre></div>
 </div>
 <p>After the new environment is created, we can activate it.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">activate</span> <span class="n">rosalia</span>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>activate<span class="w"> </span>rosalia
 </pre></div>
 </div>
 <p>Once in a clean conda environment, we can install ROSALIA. The preferred method to install it is through pip.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">rosalia</span>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>rosalia
 </pre></div>
 </div>
 <p>ROSALIA needs a series of cache files to work. If they are not installed, most of the functions will work, but you won’t be able to estimate the surface brightness of the stray light, which is one of the main functionalities of ROSALIA. To install the cache files, download the following folder:</p>

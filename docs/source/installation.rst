@@ -13,29 +13,29 @@ There are many versions of Conda managers. We recommend using free `Miniforge <h
 Downloading Miniforge for Linux
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. code-block::
+.. code-block:: sh
        wget -O Miniforge3.sh "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
 
 Downloading Miniforge for MacOS
 
-.. code-block::
+.. code-block:: sh
        curl -fsSLo Miniforge3.sh "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-MacOSX-$(uname -m).sh"
 
 This will download a ``Miniforge.sh`` file. Run it to install Miniforge:
 
-.. code-block::
+.. code-block:: sh
        bash Miniforge3.sh -b -p "${HOME}/conda"
 
 To finish the installation, run the following scripts:
 
-.. code-block::
+.. code-block:: sh
        source "${HOME}/conda/etc/profile.d/conda.sh"
        # For mamba support also run the following command
        source "${HOME}/conda/etc/profile.d/mamba.sh"
 
 That is it! You can activate your Miniforge installation with:
 
-.. code-block::
+.. code-block:: sh
        conda activate
 
 
@@ -44,20 +44,20 @@ Installing ROSALIA
 ------------------
 Create a clean environment for ROSALIA
 
-.. code-block::
+.. code-block:: sh
 
        conda create -n rosalia python=3.12 conda-forge::astromatic-swarp
 
 After the new environment is created, we can activate it.
 
-.. code-block::
+.. code-block:: sh
 
        conda activate rosalia
 
 
 Once in a clean conda environment, we can install ROSALIA. The preferred method to install it is through pip.
 
-.. code-block::
+.. code-block:: sh
 
        pip install rosalia
 
