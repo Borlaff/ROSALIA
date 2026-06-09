@@ -36,13 +36,20 @@ ROSALIA needs a series of cache files to work. If they are not installed, most o
 `ROSALIA Cache <https://zenodo.org/records/20335392/files/rosalia-cache.tar.gz>`_,
 
 Then, extract the contents of the downloaded file and move the resulting folder to a location of your choice. Finally, set the environment variable ``ROSALIACACHE`` to point to the location of the extracted folder. For example, if you extracted the folder to ``/path/to/rosalia-cache``, you can set the environment variable as follows:
+
 .. code-block:: sh
 
    export ROSALIACACHE=/path/to/rosalia-cache
 
 CRDS installation
 ---------------------
-ROSALIA relies on the `CRDS <https://roman-crds.stsci.edu/>`_ package to access the calibration reference files for the Roman Space Telescope. CRDS is installed by default as a ROSALIA dependency, but it needs to be configured to work properly. To configure CRDS, we need to set the environment variable ``CRDS_PATH`` to point to a directory where CRDS can store its cache files. For example, you can create a directory called ``crds_cache`` in your home directory and set the environment variable as follows:
+ROSALIA relies on the `CRDS <https://roman-crds.stsci.edu/>`_ package to access the calibration reference files for the Roman Space Telescope. CRDS is installed by default as a ROSALIA dependency, but it needs to be configured to work properly. If - for any reason - it is not installed, you can manually install CRDS with:
+
+.. code-block:: sh
+    pip install crds
+
+
+To configure CRDS, we need to set the environment variable ``CRDS_PATH`` to point to a directory where CRDS can store its cache files. For example, you can create a directory called ``crds_cache`` in your home directory and set the environment variable as follows:
 
 .. code-block:: sh
 
