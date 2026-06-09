@@ -8,7 +8,36 @@ Preparing your system
 
 ROSALIA is based on multiple packages, including `Astropy <https://www.astropy.org/>`_, `Astroquery <https://astroquery.readthedocs.io/en/latest/>`_, `Romanisim <https://romanisim.readthedocs.io/en/latest/>`_, `NumPy <https://numpy.org/>`_, `SciPy <https://scipy.org>`_, `Matplotlib <https://matplotlib.org/>`_ among many others. The easiest way to install all the dependencies is through a package manager like `Conda <https://anaconda.org/anaconda/conda>`_ or `Mamba <https://github.com/mamba-org/mamba>`_. If you have a *Conda/Mamba* package manager already installed in your system, skip to the following section. If you do not have a package manager, follow the Conda installation instructions at the `Space Telescope *stenv* environment webpage <https://stenv.readthedocs.io/getting_started.html>`_. 
 
-There are many versions of Conda managers. We recommend using free `Miniforge <https://github.com/conda-forge/miniforge>` with mamba as the package manager. You can install Miniforge by following the instructions at the `Miniforge GitHub repository <https://github.com/conda-forge/miniforge>`_. 
+There are many versions of Conda managers. We recommend using free `Miniforge <https://github.com/conda-forge/miniforge>` with mamba as the package manager. You can install Miniforge by following the instructions at the `Miniforge GitHub repository <https://github.com/conda-forge/miniforge>`_. As a summary, use the following commands: 
+
+Downloading Miniforge for Linux
+
+.. code-block::
+       wget -O Miniforge3.sh "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
+
+Downloading Miniforge for MacOS
+
+.. code-block::
+       curl -fsSLo Miniforge3.sh "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-MacOSX-$(uname -m).sh"
+
+This will download a ``Miniforge.sh`` file. Run it to install Miniforge:
+
+.. code-block::
+       bash Miniforge3.sh -b -p "${HOME}/conda"
+
+To finish the installation, run the following scripts:
+
+.. code-block::
+       source "${HOME}/conda/etc/profile.d/conda.sh"
+       # For mamba support also run the following command
+       source "${HOME}/conda/etc/profile.d/mamba.sh"
+
+That is it! You can activate your Miniforge installation with:
+
+.. code-block::
+       conda activate
+
+
 
 Installing ROSALIA
 ------------------
