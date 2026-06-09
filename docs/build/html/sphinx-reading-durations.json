@@ -1,12 +1,3 @@
 {
-    "commissioning": 0.024,
-    "generated/rosalia.core": 0.009,
-    "generated/rosalia.correct": 0.02,
-    "generated/rosalia.plots": 0.044,
-    "generated/rosalia.psf": 0.033,
-    "generated/rosalia.roman": 0.022,
-    "generated/rosalia.utils": 0.093,
-    "installation": 0.007,
-    "measuringstray": 0.016,
-    "rosalia": 2.214
+    "measuringstray": 0.044
 }
