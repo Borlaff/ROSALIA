@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: rosalia-wfi
-Version: 1.1.2
+Version: 1.2.0
 Summary: A software to calibrate the sky background of Space Telescope images
 Author-email: "Alejandro S. Borlaff" <a.s.borlaff@nasa.gov>, "Pablo M. Sanchez-Alarcon" <pablo.m.sanchezalarcon@nasa.gov>
 License: BSD
