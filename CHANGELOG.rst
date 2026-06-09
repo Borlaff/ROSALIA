@@ -2,6 +2,15 @@
 Changelog
 =========
 
+v1.2.0
+======
+
+Added or Changed
+----------------
+
+- Now ROSALIA stray-light runs through a new class `rosalia.core.exposure`. Follow the tutorial under notebooks/tutorials/R1_ for more information. 
+
+
 v1.1.2
 ======
 
