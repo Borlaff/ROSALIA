@@ -59,6 +59,11 @@ We will work to include more telescopes soon (Hubble), but for now, if the obser
 
     custom_exposure = rs.core.exposure(observer=observer)
 
+
+``rosalia.core.exposure`` accepts any filter supported in the SVO filter system `SVO Filter System <https://svo2.cab.inta-csic.es/svo/theory/fps/>`. 
+
+
+
 In-field vs. out-field stray-light
 -----------------------------
 
