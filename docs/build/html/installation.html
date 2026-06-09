@@ -46,7 +46,10 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="mission.html">What is ROSALIA?</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#preparing-your-system">Preparing your system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#preparing-your-system">Preparing your system</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#downloading-miniforge-for-linux">Downloading Miniforge for Linux</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#installing-rosalia">Installing ROSALIA</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#crds-installation">CRDS installation</a></li>
 </ul>
@@ -94,11 +97,13 @@
 <h2>Preparing your system<a class="headerlink" href="#preparing-your-system" title="Link to this heading"></a></h2>
 <p>ROSALIA is based on multiple packages, including <a class="reference external" href="https://www.astropy.org/">Astropy</a>, <a class="reference external" href="https://astroquery.readthedocs.io/en/latest/">Astroquery</a>, <a class="reference external" href="https://romanisim.readthedocs.io/en/latest/">Romanisim</a>, <a class="reference external" href="https://numpy.org/">NumPy</a>, <a class="reference external" href="https://scipy.org">SciPy</a>, <a class="reference external" href="https://matplotlib.org/">Matplotlib</a> among many others. The easiest way to install all the dependencies is through a package manager like <a class="reference external" href="https://anaconda.org/anaconda/conda">Conda</a> or <a class="reference external" href="https://github.com/mamba-org/mamba">Mamba</a>. If you have a <em>Conda/Mamba</em> package manager already installed in your system, skip to the following section. If you do not have a package manager, follow the Conda installation instructions at the <a class="reference external" href="https://stenv.readthedocs.io/getting_started.html">Space Telescope *stenv* environment webpage</a>.</p>
 <p>There are many versions of Conda managers. We recommend using free <cite>Miniforge &lt;https://github.com/conda-forge/miniforge&gt;</cite> with mamba as the package manager. You can install Miniforge by following the instructions at the <a class="reference external" href="https://github.com/conda-forge/miniforge">Miniforge GitHub repository</a>. As a summary, use the following commands:</p>
-<p>Downloading Miniforge for Linux</p>
+<section id="downloading-miniforge-for-linux">
+<h3>Downloading Miniforge for Linux<a class="headerlink" href="#downloading-miniforge-for-linux" title="Link to this heading"></a></h3>
 <p>Downloading Miniforge for MacOS</p>
 <p>This will download a <code class="docutils literal notranslate"><span class="pre">Miniforge.sh</span></code> file. Run it to install Miniforge:</p>
 <p>To finish the installation, run the following scripts:</p>
 <p>That is it! You can activate your Miniforge installation with:</p>
+</section>
 </section>
 <section id="installing-rosalia">
 <h2>Installing ROSALIA<a class="headerlink" href="#installing-rosalia" title="Link to this heading"></a></h2>

@@ -11,6 +11,7 @@ ROSALIA is based on multiple packages, including `Astropy <https://www.astropy.o
 There are many versions of Conda managers. We recommend using free `Miniforge <https://github.com/conda-forge/miniforge>` with mamba as the package manager. You can install Miniforge by following the instructions at the `Miniforge GitHub repository <https://github.com/conda-forge/miniforge>`_. As a summary, use the following commands: 
 
 Downloading Miniforge for Linux
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block::
        wget -O Miniforge3.sh "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
