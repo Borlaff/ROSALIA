@@ -1,4 +1,4 @@
-rosalia.utils
+﻿rosalia.utils
 =============
 
 .. automodule:: rosalia.utils
@@ -36,9 +36,12 @@ rosalia.utils
       find_max_angular_size_of_image
       find_nearest_index
       find_subposition_EXTNAME
+      fix_custom_catalog
       flambda_to_fnu
       fnu_to_flambda
       generate_image_interpolator
+      generate_scaled_drz
+      get_astropywcs_info_from_sciexts
       get_data_and_wcs
       get_keys_from_header
       get_parameters_list

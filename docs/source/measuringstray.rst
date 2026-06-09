@@ -1,11 +1,68 @@
 Stray Light
 ==========================
 
+Basics
+-----------------------------
+To use ROSALIA, the user will interact with the main class of the package, the ``rosalia.core.exposure`` class. This class is defined by the user and it holds all the information about a particular image, including the pointing orientation, the filter, the position angle, the date of the observation, and many other parameters. The ``rosalia.core.exposure`` class also contains methods to estimate the stray-light signal in a given exposure, and to correct for it. We describe one example in the next section. 
+
+
+``rosalia.core.exposure`` can be initialized in two ways: 
+- By providing a filename of a fits file with the necessary WCS and header information (filename). In this case, the class will read the fits file and extract the necessary information from the header. This is the most straightforward way to initialize the class, as long as the input fits file has the necessary information in the header.
+
+- By providing the custom observer parameters in a dictionary (observer). In this case, the class will use the observer parameters to create a dummy fits file with the necessary WCS and header information. This is useful when the user does not have a fits file with the necessary information, but has the observer parameters. If the observer keyword "TELESCOP" is set to "Roman/WFI", then the class will create a dummy Roman/WFI fits file with the necessary information. In that case, only needs to contain the name of the telescope ("TELESCOP"), the [ra, dec] coordinates of the pointing ("pointing"), the name of the filter ("FILTER"), the position angle ("PA_Y"), the start time ("EXPSTART"), and the exposure time ("EXPTIME"). For example, the observer dictionary for a simple Roman/WFI observation can be defined as follows:
+
+.. code-block:: python
+
+    observer={"TELESCOP": "Roman/WFI", 
+            "pointing": [ra, dec], 
+            "FILTER":bandpass, 
+            "PA_Y": PA, 
+            "EXPSTART": date.mjd, 
+            "EXPTIME": exptime}
+
+    prefix = "Pleiades"
+    custom_roman_exposure = rs.core.exposure(observer=observer, prefix=prefix) 
+    straylight_out = custom_roman_exposure.straylight() 
+    
+    
+We will work to include more telescopes soon (Hubble), but for now, if the observer keyword "TELESCOP" is set to any other value than "Roman/WFI", then the class will create a generic dummy fits file with the necessary information. The observer dictionary should contain the following parameters:
+
+.. code-block:: python
+
+    TELESCOP = "MYTELESCOPE"
+    INSTRUME = "MYTELESCOPE"
+    DETECTOR = "MYTELESCOPE"
+    RA_TARG = 100
+    DEC_TARG = 23
+    PA_Y = 32
+    NAXIS1=3048
+    NAXIS2=4096
+    PIXSCALE=8/60/60
+    R_mirror=1
+    OBSLOC=273
+    EXPSTART=61000
+    EXPTIME=10
+    FILTER_PARAMS={"NAME": "F606W", "TELESCOPE": "HST", "INSTRUMENT": "ACS", "DETECTOR": "WFC"}
+
+    observer = {"TELESCOP":TELESCOP, 
+                "INSTRUME":INSTRUME, 
+                "DETECTOR": DETECTOR,
+                "pointing": [RA_TARG, DEC_TARG], 
+                "PA_Y": PA_Y, 
+                "DATA_SHAPE": [NAXIS1, NAXIS2], 
+                "PIXSCALE": PIXSCALE,
+                "R_mirror": R_mirror, 
+                "FILTER_PARAMS":FILTER_PARAMS, 
+                "OBSLOC": OBSLOC, 
+                "EXPSTART": EXPSTART, 
+                "EXPTIME": EXPTIME}
+
+    custom_exposure = rs.core.exposure(observer=observer)
+
 In-field vs. out-field stray-light
 -----------------------------
 
 Stray-light is the light that reaches the detector without following the nominal optical path. It can be produced by a variety of sources, like bright stars, planets, the Moon, or even the Earth. On first approximation, stray-light can be classified into two main categories: **in-field** and **out-field** stray-light.
-
 
 
 Quickstart: Stray Light Analysis Example with ROSALIA
@@ -15,20 +72,30 @@ The following Jupyter-notebook shows a quick example to estimate stray-light wit
 
 .. code-block:: python
 
+    # This notebook demonstrates how to use ROSALIA to analyze stray light in a simple exposure. 
     import rosalia as rs
-    # Let's define the minimum parameters to generate a dummy Roman / WFI image
 
+    # Let's define the minimum parameters to generate a dummy Roman / WFI image
     # To get some challenging environment, let's target the Pleiades.
     ra = 56.6583333  # Right ascension, in degrees. 
     dec = +24.1780556 # Declination, in degrees.
     PA = 0 # Position angle, in degrees.
-    
     from astropy.time import Time
-    date = Time("2026-06-01T00:00:00") # Date of the observation, in Astropy Time YYYY-MM-DDTHH:MM:SS format.
+    date = Time("2026-12-01T00:00:00") # Date of the observation, in Astropy Time YYYY-MM-DDTHH:MM:SS format.
     bandpass = "F129"
     exptime = 600 # Exposure time, in seconds.
 
-    rosalia_stray = rs.correct.rosalia_stray(ra=ra, dec=dec, PA=PA, date=date, bandpass=bandpass, exptime=exptime, radius=1, g_mag_max=15, sun_block=False, verbose=False, catalog=None)
+
+    observer={"TELESCOP": "Roman/WFI", 
+            "pointing": [ra, dec], 
+            "FILTER":bandpass, 
+            "PA_Y": PA, 
+            "EXPSTART": date.mjd, 
+            "EXPTIME": exptime}
+
+    prefix = "Pleiades"
+    custom_roman_exposure = rs.core.exposure(observer=observer, prefix=prefix) 
+    straylight_out = custom_roman_exposure.straylight()
 
 .. image:: ../../images/rosalia_loading.gif
   :width: 802
@@ -43,7 +110,7 @@ The notebook is available in the ``notebooks`` directory of the ROSALIA reposito
 
 
 Case study: Calibrating stray-light with a bright star
------------------------------
+----------------------------------------------------------
 
 A particular case of interest would be to produce an intense stray-light background signal on purpose, to calibrate the models against real observations. To gather sufficient signal-to-noise and minimize contamination from other background sources like the Zodiacal light, the selected star (*offending* source) would need to be as bright as possible. In addition, we need to place it in positions around Roman Space Telescope WFI that are known to produce the maximum stray light if hit by a source. With ROSALIA, it is possible to find out where should we point our telescope and which roll (position) angle we should have to maximize or minimize the stray-light from a star. 
 

@@ -12,7 +12,75 @@ from rosalia.correct import rosalia_stray
 import os
 
 class exposure():
+    """
+    Exposure class. This class holds all the information about a particular image, including the pointing orientation,  the filter, the position angle, the date of the observation, and many other parameters. The ``exposure`` class also contains methods to estimate the stray-light signal in a given exposure, and to correct for it.
+
+    Exposure can be initialized in two ways: 
+    - By providing a filename of a fits file with the necessary WCS and header information (filename). In this case, the class will read the fits file and extract the necessary information from the header. This is the most straightforward way to initialize the class, as long as the input fits file has the necessary information in the header.
+
+    - By providing the custom observer parameters in a dictionary (observer). In this case, the class will use the observer parameters to create a dummy fits file with the necessary WCS and header information. This is useful when the user does not have a fits file with the necessary information, but has the observer parameters. If the observer keyword "TELESCOP" is set to "Roman/WFI", then the class will create a dummy Roman/WFI fits file with the necessary information. In that case, only needs to contain "TELESCOP", "pointing", "FILTER", "PA_Y", "EXPSTART", and "EXPTIME". For example, the observer dictionary can be defined as follows:
+
     
+    observer={"TELESCOP": "Roman/WFI", 
+            "pointing": [ra, dec], 
+            "FILTER":bandpass, 
+            "PA_Y": PA, 
+            "EXPSTART": date.mjd, 
+            "EXPTIME": exptime}
+
+    prefix = "Pleiades"
+    custom_roman_exposure = rs.core.exposure(observer=observer, prefix=prefix) 
+    straylight_out = custom_roman_exposure.straylight() 
+     
+     
+    If the observer keyword "TELESCOP" is set to any other value, then the class will create a generic dummy fits file with the necessary information. The observer dictionary should contain the following parameters:
+
+    TELESCOP = "MYTELESCOPE"
+    INSTRUME = "MYTELESCOPE"
+    DETECTOR = "MYTELESCOPE"
+    RA_TARG = 100
+    DEC_TARG = 23
+    PA_Y = 32
+    NAXIS1=3048
+    NAXIS2=4096
+    PIXSCALE=8/60/60
+    R_mirror=1
+    OBSLOC=273
+    EXPSTART=61000
+    EXPTIME=10
+    FILTER_PARAMS={"NAME": "F606W", "TELESCOPE": "HST", "INSTRUMENT": "ACS", "DETECTOR": "WFC"}
+
+    observer = {"TELESCOP":TELESCOP, 
+                "INSTRUME":INSTRUME, 
+                "DETECTOR": DETECTOR,
+                "pointing": [RA_TARG, DEC_TARG], 
+                "PA_Y": PA_Y, 
+                "DATA_SHAPE": [NAXIS1, NAXIS2], 
+                "PIXSCALE": PIXSCALE,
+                "R_mirror": R_mirror, 
+                "FILTER_PARAMS":FILTER_PARAMS, 
+                "OBSLOC": OBSLOC, 
+                "EXPSTART": EXPSTART, 
+                "EXPTIME": EXPTIME}
+
+    custom_exposure = rs.core.exposure(observer=observer)
+
+    ---------- 
+    
+    init parameters:
+    - filename: str. Path to the input fits file. If None, then the user needs to provide the observer and telescope parameters.
+    - prefix: str. Prefix to add to the output filename. Default is "".
+    - observer: dict. Dictionary with the observer parameters. If None, then the user needs to provide the filename parameter. The dictionary should contain the following
+        - "TELESCOP": str. For predefined telescopes, this replaces the telescope dictionary, simplifying the input. Name of the telescope. For example, "Roman/WFI". 
+        - "pointing": list. List with the RA and DEC of the pointing, in degrees. For example, [RA_TARG, DEC_TARG].
+        - "FILTER": str. Name of the filter. For example, "F129".
+        - "PA_Y": float. Position angle of the Y axis of the detector, in degrees. For example, PA_Y = 0 means that the Y axis of the detector is aligned with the North direction.
+        - "EXPSTART": float. Start time of the exposure, in MJD. For example, EXPSTART = 59300.0.
+        - "EXPTIME": float. Exposure time, in seconds. For example, EXPTIME = 600.0.
+        
+    """
+
+
     def __init__(self, filename=None, prefix="", observer=None, telescope=None):
         import os 
         from astropy.wcs import WCS   

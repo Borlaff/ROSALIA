@@ -47,6 +47,7 @@
 <li class="toctree-l1"><a class="reference internal" href="mission.html">What is ROSALIA?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Stray Light</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#basics">Basics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#in-field-vs-out-field-stray-light">In-field vs. out-field stray-light</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#quickstart-stray-light-analysis-example-with-rosalia">Quickstart: Stray Light Analysis Example with ROSALIA</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#case-study-calibrating-stray-light-with-a-bright-star">Case study: Calibrating stray-light with a bright star</a></li>
@@ -90,6 +91,59 @@
              
   <section id="stray-light">
 <h1>Stray Light<a class="headerlink" href="#stray-light" title="Link to this heading"></a></h1>
+<section id="basics">
+<h2>Basics<a class="headerlink" href="#basics" title="Link to this heading"></a></h2>
+<p>To use ROSALIA, the user will interact with the main class of the package, the <code class="docutils literal notranslate"><span class="pre">rosalia.core.exposure</span></code> class. This class is defined by the user and it holds all the information about a particular image, including the pointing orientation, the filter, the position angle, the date of the observation, and many other parameters. The <code class="docutils literal notranslate"><span class="pre">rosalia.core.exposure</span></code> class also contains methods to estimate the stray-light signal in a given exposure, and to correct for it. We describe one example in the next section.</p>
+<p><code class="docutils literal notranslate"><span class="pre">rosalia.core.exposure</span></code> can be initialized in two ways:
+- By providing a filename of a fits file with the necessary WCS and header information (filename). In this case, the class will read the fits file and extract the necessary information from the header. This is the most straightforward way to initialize the class, as long as the input fits file has the necessary information in the header.</p>
+<ul class="simple">
+<li><p>By providing the custom observer parameters in a dictionary (observer). In this case, the class will use the observer parameters to create a dummy fits file with the necessary WCS and header information. This is useful when the user does not have a fits file with the necessary information, but has the observer parameters. If the observer keyword “TELESCOP” is set to “Roman/WFI”, then the class will create a dummy Roman/WFI fits file with the necessary information. In that case, only needs to contain the name of the telescope (“TELESCOP”), the [ra, dec] coordinates of the pointing (“pointing”), the name of the filter (“FILTER”), the position angle (“PA_Y”), the start time (“EXPSTART”), and the exposure time (“EXPTIME”). For example, the observer dictionary for a simple Roman/WFI observation can be defined as follows:</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">observer</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;TELESCOP&quot;</span><span class="p">:</span> <span class="s2">&quot;Roman/WFI&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;pointing&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">ra</span><span class="p">,</span> <span class="n">dec</span><span class="p">],</span>
+        <span class="s2">&quot;FILTER&quot;</span><span class="p">:</span><span class="n">bandpass</span><span class="p">,</span>
+        <span class="s2">&quot;PA_Y&quot;</span><span class="p">:</span> <span class="n">PA</span><span class="p">,</span>
+        <span class="s2">&quot;EXPSTART&quot;</span><span class="p">:</span> <span class="n">date</span><span class="o">.</span><span class="n">mjd</span><span class="p">,</span>
+        <span class="s2">&quot;EXPTIME&quot;</span><span class="p">:</span> <span class="n">exptime</span><span class="p">}</span>
+
+<span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;Pleiades&quot;</span>
+<span class="n">custom_roman_exposure</span> <span class="o">=</span> <span class="n">rs</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">exposure</span><span class="p">(</span><span class="n">observer</span><span class="o">=</span><span class="n">observer</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">)</span>
+<span class="n">straylight_out</span> <span class="o">=</span> <span class="n">custom_roman_exposure</span><span class="o">.</span><span class="n">straylight</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>We will work to include more telescopes soon (Hubble), but for now, if the observer keyword “TELESCOP” is set to any other value than “Roman/WFI”, then the class will create a generic dummy fits file with the necessary information. The observer dictionary should contain the following parameters:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">TELESCOP</span> <span class="o">=</span> <span class="s2">&quot;MYTELESCOPE&quot;</span>
+<span class="n">INSTRUME</span> <span class="o">=</span> <span class="s2">&quot;MYTELESCOPE&quot;</span>
+<span class="n">DETECTOR</span> <span class="o">=</span> <span class="s2">&quot;MYTELESCOPE&quot;</span>
+<span class="n">RA_TARG</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">DEC_TARG</span> <span class="o">=</span> <span class="mi">23</span>
+<span class="n">PA_Y</span> <span class="o">=</span> <span class="mi">32</span>
+<span class="n">NAXIS1</span><span class="o">=</span><span class="mi">3048</span>
+<span class="n">NAXIS2</span><span class="o">=</span><span class="mi">4096</span>
+<span class="n">PIXSCALE</span><span class="o">=</span><span class="mi">8</span><span class="o">/</span><span class="mi">60</span><span class="o">/</span><span class="mi">60</span>
+<span class="n">R_mirror</span><span class="o">=</span><span class="mi">1</span>
+<span class="n">OBSLOC</span><span class="o">=</span><span class="mi">273</span>
+<span class="n">EXPSTART</span><span class="o">=</span><span class="mi">61000</span>
+<span class="n">EXPTIME</span><span class="o">=</span><span class="mi">10</span>
+<span class="n">FILTER_PARAMS</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;NAME&quot;</span><span class="p">:</span> <span class="s2">&quot;F606W&quot;</span><span class="p">,</span> <span class="s2">&quot;TELESCOPE&quot;</span><span class="p">:</span> <span class="s2">&quot;HST&quot;</span><span class="p">,</span> <span class="s2">&quot;INSTRUMENT&quot;</span><span class="p">:</span> <span class="s2">&quot;ACS&quot;</span><span class="p">,</span> <span class="s2">&quot;DETECTOR&quot;</span><span class="p">:</span> <span class="s2">&quot;WFC&quot;</span><span class="p">}</span>
+
+<span class="n">observer</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;TELESCOP&quot;</span><span class="p">:</span><span class="n">TELESCOP</span><span class="p">,</span>
+            <span class="s2">&quot;INSTRUME&quot;</span><span class="p">:</span><span class="n">INSTRUME</span><span class="p">,</span>
+            <span class="s2">&quot;DETECTOR&quot;</span><span class="p">:</span> <span class="n">DETECTOR</span><span class="p">,</span>
+            <span class="s2">&quot;pointing&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">RA_TARG</span><span class="p">,</span> <span class="n">DEC_TARG</span><span class="p">],</span>
+            <span class="s2">&quot;PA_Y&quot;</span><span class="p">:</span> <span class="n">PA_Y</span><span class="p">,</span>
+            <span class="s2">&quot;DATA_SHAPE&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">NAXIS1</span><span class="p">,</span> <span class="n">NAXIS2</span><span class="p">],</span>
+            <span class="s2">&quot;PIXSCALE&quot;</span><span class="p">:</span> <span class="n">PIXSCALE</span><span class="p">,</span>
+            <span class="s2">&quot;R_mirror&quot;</span><span class="p">:</span> <span class="n">R_mirror</span><span class="p">,</span>
+            <span class="s2">&quot;FILTER_PARAMS&quot;</span><span class="p">:</span><span class="n">FILTER_PARAMS</span><span class="p">,</span>
+            <span class="s2">&quot;OBSLOC&quot;</span><span class="p">:</span> <span class="n">OBSLOC</span><span class="p">,</span>
+            <span class="s2">&quot;EXPSTART&quot;</span><span class="p">:</span> <span class="n">EXPSTART</span><span class="p">,</span>
+            <span class="s2">&quot;EXPTIME&quot;</span><span class="p">:</span> <span class="n">EXPTIME</span><span class="p">}</span>
+
+<span class="n">custom_exposure</span> <span class="o">=</span> <span class="n">rs</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">exposure</span><span class="p">(</span><span class="n">observer</span><span class="o">=</span><span class="n">observer</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
 <section id="in-field-vs-out-field-stray-light">
 <h2>In-field vs. out-field stray-light<a class="headerlink" href="#in-field-vs-out-field-stray-light" title="Link to this heading"></a></h2>
 <p>Stray-light is the light that reaches the detector without following the nominal optical path. It can be produced by a variety of sources, like bright stars, planets, the Moon, or even the Earth. On first approximation, stray-light can be classified into two main categories: <strong>in-field</strong> and <strong>out-field</strong> stray-light.</p>
@@ -97,20 +151,30 @@
 <section id="quickstart-stray-light-analysis-example-with-rosalia">
 <h2>Quickstart: Stray Light Analysis Example with ROSALIA<a class="headerlink" href="#quickstart-stray-light-analysis-example-with-rosalia" title="Link to this heading"></a></h2>
 <p>The following Jupyter-notebook shows a quick example to estimate stray-light with ROSALIA.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">rosalia</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">rs</span>
-<span class="c1"># Let&#39;s define the minimum parameters to generate a dummy Roman / WFI image</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># This notebook demonstrates how to use ROSALIA to analyze stray light in a simple exposure.</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">rosalia</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">rs</span>
 
+<span class="c1"># Let&#39;s define the minimum parameters to generate a dummy Roman / WFI image</span>
 <span class="c1"># To get some challenging environment, let&#39;s target the Pleiades.</span>
 <span class="n">ra</span> <span class="o">=</span> <span class="mf">56.6583333</span>  <span class="c1"># Right ascension, in degrees.</span>
 <span class="n">dec</span> <span class="o">=</span> <span class="o">+</span><span class="mf">24.1780556</span> <span class="c1"># Declination, in degrees.</span>
 <span class="n">PA</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># Position angle, in degrees.</span>
-
 <span class="kn">from</span><span class="w"> </span><span class="nn">astropy.time</span><span class="w"> </span><span class="kn">import</span> <span class="n">Time</span>
-<span class="n">date</span> <span class="o">=</span> <span class="n">Time</span><span class="p">(</span><span class="s2">&quot;2026-06-01T00:00:00&quot;</span><span class="p">)</span> <span class="c1"># Date of the observation, in Astropy Time YYYY-MM-DDTHH:MM:SS format.</span>
+<span class="n">date</span> <span class="o">=</span> <span class="n">Time</span><span class="p">(</span><span class="s2">&quot;2026-12-01T00:00:00&quot;</span><span class="p">)</span> <span class="c1"># Date of the observation, in Astropy Time YYYY-MM-DDTHH:MM:SS format.</span>
 <span class="n">bandpass</span> <span class="o">=</span> <span class="s2">&quot;F129&quot;</span>
 <span class="n">exptime</span> <span class="o">=</span> <span class="mi">600</span> <span class="c1"># Exposure time, in seconds.</span>
 
-<span class="n">rosalia_stray</span> <span class="o">=</span> <span class="n">rs</span><span class="o">.</span><span class="n">correct</span><span class="o">.</span><span class="n">rosalia_stray</span><span class="p">(</span><span class="n">ra</span><span class="o">=</span><span class="n">ra</span><span class="p">,</span> <span class="n">dec</span><span class="o">=</span><span class="n">dec</span><span class="p">,</span> <span class="n">PA</span><span class="o">=</span><span class="n">PA</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="n">date</span><span class="p">,</span> <span class="n">bandpass</span><span class="o">=</span><span class="n">bandpass</span><span class="p">,</span> <span class="n">exptime</span><span class="o">=</span><span class="n">exptime</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">g_mag_max</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">sun_block</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">catalog</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+<span class="n">observer</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;TELESCOP&quot;</span><span class="p">:</span> <span class="s2">&quot;Roman/WFI&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;pointing&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">ra</span><span class="p">,</span> <span class="n">dec</span><span class="p">],</span>
+        <span class="s2">&quot;FILTER&quot;</span><span class="p">:</span><span class="n">bandpass</span><span class="p">,</span>
+        <span class="s2">&quot;PA_Y&quot;</span><span class="p">:</span> <span class="n">PA</span><span class="p">,</span>
+        <span class="s2">&quot;EXPSTART&quot;</span><span class="p">:</span> <span class="n">date</span><span class="o">.</span><span class="n">mjd</span><span class="p">,</span>
+        <span class="s2">&quot;EXPTIME&quot;</span><span class="p">:</span> <span class="n">exptime</span><span class="p">}</span>
+
+<span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;Pleiades&quot;</span>
+<span class="n">custom_roman_exposure</span> <span class="o">=</span> <span class="n">rs</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">exposure</span><span class="p">(</span><span class="n">observer</span><span class="o">=</span><span class="n">observer</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">)</span>
+<span class="n">straylight_out</span> <span class="o">=</span> <span class="n">custom_roman_exposure</span><span class="o">.</span><span class="n">straylight</span><span class="p">()</span>
 </pre></div>
 </div>
 <a class="reference internal image-reference" href="_images/rosalia_loading.gif"><img alt="ROSALIA Stray-light loading bar" height="512" src="_images/rosalia_loading.gif" width="802" />

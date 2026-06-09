@@ -1,9 +1,12 @@
 {
     "commissioning": 0.024,
-    "generated/rosalia.core": 0.008,
-    "generated/rosalia.horizons": 0.011,
-    "generated/rosalia.roman": 0.023,
-    "generated/rosalia.telescopes": 0.166,
-    "installation": 0.006,
-    "rosalia": 2.148
+    "generated/rosalia.core": 0.009,
+    "generated/rosalia.correct": 0.02,
+    "generated/rosalia.plots": 0.044,
+    "generated/rosalia.psf": 0.033,
+    "generated/rosalia.roman": 0.022,
+    "generated/rosalia.utils": 0.093,
+    "installation": 0.007,
+    "measuringstray": 0.016,
+    "rosalia": 2.214
 }

@@ -48,6 +48,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#preparing-your-system">Preparing your system</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#installing-rosalia">Installing ROSALIA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#crds-installation">CRDS installation</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="measuringstray.html">Stray Light</a></li>
@@ -91,7 +92,8 @@
 <h1>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h1>
 <section id="preparing-your-system">
 <h2>Preparing your system<a class="headerlink" href="#preparing-your-system" title="Link to this heading"></a></h2>
-<p>ROSALIA is based on multiple packages, including <a class="reference external" href="https://www.astropy.org/">Astropy</a>, <a class="reference external" href="https://astroquery.readthedocs.io/en/latest/">Astroquery</a>, <a class="reference external" href="https://romanisim.readthedocs.io/en/latest/">Romanisim</a>, <a class="reference external" href="https://numpy.org/">NumPy</a>, <a class="reference external" href="https://scipy.org">SciPy</a>, <a class="reference external" href="https://matplotlib.org/">Matplotlib</a> among many others. The easiest way to install all the dependencies is through a package manager like <a class="reference external" href="https://anaconda.org/anaconda/conda">Conda</a> or <a class="reference external" href="https://github.com/mamba-org/mamba">Mamba</a>. If you have a <em>Conda/Mamba</em> package manager already installed in your system, skip to the following section. If you do not have a package manager, follow the Conda installation instructions at the <a class="reference external" href="https://stenv.readthedocs.io/en/latest/getting_started.html">Space Telescope *stenv* environment webpage</a>.</p>
+<p>ROSALIA is based on multiple packages, including <a class="reference external" href="https://www.astropy.org/">Astropy</a>, <a class="reference external" href="https://astroquery.readthedocs.io/en/latest/">Astroquery</a>, <a class="reference external" href="https://romanisim.readthedocs.io/en/latest/">Romanisim</a>, <a class="reference external" href="https://numpy.org/">NumPy</a>, <a class="reference external" href="https://scipy.org">SciPy</a>, <a class="reference external" href="https://matplotlib.org/">Matplotlib</a> among many others. The easiest way to install all the dependencies is through a package manager like <a class="reference external" href="https://anaconda.org/anaconda/conda">Conda</a> or <a class="reference external" href="https://github.com/mamba-org/mamba">Mamba</a>. If you have a <em>Conda/Mamba</em> package manager already installed in your system, skip to the following section. If you do not have a package manager, follow the Conda installation instructions at the <a class="reference external" href="https://stenv.readthedocs.io/getting_started.html">Space Telescope *stenv* environment webpage</a>.</p>
+<p>There are many versions of Conda managers. We recommend using free <cite>Miniforge &lt;https://github.com/conda-forge/miniforge&gt;</cite> with mamba as the package manager. You can install Miniforge by following the instructions at the <a class="reference external" href="https://github.com/conda-forge/miniforge">Miniforge GitHub repository</a>.</p>
 </section>
 <section id="installing-rosalia">
 <h2>Installing ROSALIA<a class="headerlink" href="#installing-rosalia" title="Link to this heading"></a></h2>
@@ -114,6 +116,14 @@
 <blockquote>
 <div><p>export ROSALIACACHE=/path/to/rosalia-cache</p>
 </div></blockquote>
+</section>
+<section id="crds-installation">
+<h2>CRDS installation<a class="headerlink" href="#crds-installation" title="Link to this heading"></a></h2>
+<p>ROSALIA relies on the <a class="reference external" href="https://roman-crds.stsci.edu/">CRDS</a> package to access the calibration reference files for the Roman Space Telescope. CRDS is installed by default as a ROSALIA dependency, but it needs to be configured to work properly. To configure CRDS, we need to set the environment variable <code class="docutils literal notranslate"><span class="pre">CRDS_PATH</span></code> to point to a directory where CRDS can store its cache files. For example, you can create a directory called <code class="docutils literal notranslate"><span class="pre">crds_cache</span></code> in your home directory and set the environment variable as follows:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">CRDS_PATH</span><span class="o">=</span><span class="nv">$HOME</span>/crds_cache
+<span class="nb">export</span><span class="w"> </span><span class="nv">CRDS_SERVER_URL</span><span class="o">=</span>https://roman-crds.stsci.edu
+</pre></div>
+</div>
 <p>That is it! We are ready to start analyzing Roman Space Telescope images.</p>
 </section>
 </section>

@@ -26,3 +26,4 @@ ipython
 pysiaf
 pyarrow
 ephessos
+crds
