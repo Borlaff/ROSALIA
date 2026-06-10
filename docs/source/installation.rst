@@ -18,6 +18,7 @@ Downloading Miniforge for Linux
        wget -O Miniforge3.sh "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
 
 Downloading Miniforge for MacOS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: sh
 
@@ -75,6 +76,7 @@ Then, extract the contents of the downloaded file and move the resulting folder 
 .. code-block:: sh
 
    export ROSALIACACHE=/path/to/rosalia-cache
+
 
 CRDS installation
 ---------------------

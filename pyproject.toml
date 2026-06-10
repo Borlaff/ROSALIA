@@ -30,7 +30,7 @@ dependencies = [
     "multiprocess",
     "bottleneck",
     "xmltodict",
-    "romanisim",
+    "romanisim=>0.14.0",
     "build",
     "asdf",
     "cartopy",
@@ -59,7 +59,7 @@ dependencies = [
     "sphinx", "sphinx-rtd-dark-mode", "sphinxcontrib-video",
     "twine",
     "psutil",
-    "zodipy",
+    "ephessos",
 ]
 
 [project.urls]
