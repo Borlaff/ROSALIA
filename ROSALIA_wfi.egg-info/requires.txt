@@ -1,7 +1,7 @@
 multiprocess
 bottleneck
 xmltodict
-romanisim
+romanisim>=0.14.0
 build
 asdf
 cartopy
@@ -32,4 +32,4 @@ sphinx-rtd-dark-mode
 sphinxcontrib-video
 twine
 psutil
-zodipy
+ephessos

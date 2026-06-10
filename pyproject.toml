@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rosalia-wfi"
-version = "1.2.0"
+version = "1.2.1"
 description = "A software to calibrate the sky background of Space Telescope images"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -30,7 +30,7 @@ dependencies = [
     "multiprocess",
     "bottleneck",
     "xmltodict",
-    "romanisim=>0.14.0",
+    "romanisim>=0.14.0",
     "build",
     "asdf",
     "cartopy",
@@ -59,6 +59,7 @@ dependencies = [
     "sphinx", "sphinx-rtd-dark-mode", "sphinxcontrib-video",
     "twine",
     "psutil",
+    "pysiaf",
     "ephessos",
 ]
 

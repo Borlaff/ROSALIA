@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: rosalia-wfi
-Version: 1.2.0
+Version: 1.2.1
 Summary: A software to calibrate the sky background of Space Telescope images
 Author-email: "Alejandro S. Borlaff" <a.s.borlaff@nasa.gov>, "Pablo M. Sanchez-Alarcon" <pablo.m.sanchezalarcon@nasa.gov>
 License: BSD
@@ -26,7 +26,7 @@ License-File: LICENSE.txt
 Requires-Dist: multiprocess
 Requires-Dist: bottleneck
 Requires-Dist: xmltodict
-Requires-Dist: romanisim
+Requires-Dist: romanisim>=0.14.0
 Requires-Dist: build
 Requires-Dist: asdf
 Requires-Dist: cartopy
@@ -57,7 +57,7 @@ Requires-Dist: sphinx-rtd-dark-mode
 Requires-Dist: sphinxcontrib-video
 Requires-Dist: twine
 Requires-Dist: psutil
-Requires-Dist: zodipy
+Requires-Dist: ephessos
 Dynamic: license-file
 
 <!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
