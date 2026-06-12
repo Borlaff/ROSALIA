@@ -52,7 +52,7 @@ Create a clean environment for ROSALIA
 
 .. code-block:: sh
 
-       conda create -n rosalia python=3.12 conda-forge::astromatic-swarp
+       conda create -n rosalia python=3.12 conda-forge::astromatic-swarp conda-forge::gnuastro
 
 After the new environment is created, we can activate it.
 

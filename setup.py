@@ -9,4 +9,5 @@ Options.annotate = False
 scripts = [str(s) for s in Path('bin/').iterdir()
            if s.is_file() and s.name != '__pycache__']
 
-setup(scripts=scripts)
+setup(scripts=scripts,
+      package_data={'rosalia': ['rosalia/style/*.mplstyle']})
