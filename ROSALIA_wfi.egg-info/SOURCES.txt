@@ -39,6 +39,8 @@ rosalia/telescopes.py
 rosalia/tests.py
 rosalia/utils.py
 rosalia/images/raccoon3_logo.png
+rosalia/style/nature_style.mplstyle
+rosalia/style/presi_style.mplstyle
 rosalia_wfi.egg-info/PKG-INFO
 rosalia_wfi.egg-info/SOURCES.txt
 rosalia_wfi.egg-info/dependency_links.txt

@@ -32,4 +32,5 @@ sphinx-rtd-dark-mode
 sphinxcontrib-video
 twine
 psutil
+pysiaf
 ephessos
