@@ -48,6 +48,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#preparing-your-system">Preparing your system</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#downloading-miniforge-for-linux">Downloading Miniforge for Linux</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#downloading-miniforge-for-macos">Downloading Miniforge for MacOS</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#installing-rosalia">Installing ROSALIA</a></li>
@@ -99,16 +100,35 @@
 <p>There are many versions of Conda managers. We recommend using free <cite>Miniforge &lt;https://github.com/conda-forge/miniforge&gt;</cite> with mamba as the package manager. You can install Miniforge by following the instructions at the <a class="reference external" href="https://github.com/conda-forge/miniforge">Miniforge GitHub repository</a>. As a summary, use the following commands:</p>
 <section id="downloading-miniforge-for-linux">
 <h3>Downloading Miniforge for Linux<a class="headerlink" href="#downloading-miniforge-for-linux" title="Link to this heading"></a></h3>
-<p>Downloading Miniforge for MacOS</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>wget<span class="w"> </span>-O<span class="w"> </span>Miniforge3.sh<span class="w"> </span><span class="s2">&quot;https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-</span><span class="k">$(</span>uname<span class="k">)</span><span class="s2">-</span><span class="k">$(</span>uname<span class="w"> </span>-m<span class="k">)</span><span class="s2">.sh&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="downloading-miniforge-for-macos">
+<h3>Downloading Miniforge for MacOS<a class="headerlink" href="#downloading-miniforge-for-macos" title="Link to this heading"></a></h3>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-fsSLo<span class="w"> </span>Miniforge3.sh<span class="w"> </span><span class="s2">&quot;https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-MacOSX-</span><span class="k">$(</span>uname<span class="w"> </span>-m<span class="k">)</span><span class="s2">.sh&quot;</span>
+</pre></div>
+</div>
 <p>This will download a <code class="docutils literal notranslate"><span class="pre">Miniforge.sh</span></code> file. Run it to install Miniforge:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>bash<span class="w"> </span>Miniforge3.sh<span class="w"> </span>-b<span class="w"> </span>-p<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">HOME</span><span class="si">}</span><span class="s2">/conda&quot;</span>
+</pre></div>
+</div>
 <p>To finish the installation, run the following scripts:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">HOME</span><span class="si">}</span><span class="s2">/conda/etc/profile.d/conda.sh&quot;</span>
+<span class="c1"># For mamba support also run the following command</span>
+<span class="nb">source</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">HOME</span><span class="si">}</span><span class="s2">/conda/etc/profile.d/mamba.sh&quot;</span>
+</pre></div>
+</div>
 <p>That is it! You can activate your Miniforge installation with:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>activate
+</pre></div>
+</div>
 </section>
 </section>
 <section id="installing-rosalia">
 <h2>Installing ROSALIA<a class="headerlink" href="#installing-rosalia" title="Link to this heading"></a></h2>
 <p>Create a clean environment for ROSALIA</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>rosalia<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.12<span class="w"> </span>conda-forge::astromatic-swarp
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>rosalia<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.12<span class="w"> </span>conda-forge::astromatic-swarp<span class="w"> </span>conda-forge::gnuastro
 </pre></div>
 </div>
 <p>After the new environment is created, we can activate it.</p>
@@ -129,6 +149,9 @@
 <section id="crds-installation">
 <h2>CRDS installation<a class="headerlink" href="#crds-installation" title="Link to this heading"></a></h2>
 <p>ROSALIA relies on the <a class="reference external" href="https://roman-crds.stsci.edu/">CRDS</a> package to access the calibration reference files for the Roman Space Telescope. CRDS is installed by default as a ROSALIA dependency, but it needs to be configured to work properly. If - for any reason - it is not installed, you can manually install CRDS with:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>crds
+</pre></div>
+</div>
 <p>To configure CRDS, we need to set the environment variable <code class="docutils literal notranslate"><span class="pre">CRDS_PATH</span></code> to point to a directory where CRDS can store its cache files. For example, you can create a directory called <code class="docutils literal notranslate"><span class="pre">crds_cache</span></code> in your home directory and set the environment variable as follows:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">CRDS_PATH</span><span class="o">=</span><span class="nv">$HOME</span>/crds_cache
 <span class="nb">export</span><span class="w"> </span><span class="nv">CRDS_SERVER_URL</span><span class="o">=</span>https://roman-crds.stsci.edu
