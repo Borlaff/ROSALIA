@@ -7,7 +7,7 @@ swarp.xml
 subprocess.out
 temp*
 *temp
-*csv
+*catalog.csv
 *.pyc
 notebooks/DEVEL/snap/snap*.png
 notebooks/CAR171/CAR171*.png
