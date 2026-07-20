@@ -1,0 +1,69 @@
+,Activity name,CAR,Region,Lite?,Possible descope,MPA_ThetaX,MPA_ThetaY,Target source,N_FRAME,N_EXP,N_FILT,Time,Filter(s),Notes
+0,OUT_pos_1_a,171.2,Outer stray,TRUE,FALSE,-3.7,5.27,Canopus,55,4,1,14.3,?,Secondary mirror leg - 1
+1,OUT_pos_1_b,171.2,Outer stray,TRUE,FALSE,3.7,5.27,Canopus,55,4,1,14.3,?,Secondary mirror leg - 2
+2,OUT_pos_1_c,171.2,Outer stray,TRUE,FALSE,6.05,1.18,Canopus,55,4,1,14.3,?,Secondary mirror leg - 3
+3,OUT_pos_1_d,171.2,Outer stray,TRUE,FALSE,2.45,-5.07,Canopus,55,4,1,14.3,?,Secondary mirror leg - 4
+4,OUT_pos_1_e,171.2,Outer stray,TRUE,FALSE,-2.45,-5.07,Canopus,55,4,1,14.3,?,Secondary mirror leg - 5
+5,OUT_pos_1_f,171.2,Outer stray,TRUE,FALSE,-6.05,1.18,Canopus,55,4,1,14.3,?,Secondary mirror leg - 6
+6,OUT_pos_2_a,171.2,Outer stray,TRUE,FALSE,-2.0,6.15,Canopus,55,4,1,14.3,?,Rogue path central lobe - 1
+7,OUT_pos_2_b,171.2,Outer stray,TRUE,FALSE,2.0,6.15,Canopus,55,4,1,14.3,?,Rogue path central lobe - 2
+8,OUT_pos_3_a,171.2,Outer stray,TRUE,FALSE,-1.3,1.0,Canopus,55,4,1,14.3,?,Inner ring - 1
+9,OUT_pos_3_b,171.2,Outer stray,TRUE,FALSE,1.3,1.0,Canopus,55,4,1,14.3,?,Inner ring - 2
+10,IN_pos_4_a,171.2,Outer stray,TRUE,FALSE,-0.0688,-0.0312,Canopus,55,4,1,14.3,?,Center lightshield SCA1
+11,IN_pos_4_b,171.2,Outer stray,TRUE,FALSE,0.0688,-0.0312,Canopus,55,4,1,14.3,?,Center lightshield SCA10
+12,IN_pos_5_a,171.2,Outer stray,TRUE,FALSE,-0.138,-0.0035,Canopus,55,4,1,14.3,?,Corner lightshield SCA1 - 4
+13,IN_pos_5_b,171.2,Outer stray,TRUE,FALSE,0.138,-0.0048,Canopus,55,4,1,14.3,?,Corner lightshield SCA10 - 13
+14,SCAN_RCHANNEL,171.2,Outer stray,TRUE,FALSE,-4.2,5.02,Canopus,55,4,1,14.3,?,Dithering pattern over secondary leg
+15,SCAN_RCHANNEL,171.2,Outer stray,TRUE,FALSE,-4.033,5.1369,Canopus,55,4,1,14.3,?,Dithering pattern over secondary leg
+16,SCAN_RCHANNEL,171.2,Outer stray,TRUE,FALSE,-3.867,5.2531,Canopus,55,4,1,14.3,?,Dithering pattern over secondary leg
+17,SCAN_RCHANNEL,171.2,Outer stray,TRUE,FALSE,-3.7,5.37,Canopus,55,4,1,14.3,?,Dithering pattern over secondary leg
+18,SCAN_RCHANNEL,171.2,Outer stray,TRUE,FALSE,-3.533,5.4869,Canopus,55,4,1,14.3,?,Dithering pattern over secondary leg
+19,SCAN_RCHANNEL,171.2,Outer stray,TRUE,FALSE,-3.37,5.601,Canopus,55,4,1,14.3,?,Dithering pattern over secondary leg
+20,SCAN_RCHANNEL,171.2,Outer stray,TRUE,FALSE,-3.2,5.72,Canopus,55,4,1,14.3,?,Dithering pattern over secondary leg
+21,SCAN_ROGUEPATH,171.2,Outer stray,TRUE,FALSE,-2.0,6.1492,Canopus,55,4,1,14.3,?,Rogue path scan
+22,SCAN_ROGUEPATH,171.2,Outer stray,TRUE,FALSE,-2.567,5.9027,Canopus,55,4,1,14.3,?,Rogue path scan
+23,SCAN_ROGUEPATH,171.2,Outer stray,TRUE,FALSE,-1.1041,6.2326,Canopus,55,4,1,14.3,?,Rogue path scan
+24,SCAN_ROGUEPATH,171.2,Outer stray,TRUE,FALSE,-1.1784,6.7592,Canopus,55,4,1,14.3,?,Rogue path scan
+25,SCAN_ROGUEPATH,171.2,Outer stray,TRUE,FALSE,-2.1641,6.5565,Canopus,55,4,1,14.3,?,Rogue path scan
+26,SCAN_ROGUEPATH,171.2,Outer stray,TRUE,FALSE,-2.7211,6.2505,Canopus,55,4,1,14.3,?,Rogue path scan
+27,SCAN_ROGUEPATH,171.2,Outer stray,TRUE,FALSE,-1.0562,5.9322,Canopus,55,4,1,14.3,?,Rogue path scan
+28,SCAN_ROGUEPATH,171.2,Outer stray,TRUE,FALSE,-1.8705,5.7158,Canopus,55,4,1,14.3,?,Rogue path scan
+29,SCAN_ROGUEPATH,171.2,Outer stray,TRUE,FALSE,-2.3948,5.4927,Canopus,55,4,1,14.3,?,Rogue path scan
+30,SCAN_ROGUEPATH,171.2,Outer stray,TRUE,FALSE,-1.6659,6.6978,Canopus,55,4,1,14.3,?,Rogue path scan
+31,SCAN_ROGUEPATH,171.2,Outer stray,TRUE,FALSE,-1.54,6.1909,Canopus,55,4,1,14.3,?,Rogue path scan
+32,SCAN_ROGUEPATH,171.2,Outer stray,TRUE,FALSE,-1.469,5.8422,Canopus,55,4,1,14.3,?,Rogue path scan
+33,SCAN_ROGUEPATH,171.2,Outer stray,TRUE,FALSE,0.0,6.9335,Canopus,55,4,1,14.3,?,Rogue path scan
+34,SCAN_ROGUEPATH,171.2,Outer stray,TRUE,FALSE,0.0,6.3394,Canopus,55,4,1,14.3,?,Rogue path scan
+35,SCAN_ROGUEPATH,171.2,Outer stray,TRUE,FALSE,0.0,6.0327,Canopus,55,4,1,14.3,?,Rogue path scan
+36,SCAN_ROGUEPATH,171.2,Outer stray,TRUE,FALSE,2.0,6.1492,Canopus,55,4,1,14.3,?,Rogue path scan
+37,SCAN_ROGUEPATH,171.2,Outer stray,TRUE,FALSE,2.567,5.9027,Canopus,55,4,1,14.3,?,Rogue path scan
+38,SCAN_ROGUEPATH,171.2,Outer stray,TRUE,FALSE,1.1041,6.2326,Canopus,55,4,1,14.3,?,Rogue path scan
+39,SCAN_ROGUEPATH,171.2,Outer stray,TRUE,FALSE,1.1784,6.7592,Canopus,55,4,1,14.3,?,Rogue path scan
+40,SCAN_ROGUEPATH,171.2,Outer stray,TRUE,FALSE,2.1641,6.5565,Canopus,55,4,1,14.3,?,Rogue path scan
+41,SCAN_ROGUEPATH,171.2,Outer stray,TRUE,FALSE,2.7211,6.2505,Canopus,55,4,1,14.3,?,Rogue path scan
+42,SCAN_ROGUEPATH,171.2,Outer stray,TRUE,FALSE,1.0562,5.9322,Canopus,55,4,1,14.3,?,Rogue path scan
+43,SCAN_ROGUEPATH,171.2,Outer stray,TRUE,FALSE,1.8705,5.7158,Canopus,55,4,1,14.3,?,Rogue path scan
+44,SCAN_ROGUEPATH,171.2,Outer stray,TRUE,FALSE,2.3948,5.4927,Canopus,55,4,1,14.3,?,Rogue path scan
+45,SCAN_ROGUEPATH,171.2,Outer stray,TRUE,FALSE,1.6659,6.6978,Canopus,55,4,1,14.3,?,Rogue path scan
+46,SCAN_ROGUEPATH,171.2,Outer stray,TRUE,FALSE,1.54,6.1909,Canopus,55,4,1,14.3,?,Rogue path scan
+47,SCAN_ROGUEPATH,171.2,Outer stray,TRUE,FALSE,1.469,5.8422,Canopus,55,4,1,14.3,?,Rogue path scan
+48,SCAN_DRAGON1,171.2,Outer stray,TRUE,FALSE,-0.1188,-0.0312,Canopus,55,4,1,14.3,?,Central light shield scan
+49,SCAN_DRAGON1,171.2,Outer stray,TRUE,FALSE,-0.0938,-0.0312,Canopus,55,4,1,14.3,?,Central light shield scan
+50,SCAN_DRAGON1,171.2,Outer stray,TRUE,FALSE,-0.0688,-0.0312,Canopus,55,4,1,14.3,?,Central light shield scan
+51,SCAN_DRAGON1,171.2,Outer stray,TRUE,FALSE,-0.0438,-0.0312,Canopus,55,4,1,14.3,?,Central light shield scan
+52,SCAN_DRAGON1,171.2,Outer stray,TRUE,FALSE,-0.0188,-0.0312,Canopus,55,4,1,14.3,?,Central light shield scan
+53,SCAN_DRAGON1,171.2,Outer stray,TRUE,FALSE,-0.0688,-0.0334,Canopus,55,4,1,14.3,?,Central light shield scan
+54,SCAN_DRAGON1,171.2,Outer stray,TRUE,FALSE,-0.0688,-0.0328,Canopus,55,4,1,14.3,?,Central light shield scan
+55,SCAN_DRAGON1,171.2,Outer stray,TRUE,FALSE,-0.0688,-0.0322,Canopus,55,4,1,14.3,?,Central light shield scan
+56,SCAN_DRAGON1,171.2,Outer stray,TRUE,FALSE,-0.0688,-0.0315,Canopus,55,4,1,14.3,?,Central light shield scan
+57,SCAN_DRAGON1,171.2,Outer stray,TRUE,FALSE,-0.0688,-0.0309,Canopus,55,4,1,14.3,?,Central light shield scan
+58,SCAN_DRAGON1,171.2,Outer stray,TRUE,FALSE,-0.0688,-0.0302,Canopus,55,4,1,14.3,?,Central light shield scan
+59,SCAN_DRAGON1,171.2,Outer stray,TRUE,FALSE,-0.0688,-0.0296,Canopus,55,4,1,14.3,?,Central light shield scan
+60,SCAN_DRAGON1,171.2,Outer stray,TRUE,FALSE,-0.0688,-0.029,Canopus,55,4,1,14.3,?,Central light shield scan
+61,SCAN_DRAGON2,171.2,Outer stray,TRUE,FALSE,-0.1324,-0.0035,Canopus,55,4,1,14.3,?,Corner light shield scan
+62,SCAN_DRAGON2,171.2,Outer stray,TRUE,FALSE,-0.1352,0.0013,Canopus,55,4,1,14.3,?,Corner light shield scan
+63,SCAN_DRAGON2,171.2,Outer stray,TRUE,FALSE,-0.1408,0.0013,Canopus,55,4,1,14.3,?,Corner light shield scan
+64,SCAN_DRAGON2,171.2,Outer stray,TRUE,FALSE,-0.1436,-0.0035,Canopus,55,4,1,14.3,?,Corner light shield scan
+65,SCAN_DRAGON2,171.2,Outer stray,TRUE,FALSE,-0.1408,-0.0083,Canopus,55,4,1,14.3,?,Corner light shield scan
+66,SCAN_DRAGON2,171.2,Outer stray,TRUE,FALSE,-0.1352,-0.0083,Canopus,55,4,1,14.3,?,Corner light shield scan
+67,SCAN_DRAGON2,171.2,Outer stray,TRUE,FALSE,-0.1324,-0.0035,Canopus,55,4,1,14.3,?,Corner light shield scan
