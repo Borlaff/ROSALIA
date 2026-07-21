@@ -451,6 +451,7 @@ class exposure():
 
         straylevel_list = []
         main_offender_list = []
+        straylight_minimal_storage_map = []
 
         ## Prepare the coordinates of the stars that do not fall inside the Focal Plane Array ##
         ## This step is common for all SCI extensions #
@@ -489,12 +490,12 @@ class exposure():
             straylevel_image_i = straylevel_image_db["straylight_SCA"]
             main_offender_image_i = straylevel_image_db["main_offender_SCA"]
 
-                #     return({"straylight_SCA": straylight_SCA, "main_offender_SCA": main_offender_SCA})
-
+            straylight_minimal_storage_array = straylevel_image_db["straylight_minimal_storage_array"]
 
 
             straylevel_list.append(straylevel_image_i)
             main_offender_list.append(main_offender_image_i)
+            straylight_minimal_storage_map.append(straylight_minimal_storage_array)
 
         ########################################
         # Save the results to a fits file.
@@ -508,10 +509,16 @@ class exposure():
             header_output.append(self.ASTROPYWCS[SCIEXT_i-1].to_header())
         
 
+        # Save the stray-light full scale map
         self.output_name = self.FILENAME.replace(".fits", "_stray.fits")
-        
         rs.utils.save_fits(array=data_output, name=self.output_name, header=header_output,
-                        extname=None, overwrite=True, output_verify='silentfix')
+                           extname=None, overwrite=True, output_verify='silentfix')
+
+        # Save the stray-light minimal storage cube        
+        self.minstraymap = self.FILENAME.replace(".fits", "_minstraymap.fits")
+        rs.utils.save_fits(array=np.array(straylight_minimal_storage_map), name=self.minstraymap,
+                           extname=None, overwrite=True, output_verify='silentfix')
+
         # Main-offender
         data_output = []
         header_output = []

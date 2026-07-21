@@ -14,6 +14,23 @@ from astropy import constants as const
 from datetime import datetime
 import logging
 
+
+romanisim_bandpasses_names = ["R062", "Z087", "Y106", "J129", "H158", "W146", "F184", "K213"]
+rosalia_bandpasses_names   = ["F062", "F087", "F106", "F129", "F158", "F146", "F184", "F213"]
+
+# Build both mapping directions
+bandpasses_names_to_rosalia = dict(zip(romanisim_bandpasses_names, rosalia_bandpasses_names))
+bandpasses_names_to_romanisim = dict(zip(rosalia_bandpasses_names, romanisim_bandpasses_names))
+
+def translate_bandpass_name(name):
+    if name in bandpasses_names_to_rosalia:
+        return bandpasses_names_to_rosalia[name]
+    elif name in bandpasses_names_to_romanisim:
+        return bandpasses_names_to_romanisim[name]
+    else:
+        return None
+
+
 # --------------------- #
 def create_roman_dummy(point, date, band, PA=None, exptime=500, output="default_roman_dummy.fits"):
     # create_roman_dummy:
@@ -357,15 +374,15 @@ def mag2fe(mag, bandpass, sca):
     # zp = 2.5*np.log10(fzpAB)
     flux = 10**(-0.4*(mag + 48.60))*u.erg/u.s/u.hertz/u.cm**2
     flux_e_s = np.zeros(len(mag))
+    romanisim_bandpass_name = translate_bandpass_name(bandpass)
     for i in range(len(mag)):
-        flux_e_s[i] = compute_count_rate(flux[i],bandpass,sca,
+        flux_e_s[i] = compute_count_rate(flux[i],romanisim_bandpass_name,sca,
                                          filename=None, effarea=None, wavedist=None)
     if back_single: flux_e_s = flux_e_s[0]
     return(flux_e_s/u.s)
 
 
 def fe2mag(fe, bandpass, sca):
-    from romanisim.bandpass import compute_count_rate
     back_single = 0
     if not isinstance(fe, (list, pd.core.series.Series, np.ndarray)):
         fe = np.array([fe])
@@ -491,18 +508,24 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
 
     if True:
         subarray_locations_db = rs.roman.get_subarray_locations(SCA=SCA, verbose=False)
+
+        # Initialize a minimal storage array for the straylight. 
+        # The minimal storage array has 64 x 18, which is 64 locations, for each one of the 18 SCAs.
+        n_subarrays = len(subarray_locations_db["NDI_labels"])
+
+        straylight_minimal_storage_array = np.zeros((n_subarrays,)).astype(np.float32) 
+
         xmid = subarray_locations_db["xmid"]
         ymid = subarray_locations_db["ymid"]
 
         # Estimating the coordinates of the center of the subarrays
         RA_mid_subarrays =       SCA_pixel_radec.ra.value #[ymid, xmid]
         DEC_mid_subarrays =      SCA_pixel_radec.dec.value #[ymid, xmid]
-        mid_subarrays_Skycoord = SkyCoord(RA_mid_subarrays, DEC_mid_subarrays, frame="icrs", unit="deg")
+        #mid_subarrays_Skycoord = SkyCoord(RA_mid_subarrays, DEC_mid_subarrays, frame="icrs", unit="deg")
 
         if verbose > 1: print(datetime.now().isoformat() + ": Done")
         if verbose > 1: print(datetime.now().isoformat() + ": Finding the NDI at the estimated angles...")
 
-        n_subarrays = len(subarray_locations_db["NDI_labels"])
         ##############################################################################
         # Initialize storage arrays for xmid, ymid, NDI, stray-light, main_offender
         ##############################################################################
@@ -539,11 +562,14 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
                                                              SCA=SCA, X_label=X_label, Y_label=Y_label, level=1, verbose=True)
                 NDI_level_1 = transfer_level_1/superpixel_mm2_area
                 straylight_level_1 = (NDI_level_1*(pixsize**2)*filter_identity["filter_transmission_ref"]*filter_identity["filter_lambda_ref"]*irradiance_level_1_stars/const.c/const.h).decompose()
-                #id_main_offender_level_1 = id_level_1_stars[np.where(straylight_level_1.value == bn.nanmax(straylight_level_1))[0][0]]
+
+                # Once we have the straylight level, we can estimate: 
+                # What is the star that produces the maximum straylight level on its own?
+                # A.K.A. the main offender.
                 where_max_stray = np.where(straylight_level_1.value == bn.nanmax(straylight_level_1))[0][0]
-                id_main_offender_level_1 = id_level_1_stars[where_max_stray]
+                id_main_offender_level_1        = id_level_1_stars[where_max_stray]
                 source_id_main_offender_level_1 = source_id_level_1[where_max_stray]
-                max_NDI_level_1 = NDI_level_1[where_max_stray]
+                max_NDI_level_1                 = NDI_level_1[where_max_stray]
 
             else:
                 stray_main_offender_level_1 = 0
@@ -556,7 +582,9 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
             # 3 - Combine all the values                                                 #
             # -------------------------------------------------------------------------- #
             stray_main_offender_level_1 = bn.nanmax(straylight_level_1)
-            straylight_SCA[ymin:ymax, xmin:xmax] = straylight_SCA[ymin:ymax, xmin:xmax] + bn.nansum(straylight_level_1)
+            total_straylight_level_1 = bn.nansum(straylight_level_1)
+            straylight_SCA[ymin:ymax, xmin:xmax] = straylight_SCA[ymin:ymax, xmin:xmax] + total_straylight_level_1
+            straylight_minimal_storage_array[i] = straylight_minimal_storage_array[i] + total_straylight_level_1
 
             # -------------------------------------------------------------------------- #
             # 2 - Estimate the stray-light at the SCA level for mid-distance stars     #
@@ -581,7 +609,9 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
                 source_id_main_offender_level_2 = None
 
             stray_main_offender_level_2 = bn.nanmax(straylight_level_2)
-            straylight_SCA[ymin:ymax, xmin:xmax] = straylight_SCA[ymin:ymax, xmin:xmax] + bn.nansum(straylight_level_2)
+            total_straylight_level_2 = bn.nansum(straylight_level_2)
+            straylight_SCA[ymin:ymax, xmin:xmax] = straylight_SCA[ymin:ymax, xmin:xmax] + total_straylight_level_2
+            straylight_minimal_storage_array[i] = straylight_minimal_storage_array[i] + total_straylight_level_2
 
             # -------------------------------------------------------------------------- #
             # 3 - Estimate the stray-light at the SCA level for long-distance stars      #
@@ -606,9 +636,12 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
                 max_NDI_level_3 = 0
                 source_id_main_offender_level_3 = None
             stray_main_offender_level_3 = bn.nanmax(straylight_level_3)
-            straylight_SCA[ymin:ymax, xmin:xmax] = straylight_SCA[ymin:ymax, xmin:xmax] + bn.nansum(straylight_level_3)
+            total_straylight_level_3 = bn.nansum(straylight_level_3)
+            straylight_SCA[ymin:ymax, xmin:xmax] = straylight_SCA[ymin:ymax, xmin:xmax] + total_straylight_level_3
+            straylight_minimal_storage_array[i] = straylight_minimal_storage_array[i] + total_straylight_level_3
 
 
+            # Combine the three levels of straylight and identify the main offender across all levels.
             main_offender_level_123 = np.array([stray_main_offender_level_1,
                                                 stray_main_offender_level_2,
                                                 stray_main_offender_level_3])
@@ -658,7 +691,10 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
         #f = RegularGridInterpolator((x_grid, y_grid), np.flip(ndi_fits[0].data, axis=1).T, bounds_error=False, fill_value=0)
 
     if verbose > 1: print(datetime.now().isoformat() + ": Done")
-    return({"straylight_SCA": straylight_SCA, "main_offender_SCA": main_offender_SCA, "main_offender_db": main_offender_db})
+    return({"straylight_SCA": straylight_SCA, 
+            "main_offender_SCA": main_offender_SCA, 
+            "main_offender_db": main_offender_db, 
+            "straylight_minimal_storage_array": straylight_minimal_storage_array})
 
 #################################################
 
