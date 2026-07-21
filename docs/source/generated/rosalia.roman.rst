@@ -1,4 +1,4 @@
-rosalia.roman
+﻿rosalia.roman
 =============
 
 .. automodule:: rosalia.roman
@@ -16,4 +16,5 @@ rosalia.roman
       make_romanisim_dummy
       roman_WFI_NDI_estimator_direct
       roman_estimate_straylight_SCA
+      translate_bandpass_name
    

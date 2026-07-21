@@ -52,6 +52,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#installing-rosalia">Installing ROSALIA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#uninstalling-rosalia">Uninstalling ROSALIA</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#crds-installation">CRDS installation</a></li>
 </ul>
 </li>
@@ -97,7 +98,7 @@
 <section id="preparing-your-system">
 <h2>Preparing your system<a class="headerlink" href="#preparing-your-system" title="Link to this heading"></a></h2>
 <p>ROSALIA is based on multiple packages, including <a class="reference external" href="https://www.astropy.org/">Astropy</a>, <a class="reference external" href="https://astroquery.readthedocs.io/en/latest/">Astroquery</a>, <a class="reference external" href="https://romanisim.readthedocs.io/en/latest/">Romanisim</a>, <a class="reference external" href="https://numpy.org/">NumPy</a>, <a class="reference external" href="https://scipy.org">SciPy</a>, <a class="reference external" href="https://matplotlib.org/">Matplotlib</a> among many others. The easiest way to install all the dependencies is through a package manager like <a class="reference external" href="https://anaconda.org/anaconda/conda">Conda</a> or <a class="reference external" href="https://github.com/mamba-org/mamba">Mamba</a>. If you have a <em>Conda/Mamba</em> package manager already installed in your system, skip to the following section. If you do not have a package manager, follow the Conda installation instructions at the <a class="reference external" href="https://stenv.readthedocs.io/getting_started.html">Space Telescope *stenv* environment webpage</a>.</p>
-<p>There are many versions of Conda managers. We recommend using free <cite>Miniforge &lt;https://github.com/conda-forge/miniforge&gt;</cite> with mamba as the package manager. You can install Miniforge by following the instructions at the <a class="reference external" href="https://github.com/conda-forge/miniforge">Miniforge GitHub repository</a>. As a summary, use the following commands:</p>
+<p>There are many versions of Conda managers. We recommend using free <cite>Miniforge &lt;https://github.com/conda-forge/miniforge&gt;</cite> with mamba as the package manager. All the commands below work exactly the same if you replace “mamba” with “conda”. You can install Miniforge by following the instructions at the <a class="reference external" href="https://github.com/conda-forge/miniforge">Miniforge GitHub repository</a>. As a summary, use the following commands:</p>
 <section id="downloading-miniforge-for-linux">
 <h3>Downloading Miniforge for Linux<a class="headerlink" href="#downloading-miniforge-for-linux" title="Link to this heading"></a></h3>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>wget<span class="w"> </span>-O<span class="w"> </span>Miniforge3.sh<span class="w"> </span><span class="s2">&quot;https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-</span><span class="k">$(</span>uname<span class="k">)</span><span class="s2">-</span><span class="k">$(</span>uname<span class="w"> </span>-m<span class="k">)</span><span class="s2">.sh&quot;</span>
@@ -128,15 +129,15 @@
 <section id="installing-rosalia">
 <h2>Installing ROSALIA<a class="headerlink" href="#installing-rosalia" title="Link to this heading"></a></h2>
 <p>Create a clean environment for ROSALIA</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>rosalia<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.12<span class="w"> </span>conda-forge::astromatic-swarp<span class="w"> </span>conda-forge::gnuastro
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>mamba<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>rosalia<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.12<span class="w"> </span>conda-forge::astromatic-swarp<span class="w"> </span>conda-forge::gnuastro
 </pre></div>
 </div>
 <p>After the new environment is created, we can activate it.</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>activate<span class="w"> </span>rosalia
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>mamba<span class="w"> </span>activate<span class="w"> </span>rosalia
 </pre></div>
 </div>
 <p>Once in a clean conda environment, we can install ROSALIA. The preferred method to install it is through pip.</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>rosalia
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>rosalia-wfi
 </pre></div>
 </div>
 <p>ROSALIA needs a series of cache files to work. If they are not installed, most of the functions will work, but you won’t be able to estimate the surface brightness of the stray light, which is one of the main functionalities of ROSALIA. To install the cache files, download the following folder:</p>
@@ -145,6 +146,10 @@
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">ROSALIACACHE</span><span class="o">=</span>/path/to/rosalia-cache
 </pre></div>
 </div>
+</section>
+<section id="uninstalling-rosalia">
+<h2>Uninstalling ROSALIA<a class="headerlink" href="#uninstalling-rosalia" title="Link to this heading"></a></h2>
+<p>mamba remove -n rosalia –all</p>
 </section>
 <section id="crds-installation">
 <h2>CRDS installation<a class="headerlink" href="#crds-installation" title="Link to this heading"></a></h2>
