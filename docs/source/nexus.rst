@@ -27,3 +27,11 @@ If your are setting up a new server in the Roman Research Nexus, you can install
 .. code-block:: sh
 
        pip install rosalia-wfi
+
+
+4. Add the Astromatic and Gnuastro packages to the new environment by running the following command:
+
+.. code-block:: sh
+
+       mamba install conda-forge::astromatic-swarp conda-forge::gnuastro
+
