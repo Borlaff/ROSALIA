@@ -1,6 +1,11 @@
 {
-    "generated/rosalia": 0.032,
-    "installation": 0.011,
-    "measuringstray": 0.016,
-    "rosalia": 2.184
+    "commissioning": 0.023,
+    "generated/rosalia.core": 0.009,
+    "generated/rosalia.psf": 0.035,
+    "generated/rosalia.roman": 0.024,
+    "generated/rosalia.sso": 0.007,
+    "installation": 0.01,
+    "measuringstray": 0.091,
+    "nexus": 0.005,
+    "rosalia": 2.078
 }

@@ -32,3 +32,4 @@ scipy
 pyarrow
 ephessos
 crds
+twine
