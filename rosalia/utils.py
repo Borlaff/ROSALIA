@@ -222,6 +222,7 @@ def exposure_inspector(input_name, verbose=False, lite=False):
     # If the input is a pattern with *, then we will use glob to find the files 
     # that match the pattern, then we will run convert_ASDF_to_FITS, 
     # and finally run exposure_inspector of the final product. 
+
     list_of_files = glob.glob(input_name)
     if "*" in input_name and input_name.endswith(".asdf"):
         output_name = input_name.replace("*", "_").replace(".asdf", ".fits")
@@ -267,13 +268,10 @@ def exposure_inspector_single(input_name, verbose=False, lite=False):
     # If the input image is a FITS file, then use astropy.io.fits.open
     if file_extension == ".fits":
         exposure_identity = exposure_inspector_fits(input_name, verbose=verbose, lite=lite)
-        exposure_identity["FILETYPE"] = "FITS"
 
     # If the input image is a ASDF file, then use asdf.open
     if file_extension == ".asdf":
         exposure_identity = exposure_inspector_asdf(input_name, verbose=verbose, lite=lite)
-        exposure_identity["FILETYPE"] = "ASDF"
-        exposure_identity["SCIEXTS"] = np.array([0])
 
     # Add the position of the telescope to the identity.
     try:
@@ -289,15 +287,22 @@ def exposure_inspector_single(input_name, verbose=False, lite=False):
 
 def exposure_inspector_asdf(input_name, verbose=False, lite=False):
     import asdf
-    input_asdf = asdf.open(input_name)
+
+    if "s3://" in asdf_file_uri_l2: 
+        if verbose: print("Nexus S3 bucket file detected")
+        input_asdf = asdf.open(fs.open(asdf_file_uri_l2, 'rb'))
+
+    else:
+        if verbose: print("Local ASDF file detected")
+        input_asdf = asdf.open(input_name)
 
     # Setting up keywords to store the info from the file
     exposure_identity = {}
     exposure_identity["FILENAME"] = input_name
 
-    keywords = ["TELESCOP", "INSTRUME", "DETECTOR", "RA_TARG", "DEC_TARG", "SUNANGLE", "BUNIT",
-                "EXPSTART", "EXPEND", "EXPTIME", "MOONANGL", "DRIZCORR",
-                "PHOTCORR", "PHOTFLAM", "PHOTPLAM"]
+    #keywords = ["TELESCOP", "INSTRUME", "DETECTOR", "RA_TARG", "DEC_TARG", "SUNANGLE", "BUNIT",
+    #            "EXPSTART", "EXPEND", "EXPTIME", "MOONANGL", "DRIZCORR",
+    #            "PHOTCORR", "PHOTFLAM", "PHOTPLAM"]
 
     exposure_identity["INSTRUME"] = input_asdf["roman"]["meta"]["instrument"]["name"]
 
@@ -359,6 +364,8 @@ def exposure_inspector_asdf(input_name, verbose=False, lite=False):
     exposure_identity["DEC_PNT"] =  input_asdf["roman"]["meta"]['pointing']['dec_v1']
     exposure_identity["PA"] = input_asdf["roman"]["meta"]['pointing']["pa_aperture"] # input_asdf["roman"]["meta"]['pointing']['pa_v3']
 
+    exposure_identity["FILETYPE"] = "ASDF"
+    exposure_identity["SCIEXTS"] = np.array([0])
 
 
     return(exposure_identity)
@@ -563,6 +570,7 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
 
     
     ################
+    exposure_identity["FILETYPE"] = "FITS"
 
     return(exposure_identity)
 
