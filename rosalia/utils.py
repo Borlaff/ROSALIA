@@ -328,7 +328,7 @@ def exposure_inspector_asdf(input_name, verbose=False, lite=False):
     exposure_identity["pixel_area"] = input_asdf["roman"]["meta"]["photometry"]["pixel_area"]*((180/np.pi)*60*60)**2
     exposure_identity["EXPSTART_ISOT"] = input_asdf["roman"]["meta"]["exposure"]["start_time"].isot
     exposure_identity["SCA"] = int(input_asdf["roman"]["meta"]["instrument"]["detector"].replace("WFI",""))
-
+    exposure_identity["BUNIT"] = "DN/s" # input_asdf["roman"]["meta"]["photometry"]["flux_unit"]
 
     ############## Get the filter identity #######################
     try: 
