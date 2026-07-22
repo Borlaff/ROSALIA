@@ -425,7 +425,7 @@ class exposure():
         #######################################
 
     
-        if self.TELESCOP != "Roman" and self.TELESCOP != "RST":
+        if self.TELESCOP != "Roman" and self.TELESCOP != "RST" and self.TELESCOP != "ROMAN":
             print("Straylight modeling is currently only available for Roman/WFI exposures.")
             return(None)
         #    stray_db = rosalia_stray(ra=self.RA_TARG, dec=self.DEC_TARG, PA=self.PA,
