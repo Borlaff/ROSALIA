@@ -284,7 +284,7 @@ class exposure():
     def get_source_catalog(self, g_mag_max=15, verbose=False):
         import pandas as pd
 
-        self.source_catalog_filename = self.FILENAME.replace(".fits", "_source_catalog.csv") #
+        self.source_catalog_filename = os.path.splitext(os.path.basename(self.FILENAME))[0] + "_source_catalog.csv" #
         
         search_radius = self.get_max_angular_size()
 
