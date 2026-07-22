@@ -359,6 +359,7 @@ def exposure_inspector_asdf(input_name, verbose=False, lite=False):
         astropywcs.append(astropy_wcs(input_asdf["roman"]["meta"]["wcs"].to_fits()[0]))
 
     exposure_identity["DATA"] = data
+    exposure_identity['DATA_SHAPE'] = data[0].shape
     exposure_identity["GWCS"] = gwcs
     exposure_identity["ASTROPYWCS"] = astropywcs
 
