@@ -150,7 +150,7 @@ class exposure():
             self.EXPSTART_ISOT = exposure_identity['EXPSTART_ISOT']
             self.PA = exposure_identity['PA']
             # self.SCA = exposure_identity['SCA']
-            self.HST_TYPE = exposure_identity['HST_TYPE']
+            # self.HST_TYPE = exposure_identity['HST_TYPE']
             self.FILTER = exposure_identity['FILTER']
             self.FILTER_IDENTITY = exposure_identity['FILTER_IDENTITY']
             # self.PHYSPIX = exposure_identity['PHYSPIX']
