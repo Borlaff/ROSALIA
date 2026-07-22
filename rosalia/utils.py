@@ -290,6 +290,8 @@ def exposure_inspector_asdf(input_name, verbose=False, lite=False):
 
     if "s3://" in input_name: 
         if verbose: print("Nexus S3 bucket file detected")
+        import s3fs
+        fs = s3fs.S3FileSystem(anon=True)
         input_asdf = asdf.open(fs.open(input_name, 'rb'))
 
     else:
