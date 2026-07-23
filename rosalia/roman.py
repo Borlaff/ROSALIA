@@ -464,7 +464,6 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
     dec_level_3_stars  = radec_level_3_stars.dec.value
 
     irradiance_level_1_stars = irradiance_stars[bool_is_the_star_level_1]
-
     source_id_level_1 = source_id[bool_is_the_star_level_1]
     id_level_1_stars = id_stars[bool_is_the_star_level_1]
     #print(id_level_1_stars)
