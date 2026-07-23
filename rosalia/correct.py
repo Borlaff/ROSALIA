@@ -131,13 +131,6 @@ def rosalia_stray(ra, dec, PA, date, bandpass, exptime, prefix="", input_fits=No
     bandpass = exposure_dict["FILTER"]
     exptime = exposure_dict["EXPTIME"]
  
-    #if input_name is None:
-    #    input_name = rs.roman.create_roman_dummy(point=exposure_dict["point"],
-    #                                             date=date,
-    #                                             band=bandpass,
-    #                                             PA=PA,
-    #                                             exptime=exptime,
-    #                                             output=output_name.replace(".fits", "_dummy.fits"))
 
     # If the input name is an ASDF, transform it to a compiled FITS.
     if isinstance(input_name, (list, np.ndarray, pd.Series)):

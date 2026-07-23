@@ -212,12 +212,12 @@ class exposure():
             self.FILENAME = observer["FILENAME"]
 
         central_coords = SkyCoord(self.RA_TARG, self.DEC_TARG, frame="icrs", unit="deg")
-        print(self.EXPTIME)
-        print(self.EXPSTART)
+
         observer["FILENAME"] = rs.roman.create_roman_dummy(point=central_coords, date=self.EXPSTART_ASTROPY,
                                                             band=observer["FILTER_PARAMS"]["NAME"],
                                                             PA=self.PA, exptime=self.EXPTIME,
                                                             output=observer["FILENAME"])
+        
         self.SCIEXTS = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]
         astropywcs_info = rs.utils.get_astropywcs_info_from_sciexts(filename=self.FILENAME, sciexts=self.SCIEXTS)
         self.ASTROPYWCS = astropywcs_info["ASTROPYWCS"]
