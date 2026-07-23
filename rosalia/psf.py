@@ -780,13 +780,13 @@ def get_hybrid_catalog(ra, dec, radius, lambda_ref, MJD, observer, g_mag_max=Fal
     for i in tqdm(range(len(high_resolution_catalog)), disable=not verbose, position=0, leave=True):
         good = np.where(np.isfinite(magnitude_array[:,i]))
         #print(magnitude_array[:,i])
-        magnitude_interpolator = interpolate.interp1d(x=filters_list_lambda[good], y=magnitude_array[good,i], kind="nearest", fill_value="extrapolate")
+        magnitude_interpolator = interpolate.interp1d(x=filters_list_lambda[good], y=magnitude_array[good,i], kind="linear", fill_value="extrapolate")
         mag_lambda[i] = magnitude_interpolator(lambda_ref.to("AA").value)[0]
 
     high_resolution_catalog["mag_lambda"] = mag_lambda
 
 
-    # magnitude_interpolator = interpolate.interp1d(x=mag_sun_db["lambda_mum"]*10**4, y=mag_sun_db["AB_App"])
+    # magnitude_interpolator = interpolate.interp1d(x=mag_sun_db["lambda_mum"]*10**4, y=mag_sun_db["AB_App"], kind="linear")
     # mag_ref = magnitude_interpolator(lambda_ref.to("AA"))
 
 
