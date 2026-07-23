@@ -359,13 +359,13 @@ def exposure_inspector_asdf(input_name, verbose=False, lite=False):
         astropywcs.append(astropy_wcs(input_asdf["roman"]["meta"]["wcs"].to_fits()[0]))
 
     exposure_identity["DATA"] = data
-    exposure_identity['DATA_SHAPE'] = data[0].shape
+    exposure_identity['DATA_SHAPE'] = [data[0].shape]
     exposure_identity["GWCS"] = gwcs
     exposure_identity["ASTROPYWCS"] = astropywcs
 
     exposure_identity["RA_PNT"] =  input_asdf["roman"]["meta"]['pointing']['ra_v1']
     exposure_identity["DEC_PNT"] =  input_asdf["roman"]["meta"]['pointing']['dec_v1']
-    exposure_identity["PA"] = input_asdf["roman"]["meta"]['pointing']["pa_aperture"] # input_asdf["roman"]["meta"]['pointing']['pa_v3']
+    exposure_identity["PA"] =   input_asdf["roman"]["meta"]['pointing']["pa_aperture"] # input_asdf["roman"]["meta"]['pointing']['pa_v3']
 
     exposure_identity["FILETYPE"] = "ASDF"
     exposure_identity["SCIEXTS"] = np.array([0])
