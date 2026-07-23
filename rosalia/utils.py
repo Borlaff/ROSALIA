@@ -368,7 +368,7 @@ def exposure_inspector_asdf(input_name, verbose=False, lite=False):
     exposure_identity["PA"] =   input_asdf["roman"]["meta"]['pointing']["pa_aperture"] # input_asdf["roman"]["meta"]['pointing']['pa_v3']
 
     exposure_identity["FILETYPE"] = "ASDF"
-    exposure_identity["SCIEXTS"] = np.array([0])
+    exposure_identity["SCIEXTS"] = [int(input_asdf["roman"]["meta"]["instrument"]["detector"].replace("WFI",""))]
 
 
     return(exposure_identity)
