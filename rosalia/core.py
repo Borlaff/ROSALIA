@@ -460,13 +460,15 @@ class exposure():
         #                figsize=figsize, mu_vmin=mu_vmin, mu_vmax=mu_vmax)
 
         # Find out which stars belong to each detector. 
-        
+        print(datetime.now().isoformat() + " > Fetching catalog")
+
         if catalog is None:
             self.source_catalog = self.get_source_catalog(g_mag_max=g_mag_max, verbose=False)
         else:
             self.source_catalog = rs.utils.fix_custom_catalog(catalog)
 
         self.source_catalog = self.find_which_stars_are_inside_each_detector(verbose=False)
+        print(datetime.now().isoformat() + " > Done.")
 
         # If sun_block is True, then remove the Sun from the catalog.
         if sun_block:
@@ -476,7 +478,6 @@ class exposure():
 
         straylevel_list = []
         main_offender_list = []
-        straylight_minimal_storage_map = []
 
         ## Prepare the coordinates of the stars that do not fall inside the Focal Plane Array ##
         ## This step is common for all SCI extensions #
@@ -530,7 +531,7 @@ class exposure():
             results = list(tqdm(executor.map(self._parallel_worker, inputs),total=len(inputs),))
             straylevel_all_SCAS.extend(results)
 
-        print(" > Done : " + str(datetime.now() - t) + " elapsed.")
+        print(datetime.now().isoformat() + " > Done : " + str(datetime.now() - t) + " elapsed.")
 
         ###########
         # Reconstruct the stray-light maps and main offender maps from the straylevel_all_SCAS database. 
@@ -555,7 +556,7 @@ class exposure():
 
             straylevel_list.append(straylight_SCA)
             main_offender_list.append(main_offender_SCA)
-        print(" > Done! ")
+        print(datetime.now().isoformat() + " > Done : ")
 
 
         ########################################
@@ -569,15 +570,9 @@ class exposure():
             data_output.append(straylevel_image_i)
             header_output.append(self.ASTROPYWCS[SCIEXT_i-1].to_header())
         
-
         # Save the stray-light full scale map
         self.output_name = self.FILENAME.replace(".fits", "_stray.fits")
         rs.utils.save_fits(array=data_output, name=self.output_name, header=header_output,
-                           extname=None, overwrite=True, output_verify='silentfix')
-
-        # Save the stray-light minimal storage cube        
-        self.minstraymap = self.FILENAME.replace(".fits", "_minstraymap.fits")
-        rs.utils.save_fits(array=np.array(straylight_minimal_storage_map), name=self.minstraymap,
                            extname=None, overwrite=True, output_verify='silentfix')
 
         # Main-offender
@@ -631,6 +626,7 @@ class exposure():
         main_offender_image.writeto(self.main_offender_output_name, overwrite=True)
         
         # Generate the drizzled and scaled version of the images
+        print(datetime.now().isoformat() + " > Drizzling maps... ")
         scaled_drz_names = rs.utils.generate_scaled_drz(stray_flc_name=self.output_name,
                                                         mainoff_flc_name=self.main_offender_output_name,
                                                         verbose=verbose)
@@ -650,10 +646,12 @@ class exposure():
         rs.utils.write_parameters_list([self.scaled_main_off_name], keywords, key_values, ext=0)
         rs.utils.write_parameters_list([self.scaled_main_off_name], ["PIXSCALE"], [[1]], ext=0)
         rs.utils.write_parameters_list([self.scaled_main_off_name], ["REBINNED"], [[10]], ext=0)
+        print(datetime.now().isoformat() + " > Done")
 
 
         ### Generate the straylight report pdf
 
+        print(datetime.now().isoformat() + " > Summary plots... ")
         self.pdf_report_name = rs.plots.make_straylight_plots(RA_TARG=self.RA_TARG, 
                                        DEC_TARG=self.DEC_TARG, 
                                        PA=self.PA, 
@@ -664,7 +662,8 @@ class exposure():
                                        scaled_main_off_name=self.scaled_main_off_name, 
                                        figsize=(10,7), mu_vmin = 25, 
                                        mu_vmax = 35, verbose=1)   
-        
+        print(datetime.now().isoformat() + " > Done")
+
         print("Output saved in: " + self.output_name)
         print("Report saved in: " + self.pdf_report_name)
 
