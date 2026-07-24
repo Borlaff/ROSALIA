@@ -202,7 +202,7 @@ def make_stray_plot(input_name, ext, mode="normal", catalog=None,
                     color_label = 'Surface brightness (mag arcsec$^{-2}$)',
                     cmap="RdYlBu", output_name=None, figsize=(10,7), mu_vmin=None, mu_vmax=None):
     import matplotlib.pyplot as plt
-    from astropy.utils.data import get_pkg_data_filename
+    # from astropy.utils.data import get_pkg_data_filename
     from astropy.wcs import WCS as astropy_wcs
     from astropy.io import fits
     import os
