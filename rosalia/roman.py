@@ -13,6 +13,7 @@ import astropy.units as u
 from astropy import constants as const
 from datetime import datetime
 import logging
+import healpy as hp
 
 
 romanisim_bandpasses_names = ["R062", "Z087", "Y106", "J129", "H158", "W146", "F184", "K213"]
@@ -329,7 +330,8 @@ def fe2mag(fe, bandpass, sca):
 #######################################
 
 
-def roman_WFI_NDI_estimator_direct(ndi_name, ra_stars, dec_stars, ra_point, dec_point, pa_point, SCA, level, X_label=None, Y_label=None, ndi_grid_interpolator=None, verbose=True):
+def roman_WFI_NDI_estimator_direct(ra_stars, dec_stars, ra_point, dec_point, pa_point, 
+                                   level, ndi_name=None, ndi_wcs=None, ndi_grid_interpolator=None, rot_custom=None, verbose=True):
     import astropy.wcs as astropy_wcs
     from scipy.interpolate import RegularGridInterpolator
     from astropy.io import fits
@@ -340,45 +342,46 @@ def roman_WFI_NDI_estimator_direct(ndi_name, ra_stars, dec_stars, ra_point, dec_
 
     if (level == 1) or (level == 2):
 
-        ndi_fits = fits.open(ndi_name)
+        # ndi_fits = fits.open(ndi_name)
 
-        w = astropy_wcs.WCS(header=ndi_fits[0].header, fobj=ndi_fits, naxis=2)
+        w = ndi_wcs
+        #w = astropy_wcs.WCS(header=ndi_fits[0].header, fobj=ndi_fits, naxis=2)
         w.wcs.crota = -pa_point,-pa_point
         w.wcs.crval = ra_point,dec_point
 
 
-        ndi_fits[0].header = w.to_header()
+        #ndi_fits[0].header = w.to_header()
 
         #rs.utils.save_fits(array=ndi_fits[0].data, name = ndi_name.replace(".fits", "_temp_aligned_hlet.fits"), header=ndi_fits[0].header, output_verify="ignore")
 
 
         x_stars, y_stars = w.wcs_world2pix(ra_stars, dec_stars, 0)
 
-        if ndi_grid_interpolator is None:
-            x_grid = np.linspace(0, ndi_fits[0].header["NAXIS1"]-1, ndi_fits[0].header["NAXIS1"])
-            y_grid = np.linspace(0, ndi_fits[0].header["NAXIS2"]-1, ndi_fits[0].header["NAXIS2"])
-            f = RegularGridInterpolator((x_grid, y_grid), np.flip(ndi_fits[0].data, axis=1).T, bounds_error=False, fill_value=0)
+        #if ndi_grid_interpolator is None:
+        #    x_grid = np.linspace(0, ndi_fits[0].header["NAXIS1"]-1, ndi_fits[0].header["NAXIS1"])
+        #    y_grid = np.linspace(0, ndi_fits[0].header["NAXIS2"]-1, ndi_fits[0].header["NAXIS2"])
+        #    f = RegularGridInterpolator((x_grid, y_grid), np.flip(ndi_fits[0].data, axis=1).T, bounds_error=False, fill_value=0)
 
-        else:
-            f = ndi_grid_interpolator
+        #else:
+        # ndi_grid_interpolator
 
         xy_points = np.c_[x_stars, y_stars]
-        return(f(xy_points))
+        return(ndi_grid_interpolator(xy_points))
 
 
 
     if (level==3):
 
-        import healpy as hp
 
         NDI_map_hp = hp.read_map(ndi_name)
 
         nside = hp.pixelfunc.get_nside(NDI_map_hp)
-        longitude = ra_point * u.deg
-        latitude = dec_point * u.deg
-        position_angle = -pa_point*u.deg
 
-        rot_custom = hp.Rotator(rot=[longitude.to_value(u.deg), latitude.to_value(u.deg), position_angle.to_value(u.deg)], inv=True)
+        # longitude = ra_point * u.deg
+        # latitude = dec_point * u.deg
+        # position_angle = -pa_point*u.deg
+
+        # rot_custom = hp.Rotator(rot=[longitude.to_value(u.deg), latitude.to_value(u.deg), position_angle.to_value(u.deg)], inv=True)
 
         # rot_custom.rotate_map_pixel is relatively slow. We must find an alternative solution.
         # Perhaps there is a way to not rotate the map at all.
@@ -484,6 +487,7 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
     n_level_2_stars = len(ra_level_2_stars)
     n_level_3_stars = len(ra_level_3_stars)
 
+    # 
 
     if verbose > 1:
         print(datetime.now().isoformat() + ": Sources identified.")
@@ -527,6 +531,27 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
         col_stray = np.zeros((n_subarrays))*np.nan
         col_main_off_id = np.zeros((n_subarrays))*np.nan
 
+        #### 
+        # Prepare the healpix rotator for level 3 stars.
+        longitude = ra_point * u.deg
+        latitude = dec_point * u.deg
+        position_angle = -pa_point*u.deg
+        rot_custom = hp.Rotator(rot=[longitude.to_value(u.deg), latitude.to_value(u.deg), position_angle.to_value(u.deg)], inv=True)
+
+
+        ############################################
+        # Load the NDI maps for the level 1 and 2  #
+        ############################################
+        # /Users/aborlaff/NASA/rosalia_cache/CORE/NDI/RST/ndi_lvl2/lvl2_SCA_1.pkl
+        import pickle
+
+        ndi_name_1 = os.environ['ROSALIACACHE'] + "/CORE/NDI/RST/ndi_lvl1/lvl1_SCA_" + str(SCA) + ".pkl"
+        ndi_name_2 = os.environ['ROSALIACACHE'] + "/CORE/NDI/RST/ndi_lvl2/lvl2_SCA_" + str(SCA) + ".pkl"
+        with open(ndi_name_1, "rb") as f:
+            ndi_lvl1 = pickle.load(f)
+        with open(ndi_name_2, "rb") as f:
+            ndi_lvl2 = pickle.load(f)
+
         ##############################################################################
         # Level 1 - The closest to the focal plane array.
         # Here we go subarray per subarray.
@@ -552,11 +577,10 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
             # -------------------------------------------------------------------------- #
             if len(ra_level_1_stars) > 0:
                 level=1
-                ndi_name_1 = os.environ['ROSALIACACHE'] + "/CORE/NDI/RST/ndi_lvl" + str(level) + "/" + "lvl" + str(level) + "_SCA_" + str(SCA) + "_SUB_X" + str(X_label) + "_Y" + str(Y_label) + "_TAN.fits"
-                transfer_level_1 = roman_WFI_NDI_estimator_direct(ndi_name=ndi_name_1, 
-                                                                  ra_stars=ra_level_1_stars, dec_stars=dec_level_1_stars,
+                transfer_level_1 = roman_WFI_NDI_estimator_direct(ra_stars=ra_level_1_stars, dec_stars=dec_level_1_stars,
                                                                   ra_point=ra_point, dec_point=dec_point, pa_point=pa_point,
-                                                                  SCA=SCA, X_label=X_label, Y_label=Y_label, 
+                                                                  ndi_wcs=ndi_lvl1["wcs"][i], 
+                                                                  ndi_grid_interpolator=ndi_lvl1["ndi_interpolator"][i],
                                                                   level=level, verbose=True)
                 NDI_level_1 = transfer_level_1/superpixel_mm2_area
                 straylight_level_1 = (NDI_level_1*(pixsize**2)*filter_identity["filter_transmission_ref"]*filter_identity["filter_lambda_ref"]*irradiance_level_1_stars/const.c/const.h).decompose()
@@ -590,10 +614,10 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
             # -------------------------------------------------------------------------- #
             if len(ra_level_2_stars) > 0:
                 level = 2
-                ndi_name_2 = os.environ['ROSALIACACHE'] + "/CORE/NDI/RST/ndi_lvl" + str(level) + "/" + "lvl" + str(level) + "_SCA_" + str(SCA) + "_SUB_X" + str(X_label) + "_Y" + str(Y_label) + "_TAN.fits"
-                transfer_level_2 = roman_WFI_NDI_estimator_direct(ndi_name=ndi_name_2, ra_stars=ra_level_2_stars, dec_stars=dec_level_2_stars,
-                                                     ra_point=ra_point, dec_point=dec_point, pa_point=pa_point,
-                                                     SCA=SCA, X_label=X_label, Y_label=Y_label, level=level, verbose=True)
+                transfer_level_2 = roman_WFI_NDI_estimator_direct(ra_stars=ra_level_2_stars, dec_stars=dec_level_2_stars,
+                                                                  ra_point=ra_point, dec_point=dec_point, pa_point=pa_point,
+                                                                  level=level,  ndi_wcs=ndi_lvl2["wcs"][i], 
+                                                                  ndi_grid_interpolator=ndi_lvl2["ndi_interpolator"][i], verbose=True)
                 NDI_level_2 = transfer_level_2/superpixel_mm2_area
 
                 straylight_level_2 = (NDI_level_2*(pixsize**2)*filter_identity["filter_transmission_ref"]*filter_identity["filter_lambda_ref"]*irradiance_level_2_stars/const.c/const.h).decompose()  #
@@ -622,9 +646,9 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
                 level = 3
                 ndi_name_3 = os.environ['ROSALIACACHE'] + "/CORE/NDI/RST/ndi_lvl" + str(level) + "/" + "lvl" + str(level) + "_SCA_" + str(SCA) + "_SUB_X" + str(X_label) + "_Y" + str(Y_label) + "_HP.fits"
 
-                transfer_level_3 = roman_WFI_NDI_estimator_direct(ndi_name=ndi_name_3, ra_stars=ra_level_3_stars, dec_stars=dec_level_3_stars,
-                                                     ra_point=ra_point, dec_point=dec_point, pa_point=pa_point,
-                                                     SCA=SCA, X_label=X_label, Y_label=Y_label, level=level, verbose=True)
+                transfer_level_3 = roman_WFI_NDI_estimator_direct(ra_stars=ra_level_3_stars, dec_stars=dec_level_3_stars,
+                                                                  ra_point=ra_point, dec_point=dec_point, pa_point=pa_point, 
+                                                                  ndi_name=ndi_name_3, level=level, rot_custom=rot_custom, verbose=True)
                 
                 NDI_level_3 = transfer_level_3/superpixel_mm2_area
                 straylight_level_3 =     (NDI_level_3*(pixsize**2)*filter_identity["filter_transmission_ref"]*filter_identity["filter_lambda_ref"]*irradiance_level_3_stars/const.c/const.h).decompose()
