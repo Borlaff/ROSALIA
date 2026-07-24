@@ -10,6 +10,7 @@ import rosalia as rs
 from astropy.coordinates import SkyCoord
 from rosalia.correct import rosalia_stray
 import os
+from datetime import datetime
 
 class exposure():
     """
@@ -400,12 +401,36 @@ class exposure():
         
         rs.utils.save_fits(data, self.FILENAME, headers)
         return(self.FILENAME)
-    
 
-    def straylight(self, catalog=None, prefix="default", radius=1, g_mag_max=15, sun_block=False, verbose=False, figsize=(10,7), mu_vmin=None, mu_vmax=None):
+
+
+    from concurrent.futures import ProcessPoolExecutor
+    from tqdm import tqdm
+
+    @staticmethod
+    def _parallel_worker(args):
+        data_shape, wcs, SCIEXT_i, filter_identity, ra_stars_outside, dec_stars_outside, cat_id_outside, source_id_outside, irradiance_stars, ra_point, dec_point, pa_point, verbose = args
+        return rs.roman.roman_estimate_straylight_SCA(
+            data_shape=data_shape,
+            wcs=wcs,
+            SCA=SCIEXT_i,
+            filter_identity=filter_identity,
+            ra_stars=ra_stars_outside,
+            dec_stars=dec_stars_outside,
+            cat_id=cat_id_outside,
+            source_id=source_id_outside,
+            irradiance_stars=irradiance_stars,
+            ra_point=ra_point,
+            dec_point=dec_point,
+            pa_point=pa_point,
+            verbose=verbose
+        )
+
+    def straylight(self, catalog=None, g_mag_max=15, sun_block=False, verbose=False):
         from astropy import constants as const
         from tqdm import tqdm 
         from astropy.io import fits
+        
         #######################################
         # straylight: AKA. main_offender: Alejandro S. Borlaff. NASA/Ames STA. a.s.borlaff@nasa.gov
         # -------------------------------
@@ -437,7 +462,7 @@ class exposure():
         # Find out which stars belong to each detector. 
         
         if catalog is None:
-            self.source_catalog = self.get_source_catalog(g_mag_max=15, verbose=False)
+            self.source_catalog = self.get_source_catalog(g_mag_max=g_mag_max, verbose=False)
         else:
             self.source_catalog = rs.utils.fix_custom_catalog(catalog)
 
@@ -471,31 +496,67 @@ class exposure():
         # Here we estimate the stray-light
         ########################################
         # Reset the Roman / WFI loading bar:
-        rs.plots.ascii_progress_focal_plane.canvas = np.copy(rs.plots.ascii_progress_focal_plane.canvas_zero)
-
-        for SCIEXT_i in tqdm(self.SCIEXTS):
-            #name_column_is_star_inside_this_detector = "in_SCI" + str(SCIEXT_i)
-            if verbose: print("> Estimating stray-light in detector positions")
-            straylevel_image_db = rs.roman.roman_estimate_straylight_SCA(data_shape=self.DATA_SHAPE[SCIEXT_i-1],
-                                                                        wcs=self.ASTROPYWCS[SCIEXT_i-1],
-                                                                        SCA=SCIEXT_i,
-                                                                        filter_identity=self.FILTER_IDENTITY,
-                                                                        ra_stars=ra_stars_outside,
-                                                                        dec_stars=dec_stars_outside,
-                                                                        cat_id = cat_id_outside,
-                                                                        source_id=source_id_outside,
-                                                                        irradiance_stars=irradiance_stars,
-                                                                        ra_point=self.RA_TARG, dec_point=self.DEC_TARG,
-                                                                        pa_point=self.PA, verbose=verbose)
-            straylevel_image_i = straylevel_image_db["straylight_SCA"]
-            main_offender_image_i = straylevel_image_db["main_offender_SCA"]
-
-            straylight_minimal_storage_array = straylevel_image_db["straylight_minimal_storage_array"]
+        # rs.plots.ascii_progress_focal_plane.canvas = np.copy(rs.plots.ascii_progress_focal_plane.canvas_zero)
+        straylevel_all_SCAS = []
 
 
-            straylevel_list.append(straylevel_image_i)
-            main_offender_list.append(main_offender_image_i)
-            straylight_minimal_storage_map.append(straylight_minimal_storage_array)
+        # Running parallel computation # 
+
+        straylevel_all_SCAS = []
+        t = datetime.now()
+        print(datetime.now().isoformat() + " > Starting Stray-light scan: ")
+        from concurrent.futures import ProcessPoolExecutor
+        from tqdm import tqdm
+
+        with ProcessPoolExecutor() as executor:
+            inputs = [
+                (
+                    self.DATA_SHAPE[SCIEXT_i-1],
+                    self.ASTROPYWCS[SCIEXT_i-1],
+                    SCIEXT_i,
+                    self.FILTER_IDENTITY,
+                    ra_stars_outside,
+                    dec_stars_outside,
+                    cat_id_outside,
+                    source_id_outside,
+                    irradiance_stars,
+                    self.RA_TARG,
+                    self.DEC_TARG,
+                    self.PA,
+                    verbose,
+                )
+                for SCIEXT_i in self.SCIEXTS
+            ]
+            results = list(tqdm(executor.map(self._parallel_worker, inputs),total=len(inputs),))
+            straylevel_all_SCAS.extend(results)
+
+        print(" > Done : " + str(datetime.now() - t) + " elapsed.")
+
+        ###########
+        # Reconstruct the stray-light maps and main offender maps from the straylevel_all_SCAS database. 
+        ###########
+        NSCAs = len(self.SCIEXTS)# NSCAs 
+        print(" > Reconstructing the Stray-light / Main offender map: ")
+        straylevel_list = [] 
+        main_offender_list = [] 
+        for SCA in range(len(self.SCIEXTS)):
+                # This is the canvas array where we will store all the straylight level.
+            straylight_SCA = np.zeros(self.DATA_SHAPE[0]).astype(np.float32)
+            # This is the canvas array where we will store the ID of the largest stray-light contributor
+            main_offender_SCA = np.zeros(self.DATA_SHAPE[0]).astype(np.float32)
+
+            for subarray_i in range(len(straylevel_all_SCAS[SCA])):
+                xmin = straylevel_all_SCAS[SCA]["xmin"].iloc[subarray_i]
+                xmax = straylevel_all_SCAS[SCA]["xmax"].iloc[subarray_i]
+                ymin = straylevel_all_SCAS[SCA]["ymin"].iloc[subarray_i]
+                ymax = straylevel_all_SCAS[SCA]["ymax"].iloc[subarray_i]
+                straylight_SCA[ymin:ymax, xmin:xmax] = straylevel_all_SCAS[SCA]["straylight_total"].iloc[subarray_i]
+                main_offender_SCA[ymin:ymax, xmin:xmax] = straylevel_all_SCAS[SCA]["mainoffender_total"].iloc[subarray_i]
+
+            straylevel_list.append(straylight_SCA)
+            main_offender_list.append(main_offender_SCA)
+        print(" > Done! ")
+
 
         ########################################
         # Save the results to a fits file.
