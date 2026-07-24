@@ -22,6 +22,17 @@ from tqdm import tqdm
 import bottleneck as bn
 import rosalia as rs
 
+
+def _reproject_worker(args):
+    """Module-level worker for reprojection so it can be pickled by multiprocessing."""
+    input_fname, sca_ext, header = args
+    from astropy.io import fits
+    from reproject import reproject_interp
+
+    with fits.open(input_fname, memmap=True) as hdu_in:
+        array, footprint = reproject_interp(hdu_in[int(sca_ext)], header, parallel=True)
+    return (array, footprint)
+
 ###############################
 # MULTIORDER HEALPIX ROUTINES #
 ###############################
@@ -581,20 +592,62 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
 def reproject_roman_wfi_fits(input_name, input_ext, reference_name, reference_ext):
     from reproject import reproject_interp
     from tqdm import tqdm
-    
-    hdu_reference = fits.open(reference_name)
-    hdu_input     = fits.open(input_name)
+    from concurrent.futures import ProcessPoolExecutor
 
-    canvas = np.zeros(hdu_reference[reference_ext].data.shape)
-        
-    for SCAi in tqdm(input_ext-1):
-        array, footprint = reproject_interp(hdu_input[SCAi+1], 
-                                            hdu_reference[reference_ext].header, 
-                                            parallel=True)
-        
-        canvas = np.nansum(np.array([canvas, array]), axis=0)
-    return([canvas, hdu_reference[reference_ext].header])
+    # Open reference header once (small) and share header to workers
+    hdu_reference = fits.open(reference_name, memmap=True)
+    reference_header = hdu_reference[reference_ext].header
+
+    # Ensure input_ext is iterable of extension numbers (e.g. [1,2,3,...])
+    sca_list = list(input_ext)
+
+    # Build tasks: each worker will open the input file and reproject the requested extension
+    inputs = [(input_name, int(sca), reference_header) for sca in sca_list]
+
+    canvas = np.zeros(hdu_reference[reference_ext].data.shape, dtype=np.float64)
+
+    # Run reproject tasks in parallel and accumulate using module-level worker
+    with ProcessPoolExecutor() as executor:
+        for array, footprint in tqdm(executor.map(_reproject_worker, inputs), total=len(inputs)):
+            # Safely add, treating NaNs as zero
+            canvas += np.nan_to_num(array, nan=0.0)
+
+    return [canvas, reference_header]
+
+
+
+
+def _test_parallel_reproject_roman_wfi_fits_NOT_WORKING(input_name, input_ext, reference_name, reference_ext):
+    import numpy as np
+    from astropy.io import fits
+    from reproject import reproject_interp
+    from dask import delayed, compute
+
+    hdu_reference = fits.open(reference_name, memmap=True)
+    hdu_input     = fits.open(input_name, memmap=True)
+
+    header = hdu_reference[reference_ext].header
+    shape  = hdu_reference[reference_ext].data.shape
     
+    # Build one delayed task per SCA
+    tasks = []
+
+    for SCAi in range(input_ext): # Borlaff 07/24/26: This line throws a weird error : TypeError: only integer scalar arrays can be converted to a scalar index
+        tasks.append(
+            delayed(reproject_interp)(hdu_input[SCAi], header, parallel=True)
+        )
+    
+    # Run tasks in parallel
+    results = compute(*tasks, scheduler="threads")  
+
+    # Combine the results
+    canvas = np.zeros(shape, dtype=np.float32)
+    for array, footprint in results:
+        canvas += np.nan_to_num(array, nan=0.0)
+    
+    return canvas, header
+
+
 
 def fix_custom_catalog(catalog):
 

@@ -33,3 +33,4 @@ pyarrow
 ephessos
 crds
 twine
+pickle

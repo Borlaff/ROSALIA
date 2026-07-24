@@ -2,6 +2,17 @@
 Changelog
 =========
 
+
+v1.2.6
+======
+
+Added or Changed
+----------------
+
+- Review of the core.straylight() method, to clean and parallelize the stray-light analysis per SCA. 
+- Now the NDI files are stored in pickle python objects that contain the NDI RegularGridInterpolator. This is much faster than looping and generating them on each run. 
+
+
 v1.2.0
 ======
 
@@ -12,7 +23,7 @@ Added or Changed
 - Adding Ephessos as dependency.
 
 
-v1.2.0
+v1.1.9
 ======
 
 Added or Changed
