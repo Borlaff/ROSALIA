@@ -571,7 +571,14 @@ class exposure():
             header_output.append(self.ASTROPYWCS[SCIEXT_i-1].to_header())
         
         # Save the stray-light full scale map
-        self.output_name = self.FILENAME.replace(".fits", "_stray.fits")
+
+        if "s3://" in input_name:
+            # 's3://stpubdata/roman/nexus/soc_simulations/tutorial_data/roman-2026.1/r0003201001001001004_0001_wfi01_f106_cal.asdf'
+            self.output_name = self.FILENAME.split("/")[-1].replace(".asdf", "_stray.fits")
+        else: 
+            self.output_name = self.FILENAME.replace(".fits", "_stray.fits")
+
+        self.main_offender_output_name = self.output_name.replace(".fits", "_main_off.fits")
         rs.utils.save_fits(array=data_output, name=self.output_name, header=header_output,
                            extname=None, overwrite=True, output_verify='silentfix')
 
@@ -583,7 +590,6 @@ class exposure():
             header_output.append(self.ASTROPYWCS[SCIEXT_i-1].to_header())
 
 
-        self.main_offender_output_name = self.output_name.replace(".fits", "_main_off.fits")
         rs.utils.save_fits(array=data_output, 
                         name=self.main_offender_output_name, 
                         header=header_output,
