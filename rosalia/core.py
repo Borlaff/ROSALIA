@@ -572,7 +572,7 @@ class exposure():
         
         # Save the stray-light full scale map
 
-        if "s3://" in input_name:
+        if "s3://" in self.FILENAME:
             # 's3://stpubdata/roman/nexus/soc_simulations/tutorial_data/roman-2026.1/r0003201001001001004_0001_wfi01_f106_cal.asdf'
             self.output_name = self.FILENAME.split("/")[-1].replace(".asdf", "_stray.fits")
         else: 
