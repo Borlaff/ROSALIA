@@ -663,7 +663,7 @@ def fix_custom_catalog(catalog):
     return(catalog)
 
 
-def generate_scaled_drz(stray_flc_name, mainoff_flc_name, verbose=False):
+def generate_scaled_drz(stray_flc_name, mainoff_flc_name, input_ext, verbose=False):
     if verbose > 0: print("Generating ROSALIA summary report...")
 
     # Make the drizzle image of the straylight image
@@ -674,7 +674,7 @@ def generate_scaled_drz(stray_flc_name, mainoff_flc_name, verbose=False):
     
     # Then reproject the main offender image to the same WCS as the straylight image.
     data, header = rs.utils.reproject_roman_wfi_fits(input_name=mainoff_flc_name, 
-                                                     input_ext=rs.telescopes.Roman.WFI_SCAs,
+                                                     input_ext=input_ext,
                                                      reference_name=scaled_stray_drz_name, 
                                                      reference_ext=1)
     
