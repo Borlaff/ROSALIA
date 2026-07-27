@@ -586,9 +586,9 @@ class exposure():
         # Main-offender
         data_output = []
         header_output = []
-        for SCIEXT_i, main_offender_i in tqdm(zip(self.SCIEXTS, main_offender_list)):
+        for SCIEXT_i, main_offender_i, ASTROPYWCS_i in tqdm(zip(self.SCIEXTS, main_offender_list, self.ASTROPYWCS)):
             data_output.append(main_offender_i)
-            header_output.append(self.ASTROPYWCS[SCIEXT_i-1].to_header())
+            header_output.append(ASTROPYWCS_i.to_header())
 
 
         rs.utils.save_fits(array=data_output, 
