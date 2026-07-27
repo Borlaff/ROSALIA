@@ -266,10 +266,10 @@ def exposure_inspector(input_name, verbose=False, lite=False):
         for i in tqdm(range(len(input_name))):
             exposure_identity = rs.utils.exposure_inspector(input_name[i], lite=lite)
             # exposure_identities.append(exposure_identity)
-            DATA.append(exposure_identity["DATA"])
-            DATA_SHAPE.append(exposure_identity["DATA_SHAPE"])
-            ASTROPYWCS.append(exposure_identity["ASTROPYWCS"])
-            SCIEXTS.append(exposure_identity["SCIEXTS"])
+            DATA.append(exposure_identity["DATA"][0])
+            DATA_SHAPE.append(exposure_identity["DATA_SHAPE"][0])
+            ASTROPYWCS.append(exposure_identity["ASTROPYWCS"][0])
+            SCIEXTS.append(exposure_identity["SCIEXTS"][0])
 
         exposure_identity["DATA"] = DATA
         exposure_identity["DATA_SHAPE"] = DATA_SHAPE
