@@ -136,7 +136,7 @@ class exposure():
 
         if filename is not None:
             exposure_identity = rs.utils.exposure_inspector(filename, lite=False)
-        
+            self.DATA = exposure_identity['DATA']
             self.FILENAME = exposure_identity['FILENAME']
             self.TELESCOP = exposure_identity['TELESCOP']
             self.INSTRUME = exposure_identity['INSTRUME']

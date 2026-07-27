@@ -25,16 +25,6 @@ import asdf
 import s3fs
 
 
-def _reproject_worker(args):
-    """Module-level worker for reprojection so it can be pickled by multiprocessing."""
-    input_fname, sca_ext, header = args
-    from astropy.io import fits
-    from reproject import reproject_interp
-
-    with fits.open(input_fname, memmap=True) as hdu_in:
-        array, footprint = reproject_interp(hdu_in[int(sca_ext)], header, parallel=True)
-    return (array, footprint)
-
 ###############################
 # MULTIORDER HEALPIX ROUTINES #
 ###############################
@@ -250,11 +240,29 @@ def exposure_inspector(input_name, verbose=False, lite=False):
 
     # If we provide a list of files, then we will run exposure_inspector_single for each file,
     # and return a dataframe with the results.
+    if "*" in input_name:
+        input_name = glob.glob(input_name)
+
     if isinstance(input_name, (list,)):
         exposure_identities = []
+        DATA = []
+        ASTROPYWCS = []
+        DATA_SHAPE = []
+        SCIEXTS = []
+
         for i in tqdm(range(len(input_name))):
             exposure_identity = rs.utils.exposure_inspector(input_name[i], lite=lite)
-            exposure_identities.append(exposure_identity)
+            # exposure_identities.append(exposure_identity)
+            DATA.append(exposure_identity["DATA"])
+            DATA_SHAPE.append(exposure_identity["DATA_SHAPE"])
+            ASTROPYWCS.append(exposure_identity["ASTROPYWCS"])
+            SCIEXTS.append(exposure_identity["SCIEXTS"])
+
+        exposure_identity["DATA"] = DATA
+        exposure_identity["DATA_SHAPE"] = DATA_SHAPE
+        exposure_identity["ASTROPYWCS"] = ASTROPYWCS
+        exposure_identity["SCIEXTS"] = SCIEXTS
+        return(exposure_identity)
 
         if exposure_identity["TELESCOP"] == "ROMAN":
             print(rs.plots.style.YELLOW)
@@ -588,7 +596,26 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
     return(exposure_identity)
 
 
-def reproject_roman_wfi_fits(input_name, input_ext, reference_name, reference_ext):
+#######################################
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#######################################
+
+def _reproject_worker(args):
+    """Module-level worker for reprojection so it can be pickled by multiprocessing."""
+    input_fname, sca_ext, header = args
+    from astropy.io import fits
+    from reproject import reproject_interp
+
+    with fits.open(input_fname, memmap=True) as hdu_in:
+        array, footprint = reproject_interp(hdu_in[int(sca_ext)], header, parallel=True)
+    return (array, footprint)
+
+#######################################
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#######################################
+
+
+def reproject_roman_wfi_fits(data_list, wcs_list, reference_name, reference_ext):
     from reproject import reproject_interp
     from tqdm import tqdm
     from concurrent.futures import ProcessPoolExecutor
@@ -596,14 +623,10 @@ def reproject_roman_wfi_fits(input_name, input_ext, reference_name, reference_ex
     # Open reference header once (small) and share header to workers
     hdu_reference = fits.open(reference_name, memmap=True)
     reference_header = hdu_reference[reference_ext].header
-
-    # Ensure input_ext is iterable of extension numbers (e.g. [1,2,3,...])
-    sca_list = list(input_ext)
+    canvas = np.zeros(hdu_reference[reference_ext].data.shape, dtype=np.float64)
 
     # Build tasks: each worker will open the input file and reproject the requested extension
     inputs = [(input_name, int(sca), reference_header) for sca in sca_list]
-
-    canvas = np.zeros(hdu_reference[reference_ext].data.shape, dtype=np.float64)
 
     # Run reproject tasks in parallel and accumulate using module-level worker
     with ProcessPoolExecutor() as executor:
