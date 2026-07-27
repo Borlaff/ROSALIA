@@ -33,5 +33,5 @@ If your are setting up a new server in the Roman Research Nexus, you can install
 
 .. code-block:: sh
 
-       mamba install conda-forge::astromatic-swarp conda-forge::gnuastro
+       mamba install conda-forge::astromatic-swarp conda-forge::gnuastro conda-forge::imagemagick
 

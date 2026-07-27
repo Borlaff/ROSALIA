@@ -336,10 +336,10 @@ class exposure():
         """
         
         fpa_detector_corners = self.get_detector_corners()
-        for SCIEXT_i in tqdm(self.SCIEXTS):
+        for SCIEXT_i, ASTROPYWCS_i in tqdm(zip(self.SCIEXTS, self.ASTROPYWCS)):
             if verbose: print("> Identifying which stars are inside the FOV and which are outside...")
             infield_stars = rs.psf.identify_stars_in_out_field(data_shape=self.DATA_SHAPE,
-                                                            wcs=self.ASTROPYWCS[SCIEXT_i-1],
+                                                            wcs=ASTROPYWCS_i,
                                                             catalog=self.source_catalog,
                                                             verbose=verbose)
 

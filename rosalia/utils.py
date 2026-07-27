@@ -21,6 +21,8 @@ from astropy.coordinates import SkyCoord  # High-level coordinates
 from tqdm import tqdm
 import bottleneck as bn
 import rosalia as rs
+import asdf
+import s3fs
 
 
 def _reproject_worker(args):
@@ -234,15 +236,15 @@ def exposure_inspector(input_name, verbose=False, lite=False):
     # that match the pattern, then we will run convert_ASDF_to_FITS, 
     # and finally run exposure_inspector of the final product. 
 
-    list_of_files = glob.glob(input_name)
-    if "*" in input_name and input_name.endswith(".asdf"):
-        output_name = input_name.replace("*", "_").replace(".asdf", ".fits")
-        input_name = rs.utils.convert_ASDF_to_FITS(asdf_list=list_of_files, output=output_name)
-        exposure_identity = exposure_inspector_single(input_name, verbose=verbose, lite=lite)
-        return(exposure_identity)
+    #list_of_files = glob.glob(input_name)
+    #if "*" in input_name and input_name.endswith(".asdf"):
+    #    output_name = input_name.replace("*", "_").replace(".asdf", ".fits")
+    #    input_name = rs.utils.convert_ASDF_to_FITS(asdf_list=list_of_files, output=output_name)
+    #    exposure_identity = exposure_inspector_single(input_name, verbose=verbose, lite=lite)
+    #    return(exposure_identity)
 
     # If it is just a string without * wildcard, then we will run exposure_inspector_single directly.
-    if isinstance(input_name, (str,)):
+    if isinstance(input_name, (str,)) and (not "*" in input_name):
         exposure_identity = exposure_inspector_single(input_name, verbose=verbose, lite=lite)
         return(exposure_identity)
 
@@ -297,11 +299,9 @@ def exposure_inspector_single(input_name, verbose=False, lite=False):
 
 
 def exposure_inspector_asdf(input_name, verbose=False, lite=False):
-    import asdf
-
     if "s3://" in input_name: 
         if verbose: print("Nexus S3 bucket file detected")
-        import s3fs
+
         fs = s3fs.S3FileSystem(anon=True)
         input_asdf = asdf.open(fs.open(input_name, 'rb'))
 
@@ -321,7 +321,7 @@ def exposure_inspector_asdf(input_name, verbose=False, lite=False):
 
     exposure_identity["TELESCOP"] = input_asdf["roman"]["meta"]["telescope"]
     if exposure_identity["TELESCOP"] == "ROMAN":
-        telescope_class = rs.telescopes.Roman
+        # telescope_class = rs.telescopes.Roman
         detector_svo = "WFI"
 
     exposure_identity["DETECTOR"] = input_asdf["roman"]["meta"]["instrument"]["detector"]
@@ -363,11 +363,10 @@ def exposure_inspector_asdf(input_name, verbose=False, lite=False):
     gwcs = []
     astropywcs = []
     from astropy.wcs import WCS as astropy_wcs
-    nSCAs = 1 # Right now (October 2024) exposure inspector only accepts Roman/WFI images with one SCA per ASDF file.
-    for i in range(nSCAs):
-        data.append(np.array(input_asdf["roman"]["data"]))
-        gwcs.append(input_asdf["roman"]["meta"]["wcs"])
-        astropywcs.append(astropy_wcs(input_asdf["roman"]["meta"]["wcs"].to_fits()[0]))
+    #  nSCAs = 1 # Right now (October 2024) exposure inspector only accepts Roman/WFI images with one SCA per ASDF file.
+    data.append(np.array(input_asdf["roman"]["data"]))
+    gwcs.append(input_asdf["roman"]["meta"]["wcs"])
+    astropywcs.append(astropy_wcs(input_asdf["roman"]["meta"]["wcs"].to_fits()[0]))
 
     exposure_identity["DATA"] = data
     exposure_identity['DATA_SHAPE'] = [data[0].shape]
