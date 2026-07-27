@@ -251,7 +251,7 @@ def exposure_inspector(input_name, verbose=False, lite=False):
             for s3_file in s3_files:
                 s3_paths.append(s3_dir + "/" + os.path.basename(s3_file))
             input_name = s3_paths
-            print(input_name)
+            # print(input_name)
         else:
             input_name = glob.glob(input_name)
 
@@ -320,7 +320,7 @@ def exposure_inspector_single(input_name, verbose=False, lite=False):
 
 
 def exposure_inspector_asdf(input_name, verbose=False, lite=False):
-    print(input_name)
+    # print(input_name)
     if "s3://" in input_name: 
         if verbose: print("Nexus S3 bucket file detected")
 
@@ -1734,7 +1734,8 @@ def find_max_angular_size_of_image(wcs, ra_cen=None, dec_cen=None):
     :type wcs: :class:`astropy.wcs.wcs.WCS`
     :return: :float: The maximum angular extension of the image in sky coordinates in degrees.
     """
-    
+    print(wcs)
+    print(type(wcs))
     if isinstance(wcs, (astropy_wcs.WCS,)):  
         data_shape = wcs.array_shape
         ra_cen, dec_cen = wcs.wcs_pix2world(data_shape[0]/2, data_shape[1]/2, 0)
