@@ -15,6 +15,8 @@ from datetime import datetime
 import logging
 import healpy as hp
 import pickle
+logger = logging.getLogger()
+logger.setLevel(logging.CRITICAL)
 
 romanisim_bandpasses_names = ["R062", "Z087", "Y106", "J129", "H158", "W146", "F184", "K213"]
 rosalia_bandpasses_names   = ["F062", "F087", "F106", "F129", "F158", "F146", "F184", "F213"]
@@ -332,11 +334,6 @@ def fe2mag(fe, bandpass, sca):
 
 def roman_WFI_NDI_estimator_direct(ra_stars, dec_stars, ra_point, dec_point, pa_point, 
                                    level, ndi_name=None, ndi_wcs=None, ndi_grid_interpolator=None, rot_custom=None, verbose=True):
-    import astropy.wcs as astropy_wcs
-    from scipy.interpolate import RegularGridInterpolator
-    from astropy.io import fits
-    logger = logging.getLogger()
-    logger.setLevel(logging.CRITICAL)
 
     # Identify NDI calibration file
     if (level == 1) or (level == 2):

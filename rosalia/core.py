@@ -166,6 +166,7 @@ class exposure():
             self.FPA_NEAR_RADIUS = self.get_max_angular_size()
 
     def roman_wfi_exposure(self, observer, prefix=""):
+        print("> roman_wfi_exposure")
         # Here we expect observer={"TELESCOP": "Roman/WFI", "pointing": [RA_TARG, DEC_TARG], "FILTER":FILTER, "PA_Y": PA_Y, "EXPSTART": EXPSTART, "EXPTIME": EXPTIME}
         # Fixed parameters for Roman/WFI 
         observer['TELESCOP'] = "Roman"
@@ -635,6 +636,7 @@ class exposure():
         print(datetime.now().isoformat() + " > Drizzling maps... ")
         scaled_drz_names = rs.utils.generate_scaled_drz(stray_flc_name=self.output_name,
                                                         mainoff_flc_name=self.main_offender_output_name,
+                                                        input_ext=self.SCIEXTS,
                                                         verbose=verbose)
         self.stray_drz_name = scaled_drz_names["stray_drz_name"]
         self.scaled_stray_drz_name = scaled_drz_names["scaled_stray_drz_name"]
