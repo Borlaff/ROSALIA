@@ -277,8 +277,8 @@ def make_stars_around_plot(flt_name, catalog,  astropywcs_list, RA_TARG, DEC_TAR
     
     # Get the detector corners: 
     detector_square_list = []
-    for astropywcs_i in range(len(astropywcs_list)):
-        detector_corners = rs.detectors.get_detector_corners(wcs=astropywcs_i)
+    for i in range(len(astropywcs_list)):
+        detector_corners = rs.detectors.get_detector_corners(wcs=astropywcs_list[i])
         detector_square_list.append(np.concatenate([detector_corners["corners_world"],
                                                     detector_corners["corners_world"]]))
 
