@@ -320,6 +320,7 @@ def exposure_inspector_single(input_name, verbose=False, lite=False):
 
 
 def exposure_inspector_asdf(input_name, verbose=False, lite=False):
+    print(input_name)
     if "s3://" in input_name: 
         if verbose: print("Nexus S3 bucket file detected")
 
