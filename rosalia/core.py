@@ -567,7 +567,7 @@ class exposure():
         # Stray-light
         data_output = []
         header_output = []
-        for SCIEXT_i, straylevel_image_i, ASTROPYWCS_i in tqdm(zip(self.SCIEXTS, straylevel_lis, self.ASTROPYWCS)):
+        for SCIEXT_i, straylevel_image_i, ASTROPYWCS_i in tqdm(zip(self.SCIEXTS, straylevel_list, self.ASTROPYWCS)):
             data_output.append(straylevel_image_i)
             header_output.append(ASTROPYWCS_i.to_header())
         
