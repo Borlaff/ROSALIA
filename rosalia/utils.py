@@ -249,7 +249,7 @@ def exposure_inspector(input_name, verbose=False, lite=False):
             s3_paths = []
 
             for s3_file in s3_files:
-                s3_paths.append(s3_dir + os.path.basename(s3_file))
+                s3_paths.append(s3_dir + "/" + os.path.basename(s3_file))
             input_name = s3_paths
             print(input_name)
         else:
