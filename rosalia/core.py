@@ -513,8 +513,8 @@ class exposure():
         with ProcessPoolExecutor() as executor:
             inputs = [
                 (
-                    self.DATA_SHAPE[SCIEXT_i-1],
-                    self.ASTROPYWCS[SCIEXT_i-1],
+                    DATA_SHAPE_i,
+                    ASTROPYWCS_i,
                     SCIEXT_i,
                     self.FILTER_IDENTITY,
                     ra_stars_outside,
@@ -527,7 +527,7 @@ class exposure():
                     self.PA,
                     verbose,
                 )
-                for SCIEXT_i in self.SCIEXTS
+                for SCIEXT_i, DATA_SHAPE_i, ASTROPYWCS_i in zip(self.SCIEXTS, self.DATA_SHAPE, self.ASTROPYWCS)
             ]
             results = list(tqdm(executor.map(self._parallel_worker, inputs),total=len(inputs),))
             straylevel_all_SCAS.extend(results)
