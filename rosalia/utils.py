@@ -241,7 +241,19 @@ def exposure_inspector(input_name, verbose=False, lite=False):
     # If we provide a list of files, then we will run exposure_inspector_single for each file,
     # and return a dataframe with the results.
     if "*" in input_name:
-        input_name = glob.glob(input_name)
+        
+        if "s3://" in input_name: # Then is a S3 bucket path. 
+            s3_files = fs.glob(input_name)
+            s3_dir = os.path.dirname(input_name)
+            s3_paths = []
+
+            for s3_file in s3_files:
+                s3_paths.append(s3_dir + os.path.basename(s3_file))
+            input_name = s3_paths
+            print(input_name)
+        else:
+            input_name = glob.glob(input_name)
+
 
     if isinstance(input_name, (list,)):
         exposure_identities = []
