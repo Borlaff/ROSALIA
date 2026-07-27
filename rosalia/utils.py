@@ -243,6 +243,7 @@ def exposure_inspector(input_name, verbose=False, lite=False):
     if "*" in input_name:
         
         if "s3://" in input_name: # Then is a S3 bucket path. 
+            fs = s3fs.S3FileSystem(anon=True)
             s3_files = fs.glob(input_name)
             s3_dir = os.path.dirname(input_name)
             s3_paths = []
