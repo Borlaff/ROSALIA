@@ -567,9 +567,9 @@ class exposure():
         # Stray-light
         data_output = []
         header_output = []
-        for SCIEXT_i, straylevel_image_i in tqdm(zip(self.SCIEXTS, straylevel_list)):
+        for SCIEXT_i, straylevel_image_i, ASTROPYWCS_i in tqdm(zip(self.SCIEXTS, straylevel_lis, self.ASTROPYWCS)):
             data_output.append(straylevel_image_i)
-            header_output.append(self.ASTROPYWCS[SCIEXT_i-1].to_header())
+            header_output.append(ASTROPYWCS_i.to_header())
         
         # Save the stray-light full scale map
 
