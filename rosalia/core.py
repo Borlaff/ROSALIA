@@ -336,7 +336,7 @@ class exposure():
         """
         
         fpa_detector_corners = self.get_detector_corners()
-        for SCIEXT_i, ASTROPYWCS_i in tqdm(zip(self.SCIEXTS, self.ASTROPYWCS)):
+        for SCIEXT_i, ASTROPYWCS_i, detector_corners in tqdm(zip(self.SCIEXTS, self.ASTROPYWCS, fpa_detector_corners)):
             if verbose: print("> Identifying which stars are inside the FOV and which are outside...")
             infield_stars = rs.psf.identify_stars_in_out_field(data_shape=self.DATA_SHAPE,
                                                             wcs=ASTROPYWCS_i,
@@ -347,7 +347,7 @@ class exposure():
             names_of_bool_columns_if_star_is_inside.append(name_column_is_star_inside_this_detector)
 
             self.source_catalog[name_column_is_star_inside_this_detector] = infield_stars["bool_isIn"]
-            detector_corners = fpa_detector_corners[SCIEXT_i-1]
+            # detector_corners = fpa_detector_corners[SCIEXT_i-1]
             # If verbose, make a plot of the stars with the footprint.
             # rs.detectors.get_detector_corners(wcs=self.ASTROPYWCS[SCIEXT_i-1])
             detector_square_list.append(np.concatenate([detector_corners["corners_world"], detector_corners["corners_world"]]))
