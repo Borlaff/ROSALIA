@@ -277,9 +277,10 @@ def make_stars_around_plot(flt_name, catalog,  astropywcs_list, RA_TARG, DEC_TAR
     
     # Get the detector corners: 
     detector_square_list = []
-    for SCIEXT_i in rs.telescopes.Roman.WFI_SCAs:
-        detector_corners = rs.detectors.get_detector_corners(wcs=astropywcs_list[SCIEXT_i-1])
-        detector_square_list.append(np.concatenate([detector_corners["corners_world"], detector_corners["corners_world"]]))
+    for astropywcs_i in range(len(astropywcs_list)):
+        detector_corners = rs.detectors.get_detector_corners(wcs=astropywcs_i)
+        detector_square_list.append(np.concatenate([detector_corners["corners_world"],
+                                                    detector_corners["corners_world"]]))
 
 
     # Make a cut in the plot for the stars closer than radius
