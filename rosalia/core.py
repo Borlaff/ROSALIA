@@ -226,7 +226,7 @@ class exposure():
         self.ASTROPYWCS = astropywcs_info["ASTROPYWCS"]
         self.DATA_SHAPE = astropywcs_info["DATA_SHAPE"]
         self.PIXSCALE = astropywcs_info["PIXSCALE"]
-
+        self.FPA_NEAR_RADIUS = self.get_max_angular_size()
         #    exposure_identity["HEADERS"] = header_list
         #    exposure_identity["DATA_SHAPE"] = data_shape
         #    exposure_identity["ASTROPYWCS"] = astropywcs
@@ -246,7 +246,7 @@ class exposure():
         return(rs.utils.find_max_angular_size_of_image(wcs=self.ASTROPYWCS, ra_cen=self.RA_TARG, dec_cen=self.DEC_TARG))
     
 
-    def plot_footprint(self, verbose=True, ax=None, color='red', label=None):
+    def plot_footprint(self, figsize=(10,10), verbose=True, ax=None, color='red', label=None):
         print("Hey! plot_footprint")
         if verbose: print("Finding ra dec constraints")
         # ra_dec_constraints = rs.gaia.find_ra_dec_constraints(self.RA_TARG, self.DEC_TARG, radius=self.FPA_NEAR_RADIUS, verbose=verbose)
@@ -254,7 +254,7 @@ class exposure():
         exp_corners = self.get_detector_corners()
         if verbose: print("Plotting...")
         if ax is None:
-            fig, ax = plt.subplots(figsize=(8,8))
+            fig, ax = plt.subplots(figsize=figsize)
         for i in range(len(self.SCIEXTS)):
             x = np.array(exp_corners[i]["corners_world"][:,0].tolist() + [exp_corners[i]["corners_world"][0,0]])
             y = np.array(exp_corners[i]["corners_world"][:,1].tolist() + [exp_corners[i]["corners_world"][0,1]])
@@ -289,7 +289,7 @@ class exposure():
 
         self.source_catalog_filename = os.path.splitext(os.path.basename(self.FILENAME))[0] + "_source_catalog.csv" #
         
-        search_radius = self.get_max_angular_size()
+        search_radius = 1.5*self.get_max_angular_size()
 
         if os.path.exists(self.source_catalog_filename):
             print("WARNING: Loading existing catalog! Remove " + self.source_catalog_filename + " if this is a mistake.")
@@ -367,8 +367,13 @@ class exposure():
 
         cone_search = ep.core.cone_search(ra=ra, dec=dec, mjd=mjd, 
                                           search_radius=radius, observatory=self.MPC_OBSLOC, verbose=verbose)
-        ephessos_df = ep.core.ephessos(sso_search=cone_search, mjd_start=self.EXPSTART, mjd_end=self.EXPEND, 
-                                       obs_center=self.JPL_OBSLOC, step_size=time_step, verbose=verbose)
+
+        if len(cone_search) == 0:
+            print("No SSOs found!")
+            return()
+        else:        
+            ephessos_df = ep.core.ephessos(sso_search=cone_search, mjd_start=self.EXPSTART, mjd_end=self.EXPEND, 
+                                           obs_center=self.JPL_OBSLOC, step_size=time_step, verbose=verbose)
         return(cone_search, ephessos_df)
     
 
