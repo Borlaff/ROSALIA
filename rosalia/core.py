@@ -368,7 +368,7 @@ class exposure():
         cone_search = ep.core.cone_search(ra=ra, dec=dec, mjd=mjd, 
                                           search_radius=radius, observatory=self.MPC_OBSLOC, verbose=verbose)
 
-        print(cone_search)
+        if verbose: print(cone_search)
         if len(cone_search) == 0:
             print("No SSOs found!")
             return()
