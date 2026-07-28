@@ -49,6 +49,7 @@
       great_circle_ra_dec_shift
       hp_resol2nside
       interpolate_location_in_fits
+      interpolate_skypoints_to_image
       load_dict
       make_ds9_region
       make_profile

@@ -610,19 +610,6 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
     return(exposure_identity)
 
 
-#######################################
-# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-#######################################
-
-def _reproject_worker(args):
-    """Module-level worker for reprojection so it can be pickled by multiprocessing."""
-    input_fname, sca_ext, header = args
-    from astropy.io import fits
-    from reproject import reproject_interp
-
-    with fits.open(input_fname, memmap=True) as hdu_in:
-        array, footprint = reproject_interp(hdu_in[int(sca_ext)], header, parallel=True)
-    return (array, footprint)
 
 #######################################
 # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -630,58 +617,29 @@ def _reproject_worker(args):
 
 
 def reproject_roman_wfi_fits(data_list, wcs_list, reference_name, reference_ext):
+    import os
     from reproject import reproject_interp
-    from tqdm import tqdm
-    from concurrent.futures import ProcessPoolExecutor
 
-    # Open reference header once (small) and share header to workers
-    hdu_reference = fits.open(reference_name, memmap=True)
-    reference_header = hdu_reference[reference_ext].header
-    canvas = np.zeros(hdu_reference[reference_ext].data.shape, dtype=np.float64)
+    reprojected_images = []
+    reprojected_footprints = []
 
-    # Build tasks: each worker will open the input file and reproject the requested extension
-    inputs = [(input_name, int(sca), reference_header) for sca in sca_list]
+    reference_header = fits.open(reference_name)[reference_ext].header
 
-    # Run reproject tasks in parallel and accumulate using module-level worker
-    with ProcessPoolExecutor() as executor:
-        for array, footprint in tqdm(executor.map(_reproject_worker, inputs), total=len(inputs)):
-            # Safely add, treating NaNs as zero
-            canvas += np.nan_to_num(array, nan=0.0)
+    # Use all available CPU cores
+    num_cpus = os.cpu_count()
 
-    return [canvas, reference_header]
-
-
-
-
-def _test_parallel_reproject_roman_wfi_fits_NOT_WORKING(input_name, input_ext, reference_name, reference_ext):
-    import numpy as np
-    from astropy.io import fits
-    from reproject import reproject_interp
-    from dask import delayed, compute
-
-    hdu_reference = fits.open(reference_name, memmap=True)
-    hdu_input     = fits.open(input_name, memmap=True)
-
-    header = hdu_reference[reference_ext].header
-    shape  = hdu_reference[reference_ext].data.shape
-    
-    # Build one delayed task per SCA
-    tasks = []
-
-    for SCAi in range(input_ext): # Borlaff 07/24/26: This line throws a weird error : TypeError: only integer scalar arrays can be converted to a scalar index
-        tasks.append(
-            delayed(reproject_interp)(hdu_input[SCAi], header, parallel=True)
+    for data, wcs in zip(data_list, wcs_list):
+        reprojected_data, footprint = reproject_interp(
+            input_data=(data, wcs),
+            output_projection=reference_header,
+            parallel=num_cpus,  # Enables block-based multi-core processing
+            block_size='auto'   # Automatically determines chunk size
         )
-    
-    # Run tasks in parallel
-    results = compute(*tasks, scheduler="threads")  
+        
+        reprojected_images.append(reprojected_data)
+        reprojected_footprints.append(footprint)
 
-    # Combine the results
-    canvas = np.zeros(shape, dtype=np.float32)
-    for array, footprint in results:
-        canvas += np.nan_to_num(array, nan=0.0)
-    
-    return canvas, header
+    return(reprojected_images, reference_header)
 
 
 
@@ -699,7 +657,60 @@ def fix_custom_catalog(catalog):
     return(catalog)
 
 
-def generate_scaled_drz(stray_flc_name, mainoff_flc_name, input_ext, verbose=False):
+def interpolate_skypoints_to_image(target_name, target_ext, ra, dec, z,
+                                   mask_original_nan=True,
+                                   method="linear"):
+    """
+    Interpolate scattered sky points (RA, Dec, Z) onto the pixel grid of a FITS image
+    using scipy.interpolate.RBFInterpolator (supports extrapolation).
+    """
+
+    from scipy.interpolate import RBFInterpolator
+    from astropy.io import fits
+    from astropy.wcs import WCS
+    import numpy as np
+
+    # Load FITS & WCS
+    target_fits = fits.open(target_name)
+    target_header = target_fits[target_ext].header
+    w = WCS(header=target_header, fobj=target_fits, naxis=2)
+
+    # Input point array for RBFInterpolator
+    ori_points = np.column_stack((ra, dec))
+
+    # Target pixel grid
+    X = np.arange(target_header["NAXIS1"])
+    Y = np.arange(target_header["NAXIS2"])
+    XX, YY = np.meshgrid(X, Y)
+    ra2, dec2 = w.wcs_pix2world(XX, YY, 0)
+    if method=="nearest":
+        from scipy.interpolate import griddata
+        ZZ = griddata(ori_points, z, (ra2, dec2), method=method)
+        if mask_original_nan: ZZ[np.isnan(target_fits[target_ext].data)] = np.nan
+        return(ZZ)
+    
+    else:
+        # Convert pixel grid → sky coordinates
+        target_points = np.column_stack((ra2.ravel(), dec2.ravel()))
+
+        # Build RBF model
+        # Note: smoothing=0 gives pure interpolation. Adjust if needed to reduce noise.
+        rbf = RBFInterpolator(ori_points, z, kernel=method, smoothing=0.0)
+
+        # Evaluate on target grid
+        ZZ = rbf(target_points).reshape(XX.shape)
+
+        # Mask original NaNs
+        if mask_original_nan:
+            ZZ[np.isnan(target_fits[target_ext].data)] = np.nan
+        return(ZZ)
+
+
+
+
+
+
+def generate_scaled_drz(stray_flc_name, mainoff_flc_name, straylevel_db, verbose=False):
     if verbose > 0: print("Generating ROSALIA summary report...")
 
     # Make the drizzle image of the straylight image
@@ -709,13 +720,30 @@ def generate_scaled_drz(stray_flc_name, mainoff_flc_name, input_ext, verbose=Fal
                                                              scale=0.1)
     
     # Then reproject the main offender image to the same WCS as the straylight image.
-    data, header = rs.utils.reproject_roman_wfi_fits(input_name=mainoff_flc_name, 
-                                                     input_ext=input_ext,
-                                                     reference_name=scaled_stray_drz_name, 
-                                                     reference_ext=1)
-    
+    #data, header = rs.utils.reproject_roman_wfi_fits(input_name=mainoff_flc_name, 
+    #                                                 input_ext=input_ext,
+    #                                                 reference_name=scaled_stray_drz_name, 
+    #                                                 reference_ext=1)
+
+    scaled_mainoff = interpolate_skypoints_to_image(target_name=scaled_stray_drz_name, target_ext=1,
+                                                    ra=straylevel_db["ramid"], 
+                                                    dec=straylevel_db["decmid"], 
+                                                    z=straylevel_db["mainoffender_total"], 
+                                                    mask_original_nan=True, 
+                                                    method="nearest")
+
+
+    scaled_stray = interpolate_skypoints_to_image(target_name=scaled_stray_drz_name, target_ext=1,
+                                                    ra=straylevel_db["ramid"], 
+                                                    dec=straylevel_db["decmid"], 
+                                                    z=straylevel_db["straylight_total"], 
+                                                    mask_original_nan=True, 
+                                                    method="linear")
+    scaled_stray_drz = fits.open(scaled_stray_drz_name)
+
     scaled_main_off_name = mainoff_flc_name.replace(".fits", "_scaled.fits")
-    rs.utils.save_fits(array=data, name=scaled_main_off_name, header=header, overwrite=True)
+    rs.utils.save_fits(array=scaled_mainoff, name=scaled_main_off_name, header=scaled_stray_drz[1].header,  overwrite=True)
+    rs.utils.save_fits(array=scaled_stray,   name=scaled_stray_drz_name, header=scaled_stray_drz[1].header, overwrite=True)
 
     return({"stray_drz_name": stray_drz_name,
             "scaled_stray_drz_name": scaled_stray_drz_name,
@@ -1734,8 +1762,8 @@ def find_max_angular_size_of_image(wcs, ra_cen=None, dec_cen=None):
     :type wcs: :class:`astropy.wcs.wcs.WCS`
     :return: :float: The maximum angular extension of the image in sky coordinates in degrees.
     """
-    print(wcs)
-    print(type(wcs))
+    # print(wcs)
+    # print(type(wcs))
     if isinstance(wcs, (astropy_wcs.WCS,)):  
         data_shape = wcs.array_shape
         ra_cen, dec_cen = wcs.wcs_pix2world(data_shape[0]/2, data_shape[1]/2, 0)
@@ -1947,7 +1975,7 @@ def get_keys_from_header(fits_list, index, ext=0):
 def write_parameters_list(fits_list, index, value, ext=0):
     for i in range(len(fits_list)):
         raw_name = fits_list[i]
-        print(raw_name)
+        # print(raw_name)
         raw_fits = fits.open(raw_name)
         for j in range(len(index)):
             try:

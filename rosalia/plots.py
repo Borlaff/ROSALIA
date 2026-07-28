@@ -556,12 +556,12 @@ def make_straylight_plots(RA_TARG, DEC_TARG, PA, source_catalog, ASTROPYWCS, str
     # Make the plots. 
     if verbose > 0: print("Plot: Stray-light surface brightness magnitude.")
     fe2mu_png = rs.plots.make_stray_plot(input_name=scaled_stray_drz_name,
-                                         ext=1, mode="fe2mu",
+                                         ext=0, mode="fe2mu",
                                          color_label = "Surface brightness (mag arcsec$^{-2}$)",
                                          figsize=figsize, mu_vmin=mu_vmin, mu_vmax=mu_vmax)
 
     if verbose > 0: print("Plot: Stray-light surface brightness flux.")
-    fe_png = rs.plots.make_stray_plot(input_name=scaled_stray_drz_name, ext=1, mode="fe", 
+    fe_png = rs.plots.make_stray_plot(input_name=scaled_stray_drz_name, ext=0, mode="fe", 
                                       color_label = "Flux (e/s/px)", cmap="RdYlBu_r", figsize=figsize)
 
     if verbose > 0: print("Plot: Main offender map.")

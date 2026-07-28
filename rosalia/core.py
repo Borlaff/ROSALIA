@@ -11,6 +11,7 @@ from astropy.coordinates import SkyCoord
 from rosalia.correct import rosalia_stray
 import os
 from datetime import datetime
+import pandas as pd
 
 class exposure():
     """
@@ -494,6 +495,22 @@ class exposure():
         lambda_ref = self.FILTER_IDENTITY["filter_lambda_ref"]
         irradiance_stars = const.c*(lambda_max-lambda_min)/(lambda_ref**2)*((10**(-0.4*(synthetic_mag_outside+56.1)))*u.W/u.meter**2/u.Hz)
 
+        ##########################################
+        # Define the output tables and filenames #
+        ##########################################
+
+        # Save the stray-light full scale map
+        if "s3://" in self.FILENAME:
+            # 's3://stpubdata/roman/nexus/soc_simulations/tutorial_data/roman-2026.1/r0003201001001001004_0001_wfi01_f106_cal.asdf'
+            self.output_name = self.FILENAME.split("/")[-1].replace(".asdf", "_stray.fits")
+        else: 
+            self.output_name = self.FILENAME.replace(".fits", "_stray.fits")
+
+        self.main_offender_output_name = self.output_name.replace(".fits", "_main_off.fits")
+        self.straylight_db_output_name = self.output_name.replace(".fits", "_db.csv")
+
+ 
+
         ########################################
         # Here we estimate the stray-light
         ########################################
@@ -503,7 +520,6 @@ class exposure():
 
 
         # Running parallel computation # 
-
         straylevel_all_SCAS = []
         t = datetime.now()
         print(datetime.now().isoformat() + " > Starting Stray-light scan: ")
@@ -555,8 +571,13 @@ class exposure():
                 straylight_SCA[ymin:ymax, xmin:xmax] = straylevel_all_SCAS[SCA]["straylight_total"].iloc[subarray_i]
                 main_offender_SCA[ymin:ymax, xmin:xmax] = straylevel_all_SCAS[SCA]["mainoffender_total"].iloc[subarray_i]
 
+            
             straylevel_list.append(straylight_SCA)
             main_offender_list.append(main_offender_SCA)
+
+        straylevel_db = pd.concat(straylevel_all_SCAS)
+        straylevel_db.to_csv(self.straylight_db_output_name)
+
         print(datetime.now().isoformat() + " > Done : ")
 
 
@@ -571,15 +592,6 @@ class exposure():
             data_output.append(straylevel_image_i)
             header_output.append(ASTROPYWCS_i.to_header())
         
-        # Save the stray-light full scale map
-
-        if "s3://" in self.FILENAME:
-            # 's3://stpubdata/roman/nexus/soc_simulations/tutorial_data/roman-2026.1/r0003201001001001004_0001_wfi01_f106_cal.asdf'
-            self.output_name = self.FILENAME.split("/")[-1].replace(".asdf", "_stray.fits")
-        else: 
-            self.output_name = self.FILENAME.replace(".fits", "_stray.fits")
-
-        self.main_offender_output_name = self.output_name.replace(".fits", "_main_off.fits")
         rs.utils.save_fits(array=data_output, name=self.output_name, header=header_output,
                            extname=None, overwrite=True, output_verify='silentfix')
 
@@ -634,9 +646,9 @@ class exposure():
         
         # Generate the drizzled and scaled version of the images
         print(datetime.now().isoformat() + " > Drizzling maps... ")
-        scaled_drz_names = rs.utils.generate_scaled_drz(stray_flc_name=self.output_name,
+        scaled_drz_names = rs.utils.generate_scaled_drz(stray_flc_name=self.output_name, straylevel_db=straylevel_db,
                                                         mainoff_flc_name=self.main_offender_output_name,
-                                                        input_ext=self.SCIEXTS,
+                                                        #input_ext=self.SCIEXTS,
                                                         verbose=verbose)
         self.stray_drz_name = scaled_drz_names["stray_drz_name"]
         self.scaled_stray_drz_name = scaled_drz_names["scaled_stray_drz_name"]
