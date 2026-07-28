@@ -3,6 +3,16 @@ Changelog
 =========
 
 
+v1.2.7
+======
+
+Added or Changed
+----------------
+
+- Now ROSALIA uses interpolation instead of reprojection for generating the scaled maps. This results on much faster and smoothed results. 
+
+
+
 v1.2.6
 ======
 

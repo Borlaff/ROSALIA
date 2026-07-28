@@ -34,3 +34,4 @@ ephessos
 crds
 twine
 pickle
+s3fs

@@ -2,13 +2,13 @@ import os
 import numpy as np
 from tqdm import tqdm
 import rosalia as rs
-import coord
+#import coord
 import pandas as pd
 from astropy.time import Time
 from astropy.io import fits
 from astropy.coordinates import SkyCoord  # High-level coordinates
-from astropy.coordinates import ICRS, Galactic, FK4, FK5  # Low-level frames
-from astropy.coordinates import Angle, Latitude, Longitude  # Angles
+#from astropy.coordinates import ICRS, Galactic, FK4, FK5  # Low-level frames
+#from astropy.coordinates import Angle, Latitude, Longitude  # Angles
 import astropy.units as u
 from astropy import constants as const
 from datetime import datetime
@@ -680,7 +680,8 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
         # from scipy.interpolate import RegularGridInterpolator
         #f = RegularGridInterpolator((x_grid, y_grid), np.flip(ndi_fits[0].data, axis=1).T, bounds_error=False, fill_value=0)
 
-    main_offender_db = pd.DataFrame({"xmid": subarray_locations_db["xmid"], "ymid": subarray_locations_db["ymid"],
+    main_offender_db = pd.DataFrame({"SCA": len(straylight_total)*[SCA], 
+                                     "xmid": subarray_locations_db["xmid"], "ymid": subarray_locations_db["ymid"],
                                      "ramid": ramid, "decmid": decmid,
                                      "xmin": subarray_locations_db["xmin"], "ymin": subarray_locations_db["ymin"],
                                      "xmax": subarray_locations_db["xmax"], "ymax": subarray_locations_db["ymax"],
