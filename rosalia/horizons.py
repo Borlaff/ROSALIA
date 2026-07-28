@@ -17,7 +17,7 @@ def get_mpc_observer_name(observer_name):
     from astroquery.mpc import MPC
 
     if observer_name == "HST" or observer_name == "Hubble": return("250")
-    if observer_name == "RST" or observer_name == "Roman": return("289")
+    if observer_name == "RST" or observer_name == "Roman" or observer_name == "ROMAN": return("289")
     if observer_name == "Euclid": return("273")
 
     try:
