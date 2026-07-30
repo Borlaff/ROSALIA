@@ -358,7 +358,7 @@ class exposure():
         return(self.source_catalog)
 
 
-    def get_nearby_ssos(self, ra=None, dec=None, radius=None, mjd=None, verbose=False, time_step="30s"):
+    def get_nearby_ssos(self, ra=None, dec=None, radius=None, mjd=None, verbose=False, time_step="1m"):
         import ephessos as ep
         if ra==None: ra = self.RA_TARG
         if dec==None: dec = self.DEC_TARG
