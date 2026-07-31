@@ -961,20 +961,6 @@ def MJysr_to_jyarcsec2(flux_mjy_sr):
     return(flux_mjy_sr*(10**6)/(4.25e10))
 
 
-
-###############################################
-"""
-def get_pixscale(fits_name, ext):
-    # We look for the pixsize in the ext 0, if it doesnt work, go to ext 1.
-    input_fits = fits.open(fits_name)
-
-    try:
-        pixsize = np.abs(input_fits[ext].header["CDELT2"])*60*60
-    except:
-        pixsize = np.abs(input_fits[ext].header["CD2_2"])*60*60
-
-    return(pixsize)
-"""
 #################################
 
 def radec_to_xy(ra, dec, fits_name, ext):
