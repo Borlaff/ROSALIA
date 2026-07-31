@@ -11,23 +11,16 @@
 
 # General modules
 import os
-import glob
 import numpy as np
 import pandas as pd
 import rosalia as rs
 import bottleneck as bn
-import astropy.units as u
-
 from tqdm import tqdm
 from scipy import interpolate
-import matplotlib.pyplot as plt
 from astropy import coordinates
 from astroquery.mast import Observations
 from astropy.io import fits
-import astropy.wcs as wcs
-from astropy.time import Time
-from astropy import constants as const
-from astropy.coordinates import ICRS, Angle, SkyCoord
+from astropy.coordinates import SkyCoord
 
 ###########################
 
@@ -381,11 +374,6 @@ def rosalia_psf(ra, dec, PA, g_mag_max, date, bandpass, exptime, input_catalog=N
 
 
     # Get the catalog of the stars around the FOV
-    # hybrid_catalog = rs.psf.find_stars_inside_detector(input_name=roman_dummy_name, g_mag_max=g_mag_max, verbose=verbose)
-    #hybrid_catalog = rs.psf.find_gaia_stars_around_image(lambda_ref=lambda_ref, input_name=input_name, ext=ext,
-                                                          # ra=ra, dec=dec, MJD=MJD, radius=radius, g_mag_max=g_mag_max, verbose=verbose)
-    #hybrid_catalog = gaia_query_dict["gaia_query"]
-
     source_catalog_filename = roman_dummy_name.replace(".fits", "_source_catalog.csv")
     if input_catalog is not None:
         hybrid_catalog = input_catalog
@@ -399,13 +387,6 @@ def rosalia_psf(ra, dec, PA, g_mag_max, date, bandpass, exptime, input_catalog=N
                                                observer=image_identity["TELESCOP"],
                                                g_mag_max=g_mag_max, verbose=verbose, 
                                                query_filename=source_catalog_filename)
-
-    # def rosalia_stray(input_name, output_name="rosalia_stray_output.fits", radius=1, g_mag_max=15, sun_block=False, verbose=False, catalog=None):
-
-    # input_name = "/Users/aborlaff/NASA/ROSALIA/notebooks/DEVEL/default_roman_dummy.fits"
-    # verbose=1
-    # g_mag_max=15
-    #
 
 
     # Generate the star stamps (PSFs)
@@ -542,291 +523,7 @@ def correct_zody(input_name, verbose=False):
 
         output_list.append(corrected_image)
     return(output_list)
-########################################
-"""
-def main_offender(input_name=None, ext=None, ra=None, dec=None, phi=0,
-                  filter_name=None, instrument=None, telescope=None, detector=None,
-                  exptime=None, expstart=None, radius=1, g_mag_max=False,
-                  step=200, grid_method="random", verbose=False, ndi_mode="legacy",
-                  input_catalog=None, match_inside_stars=False, sun_block=False,
-                  output_name="main_offender_default_output.fits"):
-    #print("input_catalog")
 
-    #print(input_catalog)
-    #######################################
-    # main_offender: Alejandro S. Borlaff. NASA/Ames STA. a.s.borlaff@nasa.gov
-    # -------------------------------
-    # The objective of this program is to identify and estimate the straylight from stars outside the field of view for Optical and NIR observations.
-    # As input, the user can provide either a fits file with a WCS, or a pair of coordinates (ra, dec, ICRS).
-    # The output is an image with the estimated straylight per pixel if an image is provided.
-    # If the input is a coordinate, then the estimation is only performed in the center of the coordinates.
-    # --------------------------------
-    # History:
-    # v1 - 29 Feb 2024. First working version.
-    # v2 - 14 June 2024. Adding g_mag_max to limit the number for Gaia stars.
-    #                    Adding Multiextension FITS functionality.
-    # v3 - 18 June 2024. Reshaping the code to estimate first which stars are inside which detector before straylight estimations.
-    # v4 - 22 October 2024. Adapting main_offender to accept Roman ASDF files.
-    #      Nov 5 2024 - Roman Single SCA ASDF files now working in main_offender
-    #
-    #######################################
-
-    # Gathering info about the scene
-    # Resetting the Roman / WFI Loading bar
-    rs.plots.ascii_progress_focal_plane.canvas = np.copy(rs.plots.ascii_progress_focal_plane.canvas_zero)
-
-    if input_name is not None: # If the input is an image, use exposure inspector to get the arguments to the following programs.
-        if verbose: print("> Image mode:" + input_name)
-        bool_image_mode = True
-
-        # Get the exposure time
-        image_identity = rs.utils.exposure_inspector(input_name, verbose)
-        exptime = image_identity["EXPTIME"]
-        MJD     = image_identity["EXPSTART"]
-        SCIEXTS = image_identity["SCIEXTS"]
-
-        if (len(SCIEXTS) == 0) and (ext is None):
-            raise(Exception("No SCI extensions in FITS file, and no extensions (ext) defined in input. Please flag the science extensions in the header of the FITS file, or specify them in your call to main_offender."))
-
-        # Find closest stars with Gaia.
-        filter_name = image_identity["FILTER"]
-        instrument  = image_identity["INSTRUME"]
-        telescope   = image_identity["TELESCOP"]
-        lambda_ref  = image_identity["FILTER_IDENTITY"]["filter_lambda_ref"]
-        # Find the central coordinates of the image - If there are more than one science extensions,
-        # then find the center of them all. <--- exposure_inspector does this for us
-        RA_PNT      = image_identity["RA_TARG"]
-        DEC_PNT     = image_identity["DEC_TARG"]
-        PA_PNT      = image_identity["PA"]
-
-    # If the user does not input an image, just a set of coordinates, then bool_image_mode is False
-    else:
-        if verbose: print("> Single location mode: RA: " + str(ra) + " DEC: " + str(dec))
-        bool_image_mode = False
-        filter_db  = rs.telescopes.find_filter_in_svo(wavelength=filter_name, telescope=telescope,
-                                                      instrument=instrument, detector=detector, verbose=False)
-        lambda_ref = filter_db["filter_lambda_ref"]
-        MJD        = expstart
-        RA_PNT     = ra
-        DEC_PNT    = dec
-
-
-    #print("Demo warning: ADD FEATURE planets: https://github.com/skyfielders/python-skyfield/tree/master")
-
-    #print("input_catalog")
-    #print(input_catalog)
-
-    if input_name is None:
-        source_catalog_filename = str(RA_PNT) + "_" + str(DEC_PNT) + "_source_catalog.csv"
-    else:
-        source_catalog_filename = input_name.replace(".fits", "_source_catalog.csv")
-
-    if input_catalog is None:
-        #print("input catalog is none!")
-        existing_catalog_name = output_name.replace(".fits", "_catalog.csv")
-        if os.path.exists(existing_catalog_name):
-            print("WARNING: Loading existing catalog! Remove " + existing_catalog_name + " if this is a mistake.")
-            input_catalog = pd.read_csv(existing_catalog_name)
-
-        else:
-            if verbose: print("> Querying stars in the surroundings using ESA/Gaia Archive")
- 
-            if radius > 0.5:
-                print("INFO: radius parameter (minimum distance to search for individual stars) is > 0.5 degrees.")
-                print("Gaia/2MASS/WISE query database can take several minutes to process. Please be patient.")
-
-            # Find the stars around the central coordinate of the scene.
-            # Save the stellar catalog into a catalog object, and run main_offender as if input_catalog was set by the User.
-            loader = rs.plots.Loader("Querying Gaia/2MASS/WISE/JPL Horizons databases. This might take a few minutes...",
-                                     "All-sky source map constructed.", 0.05).start()
-
-            hybrid_catalog = rs.psf.get_hybrid_catalog(ra=RA_PNT, dec=DEC_PNT,
-                                                   radius=radius,
-                                                   lambda_ref=lambda_ref,
-                                                   MJD=MJD,
-                                                   observer=telescope,
-                                                   g_mag_max = g_mag_max,
-                                                   verbose=verbose,
-                                                   query_filename=source_catalog_filename)
-            loader.stop()
-    else:
-        hybrid_catalog = input_catalog
-
-    hybrid_catalog.to_csv(source_catalog_filename)
-
-
-    # If sun_block is True, then remove the Sun from the catalog.
-    if sun_block:
-        hybrid_catalog = hybrid_catalog[~(hybrid_catalog["source_id"] == "Sun")]
-        hybrid_catalog = hybrid_catalog[~(hybrid_catalog["source_id"] == "Earth")]
-
-    # Find where each star lands (detector ID or outside FOV)
-    names_of_bool_columns_if_star_is_inside = []
-    detector_square_list = []
-
-    
-    #If the input file is a multi-extension fits, then exposure_inspector will scan for extensions with EXTNAME = SCI.
-    #The extension ID in the FITS file will be stored in SCIEXTS = image_identity["SCIEXTS"].
-
-    #In that case, hybrid_catalog, the catalog of stars, will have a set of N columns called in_SCI[i] (boolean), where the catalog
-    #stores if that particular star is inside each detector or not.
-
-    for SCIEXT_i in tqdm(SCIEXTS):
-        if verbose: print("> Identifying which stars are inside the FOV and which are outside...")
-        infield_stars = rs.psf.identify_stars_in_out_field(data_shape=image_identity["DATA"][SCIEXT_i-1].shape,
-                                                           wcs=image_identity["ASTROPYWCS"][SCIEXT_i-1],
-                                                           catalog=hybrid_catalog,
-                                                           verbose=verbose)
-
-        name_column_is_star_inside_this_detector = "in_SCI" + str(SCIEXT_i)
-        names_of_bool_columns_if_star_is_inside.append(name_column_is_star_inside_this_detector)
-
-        hybrid_catalog[name_column_is_star_inside_this_detector] = infield_stars["bool_isIn"]
-
-        # If verbose, make a plot of the stars with the footprint.
-        detector_corners = rs.detectors.get_detector_corners(wcs=image_identity["ASTROPYWCS"][SCIEXT_i-1])
-        detector_square_list.append(np.concatenate([detector_corners["corners_world"], detector_corners["corners_world"]]))
-    # Once you are done checking if the stars are inside each detector,
-    # find out which stars are outside ALL detectors.
-    hybrid_catalog["is_inside_FPA"] = hybrid_catalog[names_of_bool_columns_if_star_is_inside].any(axis=1)
-
-
-    straylevel_list = []
-    main_offender_list = []
-
-    ## Prepare the coordinates of the stars that do not fall inside the Focal Plane Array ##
-    ## This step is common for all SCI extensions #
-    ra_stars_outside      = np.array(hybrid_catalog["ra"][~hybrid_catalog["is_inside_FPA"]])
-    dec_stars_outside     = np.array(hybrid_catalog["dec"][~hybrid_catalog["is_inside_FPA"]])
-    source_id_outside     = np.array(hybrid_catalog["source_id"][~hybrid_catalog["is_inside_FPA"]])
-    cat_id_outside        = np.array(hybrid_catalog["cat_id"][~hybrid_catalog["is_inside_FPA"]])
-    synthetic_mag_outside = np.array(hybrid_catalog["mag_lambda"][~hybrid_catalog["is_inside_FPA"]])
-    stars_world_location = coordinates.SkyCoord(ra_stars_outside, dec_stars_outside, frame='icrs', unit="deg")
-
-    irradiance_stars = const.c*(image_identity["FILTER_IDENTITY"]["filter_lambda_max"]-image_identity["FILTER_IDENTITY"]["filter_lambda_min"])/(image_identity["FILTER_IDENTITY"]["filter_lambda_ref"]**2)*((10**(-0.4*(synthetic_mag_outside+56.1)))*u.W/u.meter**2/u.Hz)
-
-    ########################################
-    # Here we estimate the stray-light
-    ########################################
-    # Reset the Roman / WFI loading bar:
-
-    for SCIEXT_i, name_column_is_star_inside_this_detector in tqdm(zip(SCIEXTS, names_of_bool_columns_if_star_is_inside)):
-
-
-        if verbose: print("> Estimating stray-light in detector positions")
-
-        if image_identity["TELESCOP"] == "Roman" or image_identity["TELESCOP"] == "ROMAN" or image_identity["TELESCOP"]=="RST" or image_identity["TELESCOP"]=="NGRST":
-            #print("DEMO WARNING: The straylight estimator must be a method of rs.telescopes.CLASS")
-            if verbose:
-                print("rs.roman.roman_estimate_straylight_SCA")
-                print("RA DEC irradiance_stars")
-                print(ra_stars_outside)
-                print(dec_stars_outside)
-                print(irradiance_stars)
-
-
-            #
-            straylevel_image_db = rs.roman.roman_estimate_straylight_SCA(data=image_identity["DATA"][SCIEXT_i-1],
-                                                                         wcs=image_identity["ASTROPYWCS"][SCIEXT_i-1],
-                                                                         SCA=image_identity["SCA"][SCIEXT_i-1],
-                                                                         filter_identity=image_identity["FILTER_IDENTITY"],
-                                                                         ra_stars=ra_stars_outside,
-                                                                         dec_stars=dec_stars_outside,
-                                                                         cat_id = cat_id_outside,
-                                                                         source_id=source_id_outside,
-                                                                         irradiance_stars=irradiance_stars,
-                                                                         ra_point=RA_PNT, dec_point=DEC_PNT,
-                                                                         pa_point=PA_PNT, verbose=verbose)
-            straylevel_image_i = straylevel_image_db["straylight_SCA"]
-            main_offender_image_i = straylevel_image_db["main_offender_SCA"]
-
-            #     return({"straylight_SCA": straylight_SCA, "main_offender_SCA": main_offender_SCA})
-
-
-        else:
-            if verbose: print("estimate_straylight_in_detector_locations")
-            straylevel_image_i = estimate_straylight_in_detector_locations(input_name=input_name,
-                                                                    ext=SCIEXT_i,
-                                                                    ra=RA_PNT,
-                                                                    dec=DEC_PNT,
-                                                                    stars_world_location=stars_world_location,
-                                                                    synthetic_mag=synthetic_mag_outside,
-                                                                    image_identity=image_identity,
-                                                                    step=step,
-                                                                    grid_method=grid_method,
-                                                                    ndi_mode=ndi_mode,
-                                                                    bool_image_mode=bool_image_mode,
-                                                                    verbose=verbose)
-
-        straylevel_list.append(straylevel_image_i)
-        main_offender_list.append(main_offender_image_i)
-
-    ########################################
-    # Save the results to a fits file.
-    ########################################
-
-    # Stray-light
-    input_fits = fits.open(input_name)
-    data_output = []
-    header_output = []
-    for SCIEXT_i, straylevel_image_i in tqdm(zip(SCIEXTS, straylevel_list)):
-        data_output.append(straylevel_image_i)
-        header_output.append(image_identity["ASTROPYWCS"][SCIEXT_i-1].to_header())
-
-    rs.utils.save_fits(array=data_output, name=output_name, header=header_output,
-                       extname=None, overwrite=True, output_verify='silentfix')
-    # Main-offender
-    input_fits = fits.open(input_name)
-    data_output = []
-    header_output = []
-    for SCIEXT_i, main_offender_i in tqdm(zip(SCIEXTS, main_offender_list)):
-        data_output.append(main_offender_i)
-        header_output.append(image_identity["ASTROPYWCS"][SCIEXT_i-1].to_header())
-
-
-    main_offender_output_name = output_name.replace(".fits", "_main_off.fits")
-    rs.utils.save_fits(array=data_output, 
-                       name=main_offender_output_name, 
-                       header=header_output,
-                       extname=None, 
-                       overwrite=True, 
-                       output_verify='silentfix')
-
-
-    # Let's do one more step to include the needed metadata from the dummy file. 
-    stray_image = fits.open(output_name)
-    main_offender_image = fits.open(main_offender_output_name)
-    exposure_identity_keys_to_copy = ["TELESCOP", "INSTRUME", "DETECTOR", "FILTER", "RA_TARG", "DEC_TARG", 
-                                      "RA_PNT", "DEC_PNT", "X_PNT", "Y_PNT", "PA",
-                                      "EXPTIME", "EXPSTART", "EXPSTART_ISOT"]
-    for key in exposure_identity_keys_to_copy:
-        stray_image[0].header[key] = image_identity[key]
-        main_offender_image[0].header[key] = image_identity[key]
-    
-    # Additional keys: 
-    stray_image[0].header["WAVEREF"] = image_identity["FILTER_IDENTITY"]["filter_lambda_ref"].to("nm").value
-    main_offender_image[0].header["WAVEREF"] = image_identity["FILTER_IDENTITY"]["filter_lambda_ref"].to("nm").value
-    stray_image[0].header["WAVEMIN"] = image_identity["FILTER_IDENTITY"]["filter_lambda_min"].to("Angstrom").value
-    main_offender_image[0].header["WAVEMIN"] = image_identity["FILTER_IDENTITY"]["filter_lambda_min"].to("nm").value
-    stray_image[0].header["WAVEMAX"] = image_identity["FILTER_IDENTITY"]["filter_lambda_max"].to("nm").value
-    main_offender_image[0].header["WAVEMAX"] = image_identity["FILTER_IDENTITY"]["filter_lambda_max"].to("nm").value
-    
-    # Verify, save and close
-    stray_image.verify("silentfix")
-    main_offender_image.verify("silentfix")
-    stray_image.writeto(output_name, overwrite=True)
-    main_offender_image.writeto(main_offender_output_name, overwrite=True)
-    
-
-    print("Output saved in: " + output_name)
-
-    return({"image_identity":image_identity,
-            "straylevel_list": straylevel_list,
-            "star_catalog": source_catalog_filename,
-            "output_name": output_name,
-            "main_offender_output": main_offender_output_name,
-            "detector_square": detector_square_list})
-"""
 ########################################
 
 def estimate_straylight_in_detector_locations(input_name, ext, ra, dec,

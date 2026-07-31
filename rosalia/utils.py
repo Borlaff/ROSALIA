@@ -52,40 +52,6 @@ def hp_resol2nside(resolution):
         i = i + 1
     return(nside)
 
-#################################
-
-""" DEPRECATED
-def make_allsky_MOC(min_resolution):
-    import mhealpy as hmap
-    from astropy import units as u
-    nside = hp_resol2nside(min_resolution)
-    MOC = hmap.HealpixMap(nside=nside, density=True)
-    return({"MOC": MOC, "nside": nside})
-"""
-#################################
-
-""" DEPRECATED
-def make_polygon_MOC(ra_vert, dec_vert, min_resolution):
-    import healpy as hp
-    import mhealpy as hmap
-    from astropy import units as u
-
-    #min_resolution = 10*u.arcsec # arcsec
-    #ra_vert = np.array([-0.1, -0.1, 0.1, 0.1])
-    #dec_vert = np.array([-0.1, 0.1, 0.1, -0.1])
-
-    nside = hp_resol2nside(min_resolution)
-    mEq = hmap.HealpixBase(nside = nside)
-
-    vec = hp.ang2vec(ra_vert[::-1], dec_vert[::-1], lonlat=True)
-    polygon_pix = mEq.query_polygon(vec)
-
-    #print("Making MOC from pixels 1")
-    MOC = hmap.HealpixMap.moc_from_pixels(mEq.nside, polygon_pix, density=True)
-
-    return({"MOC": MOC, "nside": nside})
-"""
-
 ###############################
 
 def interpolate_location_in_fits(fits_name, ext, ra, dec):

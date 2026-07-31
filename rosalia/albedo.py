@@ -3,7 +3,7 @@ import healpy as hp
 import numpy as np
 import bottleneck as bn
 from tqdm import tqdm
-import matplotlib.pyplot as plt
+
 
 def read_MODIS_albedo(modis_file, scaling_factor=0.001):
     # Using this MODIS MCD43A3 v061 prodiuct https://lpdaac.usgs.gov/products/mcd43a3v061/
@@ -45,9 +45,6 @@ def regrid_modis_to_healpix(modis_file, nside, outfile, scaling_factor=0.001, ex
     yy, xx = np.meshgrid(y, x, indexing='ij')
     lon_grid = 360/max_x_lon*(xx - max_x_lon/2)
     lat_grid = 180/max_y_lat*(max_y_lat/2 - yy)
-
-    # plt.imshow(lon_grid)
-    # plt.imshow(lat_grid)
 
     # Register which Healpix pix each pixel belongs to
     hp_id = hp.ang2pix(nside=nside, theta=lon_grid, phi=lat_grid, lonlat=True, nest=True)

@@ -12,7 +12,6 @@
 
 ############################
 import os
-import sys
 import pandas as pd
 import numpy as np
 import bottleneck as bn
@@ -21,8 +20,7 @@ from astropy.io import fits
 import astropy.wcs as astropy_wcs
 import matplotlib.pyplot as plt
 import astropy.units as u
-from astroquery.mast import Observations
-from astropy.coordinates import match_coordinates_sky, ICRS, Angle, SkyCoord
+from astropy.coordinates import SkyCoord
 import rosalia as rs
 
 # Suppress warnings. Comment this out if you wish to see the warning messages

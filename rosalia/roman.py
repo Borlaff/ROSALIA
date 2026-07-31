@@ -2,13 +2,9 @@ import os
 import numpy as np
 from tqdm import tqdm
 import rosalia as rs
-#import coord
 import pandas as pd
-from astropy.time import Time
 from astropy.io import fits
 from astropy.coordinates import SkyCoord  # High-level coordinates
-#from astropy.coordinates import ICRS, Galactic, FK4, FK5  # Low-level frames
-#from astropy.coordinates import Angle, Latitude, Longitude  # Angles
 import astropy.units as u
 from astropy import constants as const
 from datetime import datetime

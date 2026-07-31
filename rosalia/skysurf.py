@@ -1,17 +1,7 @@
-import os
-import sys
-import glob
 import requests
-
 import pandas as pd
 import numpy as np
-import bottleneck as bn
-from astropy.io import ascii
-from astropy import coordinates
-import astropy.wcs as wcs
-from astropy.io import fits
 from tqdm import tqdm
-import matplotlib.pyplot as plt
 
 def load_skysurf():
     acs_filters = ["F435W", "F475W", "F555W", "F606W",

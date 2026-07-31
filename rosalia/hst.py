@@ -5,7 +5,6 @@ def f_hst_attenuation(theta):
 
 
 def sort_hst_flcs_by_filter(filelist):
-    #print(filelist)
     filters_list_keywords = rs.utils.get_keys_from_header(filelist, ["FILTER1", "FILTER2"], ext=0)
     filters = []
     for i in tqdm(range(len(filelist))):
@@ -65,9 +64,6 @@ def measure_sky_level_HST_ACS(exposure_name, verbose=False):
 
 
     # Lets import some more astropy packages to deal with the time, units, and coordinates.
-    import astropy.units as u
-    from astropy.time import Time
-    from astropy.coordinates import SkyCoord  # High-level coordinates
 
     # -------------------------------------- #
     # MODEL ZODIACAL LIGHT                   #

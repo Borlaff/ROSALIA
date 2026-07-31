@@ -1,9 +1,4 @@
-import os
-import sys
 import numpy as np
-import matplotlib.pyplot as plt
-import bottleneck as bn
-import pandas as pd
 from astropy.io import fits
 import rosalia as rs
 

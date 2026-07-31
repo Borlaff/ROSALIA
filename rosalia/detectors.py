@@ -10,8 +10,7 @@
 #
 ##########################################################
 
-from astropy.io import fits
-import astropy.wcs as wcs
+
 import numpy as np
 import astropy.units as u
 
@@ -120,105 +119,7 @@ def fe2mu(fe, instrument, filter_name, telescope, verbose=False):
     # mu = -2.5*np.log10(electrons/evp.e_adu/evp.exptime/evp.pixsize**2) + zp
     return(mu)
 
-"""
-def mag2fe(mag, instrument, filter_name, telescope, verbose=False):
-    ################################################
-    # mu2electrons:
-    # A function cannibalized from the Euclid Low Surface Brightness project. A.S.Borlaff et al. 2022.
-    # to calculate the flux of photo-electrons per pixel that must reach to a telescope to provide a certain
-    # surface brightness.
-    # -----------------------------------------#
-    #
-    # Esto se debe calcular desde el Universo hacia la camara, no desde la CCD al Universo.
-    # How many photons come from Fnu0
-    #  Note: Fnu0 is Fnu0 at all wavelenghts
-    # Ephot_0 = h*cs/lambda
-    # dnu = c*dlambda/lambda**2
-    # dnu*Ephot = dlambda/lambda / (h)
-    # Nelectophot_0 = int(Fnu_0 / Ephot_0(nu) dnu) = int(Fnu0 lambda dlambda * qe(lambda) / c h lambda**2)
-    ################################################
 
-    if not isinstance(mag, (np.ndarray)):
-        mag = np.array([mag])
-
-    #fnu = 10**(-0.4*(mu + 56.10))*u.W.decompose()/u.meter**2/u.arcsec**2/u.Hz # W / m2 Hz arcsec2
-    fnu = 10**(-0.4*(mag + 56.10))*u.W.decompose()/u.meter**2/u.Hz # W / m2 Hz
-
-    #print("Telescope: " + telescope + "/" + instrument)
-
-    # For Hubble Space Telescope
-    if telescope == "Hubble" or telescope == "HST":
-        teles = rs.telescopes.Hubble
-
-    # For Hubble Space Telescope
-    if telescope == "Roman" or telescope == "RST" or telescope == "ROMAN":
-        teles = rs.telescopes.Roman
-
-    if telescope == "ARRAKIHS":
-        teles = rs.telescopes.ARRAKIHS
-
-    if telescope == "CSST":
-        teles = rs.telescopes.CSST
-
-    if telescope == "SPHEREx":
-        teles = rs.telescopes.SPHEREx
-
-    #print(teles)
-    filter_db = teles.get_filter(instrument=instrument, filter_name=filter_name)
-    mirror_radius = teles.mirror_radius
-    #pixscale = teles.get_pixscale(instrument=instrument).to("arcsec")
-    #print(pixscale)
-    A_telescope_factor = (np.pi * fnu*(mirror_radius**2)/const.h).decompose()
-
-    # We initialize the array that will contain the photoelectrons
-    Nephot_i = np.zeros(mag.shape)
-
-    # Now we integrate the photo-electron flux across the filter bandwidth
-    for i in range(len(filter_db["transmission_bins"])-1):
-        lambda_i0 = filter_db["wavelength_bins"][i]   # Wavelength in m
-        lambda_i1 = filter_db["wavelength_bins"][i+1] # Wavelength in m
-        lambda_i = (lambda_i0 + lambda_i1)/2. # Average lambda
-        T_i = (filter_db["transmission_bins"][i] + filter_db["transmission_bins"][i+1])/2. # Average quantum efficiency
-        dlambda_i = lambda_i1 - lambda_i0 # Delta lambda
-        #dnui = cs*dlambda_i/lambda_i0**2
-        #nui = h*cs/lambda_i0
-        # Nephot_i = Nephot_i + (fnu * np.pi * (evp.telescope_radius**2) * T_i * evp.exptime * dlambda_i  * (evp.pixsize**2) / (evp.h * lambda_i))
-        # Nephot_i = Nephot_i + (fnu * np.pi * (evp.telescope_radius**2) * T_i * evp.exptime * dlambda_i  * (evp.pixsize**2) / (evp.h * lambda_i))
-        Nephot_i = Nephot_i + (T_i * dlambda_i /lambda_i)
-    #Nephot = bn.nansum(Nephot_i, axis=0)
-    return((Nephot_i*A_telescope_factor).decompose())
-
-
-def fe2mag(fe, instrument, filter_name, telescope, verbose=False):
-    # For Hubble Space Telescope
-    # For Hubble Space Telescope
-    if telescope == "Hubble" or telescope == "HST":
-        teles = rs.telescopes.Hubble
-
-    # For Hubble Space Telescope
-    if telescope == "Roman" or telescope == "RST":
-        teles = rs.telescopes.Roman
-
-    if telescope == "ARRAKIHS":
-        teles = rs.telescopes.ARRAKIHS
-
-    if telescope == "CSST":
-        teles = rs.telescopes.CSST
-
-    if telescope == "SPHEREx":
-        teles = rs.telescopes.SPHEREx
-
-    pixscale = teles.get_pixscale(instrument=instrument)
-
-    zeropoint = mag2fe(mag=0, instrument=instrument, filter_name=filter_name, telescope=telescope, verbose=False) # electrons / s / pixel
-
-    if not isinstance(fe, u.quantity.Quantity):
-        fe = fe/u.s
-
-    mag = -2.5*np.log10(fe.value/zeropoint.value)
-    # mu = -2.5*np.log10(electrons/evp.e_adu/evp.exptime/evp.pixsize**2) + zp
-    return(mag)
-"""
 
 def get_detector_corners(wcs):
     #input_fits = fits.open(input_name)

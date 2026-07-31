@@ -141,13 +141,8 @@ def find_moon_and_jupiter_in_HST_history(obs_history, chunksize=50):
         min_i = counter
         max_i = counter+chunksize
         obs_history_chunk = obs_history.iloc[min_i:max_i]#.sort_values(by=['t_med'])
-        #print(len(obs_history_chunk))
-        #print(min_i)
-        #print(max_i)
+
         t_med_chunk = obs_history_chunk["t_med"]
-        #print("Len tmedchunck")
-        #print(len(t_med_chunk))
-        #print(t_med_chunk)
 
         RA_DEC_moon_chunck = horizons_query(t_med_chunk, source="301", location="@hst")
         RA_DEC_moon_chunck = pd.DataFrame(RA_DEC_moon_chunck)

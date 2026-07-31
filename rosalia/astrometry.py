@@ -6,7 +6,6 @@ import pandas as pd
 from astropy.io import fits
 from astropy.io import ascii
 from astropy.table import Table
-import multiprocess
 import rosalia as rs
 
 def clean_crs(input_list):

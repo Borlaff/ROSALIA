@@ -1,10 +1,7 @@
 import os
-import numpy as np
 from astropy.time import Time
 import pandas as pd
-import astropy.units as u
 from astroquery.jplhorizons import Horizons
-import rosalia as rs
 
 # From https://ssd-api.jpl.nasa.gov/doc/horizons.html#encode
 # To successfully transmit such a list via URL to the API,

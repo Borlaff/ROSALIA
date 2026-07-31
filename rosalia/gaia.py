@@ -11,21 +11,14 @@
 
 ############################
 import os
-import sys
 import pandas as pd
 import numpy as np
-import healpy as hp
 from tqdm import tqdm
 import bottleneck as bn
-from astropy.io import fits
-import astropy.wcs as wcs
 import matplotlib.pyplot as plt
-from astropy.io import ascii
 import astropy.units as u
-from astropy.coordinates import match_coordinates_sky, ICRS, Angle, SkyCoord
-from astropy.table import Table, join
+from astropy.coordinates import ICRS, Angle, SkyCoord
 import astropy_healpix as astro_hp
-import rosalia as rs
 from rosalia.plots import style
 import rosalia.constants as rs_constants
 
