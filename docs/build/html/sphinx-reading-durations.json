@@ -1,25 +1,3 @@
 {
-    "SSOs": 0.019,
-    "generated/rosalia.albedo": 0.008,
-    "generated/rosalia.astrometry": 0.012,
-    "generated/rosalia.bootima": 0.02,
-    "generated/rosalia.correct": 0.021,
-    "generated/rosalia.detectors": 0.013,
-    "generated/rosalia.gaia": 0.013,
-    "generated/rosalia.gnu": 0.008,
-    "generated/rosalia.horizons": 0.01,
-    "generated/rosalia.hst": 0.006,
-    "generated/rosalia.irsa": 0.009,
-    "generated/rosalia.ndi": 0.015,
-    "generated/rosalia.plots": 0.043,
-    "generated/rosalia.psf": 0.033,
-    "generated/rosalia.render": 0.004,
-    "generated/rosalia.roman": 0.022,
-    "generated/rosalia.sky": 0.017,
-    "generated/rosalia.skysurf": 0.006,
-    "generated/rosalia.sso": 0.007,
-    "generated/rosalia.telescopes": 0.161,
-    "generated/rosalia.tests": 0.008,
-    "generated/rosalia.utils": 0.094,
-    "rosalia": 1.974
+    "nexus": 0.024
 }

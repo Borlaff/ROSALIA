@@ -5,7 +5,7 @@ Roman Research Nexus
 
 *ROSALIA is in the process to be integrated into the Roman Research Nexus. We will update this section as soon as the integration is complete. Suggestions are welcome!*
 
-How to use ROSALIA in the Roman Research Nexus
+Installing ROSALIA in the Roman Research Nexus
 -----------------------------
 
 If your are setting up a new server in the Roman Research Nexus, you can install ROSALIA by following these steps:
@@ -34,4 +34,28 @@ If your are setting up a new server in the Roman Research Nexus, you can install
 .. code-block:: sh
 
        mamba install conda-forge::astromatic-swarp conda-forge::gnuastro conda-forge::imagemagick
+
+
+Using ROSALIA in the Roman Research Nexus
+-----------------------------
+
+We are actively preparing a series of tutorials to learn all the capabilities that ROSALIA has to exploit the scientific potential of the Roman WFI images. As of July 31st, 2026, we made available: 
+
+1 - *Using ROSALIA to estimate stray-light in Nexus S3 stored WFI exposures*: The notebook is available at ``notebooks/tutorials/N1_Estimating_Straylight_ROSALIA_in_Nexus.ipynb``, and can be downloaded from the link below:
+* :download:`R1_Rosalia_stray_example.ipynb <../../notebooks/tutorials/N1_Estimating_Straylight_ROSALIA_in_Nexus.ipynb>`. This tutorial shows how to compute the stray-light background for a given Roman level 2 exposure. The examples point to a Nexus cloud-stored mock image, so it might take some time to download if you run it in your own computer:
+
+.. code-block:: bash
+    jupyter notebook notebooks/tutorials/N1_Estimating_Straylight_ROSALIA_in_Nexus.ipynb
+
+
+2 - *Using ROSALIA to find asteroids in WFI exposures*: The notebook is available at ``notebooks/tutorials/N2_Finding_Asteroids_ROSALIA_in_Nexus.ipynb``, and can be downloaded here:
+* :download:`R1_Rosalia_stray_example.ipynb <../../notebooks/tutorials/N2_Finding_Asteroids_ROSALIA_in_Nexus.ipynb>`. This tutorial shows how to find out if any known Solar System Objects (i.e., asteroids) are present in your Roman data:
+
+.. code-block:: bash
+    jupyter notebook notebooks/tutorials/N2_Finding_Asteroids_ROSALIA_in_Nexus.ipynb
+
+
+
+
+
 
