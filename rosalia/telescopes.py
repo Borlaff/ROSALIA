@@ -1,11 +1,7 @@
 import os
-import sys
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
-import bottleneck as bn
 import astropy.units as u
-from astropy import constants as const
 from astropy.io import fits
 from scipy import interpolate
 from astropy.time import Time

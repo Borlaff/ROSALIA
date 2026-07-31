@@ -1,10 +1,6 @@
-import os
-import sys
 import numpy as np
 import matplotlib.pyplot as plt
 import bottleneck as bn
-import pandas as pd
-import pytest
 from numpy.testing import assert_allclose
 
 # Custom modules

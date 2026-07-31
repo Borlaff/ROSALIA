@@ -14,9 +14,7 @@ import os
 import pandas as pd
 import numpy as np
 import multiprocess
-from scipy import interpolate
 from tqdm import tqdm
-from astropy.time import Time
 import rosalia as rs
 
 #########################
@@ -91,13 +89,6 @@ def irsa_query_single(ra, dec, wavelength, year, day, obslocin):
 
 def irsa_query(ra, dec, wavelength, year, day, obslocin):
     # Check that ra and dec arguments are in array
-    #print("IRSA Query")
-    #print(ra)
-    #print(dec)
-    #print(wavelength)
-    #print(year)
-    #print(day)
-    #print(obslocin)
 
     if not isinstance(ra, (list, pd.core.series.Series, np.ndarray)):
         ra = np.array([ra])

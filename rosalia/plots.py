@@ -11,20 +11,11 @@
 ##########################################################
 
 ############################
-import os
-import sys
-import pandas as pd
 import numpy as np
-import bottleneck as bn
-from tqdm import tqdm
 from astropy.io import fits
 import astropy.wcs as astropy_wcs
 import matplotlib.pyplot as plt
 import matplotlib.colors as matplotlib_colors
-from celluloid import Camera
-from astropy.io import ascii
-import astropy.units as u
-from astropy.coordinates import ICRS, Angle, SkyCoord
 import rosalia as rs
 
 # Suppress warnings. Comment this out if you wish to see the warning messages
