@@ -11,7 +11,7 @@ temp*
 *.pyc
 notebooks/DEVEL/snap/snap*.png
 notebooks/CAR171/CAR171*.png
-
+PAPER_I/
  
 # Byte-compiled / optimized / DLL files
 __pycache__/
