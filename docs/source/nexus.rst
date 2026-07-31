@@ -41,21 +41,34 @@ Using ROSALIA in the Roman Research Nexus
 
 We are actively preparing a series of tutorials to learn all the capabilities that ROSALIA has to exploit the scientific potential of the Roman WFI images. As of July 31st, 2026, we made available: 
 
-1 - *Using ROSALIA to estimate stray-light in Nexus S3 stored WFI exposures*: The notebook is available at ``notebooks/tutorials/N1_Estimating_Straylight_ROSALIA_in_Nexus.ipynb``, and can be downloaded from the link below:
+Using ROSALIA to estimate stray-light in Nexus S3 stored WFI exposures
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The notebook is available at ``notebooks/tutorials/N1_Estimating_Straylight_ROSALIA_in_Nexus.ipynb``, and can be downloaded from the link below:
 * :download:`R1_Rosalia_stray_example.ipynb <../../notebooks/tutorials/N1_Estimating_Straylight_ROSALIA_in_Nexus.ipynb>`. This tutorial shows how to compute the stray-light background for a given Roman level 2 exposure. The examples point to a Nexus cloud-stored mock image, so it might take some time to download if you run it in your own computer:
 
 .. code-block:: bash
     jupyter notebook notebooks/tutorials/N1_Estimating_Straylight_ROSALIA_in_Nexus.ipynb
 
+.. image:: ../../notebooks/tutorials/Pleiades_Roman_RA_056.658_DEC_024.178_MJD_61192.00000_PA_000.00_stray_drz_scaled_fe.png
+  :height: 512
+  :alt: ROSALIA Stray-light map
 
-2 - *Using ROSALIA to find asteroids in WFI exposures*: The notebook is available at ``notebooks/tutorials/N2_Finding_Asteroids_ROSALIA_in_Nexus.ipynb``, and can be downloaded here:
+
+
+Using ROSALIA to find asteroids in WFI exposures
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The notebook is available at ``notebooks/tutorials/N2_Finding_Asteroids_ROSALIA_in_Nexus.ipynb``, and can be downloaded here:
 * :download:`R1_Rosalia_stray_example.ipynb <../../notebooks/tutorials/N2_Finding_Asteroids_ROSALIA_in_Nexus.ipynb>`. This tutorial shows how to find out if any known Solar System Objects (i.e., asteroids) are present in your Roman data:
 
 .. code-block:: bash
     jupyter notebook notebooks/tutorials/N2_Finding_Asteroids_ROSALIA_in_Nexus.ipynb
 
 
-
+.. image:: ../../images/test_SSOs_in_Roman_WFI_exposure.png
+  :height: 512
+  :alt: ROSALIA Solar System Object map
 
 
 
