@@ -52,7 +52,7 @@ Create a clean environment for ROSALIA
 
 .. code-block:: sh
 
-       mamba create -n rosalia python=3.12 conda-forge::astromatic-swarp conda-forge::gnuastro conda-forge::imagemagick
+       mamba create -n rosalia python=3.12 conda-forge::astromatic-swarp conda-forge::gnuastro conda-forge::imagemagick conda-forge::ds9
 
 After the new environment is created, we can activate it.
 
