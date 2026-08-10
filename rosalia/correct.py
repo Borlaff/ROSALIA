@@ -224,7 +224,7 @@ def rosalia_stray(ra, dec, PA, date, bandpass, exptime, prefix="", input_fits=No
 
 ###########################
 
-def rosalia_zody(ra, dec, PA, date, bandpass, exptime, verbose=False, output_name=None, output_units="e/s"):
+def rosalia_zody(ra, dec, PA, date, bandpass, exptime, zody_mode="IRSA", verbose=False, output_name=None, output_units="e/s"):
 
     from tqdm import tqdm
     import logging
@@ -263,7 +263,7 @@ def rosalia_zody(ra, dec, PA, date, bandpass, exptime, verbose=False, output_nam
                                                       instrument=exposure_identity["INSTRUME"],
                                                       detector=exposure_identity["DETECTOR"],
                                                       expstart=exposure_identity["EXPSTART"],
-                                                      step=1000, zody_mode="zodipy",
+                                                      step=1000, zody_mode=zody_mode,
                                                       nbins_wavelength=20, obslocin=3,
                                                       grid_method="random", output_units=output_units,
                                                       verbose=False)

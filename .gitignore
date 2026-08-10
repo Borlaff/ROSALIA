@@ -12,6 +12,12 @@ temp*
 notebooks/DEVEL/snap/snap*.png
 notebooks/CAR171/CAR171*.png
 PAPER_I/
+notebooks/MOCK/*/
+notebooks/*.xml
+notebooks/MOCK/*.png
+notebooks/MOCK/*.csv
+notebooks/MOCK/*.pdf
+
  
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -61,6 +61,10 @@ dependencies = [
     "psutil",
     "pysiaf",
     "ephessos",
+    "crds",
+    "twine",
+    "pickle",
+    "s3fs"
 ]
 
 [project.urls]

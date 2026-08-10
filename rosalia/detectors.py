@@ -51,7 +51,7 @@ def mu2fe(mu, instrument, filter_name, telescope, verbose=False):
         teles = rs.telescopes.Hubble
 
     # For Hubble Space Telescope
-    if telescope == "Roman" or telescope == "RST":
+    if telescope.lower() == "roman" or telescope.lower() == "rst" or telescope.lower() == "roman/wfi":
         teles = rs.telescopes.Roman
 
     if telescope == "ARRAKIHS":
