@@ -98,11 +98,11 @@ def find_filter_in_svo(wavelength, telescope, instrument, detector, verbose=Fals
 
     # Handle exceptions with naming
     # ----------------------------------- #
-    if telescope== "Hubble" or telescope =="HST":
+    if telescope.lower() == "hubble" or telescope.lower() == "hst":
         telescope = "HST"
-    if instrument== "ACS/WFC" or instrument== "acs" or instrument== "ACS/HRC" or instrument== "ACS/SBC":
+    if instrument.lower() == "acs/wfc" or instrument.lower() == "acs" or instrument.lower() == "acs/hrc" or instrument.lower() == "acs/sbc":
         instrument = "ACS"
-    if telescope== "RST" or telescope =="Roman":
+    if telescope.lower() == "rst" or telescope.lower() == "roman" or telescope.lower() == "roman/wfi":
         telescope = "Roman"
 
     #if True:
@@ -193,7 +193,7 @@ def get_filter(telescope, instrument, detector, filter_name, verbose=False):
     telescope_area = telescope_class.mirror_radius**2 * np.pi
 
     if transmission_bins.unit == u.meter**2:
-        print("SVO reported the transmission in m2. Correcting by area of the telescope (" + str(telescope_area) + " )")
+        if verbose: print("SVO reported the transmission in m2. Correcting by area of the telescope (" + str(telescope_area) + " )")
         transmission_bins = np.array(transmission_bins)/telescope_area.value
 
     return({"instrument": instrument, "filter_name": filter_name,

@@ -6,6 +6,10 @@ from tqdm import tqdm
 import astropy.units as u
 from astropy.coordinates import SkyCoord
 from rosalia.utils import divide_array_in_chunks
+import requests
+from astropy.time import Time
+from scipy.interpolate import interp1d
+
 
 def get_jpl_observer_name(observer_name):
     obs_center = ep.core.jpl_name_translation(observer_name)
@@ -193,3 +197,80 @@ def find_moon_and_jupiter_in_HST_history(obs_history, chunksize=50):
     obs_history["Jupiter_sep"] = sep_jupiter.value
 
     return(obs_history)
+
+
+
+def read_oem_to_dataframe(url="https://raw.githubusercontent.com/RomanSpaceTelescope/roman-technical-information/main/roman_technical_information/data/Observatory/Orbit/RST_103026.oem"):
+    """
+    Reads an OEM file from the given URL, skips the first 6 header lines,
+    ignores META_START/META_STOP blocks, and extracts state vectors into
+    a pandas DataFrame with columns:
+    DATE, X, Y, Z, VX, VY, VZ
+    """
+
+    text = requests.get(url).text
+    lines = text.splitlines()
+
+    data_rows = []
+    inside_meta = False
+
+    for i, line in enumerate(lines):
+        # Skip first 6 header lines
+        if i < 6:
+            continue
+
+        # Handle META blocks
+        if "META_START" in line:
+            inside_meta = True
+            continue
+        if "META_STOP" in line:
+            inside_meta = False
+            continue
+        if inside_meta:
+            continue
+
+        # OEM data lines have: DATE X Y Z VX VY VZ
+        parts = line.split()
+        if len(parts) == 7:
+            date = Time(parts[0].replace("-",":").replace("T",":"), format='yday', scale='utc').mjd # In table 2026-303T07:04:15 #  2000:001:00:00:00.000
+            numbers = list(map(float, parts[1:]))
+            data_rows.append([date] + numbers)
+
+    return(pd.DataFrame(data_rows, columns=["DATE", "X", "Y", "Z", "VX", "VY", "VZ"]))
+
+
+def interpolate_Roman_state_vectors(mjd):
+    """
+    Interpolates X, Y, Z, VX, VY, VZ from the OEM DataFrame
+    for the given astropy Time object.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Must contain columns: DATE, X, Y, Z, VX, VY, VZ
+        DATE must be parseable by astropy.time.Time
+    astropy_time : astropy.time.Time
+        The epoch at which to interpolate the state vector.
+
+    Returns
+    -------
+    dict
+        Interpolated values:
+        {
+            "DATE": astropy_time.isot,
+            "X": ...,
+            "Y": ...,
+            "Z": ...,
+            "VX": ...,
+            "VY": ...,
+            "VZ": ...
+        }
+    """
+    df = read_oem_to_dataframe()
+    result = {"DATE": mjd}
+    # Interpolate each column
+    for col in ["X", "Y", "Z", "VX", "VY", "VZ"]:
+        f = interp1d(df["DATE"], df[col].values, kind="linear", fill_value="extrapolate")
+        result[col] = f(mjd)
+    return result
+

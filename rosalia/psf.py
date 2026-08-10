@@ -1107,48 +1107,55 @@ def find_SCA_for_a_target(file_name, ra, dec, include_border=True):
     return(IN_SCA)
 ##########################
 
-def generate_star_stamps(hybrid_catalog, image_identity, verbose=False):
+def generate_star_stamps(hybrid_catalog, telescope, filename, sciexts, astropywcs, filter, pa, verbose=False):
     # For each SCIEXT.
-    os.system("rm -r temp_rosalia_stars")
-    os.system("mkdir temp_rosalia_stars")
+    foldername = filename.replace(".fits", "_star_stamps")
+    
+    # os.system("rm -r " + foldername)
+    # os.system("mkdir " + foldername)
 
     stars_outnames = []
     from tqdm import tqdm
-    import romanisim
     #  Find the telescope class for the get_psf function
-    telescope_class = rs.telescopes.telescope_class_finder(telescope=image_identity["TELESCOP"])
+    telescope_class = rs.telescopes.telescope_class_finder(telescope=telescope)
 
     if verbose > 0: print("Generating stamps for infield stars...")
 
     print("We might need to get rid of stars very far away.")
     print(np.array(hybrid_catalog["ra"])) #
     # Find the right SCA for each star.
-    IN_SCA = find_SCA_for_a_target(file_name=image_identity["FILENAME"],
+    IN_SCA = rs.psf.find_SCA_for_a_target(file_name=filename,
                                    ra=np.array(hybrid_catalog["ra"]),
                                    dec=np.array(hybrid_catalog["dec"]),
                                    include_border=True)
 
 
 
+    rs.utils.execute_cmd("mkdir " + foldername)
 
-    for SCIEXT_i in tqdm(image_identity["SCIEXTS"]):
+    for SCIEXT_i in tqdm(sciexts):
         stars_sciext_outnames = []
-        os.system("mkdir temp_rosalia_stars/SCIEXT_" + str(SCIEXT_i).zfill(2))
+        rs.utils.execute_cmd("mkdir " + foldername + "/SCIEXT_" + str(SCIEXT_i).zfill(2))
         ra_stars = np.array(hybrid_catalog["ra"][IN_SCA == SCIEXT_i])
         dec_stars =  np.array(hybrid_catalog["dec"][IN_SCA == SCIEXT_i])
         mag_stars =  np.array(hybrid_catalog["mag_lambda"][IN_SCA == SCIEXT_i])
-        astropywcs = image_identity["ASTROPYWCS"][SCIEXT_i-1]
-        xcen, ycen = astropywcs.wcs_world2pix(ra_stars, dec_stars, 0)
+        astropywcs_sca = astropywcs[SCIEXT_i-1]
+        xcen, ycen = astropywcs_sca.wcs_world2pix(ra_stars, dec_stars, 0)
 
         # Get the flux of each star in electrons per second
-        fe_stars = rs.roman.mag2fe(mag=mag_stars, bandpass=image_identity["FILTER"], sca=SCIEXT_i)
+        fe_stars = rs.roman.mag2fe(mag=mag_stars, bandpass=filter, sca=SCIEXT_i)
 
 
         for i in tqdm(range(len(ra_stars)), disable=(verbose < 2)):
-
+            outname = foldername + "/SCIEXT_" + str(SCIEXT_i).zfill(2) + "/star_ext" + str(SCIEXT_i).zfill(2) + "_id_" + str(i).zfill(6) + ".fits"
+            if os.path.exists(outname):
+                if verbose > 0: print("Star stamp already exists: " + outname)
+                stars_sciext_outnames.append(outname)
+                continue
+            
             psf_array = telescope_class.get_psf(detector_position=(xcen[i], ycen[i]),
                                                 detector = SCIEXT_i,
-                                                filter_name = image_identity["FILTER"])
+                                                filter_name = filter)
             norm_psf = np.nansum(psf_array.data)
 
             pixscale = 0.11/60/60
@@ -1156,11 +1163,10 @@ def generate_star_stamps(hybrid_catalog, image_identity, verbose=False):
             header = rs.utils.create_custom_wcs(crpix=[int(psf_array_shape[1]/2), int(psf_array_shape[0]/2)],
                                                 crval=[ra_stars[i], dec_stars[i]],
                                                 cdelt=[-pixscale,pixscale],
-                                                crota=[-image_identity["PA"],-image_identity["PA"]])
+                                                crota=[-pa,-pa])
 
             psf_array.data = (psf_array.data/norm_psf)*fe_stars[i]
 
-            outname = "temp_rosalia_stars/SCIEXT_" + str(SCIEXT_i).zfill(2) + "/star_ext" + str(SCIEXT_i).zfill(2) + "_id_" + str(i).zfill(6) + ".fits"
 
             rs.utils.save_fits(psf_array.data.value, outname, header)
 

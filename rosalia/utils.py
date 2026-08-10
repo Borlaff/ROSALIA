@@ -167,14 +167,15 @@ def execute_cmd(cmd, verbose=False):
     if verbose:
         print(cmd)
     try:
-        print(rs.plots.style.YELLOW)
+        if verbose: print(rs.plots.style.YELLOW)
         result = subprocess.check_output([cmd], shell=True, text=True, stderr=subprocess.STDOUT)
-        print(rs.plots.style.RESET)
+        if verbose: print(rs.plots.style.RESET)
         return(result)
 
     except subprocess.CalledProcessError as e:
-        print(e.returncode)
-        print(e.output)
+        if verbose:
+            print(e.returncode)
+            print(e.output)
         return(None)
 
 ############################
@@ -554,7 +555,7 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
 
             outname, outname_scaled = run_swarp(pattern=swarp_cmd_str, 
                                                 outname=input_name.replace(".fits", "_drz.fits"),
-                                                scale=0.1,
+                                                scale=0.11,
                                                 coveredfrac=1)
 
 
@@ -584,26 +585,34 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
 
 def reproject_roman_wfi_fits(data_list, wcs_list, reference_name, reference_ext):
     import os
-    from reproject import reproject_interp
-
+    from reproject import reproject_interp, reproject_exact
+    import copy
     reprojected_images = []
-    reprojected_footprints = []
 
-    reference_header = fits.open(reference_name)[reference_ext].header
-
+    reference_fits = fits.open(reference_name, memmap=True)
+    reference_header = reference_fits[reference_ext].header
+    reference_shape = reference_fits[reference_ext].data.shape
     # Use all available CPU cores
     num_cpus = os.cpu_count()
 
-    for data, wcs in zip(data_list, wcs_list):
-        reprojected_data, footprint = reproject_interp(
+    for data, wcs in tqdm(zip(data_list, wcs_list)):
+        data=np.float32(data)
+        array_out = np.memmap(filename='output.np', mode='w+',  
+                              shape=reference_shape, dtype='float32')
+        # print(wcs)
+        reproject_interp(
             input_data=(data, wcs),
             output_projection=reference_header,
             parallel=num_cpus,  # Enables block-based multi-core processing
-            block_size='auto'   # Automatically determines chunk size
-        )
-        
-        reprojected_images.append(reprojected_data)
-        reprojected_footprints.append(footprint)
+            block_size='auto',   # Automatically determines chunk size 
+            return_footprint=False,
+            output_array=array_out
+            )
+
+        reprojected_image = copy.deepcopy(array_out)
+        reprojected_images.append(reprojected_image)
+        del array_out
+
 
     return(reprojected_images, reference_header)
 
@@ -682,8 +691,8 @@ def generate_scaled_drz(stray_flc_name, mainoff_flc_name, straylevel_db, verbose
     # Make the drizzle image of the straylight image
     stray_drz_name = stray_flc_name.replace(".fits","_drz.fits")
     stray_drz_name, scaled_stray_drz_name = rs.utils.run_swarp(pattern=stray_flc_name, 
-                                                             outname=stray_drz_name, 
-                                                             scale=0.1)
+                                                               outname=stray_drz_name, 
+                                                               scale=0.11)
     
     # Then reproject the main offender image to the same WCS as the straylight image.
     #data, header = rs.utils.reproject_roman_wfi_fits(input_name=mainoff_flc_name, 

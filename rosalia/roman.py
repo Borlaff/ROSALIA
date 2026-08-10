@@ -70,9 +70,8 @@ def create_roman_dummy(point, date, band, PA=None, exptime=500, output="default_
     #    WFI_PA = galsim.Angle(PA, coord.degrees)
     #else:
     #    WFI_PA = None
-    from romanisim import ris_make_utils as ris
-    from romanisim import wcs as ris_wcs
-    from romanisim.models import parameters
+    from romanisim.ris_make_utils import set_metadata
+    from romanisim.models import wcs as ris_wcs
 
     # import roman_datamodels
 
@@ -90,7 +89,7 @@ def create_roman_dummy(point, date, band, PA=None, exptime=500, output="default_
         temp_out_sca_filename_list.append(out_sca_filename)
 
         # Romanisim procedure>
-        metadata = ris.set_metadata(date=date,
+        metadata = set_metadata(date=date,
                             bandpass=band,
                             sca=SCA_i+1,
                             ma_table_number=4,
