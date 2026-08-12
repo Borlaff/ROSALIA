@@ -36,7 +36,7 @@ def measure_sky_level_HST_ACS(exposure_name, verbose=False):
     # Open the fits file
     from astropy.io import fits
 
-    exposure_fits = fits.open(exposure_name) # We open the fits file with astropy
+    exposure_fits = fits.open(exposure_name, memmap=True) # We open the fits file with astropy
 
     # Try to retrieve a previous analysis that was performed in this exposure
     try:

@@ -696,12 +696,13 @@ class exposure():
         print("Output saved in: " + self.output_name)
         print("Report saved in: " + self.pdf_report_name)
 
-        return({"stray_flc_name": self.output_name,
+        return({"straylevel_db": straylevel_db, 
+                "stray_flc_name": self.output_name,
                 "mainoff_flc_name": self.scaled_main_off_name})
     
 
 
-    def psf_background(self, g_mag_max=15, verbose=False):
+    def psf_background(self, g_mag_max=15, catalog=None, verbose=False):
         #######################################
         # rosalia_psf: Alejandro S. Borlaff. NASA/Ames STA. a.s.borlaff@nasa.gov
         # -------------------------------
@@ -765,12 +766,12 @@ class exposure():
         print("To do this, make a profile of the Roman / PSF, and find out when would it be essentially 0.")
         star_stamps = rs.psf.generate_star_stamps(hybrid_catalog=self.source_catalog,
                                                 # image_identity=image_identity),
-                                                telescope=self.TELESCOP, 
-                                                filename=self.FILENAME, 
-                                                sciexts=self.SCIEXTS, 
-                                                astropywcs=self.ASTROPYWCS,
-                                                filter=self.FILTER_IDENTITY["wavelength"],
-                                                pa=self.PA, verbose=verbose)
+                                                 telescope=self.TELESCOP, 
+                                                 filename=self.FILENAME, 
+                                                 sciexts=self.SCIEXTS, 
+                                                 astropywcs=self.ASTROPYWCS,
+                                                 filter=self.FILTER_IDENTITY["wavelength"],
+                                                 pa=self.PA, verbose=verbose)
         # def generate_star_stamps(hybrid_catalog, telescope, filename, sciexts, astropywcs, filter, pa, verbose=False):
 
 
@@ -803,14 +804,25 @@ class exposure():
         if verbose: print("Storing stars in each SCA")
         for SCIEXT_i in tqdm(self.SCIEXTS):
             # Open the star fits
-            star_reprojected, footprint = reproject_interp(star_model[0], roman_dummy[SCIEXT_i].header, parallel=True)
+            star_reprojected, footprint = reproject_interp(star_model[0],
+                                                           roman_dummy[SCIEXT_i].header, 
+                                                           parallel=True)
             star_reprojected[np.isnan(star_reprojected)] = 0
             roman_dummy[SCIEXT_i].data = roman_dummy[SCIEXT_i].data + star_reprojected
 
         roman_dummy.verify("silentfix")
         star_output_name = self.FILENAME.replace(".fits", "_stars.fits")
         roman_dummy.writeto(star_output_name, overwrite=True)
-        if verbose: print("In-field stray-light model completed: " + star_output_name)
+
+        # Now make again the drz, this time with the correct gaps.
+        drz_name, scaled_drz_name = rs.utils.run_swarp(pattern=star_output_name, 
+                                                       outname=star_output_name.replace(".fits","_drz.fits"), scale=0.11)
+
+
+        if verbose: 
+            print("In-field stray-light model completed. Level 2 multi-extension FITS: " + star_output_name)
+            print("Mosaic image: " + drz_name)
+            print("Scaled mosaic: " + scaled_drz_name)
         return(star_output_name)
 
 
@@ -878,19 +890,19 @@ class exposure():
         import bottleneck as bn
         drz_zody = bn.nansum(np.array(reprojected_images), axis=0)
         from astropy.io import fits 
-        scaled_drz = fits.open(scaled_drz_name)
+        scaled_drz = fits.open(scaled_drz_name, memmap=True)
         drz_zody_name = output_name.replace(".fits","_drz.fits")
         scaled_drz_zody_name = output_name.replace(".fits","_drz_scaled.fits")
 
         
         rs.utils.save_fits(array=drz_zody, name=scaled_drz_zody_name,
-                        header=scaled_drz[1].header,
-                        extname=None, overwrite=True, output_verify='silentfix')
+                           header=scaled_drz[1].header,
+                           extname=None, overwrite=True, output_verify='silentfix')
 
         rs.plots.make_stray_plot(input_name=scaled_drz_zody_name, ext=0, mode="fe2mu", 
-                                vmin=None, vmax=None, 
-                                color_label = 'Surface brightness (mag arcsec$^{-2}$)',
-                                cmap="RdYlBu", output_name=None, figsize=(10,7), mu_vmin=None, mu_vmax=None)
+                                 vmin=None, vmax=None, 
+                                 color_label = 'Surface brightness (mag arcsec$^{-2}$)',
+                                 cmap="RdYlBu", output_name=None, figsize=(10,7), mu_vmin=None, mu_vmax=None)
 
         print("Output saved in: " + output_name)
 
