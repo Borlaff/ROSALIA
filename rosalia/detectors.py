@@ -122,8 +122,6 @@ def fe2mu(fe, instrument, filter_name, telescope, verbose=False):
 
 
 def get_detector_corners(wcs):
-    #input_fits = fits.open(input_name)
-    #w = wcs.WCS(header=input_fits[ext].header, fobj=input_fits, naxis=2)
     data_shape = wcs.array_shape
 
     x_min = 0
@@ -205,8 +203,7 @@ def make_array_grid(array, step, mode="random", nborder_points=64):
 
 
 def make_detector_grid(w, step, mode="random"):
-    #input_fits = fits.open(input_name)
-    #w = wcs.WCS(header=input_fits[ext].header, fobj=input_fits, naxis=2)
+
     data_shape = w.array_shape
     x_min = 0
     x_max = data_shape[1] #input_fits[ext].data.shape[1]

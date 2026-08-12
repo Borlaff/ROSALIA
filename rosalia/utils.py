@@ -646,7 +646,7 @@ def interpolate_skypoints_to_image(target_name, target_ext, ra, dec, z,
     import numpy as np
 
     # Load FITS & WCS
-    target_fits = fits.open(target_name)
+    target_fits = fits.open(target_name, memmap=True)
     target_header = target_fits[target_ext].header
     w = WCS(header=target_header, fobj=target_fits, naxis=2)
 
@@ -700,6 +700,7 @@ def generate_scaled_drz(stray_flc_name, mainoff_flc_name, straylevel_db, verbose
     #                                                 reference_name=scaled_stray_drz_name, 
     #                                                 reference_ext=1)
 
+    
     scaled_mainoff = interpolate_skypoints_to_image(target_name=scaled_stray_drz_name, target_ext=1,
                                                     ra=straylevel_db["ramid"], 
                                                     dec=straylevel_db["decmid"], 
@@ -709,24 +710,50 @@ def generate_scaled_drz(stray_flc_name, mainoff_flc_name, straylevel_db, verbose
 
 
     scaled_stray = interpolate_skypoints_to_image(target_name=scaled_stray_drz_name, target_ext=1,
-                                                    ra=straylevel_db["ramid"], 
-                                                    dec=straylevel_db["decmid"], 
-                                                    z=straylevel_db["straylight_total"], 
-                                                    mask_original_nan=True, 
-                                                    method="linear")
-    scaled_stray_drz = fits.open(scaled_stray_drz_name)
+                                                  ra=straylevel_db["ramid"], 
+                                                  dec=straylevel_db["decmid"], 
+                                                  z=straylevel_db["straylight_total"], 
+                                                  mask_original_nan=True, 
+                                                  method="linear")
 
+    ########### Make the full resolution, interpolated image #############
+    smooth_stray_list = []
+    for i in tqdm(rs.telescopes.Roman.WFI_SCAs):
+        straylevel_db_SCA = straylevel_db[straylevel_db["SCA"] == i]
+        smooth_stray = interpolate_skypoints_to_image(target_name=stray_flc_name, target_ext=i,
+                                                      ra=straylevel_db_SCA["ramid"], 
+                                                      dec=straylevel_db_SCA["decmid"], 
+                                                      z=straylevel_db_SCA["straylight_total"], 
+                                                      mask_original_nan=True, 
+                                                      method="linear")
+        smooth_stray_list.append(smooth_stray)
+
+    stray_flc = fits.open(stray_flc_name, memmap=True)
+    for ext in range(len(smooth_stray_list)):
+        stray_flc[ext+1].data = smooth_stray_list[ext]
+    stray_flc.verify("silentfix")
+    stray_flc.writeto(stray_flc_name, overwrite=True)
+    ################################################
+
+    stray_drz_name, scaled_stray_drz_name = rs.utils.run_swarp(pattern=stray_flc_name, 
+                                                               outname=stray_drz_name, 
+                                                               scale=0.11)
+    scaled_stray_drz = fits.open(scaled_stray_drz_name)
     scaled_main_off_name = mainoff_flc_name.replace(".fits", "_scaled.fits")
+
     rs.utils.save_fits(array=scaled_mainoff, name=scaled_main_off_name, header=scaled_stray_drz[1].header,  overwrite=True)
     rs.utils.save_fits(array=scaled_stray,   name=scaled_stray_drz_name, header=scaled_stray_drz[1].header, overwrite=True)
 
+
+
+    # 
     return({"stray_drz_name": stray_drz_name,
             "scaled_stray_drz_name": scaled_stray_drz_name,
             "scaled_main_off_name": scaled_main_off_name})
 
 
 
-def run_swarp(pattern, outname, scale=1, coveredfrac=1, resample=True, verbose=False):
+def run_swarp(pattern, outname, scale=1, coveredfrac=1, celestial_type="NATIVE", resample=True, verbose=False):
     """
     run_swarp:
     This program runs SWARP on the input pattern of files, and generates a mosaic with the output name specified in outname. The pattern can be a string with the name of the file, a list of files, or a pattern with *. The output mosaic will be saved as outname, and if scale is different from 1, a scaled version of the mosaic will be saved as outname with the suffix "_scaled.fits". 
@@ -751,10 +778,10 @@ def run_swarp(pattern, outname, scale=1, coveredfrac=1, resample=True, verbose=F
     else:
         resample_str = "N"
     rs.utils.execute_cmd("swarp -d > swarp.conf", verbose=verbose) # Generate a default config file for swarp
-    rs.utils.execute_cmd("swarp -c swarp.conf -RESAMPLE " + resample_str + " -SUBTRACT_BACK N -BLANK_BADPIXELS Y -VERBOSE_TYPE QUIET " + pattern, verbose=verbose) # Run swarp on all the SCAs
+    rs.utils.execute_cmd("swarp -c swarp.conf -CELESTIAL_TYPE " + celestial_type + " -RESAMPLE " + resample_str + " -SUBTRACT_BACK N -BLANK_BADPIXELS N -VERBOSE_TYPE QUIET " + pattern, verbose=verbose) # Run swarp on all the SCAs
 
     # Mask all the 0s as NANs
-    hdu = fits.open("coadd.fits")
+    hdu = fits.open("coadd.fits", memmap=True)
     hdu[0].data[hdu[0].data == 0] = np.nan
     hdu.verify('silentfix') # Fix the header to make it compatible with astropy.io.fits
     hdu.writeto("coadd.fits", overwrite=True) # Save the mosaic as coadd.fits

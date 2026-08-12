@@ -418,8 +418,8 @@ def rosalia_psf(ra, dec, PA, g_mag_max, date, bandpass, exptime, input_catalog=N
     # Now blot back to the dummy SCA per SCA frame
     from reproject import reproject_interp
     # Let's make a dummy copy to reproject the stars into
-    roman_dummy = fits.open(roman_dummy_name)
-    star_model = fits.open(star_swarp_name)
+    roman_dummy = fits.open(roman_dummy_name, memmap=True)
+    star_model = fits.open(star_swarp_name, memmap=True)
 
     if verbose > 1: print("Storing stars in each SCA")
     for SCIEXT_i in tqdm(image_identity["SCIEXTS"]):
@@ -616,7 +616,7 @@ def estimate_straylight_in_detector_locations(input_name, ext, ra, dec,
         points = [(x_pixel_list[i], y_pixel_list[i]) for i in range(n_pixels)]
         straylight_image_interp =  interpolate.griddata(points, sum_of_straylevel_list_on_locations, (xv, yv), method="cubic").T
         straylight_output_name = input_name.replace(".fits", "_" + str(ext) + "_ofs.fits")
-        input_fits = fits.open(input_name)
+        input_fits = fits.open(input_name, memmap=True)
         rs.utils.save_fits(array=straylight_image_interp, name=straylight_output_name, header=input_fits[ext].header, extname="OFS")
 
     return(straylight_image_interp)
