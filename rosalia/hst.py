@@ -32,8 +32,7 @@ def sort_hst_flcs_by_filter(filelist):
     return(list_of_filters)
 #####################################################################
 
-
-def measure_sky_level_HST_ACS(exposure_name, verbose=False):
+def measure_sky_level_HST_ACS(exposure_name, zody_mode="stsci",verbose=False):
     # Open the fits file
     from astropy.io import fits
 
@@ -79,7 +78,7 @@ def measure_sky_level_HST_ACS(exposure_name, verbose=False):
                                                           instrument="ACS",
                                                           detector="WFC",
                                                           expstart=EXPSTART,
-                                                          step=4000, zody_mode="zodipy",
+                                                          step=4000, zody_mode=zody_mode,
                                                           nbins_wavelength=20, obslocin=3,
                                                           grid_method="random", verbose=False, interpolate=False)
     import bottleneck as bn

@@ -238,7 +238,7 @@ def rosalia_stray(ra, dec, PA, date, bandpass, exptime, prefix="", input_fits=No
 
 ###########################
 
-def rosalia_zody(ra, dec, PA, date, bandpass, exptime, verbose=False, output_name=None, output_units="e/s"):
+def rosalia_zody(ra, dec, PA, date, bandpass, exptime, verbose=False, output_name=None, output_units="e/s",zody_mode="stsci"):
 
     from tqdm import tqdm
     import logging
@@ -267,7 +267,7 @@ def rosalia_zody(ra, dec, PA, date, bandpass, exptime, verbose=False, output_nam
     zodiacal_background_list = []
     zodiacal_background_unit_list = []
     if output_name is None:
-        output_name = roman_dummy_name.replace(".fits", "_zody.fits")
+        output_name = roman_dummy_name.replace(".fits", "_zody_"+zody_mode+".fits")
 
     for i in tqdm(range(len(exposure_identity["SCIEXTS"]))):
         zodiacal_background = rs.sky.get_zodiacal_background(input_name=roman_dummy_name,
@@ -277,7 +277,7 @@ def rosalia_zody(ra, dec, PA, date, bandpass, exptime, verbose=False, output_nam
                                                       instrument=exposure_identity["INSTRUME"],
                                                       detector=exposure_identity["DETECTOR"],
                                                       expstart=exposure_identity["EXPSTART"],
-                                                      step=1000, zody_mode="zodipy",
+                                                      step=1000, zody_mode=zody_mode,
                                                       nbins_wavelength=20, obslocin=3,
                                                       grid_method="random", output_units=output_units,
                                                       verbose=False)
@@ -304,7 +304,7 @@ def rosalia_zody(ra, dec, PA, date, bandpass, exptime, verbose=False, output_nam
                                                    outname=output_name.replace(".fits","_drz.fits"), scale=0.1)
     
     ext = 1
-    rs.plots.make_stray_plot(input_name=scaled_drz_name, ext=ext, mode="fe2mu", catalog_name=None, 
+    rs.plots.make_stray_plot(input_name=scaled_drz_name, ext=ext, mode="fe2mu", catalog=None,
                     vmin=None, vmax=None, 
                     color_label = 'Surface brightness (mag arcsec$^{-2}$)',
                     cmap="RdYlBu", output_name=None, figsize=(10,7), mu_vmin=None, mu_vmax=None)
@@ -532,7 +532,7 @@ def subtract_stars(input_name, clean=True, verbose=False):
 
 ##########################################
 
-def correct_zody(input_name, verbose=False):
+def correct_zody(input_name, zody_mode="stsci", verbose=False):
     output_list = []
     for input_name_i in tqdm(input_name):
         # Run HST_inspector
@@ -542,7 +542,7 @@ def correct_zody(input_name, verbose=False):
 
         # Select the right order of extensions
         if (input_inspection["INSTRUME"] == "ACS"):
-            corrected_image = rs.sky.remove_zodiacal_light_acs(input_name_i)
+            corrected_image = rs.sky.remove_zodiacal_light_acs(input_name_i, zody_mode=zody_mode)
         if (input_inspection["INSTRUME"] == "WFC3IR"):
             print("Zodiacal light correction not yet implemented for WFC3!")
             raise(Exception)
