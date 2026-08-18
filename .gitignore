@@ -2,6 +2,7 @@
 # ROSALIA Specific
 *.fits
 *.asdf
+*.np
 swarp.conf
 swarp.xml
 subprocess.out
@@ -17,7 +18,7 @@ notebooks/*.xml
 notebooks/MOCK/*.png
 notebooks/MOCK/*.csv
 notebooks/MOCK/*.pdf
-
+notebooks/MOCK
  
 # Byte-compiled / optimized / DLL files
 __pycache__/
