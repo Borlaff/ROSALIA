@@ -28,7 +28,10 @@ ephem
 pysolar
 numexpr
 reproject
-scipy
+scipy>=1.18.0
 pyarrow
 ephessos
 crds
+twine
+s3fs
+zodipy
