@@ -21,6 +21,8 @@ Seppo Laine (Roman Scientist) - IPAC Caltech, Pasadena, USA
 
 Pablo M. Sanchez-Alarcon (NASA Postdoctoral Fellow) - NASA Ames Research Center
 
+Sarah L. Nickerson (Research Scientist) - NASA Ames Research Center, BAERI
+
 Mireia Montes (collaborator) - Institute of Space Sciences (ICE-CSIC), Spain
 
 Anton Koekemoer (collaborator) - STScI, Baltimore, USA
