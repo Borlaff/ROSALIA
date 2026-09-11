@@ -24,20 +24,12 @@ from astropy.coordinates import SkyCoord
 from scipy import constants
 import matplotlib.pyplot as plt
 # import gunagala.sky as skies # Gunagala is not maintained. It requires to detach from astropy_helpers. https://github.com/astropy/astropy-helpers
-import io
-import copy
-import healpy
-from scipy.interpolate import interp1d
-from astropy.coordinates import get_body
-import warnings
-from astropy.utils.exceptions import AstropyWarning
-import urllib.request
 
 import rosalia as rs
 
-def remove_zodiacal_light_acs(input_name, zody_mode="stsci", verbose=False):
-    zody_interp_sci1 = get_zodiacal_background(input_name=input_name, ext=1, zody_mode=zody_mode, verbose=verbose)
-    zody_interp_sci2 = get_zodiacal_background(input_name=input_name, ext=4, zody_mode=zody_mode, verbose=verbose)
+def remove_zodiacal_light_acs(input_name, verbose=False):
+    zody_interp_sci1 = get_zodiacal_background(input_name=input_name, ext=1, verbose=verbose)
+    zody_interp_sci2 = get_zodiacal_background(input_name=input_name, ext=4, verbose=verbose)
 
     input_fits = fits.open(input_name)
     input_fits[1].data = input_fits[1].data - zody_interp_sci1
@@ -97,10 +89,10 @@ def correct_flat_sky(input_name, ext, overwrite=True, clean=True, verbose=False)
 
 #####################################################
 
-def rebin( a, newshape ):
+def rebin(a, newshape):
         '''Rebin an array to a new shape.
         '''
-        assert len(a.shape) == len(newshape)
+        # assert len(a.shape) == len(newshape)
         slices = [ slice(0,old, float(old)/new) for old,new in zip(a.shape,newshape) ]
         coordinates = np.mgrid[slices]
         indices = coordinates.astype('i')   #choose the biggest smaller integer index

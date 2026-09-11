@@ -2,17 +2,33 @@ import os
 import numpy as np
 from tqdm import tqdm
 import rosalia as rs
-import coord
 import pandas as pd
-from astropy.time import Time
 from astropy.io import fits
 from astropy.coordinates import SkyCoord  # High-level coordinates
-from astropy.coordinates import ICRS, Galactic, FK4, FK5  # Low-level frames
-from astropy.coordinates import Angle, Latitude, Longitude  # Angles
 import astropy.units as u
 from astropy import constants as const
 from datetime import datetime
 import logging
+import healpy as hp
+import pickle
+logger = logging.getLogger()
+logger.setLevel(logging.CRITICAL)
+
+romanisim_bandpasses_names = ["R062", "Z087", "Y106", "J129", "H158", "W146", "F184", "K213"]
+rosalia_bandpasses_names   = ["F062", "F087", "F106", "F129", "F158", "F146", "F184", "F213"]
+
+# Build both mapping directions
+bandpasses_names_to_rosalia = dict(zip(romanisim_bandpasses_names, rosalia_bandpasses_names))
+bandpasses_names_to_romanisim = dict(zip(rosalia_bandpasses_names, romanisim_bandpasses_names))
+
+def translate_bandpass_name(name):
+    if name in bandpasses_names_to_rosalia:
+        return bandpasses_names_to_rosalia[name]
+    elif name in bandpasses_names_to_romanisim:
+        return bandpasses_names_to_romanisim[name]
+    else:
+        return None
+
 
 # --------------------- #
 def create_roman_dummy(point, date, band, PA=None, exptime=500, output="default_roman_dummy.fits"):
@@ -54,11 +70,10 @@ def create_roman_dummy(point, date, band, PA=None, exptime=500, output="default_
     #    WFI_PA = galsim.Angle(PA, coord.degrees)
     #else:
     #    WFI_PA = None
-    from romanisim import ris_make_utils as ris
-    from romanisim import wcs as ris_wcs
-    from romanisim.models import parameters
+    from romanisim.ris_make_utils import set_metadata
+    from romanisim.models import wcs as ris_wcs
 
-    import roman_datamodels
+    # import roman_datamodels
 
     # Starting the loop for the 18 SCAs
     temp_out_sca_filename_list = []
@@ -74,7 +89,7 @@ def create_roman_dummy(point, date, band, PA=None, exptime=500, output="default_
         temp_out_sca_filename_list.append(out_sca_filename)
 
         # Romanisim procedure>
-        metadata = ris.set_metadata(date=date,
+        metadata = set_metadata(date=date,
                             bandpass=band,
                             sca=SCA_i+1,
                             ma_table_number=4,
@@ -268,79 +283,6 @@ def _test_run_rosalia_asdf(catalog, exposure_name_list, outname="TEST_rosalia_",
 #################################################
 
 
-def roman_WFI_NDI_estimator_direct(ra_stars, dec_stars, ra_point, dec_point, pa_point, SCA, level, X_label=None, Y_label=None, verbose=True):
-    import astropy.wcs as astropy_wcs
-    from scipy.interpolate import RegularGridInterpolator
-    from astropy.io import fits
-    logger = logging.getLogger()
-    logger.setLevel(logging.CRITICAL)
-
-    # Identify NDI calibration file
-
-    if (level == 1) or (level == 2):
-        ndi_name = os.environ['ROSALIACACHE'] + "/CORE/NDI/RST/ndi_lvl" + str(level) + "/" + "lvl" + str(level) + "_SCA_" + str(SCA) + "_SUB_X" + str(X_label) + "_Y" + str(Y_label) + "_TAN.fits"
-
-        ndi_fits = fits.open(ndi_name)
-
-        w = astropy_wcs.WCS(header=ndi_fits[0].header, fobj=ndi_fits, naxis=2)
-        w.wcs.crota = -pa_point,-pa_point
-        w.wcs.crval = ra_point,dec_point
-
-        #if level == 1:
-        #    w.wcs.crpix = [727.51801, 767.21764]
-
-        #if level == 2:
-        #    w.wcs.crpix = [636.5015, 639.8098]
-        ndi_fits[0].header = w.to_header()
-        # rs.utils.save_fits(array=[], name = ndi_name.replace(".fits", "_temp_aligned_hlet.fits"), header=ndi_fits[0].header, output_verify="ignore")
-        rs.utils.save_fits(array=ndi_fits[0].data, name = ndi_name.replace(".fits", "_temp_aligned_hlet.fits"), header=ndi_fits[0].header, output_verify="ignore")
-
-            #ndi_fits.verify("silentfix")
-            # ndi_fits.writeto(, overwrite=True)
-        #w = astropy_wcs.WCS(header=ndi_fits[0].header, fobj=ndi_fits, naxis=2)
-        x_stars, y_stars = w.wcs_world2pix(ra_stars, dec_stars, 0)
-
-        x_grid = np.linspace(0, ndi_fits[0].header["NAXIS1"]-1, ndi_fits[0].header["NAXIS1"])
-        y_grid = np.linspace(0, ndi_fits[0].header["NAXIS2"]-1, ndi_fits[0].header["NAXIS2"])
-
-        f = RegularGridInterpolator((x_grid, y_grid), np.flip(ndi_fits[0].data, axis=1).T, bounds_error=False, fill_value=0)
-
-        xy_points = np.c_[x_stars, y_stars]
-        return(f(xy_points))
-
-
-
-    if (level==3):
-
-        import healpy as hp
-
-        ndi_name = os.environ['ROSALIACACHE'] + "/CORE/NDI/RST/ndi_lvl" + str(level) + "/" + "lvl" + str(level) + "_SCA_" + str(SCA) + "_SUB_X" + str(X_label) + "_Y" + str(Y_label) + "_HP.fits"
-        NDI_map_hp = hp.read_map(ndi_name)
-
-        nside = hp.pixelfunc.get_nside(NDI_map_hp)
-        longitude = ra_point * u.deg
-        latitude = dec_point * u.deg
-        position_angle = -pa_point*u.deg
-
-        rot_custom = hp.Rotator(rot=[longitude.to_value(u.deg), latitude.to_value(u.deg), position_angle.to_value(u.deg)], inv=True)
-
-        # rot_custom.rotate_map_pixel is relatively slow. We must find an alternative solution.
-        # Perhaps there is a way to not rotate the map at all.
-        NDI_map_hp_rotated = rot_custom.rotate_map_pixel(NDI_map_hp) # The use of rotate_map_pixel from healpy introduces artifacts at low SNR.
-
-        #print("Saving file: " + str(datetime.now() - zero_time))
-        #zero_time = datetime.now()
-        # This is relatively contradictory to what the documentation claims. https://healpy.readthedocs.io/en/latest/generated/healpy.rotator.Rotator.rotate_map_pixel.html#healpy.rotator.Rotator.rotate_map_pixel
-
-        # hp.write_map(filename=ndi_name.replace(".fits", "_temp_aligned.fits"), m=NDI_map_hp_rotated, overwrite=True)
-
-        pix = hp.ang2pix(nside=hp.pixelfunc.get_nside(NDI_map_hp), theta=ra_stars, phi=dec_stars, lonlat=True)
-        #print("Done: " + str(datetime.now() - zero_time))
-        #zero_time = datetime.now()
-        return(NDI_map_hp_rotated[pix])
-
-#################################################
-
 ############################
 def mag2fe(mag, bandpass, sca):
     from romanisim.bandpass import compute_count_rate
@@ -357,15 +299,15 @@ def mag2fe(mag, bandpass, sca):
     # zp = 2.5*np.log10(fzpAB)
     flux = 10**(-0.4*(mag + 48.60))*u.erg/u.s/u.hertz/u.cm**2
     flux_e_s = np.zeros(len(mag))
+    romanisim_bandpass_name = translate_bandpass_name(bandpass)
     for i in range(len(mag)):
-        flux_e_s[i] = compute_count_rate(flux[i],bandpass,sca,
+        flux_e_s[i] = compute_count_rate(flux[i],romanisim_bandpass_name,sca,
                                          filename=None, effarea=None, wavedist=None)
     if back_single: flux_e_s = flux_e_s[0]
     return(flux_e_s/u.s)
 
 
 def fe2mag(fe, bandpass, sca):
-    from romanisim.bandpass import compute_count_rate
     back_single = 0
     if not isinstance(fe, (list, pd.core.series.Series, np.ndarray)):
         fe = np.array([fe])
@@ -383,16 +325,40 @@ def fe2mag(fe, bandpass, sca):
     return(mag)
 
 #######################################
+
+
+def roman_WFI_NDI_estimator_direct(ra_stars, dec_stars, ra_point, dec_point, pa_point, 
+                                   level, ndi_name=None, ndi_wcs=None, ndi_grid_interpolator=None, rot_custom=None, verbose=True):
+
+    # Identify NDI calibration file
+    if (level == 1) or (level == 2):
+        w = ndi_wcs
+        w.wcs.crota = -pa_point,-pa_point
+        w.wcs.crval = ra_point,dec_point
+        x_stars, y_stars = w.wcs_world2pix(ra_stars, dec_stars, 0)
+        xy_points = np.c_[x_stars, y_stars]
+        return(ndi_grid_interpolator(xy_points))
+
+    if (level==3):
+        NDI_map_hp = hp.read_map(ndi_name)
+        # rot_custom.rotate_map_pixel is relatively slow. We must find an alternative solution.
+        # Perhaps there is a way to not rotate the map at all.
+        # This is relatively contradictory to what the documentation claims. https://healpy.readthedocs.io/en/latest/generated/healpy.rotator.Rotator.rotate_map_pixel.html#healpy.rotator.Rotator.rotate_map_pixel
+        NDI_map_hp_rotated = rot_custom.rotate_map_pixel(NDI_map_hp) # The use of rotate_map_pixel from healpy introduces artifacts at low SNR.
+        pix = hp.ang2pix(nside=hp.pixelfunc.get_nside(NDI_map_hp), theta=ra_stars, phi=dec_stars, lonlat=True)
+        return(NDI_map_hp_rotated[pix])
+
+#################################################
 #################################################
 
 def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_stars,
                                   dec_stars, irradiance_stars, cat_id,
                                   source_id, ra_point, dec_point, pa_point,
-                                  verbose=False, dry_mode=False):
+                                  verbose=False, loadingbar=False):
 
-    from tqdm import tqdm
     import bottleneck as bn
     from IPython.display import clear_output
+
     # Level 1 stars are the closest. R to the center of the SCA of 1 degree.
     # Level 2 stars have a distance between 1 degree and 10 degrees to the center of the SCA.
     # Level 3 stars have a distance of 10 degrees or more to the SCA.
@@ -404,9 +370,7 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
 
     # Find the coordinates of each pixel in the sky.
     if verbose > 1: print(datetime.now().isoformat() + ": Finding coordinates of SCA pixels in the Sky...")
-    SCA_pixel_radec = wcs.pixel_to_world(int(data_shape[0])/2,int(data_shape[1])/2)
-    #ra_SCA = SCA_pixel_radec.ra.value   # Right ascension of the center of the SCA
-    #dec_SCA = SCA_pixel_radec.dec.value # Declination of the center of the SCA
+    # SCA_pixel_radec = wcs.pixel_to_world(int(data_shape[0])/2,int(data_shape[1])/2)
     if verbose > 1: print(datetime.now().isoformat() + ": Done")
 
     radec_stars =  SkyCoord(ra_stars, dec_stars, frame="icrs", unit="deg")
@@ -418,8 +382,11 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
     # For stars at those distances, we will only estimate one NDI and assume the straylight is flat across
     # the subarray (we will still have gradients!).
     if verbose > 1: print(datetime.now().isoformat() + ": Estimating the relative coordinates of the SCA to the stars...")
-    theta_phi_center_FPA = rs.utils.angular_distance(ra1=np.array([ra_point]), dec1=np.array([dec_point]),
-                                                     ra2=ra_stars, dec2=dec_stars)
+    theta_phi_center_FPA = rs.utils.angular_distance(ra1=np.array([ra_point]), 
+                                                     dec1=np.array([dec_point]),
+                                                     ra2=ra_stars, 
+                                                     dec2=dec_stars)
+    
     if verbose > 1: print(datetime.now().isoformat() + ": Done")
 
     if verbose > 1:
@@ -442,7 +409,7 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
     radec_level_2_stars = radec_stars[bool_is_the_star_level_2]
     radec_level_3_stars = radec_stars[bool_is_the_star_level_3]
 
-    id_stars = cat_id # np.linspace(0, n_stars-1, n_stars, dtype="int64")
+    id_stars = cat_id # 
 
     ra_level_1_stars   = radec_level_1_stars.ra.value
     dec_level_1_stars  = radec_level_1_stars.dec.value
@@ -451,20 +418,18 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
     ra_level_3_stars   = radec_level_3_stars.ra.value
     dec_level_3_stars  = radec_level_3_stars.dec.value
 
+    # Level 1
     irradiance_level_1_stars = irradiance_stars[bool_is_the_star_level_1]
-
     source_id_level_1 = source_id[bool_is_the_star_level_1]
     id_level_1_stars = id_stars[bool_is_the_star_level_1]
-    #print(id_level_1_stars)
-
+    # Level 2
     irradiance_level_2_stars = irradiance_stars[bool_is_the_star_level_2]
     source_id_level_2 = source_id[bool_is_the_star_level_2]
     id_level_2_stars = id_stars[bool_is_the_star_level_2]
-    #print(id_level_2_stars)
+    # Level 3
     irradiance_level_3_stars = irradiance_stars[bool_is_the_star_level_3]
     source_id_level_3 = source_id[bool_is_the_star_level_3]
     id_level_3_stars = id_stars[bool_is_the_star_level_3]
-    #print(id_level_3_stars)
 
     ##############################################################################
 
@@ -473,6 +438,7 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
     n_level_2_stars = len(ra_level_2_stars)
     n_level_3_stars = len(ra_level_3_stars)
 
+    # 
 
     if verbose > 1:
         print(datetime.now().isoformat() + ": Sources identified.")
@@ -480,176 +446,228 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
         print("Number of stars at " + str(level_1_critical_distance_to_star) + " < R < " + str(level_2_critical_distance_to_star) + " degrees - " + str(n_level_2_stars))
         print("Number of stars at R > " + str(level_2_critical_distance_to_star) + " degrees - " + str(n_level_3_stars))
 
-    # This is the canvas array where we will store all the straylight level.
-    straylight_SCA = np.zeros(data_shape).astype(np.float32)
-    # This is the canvas array where we will store the ID of the largest stray-light contributor
-    main_offender_SCA = np.zeros(data_shape).astype(np.float32)
-
     # The transfer NDI maps units of 1/(superpixel size in mm2). 
     # We need to correct by that factor. 
     superpixel_mm2_area = (rs.telescopes.Roman.get_physical_pixelsize("WFI").to("mm").value * 512)**2
 
-    if True:
-        subarray_locations_db = rs.roman.get_subarray_locations(SCA=SCA, verbose=False)
-        xmid = subarray_locations_db["xmid"]
-        ymid = subarray_locations_db["ymid"]
+    # Get the locations of the subarrays in the selected SCA.
+    subarray_locations_db = rs.roman.get_subarray_locations(SCA=SCA, verbose=False)
 
-        # Estimating the coordinates of the center of the subarrays
-        RA_mid_subarrays =       SCA_pixel_radec.ra.value #[ymid, xmid]
-        DEC_mid_subarrays =      SCA_pixel_radec.dec.value #[ymid, xmid]
-        mid_subarrays_Skycoord = SkyCoord(RA_mid_subarrays, DEC_mid_subarrays, frame="icrs", unit="deg")
+    # Initialize a minimal storage array for the straylight. 
+    # The minimal storage array has 64 x 18, which is 64 locations, for each one of the 18 SCAs.
+    n_subarrays = len(subarray_locations_db["NDI_labels"])
 
-        if verbose > 1: print(datetime.now().isoformat() + ": Done")
-        if verbose > 1: print(datetime.now().isoformat() + ": Finding the NDI at the estimated angles...")
+    # Initialize the minimal storage arrays: straylight, mainoffender, ra, dec
+    straylight_total   = np.zeros((n_subarrays,)).astype(np.float32) 
+    mainoffender_total = np.zeros((n_subarrays,)).astype(np.float32) 
 
-        n_subarrays = len(subarray_locations_db["NDI_labels"])
-        ##############################################################################
-        # Initialize storage arrays for xmid, ymid, NDI, stray-light, main_offender
-        ##############################################################################
+    xmid = subarray_locations_db["xmid"]
+    ymid = subarray_locations_db["ymid"]
+    ramid, decmid = wcs.wcs_pix2world(xmid, ymid, 0) # subarray_locations_db["xmid"]
+    
 
-        col_stray = np.zeros((n_subarrays))*np.nan
-        col_main_off_id = np.zeros((n_subarrays))*np.nan
+    # Estimating the coordinates of the center of the subarrays
+    # RA_mid_subarrays =       SCA_pixel_radec.ra.value #[ymid, xmid]
+    # DEC_mid_subarrays =      SCA_pixel_radec.dec.value #[ymid, xmid]
+    #mid_subarrays_Skycoord = SkyCoord(RA_mid_subarrays, DEC_mid_subarrays, frame="icrs", unit="deg")
 
-        ##############################################################################
-        # Level 1 - The closest to the focal plane array.
-        # Here we go subarray per subarray.
-        # First - We measure the average Straylight at the center of the SCA for stars at large distances
-        #.        Theta > 1 degrees
-        # Second - We measure the straylight at the center of the subarray for stars at closer distances.
-        #
-        ################################################################################
-        # for i in tqdm(range(n_subarrays), disable=not verbose):
-        for i in range(n_subarrays): # Replaced by Roman / WFI loading bar
-            X_label = subarray_locations_db["xlabel"][i]
-            Y_label = subarray_locations_db["ylabel"][i]
-            xmin    = subarray_locations_db["xmin"][i]
-            xmax    = subarray_locations_db["xmax"][i]
-            ymin    = subarray_locations_db["ymin"][i]
-            ymax    = subarray_locations_db["ymax"][i]
-            xmid    = subarray_locations_db["xmid"][i]
-            ymid    = subarray_locations_db["ymid"][i]
+    if verbose > 1: print(datetime.now().isoformat() + ": Done")
+    if verbose > 1: print(datetime.now().isoformat() + ": Finding the NDI at the estimated angles...")
+
+    ##############################################################################
+    # Initialize storage arrays for xmid, ymid, NDI, stray-light, main_offender
+    ##############################################################################
+    #### 
+    # Prepare the healpix rotator for level 3 stars.
+    longitude = ra_point * u.deg
+    latitude = dec_point * u.deg
+    position_angle = -pa_point*u.deg
+    rot_custom = hp.Rotator(rot=[longitude.to_value(u.deg), latitude.to_value(u.deg), position_angle.to_value(u.deg)], inv=True)
 
 
-            # -------------------------------------------------------------------------- #
-            # 1 - Estimate the stray-light at the SCA level for close-distance stars     #
-            # -------------------------------------------------------------------------- #
-            if len(ra_level_1_stars) > 0:
-                transfer_level_1 = roman_WFI_NDI_estimator_direct(ra_stars=ra_level_1_stars, dec_stars=dec_level_1_stars,
-                                                             ra_point=ra_point, dec_point=dec_point, pa_point=pa_point,
-                                                             SCA=SCA, X_label=X_label, Y_label=Y_label, level=1, verbose=True)
-                NDI_level_1 = transfer_level_1/superpixel_mm2_area
-                straylight_level_1 = (NDI_level_1*(pixsize**2)*filter_identity["filter_transmission_ref"]*filter_identity["filter_lambda_ref"]*irradiance_level_1_stars/const.c/const.h).decompose()
-                #id_main_offender_level_1 = id_level_1_stars[np.where(straylight_level_1.value == bn.nanmax(straylight_level_1))[0][0]]
-                where_max_stray = np.where(straylight_level_1.value == bn.nanmax(straylight_level_1))[0][0]
-                id_main_offender_level_1 = id_level_1_stars[where_max_stray]
-                source_id_main_offender_level_1 = source_id_level_1[where_max_stray]
-                max_NDI_level_1 = NDI_level_1[where_max_stray]
+    ############################################
+    # Load the NDI maps for the level 1 and 2  #
+    ############################################
+    ndi_name_1 = os.environ['ROSALIACACHE'] + "/CORE/NDI/RST/ndi_lvl1/lvl1_SCA_" + str(SCA) + ".pkl"
+    ndi_name_2 = os.environ['ROSALIACACHE'] + "/CORE/NDI/RST/ndi_lvl2/lvl2_SCA_" + str(SCA) + ".pkl"
+    with open(ndi_name_1, "rb") as f:
+        ndi_lvl1 = pickle.load(f)
+    with open(ndi_name_2, "rb") as f:
+        ndi_lvl2 = pickle.load(f)
 
-            else:
-                stray_main_offender_level_1 = 0
-                straylight_level_1 = 0/u.s
-                id_main_offender_level_1 = 0
-                max_NDI_level_1 = 0
-                source_id_main_offender_level_1 = None
+    ###############################################
+    # Precalculate constant factors for straylight estimation                                            
+    ###############################################
+    NDI_conversion_factor = ((pixsize**2)*filter_identity["filter_transmission_ref"]*filter_identity["filter_lambda_ref"]/superpixel_mm2_area/const.c/const.h)
+    NDI_conversion_factor_1 = (NDI_conversion_factor*irradiance_level_1_stars).decompose()
+    NDI_conversion_factor_2 = (NDI_conversion_factor*irradiance_level_2_stars).decompose()
+    NDI_conversion_factor_3 = (NDI_conversion_factor*irradiance_level_3_stars).decompose()
 
-            # -------------------------------------------------------------------------- #
-            # 3 - Combine all the values                                                 #
-            # -------------------------------------------------------------------------- #
-            stray_main_offender_level_1 = bn.nanmax(straylight_level_1)
-            straylight_SCA[ymin:ymax, xmin:xmax] = straylight_SCA[ymin:ymax, xmin:xmax] + bn.nansum(straylight_level_1)
+    ##############################################################################
+    # Here we go subarray per subarray.
+    # First - We measure the average Straylight at the center of the SCA for stars at large distances
+    #.        Theta > 1 degrees
+    # Second - We measure the straylight at the center of the subarray for stars at closer distances.
+    ################################################################################
 
-            # -------------------------------------------------------------------------- #
-            # 2 - Estimate the stray-light at the SCA level for mid-distance stars     #
-            # -------------------------------------------------------------------------- #
-            if len(ra_level_2_stars) > 0:
-                transfer_level_2 = roman_WFI_NDI_estimator_direct(ra_stars=ra_level_2_stars, dec_stars=dec_level_2_stars,
-                                                     ra_point=ra_point, dec_point=dec_point, pa_point=pa_point,
-                                                     SCA=SCA, X_label=X_label, Y_label=Y_label, level=2, verbose=True)
-                NDI_level_2 = transfer_level_2/superpixel_mm2_area
-
-                straylight_level_2 = (NDI_level_2*(pixsize**2)*filter_identity["filter_transmission_ref"]*filter_identity["filter_lambda_ref"]*irradiance_level_2_stars/const.c/const.h).decompose()  #
-                where_max_stray = np.where(straylight_level_2.value == bn.nanmax(straylight_level_2))[0][0]
-                id_main_offender_level_2 = id_level_2_stars[where_max_stray]
-                source_id_main_offender_level_2 = source_id_level_2[where_max_stray]
-                max_NDI_level_2 = NDI_level_2[where_max_stray]
-
-            else:
-                straylight_level_2 = 0/u.s
-                id_main_offender_level_2 = 0
-                stray_main_offender_level_2 = 0
-                max_NDI_level_2 = 0
-                source_id_main_offender_level_2 = None
-
-            stray_main_offender_level_2 = bn.nanmax(straylight_level_2)
-            straylight_SCA[ymin:ymax, xmin:xmax] = straylight_SCA[ymin:ymax, xmin:xmax] + bn.nansum(straylight_level_2)
-
-            # -------------------------------------------------------------------------- #
-            # 3 - Estimate the stray-light at the SCA level for long-distance stars      #
-            # -------------------------------------------------------------------------- #
-
-            if len(ra_level_3_stars) > 0:
-                transfer_level_3 = roman_WFI_NDI_estimator_direct(ra_stars=ra_level_3_stars, dec_stars=dec_level_3_stars,
-                                                     ra_point=ra_point, dec_point=dec_point, pa_point=pa_point,
-                                                     SCA=SCA, X_label=X_label, Y_label=Y_label, level=3, verbose=True)
-                NDI_level_3 = transfer_level_3/superpixel_mm2_area
-                straylight_level_3 =     (NDI_level_3*(pixsize**2)*filter_identity["filter_transmission_ref"]*filter_identity["filter_lambda_ref"]*irradiance_level_3_stars/const.c/const.h).decompose()
-                where_max_stray = np.where(straylight_level_3.value == bn.nanmax(straylight_level_3))[0][0]
-                id_main_offender_level_3 = id_level_3_stars[where_max_stray]
-                source_id_main_offender_level_3 = source_id_level_3[where_max_stray]
-                stray_main_offender_level_3 = bn.nanmax(straylight_level_3)
-                max_NDI_level_3 = NDI_level_3[where_max_stray]
-
-            else:
-                straylight_level_3 = 0/u.s#
-                id_main_offender_level_3 = 0
-                stray_main_offender_level_3 = 0
-                max_NDI_level_3 = 0
-                source_id_main_offender_level_3 = None
-            stray_main_offender_level_3 = bn.nanmax(straylight_level_3)
-            straylight_SCA[ymin:ymax, xmin:xmax] = straylight_SCA[ymin:ymax, xmin:xmax] + bn.nansum(straylight_level_3)
+    for i in range(n_subarrays): # Replaced by Roman / WFI loading bar
+        X_label = subarray_locations_db["xlabel"][i]
+        Y_label = subarray_locations_db["ylabel"][i]
+        xmid    = subarray_locations_db["xmid"][i]
+        ymid    = subarray_locations_db["ymid"][i]
 
 
-            main_offender_level_123 = np.array([stray_main_offender_level_1,
-                                                stray_main_offender_level_2,
-                                                stray_main_offender_level_3])
+        # -------------------------------------------------------------------------- #
+        # 1 - Estimate the stray-light at the SCA level for close-distance stars     #
+        # -------------------------------------------------------------------------- #
+        if len(ra_level_1_stars) > 0:
+            level=1
+            transfer_level_1 = roman_WFI_NDI_estimator_direct(ra_stars=ra_level_1_stars, dec_stars=dec_level_1_stars,
+                                                              ra_point=ra_point, dec_point=dec_point, pa_point=pa_point,
+                                                                ndi_wcs=ndi_lvl1["wcs"][i], 
+                                                                ndi_grid_interpolator=ndi_lvl1["ndi_interpolator"][i],
+                                                                level=level, verbose=True)
 
-            id_main_offender_level_123 = np.array([id_main_offender_level_1,
-                                                   id_main_offender_level_2,
-                                                   id_main_offender_level_3])
+            straylight_level_1 = transfer_level_1*NDI_conversion_factor_1  # (NDI_level_1*(pixsize**2)*filter_identity["filter_transmission_ref"]*filter_identity["filter_lambda_ref"]*irradiance_level_1_stars/const.c/const.h).decompose()
+            
+            # Once we have the straylight level, we can estimate: 
+            # What is the star that produces the maximum straylight level on its own?
+            # A.K.A. the main offender.
+            where_max_stray = np.where(straylight_level_1.value == bn.nanmax(straylight_level_1))[0][0]
+            id_main_offender_level_1        = id_level_1_stars[where_max_stray]
+            source_id_main_offender_level_1 = source_id_level_1[where_max_stray]
 
-            source_name_main_offence_level_123 = np.array([source_id_main_offender_level_1,
-                                                           source_id_main_offender_level_2,
-                                                           source_id_main_offender_level_3])
+        else:
+            stray_main_offender_level_1 = 0
+            straylight_level_1 = np.array([0/u.s])
+            id_main_offender_level_1 = 0
+            where_max_stray = 0
+            source_id_main_offender_level_1 = None
+
+        # -------------------------------------------------------------------------- #
+        # 3 - Combine all the values                                                 #
+        # -------------------------------------------------------------------------- #
+        stray_main_offender_level_1 = straylight_level_1[where_max_stray]
+        total_straylight_level_1 = bn.nansum(straylight_level_1)
+        # straylight_SCA[ymin:ymax, xmin:xmax] = straylight_SCA[ymin:ymax, xmin:xmax] + total_straylight_level_1
+        # straylight_minimal_storage_array[i] = straylight_minimal_storage_array[i] + total_straylight_level_1
+
+        # -------------------------------------------------------------------------- #
+        # 2 - Estimate the stray-light at the SCA level for mid-distance stars     #
+        # -------------------------------------------------------------------------- #
+        if len(ra_level_2_stars) > 0:
+            level = 2
+            transfer_level_2 = roman_WFI_NDI_estimator_direct(ra_stars=ra_level_2_stars, dec_stars=dec_level_2_stars,
+                                                                ra_point=ra_point, dec_point=dec_point, pa_point=pa_point,
+                                                                level=level,  ndi_wcs=ndi_lvl2["wcs"][i], 
+                                                                ndi_grid_interpolator=ndi_lvl2["ndi_interpolator"][i], verbose=True)
+            #NDI_level_2 = transfer_level_2/superpixel_mm2_area
+
+            #straylight_level_2 = (NDI_level_2*(pixsize**2)*filter_identity["filter_transmission_ref"]*filter_identity["filter_lambda_ref"]*irradiance_level_2_stars/const.c/const.h).decompose()  #
+            straylight_level_2 = transfer_level_2*NDI_conversion_factor_2
+
+            where_max_stray = np.where(straylight_level_2.value == bn.nanmax(straylight_level_2))[0][0]
+            id_main_offender_level_2 = id_level_2_stars[where_max_stray]
+            source_id_main_offender_level_2 = source_id_level_2[where_max_stray]
+            # max_NDI_level_2 = NDI_level_2[where_max_stray]
+
+        else:
+            straylight_level_2 = np.array([0/u.s])
+            id_main_offender_level_2 = 0
+            stray_main_offender_level_2 = 0
+            where_max_stray = 0
+            # max_NDI_level_2 = 0
+            source_id_main_offender_level_2 = None
+
+        stray_main_offender_level_2 = straylight_level_2[where_max_stray] # bn.nanmax(straylight_level_2)
+        total_straylight_level_2 = bn.nansum(straylight_level_2)
+        #straylight_SCA[ymin:ymax, xmin:xmax] = straylight_SCA[ymin:ymax, xmin:xmax] + total_straylight_level_2
+        # straylight_minimal_storage_array[i] = straylight_minimal_storage_array[i] + total_straylight_level_2
+
+        # -------------------------------------------------------------------------- #
+        # 3 - Estimate the stray-light at the SCA level for long-distance stars      #
+        # -------------------------------------------------------------------------- #
+
+        if len(ra_level_3_stars) > 0:
+            level = 3
+            ndi_name_3 = os.environ['ROSALIACACHE'] + "/CORE/NDI/RST/ndi_lvl" + str(level) + "/" + "lvl" + str(level) + "_SCA_" + str(SCA) + "_SUB_X" + str(X_label) + "_Y" + str(Y_label) + "_HP.fits"
+
+            transfer_level_3 = roman_WFI_NDI_estimator_direct(ra_stars=ra_level_3_stars, dec_stars=dec_level_3_stars,
+                                                                ra_point=ra_point, dec_point=dec_point, pa_point=pa_point, 
+                                                                ndi_name=ndi_name_3, level=level, rot_custom=rot_custom, verbose=True)
+            
+            #NDI_level_3 = transfer_level_3/superpixel_mm2_area
+            #straylight_level_3 =     (NDI_level_3*(pixsize**2)*filter_identity["filter_transmission_ref"]*filter_identity["filter_lambda_ref"]*irradiance_level_3_stars/const.c/const.h).decompose()
+            straylight_level_3 = transfer_level_3*NDI_conversion_factor_3
+            where_max_stray = np.where(straylight_level_3.value == bn.nanmax(straylight_level_3))[0][0]
+            id_main_offender_level_3 = id_level_3_stars[where_max_stray]
+            source_id_main_offender_level_3 = source_id_level_3[where_max_stray]
+            # stray_main_offender_level_3 = straylight_level_3[where_max_stray]
+            # max_NDI_level_3 = NDI_level_3[where_max_stray]
+
+        else:
+            straylight_level_3 = np.array([0/u.s])#
+            id_main_offender_level_3 = 0
+            stray_main_offender_level_3 = 0
+            where_max_stray = 0
+            # max_NDI_level_3 = 0
+            source_id_main_offender_level_3 = None
 
 
-            if verbose > 2:
-                print("Main offender - RA :" +  str(ra_stars[id_main_offender_level_123]) + " DEC: " + str(dec_stars[id_main_offender_level_123]))
-                print("ID :" +  str(id_main_offender_level_123))
-                print("Source name :" +  str(source_name_main_offence_level_123))
-                print("Irradiance " + str(irradiance_stars[id_main_offender_level_123]))
-                print("Stray " + str(main_offender_level_123))
-                print("NDI " + str([max_NDI_level_1, max_NDI_level_2, max_NDI_level_3]))
+
+        stray_main_offender_level_3 = straylight_level_3[where_max_stray]
+        total_straylight_level_3 = bn.nansum(straylight_level_3)
+        #straylight_SCA[ymin:ymax, xmin:xmax] = straylight_SCA[ymin:ymax, xmin:xmax] + total_straylight_level_3
+        # straylight_minimal_storage_array[i] = straylight_minimal_storage_array[i] + total_straylight_level_3
 
 
-            main_offender_SCA[ymin:ymax, xmin:xmax] = id_main_offender_level_123[main_offender_level_123 == bn.nanmax(main_offender_level_123)][0]
-            col_stray[i] = straylight_SCA[ymid, xmid]
-            col_main_off_id[i] = main_offender_SCA[ymid, xmid]
+        # Combine the three levels of straylight and identify the main offender across all levels.
+        #print(stray_main_offender_level_1)
+        #print(stray_main_offender_level_2)
+        #print(stray_main_offender_level_3)
+        main_offender_level_123 = np.array([stray_main_offender_level_1.value,
+                                            stray_main_offender_level_2.value,
+                                            stray_main_offender_level_3.value])
 
-            # Plot the Roman/WFI loading bar
-            # os.system('clear')
-            clear_output(wait=True)
-            print(rs.plots.style.CYAN + "ROSALIA Stray-light Mapper: Scanning ... " + rs.plots.style.RESET)
-            canvas = rs.plots.print_ascii_focal_plane(x=X_label, y=Y_label, SCA=SCA)
-            print(rs.plots.style.CYAN + 'SCA ' + str(SCA) + " - Subarray X=" + str(X_label) + " - Subarray Y=" + str(Y_label))
-            print('SCA ' + str(SCA) + " out of 18: " + str(np.round(100*i/n_subarrays,2)) + '% completed' + rs.plots.style.RESET)
-            #######################################################################
+        id_main_offender_level_123 = np.array([id_main_offender_level_1,
+                                                id_main_offender_level_2,
+                                                id_main_offender_level_3])
+
+        source_name_main_offence_level_123 = np.array([source_id_main_offender_level_1,
+                                                        source_id_main_offender_level_2,
+                                                        source_id_main_offender_level_3])
 
 
-        main_offender_db = pd.DataFrame({"xmid": xmid, "ymid": ymid,
-                                         "xmin": xmin, "ymin": ymin,
-                                         "xmax": xmax, "ymid": ymax,
-                                         "RA_mid": RA_mid_subarrays, "DEC_mid": DEC_mid_subarrays,
-                                         "stray": col_stray, "main_off_id": col_main_off_id})
+        if verbose > 2:
+            print("Main offender - RA :" +  str(ra_stars[id_main_offender_level_123]) + " DEC: " + str(dec_stars[id_main_offender_level_123]))
+            print("ID :" +  str(id_main_offender_level_123))
+            print("Source name :" +  str(source_name_main_offence_level_123))
+            print("Irradiance " + str(irradiance_stars[id_main_offender_level_123]))
+            print("Stray " + str(main_offender_level_123))
+            # print("NDI " + str([max_NDI_level_1, max_NDI_level_2, max_NDI_level_3]))
+
+
+        #straylight_SCA[ymin:ymax, xmin:xmax] = straylight_SCA[ymin:ymax, xmin:xmax] + total_straylight_level_1 + total_straylight_level_2 + total_straylight_level_3
+        #main_offender_SCA[ymin:ymax, xmin:xmax] = id_main_offender_level_123[main_offender_level_123 == bn.nanmax(main_offender_level_123)][0]
+        straylight_total[i] = total_straylight_level_1 + total_straylight_level_2 + total_straylight_level_3 # straylight_SCA[ymid, xmid]
+        mainoffender_total[i] = id_main_offender_level_123[main_offender_level_123 == bn.nanmax(main_offender_level_123)][0] #main_offender_SCA[ymid, xmid]
+
+        # Plot the Roman/WFI loading bar
+        # os.system('clear')
+        if loadingbar: clear_output(wait=True)
+        if loadingbar: print(rs.plots.style.CYAN + "ROSALIA Stray-light Mapper: Scanning ... " + rs.plots.style.RESET)
+        if loadingbar: rs.plots.print_ascii_focal_plane(x=X_label, y=Y_label, SCA=SCA)
+        if loadingbar: print(rs.plots.style.CYAN + 'SCA ' + str(SCA) + " - Subarray X=" + str(X_label) + " - Subarray Y=" + str(Y_label))
+        if loadingbar: print('SCA ' + str(SCA) + " out of 18: " + str(np.round(100*i/n_subarrays,2)) + '% completed' + rs.plots.style.RESET)
+        #######################################################################
+
+
+        #main_offender_db = pd.DataFrame({"xmid": xmid, "ymid": ymid,
+        #                                 "ramid": ramid, "decmid": decmid,
+        #                                 "xmin": xmin, "ymin": ymin,
+        #                                 "xmax": xmax, "ymid": ymax,
+        #                                 "RA_mid": RA_mid_subarrays, "DEC_mid": DEC_mid_subarrays,
+        #                                 "stray": col_stray, "main_off_id": col_main_off_id})
         # -------------------------------------------------------------------------- #
         # 4 - TO-DO - Interpolate the values across the SCA to smooth it out         #
         # -------------------------------------------------------------------------- #
@@ -657,9 +675,27 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
         # from scipy.interpolate import RegularGridInterpolator
         #f = RegularGridInterpolator((x_grid, y_grid), np.flip(ndi_fits[0].data, axis=1).T, bounds_error=False, fill_value=0)
 
-    if verbose > 1: print(datetime.now().isoformat() + ": Done")
-    return({"straylight_SCA": straylight_SCA, "main_offender_SCA": main_offender_SCA, "main_offender_db": main_offender_db})
+    main_offender_db = pd.DataFrame({"SCA": len(straylight_total)*[SCA], 
+                                     "xmid": subarray_locations_db["xmid"], "ymid": subarray_locations_db["ymid"],
+                                     "ramid": ramid, "decmid": decmid,
+                                     "xmin": subarray_locations_db["xmin"], "ymin": subarray_locations_db["ymin"],
+                                     "xmax": subarray_locations_db["xmax"], "ymax": subarray_locations_db["ymax"],
+                                     # "RA_mid": RA_mid_subarrays, "DEC_mid": DEC_mid_subarrays,
+                                     "straylight_total": straylight_total, 
+                                     "mainoffender_total": mainoffender_total})
+    #######################################################################
+    ##########################################
+    # OUT OF THE FOR LOOP                    #
+    ##########################################
+    #######################################################################
 
+    if verbose > 1: print(datetime.now().isoformat() + ": Done")
+    #return({"straylight_SCA": straylight_SCA, 
+    #        "main_offender_SCA": main_offender_SCA, 
+    #        "main_offender_db": main_offender_db, 
+    #        #"straylight_minimal_storage_array": straylight_minimal_storage_array,
+    #        })
+    return(main_offender_db)
 #################################################
 
 
