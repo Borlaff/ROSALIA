@@ -172,8 +172,9 @@ def rebin_transmission_curve(filter_transmission_curve, nbins, verbose=False):
 
 
 #accepted zody_mode: zodipy and stsci; if something else is entered, defaults to stsci
-def get_zodiacal_background(input_name=None, ext=None, exposure_identity=None, wavelength=None, telescope=None, instrument=None,
-                            detector=None, expstart=None, step=1000, zody_mode="stsci",
+def get_zodiacal_background(astropywcs, wavelength=None,
+                            expstart=None, step=1000, zody_mode="stsci",
+                            obspos = None,
                             nbins_wavelength=20, obslocin=3, grid_method="random",
                             output_units=None, verbose=False, interpolate=True):
 
@@ -211,7 +212,7 @@ def get_zodiacal_background(input_name=None, ext=None, exposure_identity=None, w
         if verbose:
             print("Input wavelength " + str(wavelength))
         rebinned_transmission = np.array([1])
-        dlambda = np.array([1])
+        # dlambda = np.array([1])
         rebinned_wavelength = np.array([wavelength])
     ###############################
 
@@ -244,8 +245,8 @@ def get_zodiacal_background(input_name=None, ext=None, exposure_identity=None, w
             print(i)
             # IRSA queries must go in um so we need to multiply by 1E+7 the m above
             db = rs.irsa.irsa_query(ra=detector_grid["grid_world"][0], dec=detector_grid["grid_world"][1],
-                                              wavelength=rebinned_wavelength[i].to("um").value, 
-                                              year=year, day=day, obslocin=obslocin)*rebinned_transmission[i]
+                                    wavelength=rebinned_wavelength[i].to("um").value, 
+                                    year=year, day=day, obslocin=obslocin)*rebinned_transmission[i]
 
             db_irsa[:,i] = db['zody']
         # Numerical integration of the zody surface brightness over the filter transmission curve
@@ -281,16 +282,15 @@ def get_zodiacal_background(input_name=None, ext=None, exposure_identity=None, w
         print('expstart',expstart)
         print('obspos',obspos)
         print(zody_MJysr)
-    else:
-        if not zody_mode == "stsci":
-            print("Invalid zodiacal light mode entered. Using stsci model as default.")
+
+    if zody_mode == "stsci":
+        #     print("Invalid zodiacal light mode entered. Using stsci model as default.")
         zody_MJysr = stsci_zody(ra=detector_grid["grid_world"][0],
                                  dec=detector_grid["grid_world"][1],
                                  wavelength=rebinned_wavelength.to("um").value,
                                  weights=rebinned_transmission,
                                  expstart=expstart,verbose=verbose)
-
-
+        
     x = detector_grid["grid_xy"][:,0]
     y = detector_grid["grid_xy"][:,1]
     xsize = int(np.max(x))
@@ -306,31 +306,31 @@ def get_zodiacal_background(input_name=None, ext=None, exposure_identity=None, w
         zody_interp = zody_MJysr
 
     zody_interp = zody_interp*(u.MJy * u.steradian**-1) 
-    # print(telescope)
 
     if output_units == "e/s":
         if verbose: print("Output units:" + output_units)
         #  HST_ACS_jy_to_counts(flux_ACS, photflam, photplam):
-        if telescope == "Hubble" or telescope == "HST":
-            zody_interp = rs.detectors.HST_ACS_jy_to_counts(flux_jy = zody_interp,
-                                           photflam = exposure_identity["PHOTFLAM"],
-                                           photplam = exposure_identity["PHOTPLAM"])
+        #if telescope == "Hubble" or telescope == "HST":
+        #    zody_interp = rs.detectors.HST_ACS_jy_to_counts(flux_jy = zody_interp,
+        #                                   photflam = exposure_identity["PHOTFLAM"],
+        #                                   photplam = exposure_identity["PHOTPLAM"])
+        #
 
-        if telescope.lower() == "roman" or telescope.lower() == "RST" or telescope.lower() == "roman/wfi":
-            #from romanisim.models import bandpass as ris_bandpass
-            # We need to review why this is so different from fe2mu.
-            #es_to_MJysr = ris_bandpass.etomjysr(bandpass=wavelength["wavelength"], sca=sca)*u.MJy * u.steradian**-1 * u.s # The factor F such that MJy / sr = F * DN/s
-            #zody_interp = zody_interp/es_to_MJysr
+        # if telescope.lower() == "roman" or telescope.lower() == "RST" or telescope.lower() == "roman/wfi":
+        #from romanisim.models import bandpass as ris_bandpass
+        # We need to review why this is so different from fe2mu.
+        #es_to_MJysr = ris_bandpass.etomjysr(bandpass=wavelength["wavelength"], sca=sca)*u.MJy * u.steradian**-1 * u.s # The factor F such that MJy / sr = F * DN/s
+        #zody_interp = zody_interp/es_to_MJysr
 
-            
-            zody_interp = rs.constants.MJysr_to_Jyarcsec2*zody_interp # Jy/arcsec2
-            mu = -2.5*np.log10(zody_interp.value)+8.9
-            zody_interp = rs.detectors.mu2fe(mu=mu, 
-                                             instrument="WFI",
-                                             filter_name=wavelength["wavelength"], 
-                                             telescope=telescope, 
-                                             verbose=verbose)
-            
+        
+        zody_interp = rs.constants.MJysr_to_Jyarcsec2*zody_interp # Jy/arcsec2
+        mu = -2.5*np.log10(zody_interp.value)+8.9
+        zody_interp = rs.detectors.mu2fe(mu=mu, 
+                                            instrument="WFI",
+                                            filter_name=wavelength["wavelength"], 
+                                            telescope="Roman", 
+                                            verbose=verbose)
+        
 
         if verbose: print("Output units: e/s")
 

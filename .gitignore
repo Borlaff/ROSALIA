@@ -14,9 +14,9 @@ notebooks/CAR171/CAR171*.png
 PAPER_I/
 notebooks/MOCK/*/
 notebooks/*.xml
-notebooks/MOCK/*.png
-notebooks/MOCK/*.csv
-notebooks/MOCK/*.pdf
+notebooks/*/*.png
+notebooks/*/*.csv
+notebooks/*/*.pdf
 
 .DS_Store
  

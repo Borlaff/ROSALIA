@@ -702,7 +702,7 @@ class exposure():
     
 
 
-    def psf_background(self, g_mag_max=15, catalog=None, verbose=False):
+    def psf(self, g_mag_max=15, catalog=None, verbose=False):
         #######################################
         # rosalia_psf: Alejandro S. Borlaff. NASA/Ames STA. a.s.borlaff@nasa.gov
         # -------------------------------
@@ -843,20 +843,21 @@ class exposure():
         zodiacal_background_list = []
         zodiacal_background_unit_list = []
 
+        obspos = np.array([self.XYZ_HELIO_POS[0],
+                           self.XYZ_HELIO_POS[1],
+                           self.XYZ_HELIO_POS[2]])*u.AU
+
         print("Computing Zodiacal light...")
         for i in tqdm(range(nSCIEXTS)):
-            zodiacal_background = rs.sky.get_zodiacal_background(self.ASTROPYWCS[i],
-                                                        wavelength=self.FILTER_IDENTITY,
-                                                        telescope=self.TELESCOP,
-                                                        instrument=self.INSTRUME,
-                                                        detector=self.DETECTOR,
-                                                        expstart=self.EXPSTART,
-                                                        step=1000, zody_mode=zody_mode,
-                                                        nbins_wavelength=10, obslocin=0,
-                                                        grid_method="random", 
-                                                        sca=self.SCIEXTS[i], 
-                                                        output_units=output_units,
-                                                        verbose=verbose)
+            zodiacal_background = rs.sky.get_zodiacal_background(astropywcs=self.ASTROPYWCS[i],
+                                                                 wavelength=self.FILTER_IDENTITY,
+                                                                 expstart=self.EXPSTART,
+                                                                 step=1000, zody_mode=zody_mode,
+                                                                 nbins_wavelength=10, obslocin=0,
+                                                                 grid_method="random",
+                                                                 obspos = obspos,
+                                                                 output_units=output_units,
+                                                                 verbose=verbose)
             # print(zodiacal_background)
 
             
