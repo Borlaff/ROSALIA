@@ -10,6 +10,8 @@ import rosalia as rs
 from astropy.coordinates import SkyCoord
 from rosalia.correct import rosalia_stray
 import os
+from datetime import datetime
+import pandas as pd
 
 class exposure():
     """
@@ -135,7 +137,7 @@ class exposure():
 
         if filename is not None:
             exposure_identity = rs.utils.exposure_inspector(filename, lite=False)
-        
+            self.DATA = exposure_identity['DATA']
             self.FILENAME = exposure_identity['FILENAME']
             self.TELESCOP = exposure_identity['TELESCOP']
             self.INSTRUME = exposure_identity['INSTRUME']
@@ -150,7 +152,7 @@ class exposure():
             self.EXPSTART_ISOT = exposure_identity['EXPSTART_ISOT']
             self.PA = exposure_identity['PA']
             # self.SCA = exposure_identity['SCA']
-            self.HST_TYPE = exposure_identity['HST_TYPE']
+            # self.HST_TYPE = exposure_identity['HST_TYPE']
             self.FILTER = exposure_identity['FILTER']
             self.FILTER_IDENTITY = exposure_identity['FILTER_IDENTITY']
             # self.PHYSPIX = exposure_identity['PHYSPIX']
@@ -165,6 +167,7 @@ class exposure():
             self.FPA_NEAR_RADIUS = self.get_max_angular_size()
 
     def roman_wfi_exposure(self, observer, prefix=""):
+        print("> roman_wfi_exposure")
         # Here we expect observer={"TELESCOP": "Roman/WFI", "pointing": [RA_TARG, DEC_TARG], "FILTER":FILTER, "PA_Y": PA_Y, "EXPSTART": EXPSTART, "EXPTIME": EXPTIME}
         # Fixed parameters for Roman/WFI 
         observer['TELESCOP'] = "Roman"
@@ -198,7 +201,8 @@ class exposure():
                                                                 telescope=observer["FILTER_PARAMS"]["TELESCOPE"],
                                                                 instrument=observer["FILTER_PARAMS"]["INSTRUMENT"],
                                                                 detector=observer["FILTER_PARAMS"]["DETECTOR"], verbose=False)
-        # self.XYZ_HELIO_POS = exposure_identity['XYZ_HELIO_POS']
+        state_vectors = rs.horizons.interpolate_Roman_state_vectors(self.EXPSTART)
+        self.XYZ_HELIO_POS = [state_vectors['X'], state_vectors['Y'], state_vectors['Z']]
 
         if "FILENAME" not in observer:
             # If the user did not define an output filename, do it for them
@@ -212,18 +216,18 @@ class exposure():
             self.FILENAME = observer["FILENAME"]
 
         central_coords = SkyCoord(self.RA_TARG, self.DEC_TARG, frame="icrs", unit="deg")
-        print(self.EXPTIME)
-        print(self.EXPSTART)
+
         observer["FILENAME"] = rs.roman.create_roman_dummy(point=central_coords, date=self.EXPSTART_ASTROPY,
                                                             band=observer["FILTER_PARAMS"]["NAME"],
                                                             PA=self.PA, exptime=self.EXPTIME,
                                                             output=observer["FILENAME"])
+        
         self.SCIEXTS = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]
         astropywcs_info = rs.utils.get_astropywcs_info_from_sciexts(filename=self.FILENAME, sciexts=self.SCIEXTS)
         self.ASTROPYWCS = astropywcs_info["ASTROPYWCS"]
         self.DATA_SHAPE = astropywcs_info["DATA_SHAPE"]
         self.PIXSCALE = astropywcs_info["PIXSCALE"]
-
+        self.FPA_NEAR_RADIUS = self.get_max_angular_size()
         #    exposure_identity["HEADERS"] = header_list
         #    exposure_identity["DATA_SHAPE"] = data_shape
         #    exposure_identity["ASTROPYWCS"] = astropywcs
@@ -243,7 +247,7 @@ class exposure():
         return(rs.utils.find_max_angular_size_of_image(wcs=self.ASTROPYWCS, ra_cen=self.RA_TARG, dec_cen=self.DEC_TARG))
     
 
-    def plot_footprint(self, verbose=True, ax=None, color='red', label=None):
+    def plot_footprint(self, figsize=(10,10), verbose=True, ax=None, color='red', label=None):
         print("Hey! plot_footprint")
         if verbose: print("Finding ra dec constraints")
         # ra_dec_constraints = rs.gaia.find_ra_dec_constraints(self.RA_TARG, self.DEC_TARG, radius=self.FPA_NEAR_RADIUS, verbose=verbose)
@@ -251,7 +255,7 @@ class exposure():
         exp_corners = self.get_detector_corners()
         if verbose: print("Plotting...")
         if ax is None:
-            fig, ax = plt.subplots(figsize=(8,8))
+            fig, ax = plt.subplots(figsize=figsize)
         for i in range(len(self.SCIEXTS)):
             x = np.array(exp_corners[i]["corners_world"][:,0].tolist() + [exp_corners[i]["corners_world"][0,0]])
             y = np.array(exp_corners[i]["corners_world"][:,1].tolist() + [exp_corners[i]["corners_world"][0,1]])
@@ -284,9 +288,9 @@ class exposure():
     def get_source_catalog(self, g_mag_max=15, verbose=False):
         import pandas as pd
 
-        self.source_catalog_filename = self.FILENAME.replace(".fits", "_source_catalog.csv") #
+        self.source_catalog_filename = os.path.splitext(os.path.basename(self.FILENAME))[0] + "_source_catalog.csv" #
         
-        search_radius = self.get_max_angular_size()
+        search_radius = 1.5*self.get_max_angular_size()
 
         if os.path.exists(self.source_catalog_filename):
             print("WARNING: Loading existing catalog! Remove " + self.source_catalog_filename + " if this is a mistake.")
@@ -334,10 +338,10 @@ class exposure():
         """
         
         fpa_detector_corners = self.get_detector_corners()
-        for SCIEXT_i in tqdm(self.SCIEXTS):
+        for SCIEXT_i, ASTROPYWCS_i, detector_corners in tqdm(zip(self.SCIEXTS, self.ASTROPYWCS, fpa_detector_corners)):
             if verbose: print("> Identifying which stars are inside the FOV and which are outside...")
             infield_stars = rs.psf.identify_stars_in_out_field(data_shape=self.DATA_SHAPE,
-                                                            wcs=self.ASTROPYWCS[SCIEXT_i-1],
+                                                            wcs=ASTROPYWCS_i,
                                                             catalog=self.source_catalog,
                                                             verbose=verbose)
 
@@ -345,7 +349,7 @@ class exposure():
             names_of_bool_columns_if_star_is_inside.append(name_column_is_star_inside_this_detector)
 
             self.source_catalog[name_column_is_star_inside_this_detector] = infield_stars["bool_isIn"]
-            detector_corners = fpa_detector_corners[SCIEXT_i-1]
+            # detector_corners = fpa_detector_corners[SCIEXT_i-1]
             # If verbose, make a plot of the stars with the footprint.
             # rs.detectors.get_detector_corners(wcs=self.ASTROPYWCS[SCIEXT_i-1])
             detector_square_list.append(np.concatenate([detector_corners["corners_world"], detector_corners["corners_world"]]))
@@ -355,7 +359,7 @@ class exposure():
         return(self.source_catalog)
 
 
-    def get_nearby_ssos(self, ra=None, dec=None, radius=None, mjd=None, verbose=False, time_step="30s"):
+    def get_nearby_ssos(self, ra=None, dec=None, radius=None, mjd=None, verbose=False, time_step="1m"):
         import ephessos as ep
         if ra==None: ra = self.RA_TARG
         if dec==None: dec = self.DEC_TARG
@@ -364,8 +368,14 @@ class exposure():
 
         cone_search = ep.core.cone_search(ra=ra, dec=dec, mjd=mjd, 
                                           search_radius=radius, observatory=self.MPC_OBSLOC, verbose=verbose)
-        ephessos_df = ep.core.ephessos(sso_search=cone_search, mjd_start=self.EXPSTART, mjd_end=self.EXPEND, 
-                                       obs_center=self.JPL_OBSLOC, step_size=time_step, verbose=verbose)
+
+        if verbose: print(cone_search)
+        if len(cone_search) == 0:
+            print("No SSOs found!")
+            return()
+        else:        
+            ephessos_df = ep.core.ephessos(sso_search=cone_search, mjd_start=self.EXPSTART, mjd_end=self.EXPEND, 
+                                           obs_center=self.JPL_OBSLOC, step_size=time_step, verbose=verbose)
         return(cone_search, ephessos_df)
     
 
@@ -400,12 +410,36 @@ class exposure():
         
         rs.utils.save_fits(data, self.FILENAME, headers)
         return(self.FILENAME)
-    
 
-    def straylight(self, catalog=None, prefix="default", radius=1, g_mag_max=15, sun_block=False, verbose=False, figsize=(10,7), mu_vmin=None, mu_vmax=None):
+
+
+    from concurrent.futures import ProcessPoolExecutor
+    from tqdm import tqdm
+
+    @staticmethod
+    def _parallel_worker(args):
+        data_shape, wcs, SCIEXT_i, filter_identity, ra_stars_outside, dec_stars_outside, cat_id_outside, source_id_outside, irradiance_stars, ra_point, dec_point, pa_point, verbose = args
+        return rs.roman.roman_estimate_straylight_SCA(
+            data_shape=data_shape,
+            wcs=wcs,
+            SCA=SCIEXT_i,
+            filter_identity=filter_identity,
+            ra_stars=ra_stars_outside,
+            dec_stars=dec_stars_outside,
+            cat_id=cat_id_outside,
+            source_id=source_id_outside,
+            irradiance_stars=irradiance_stars,
+            ra_point=ra_point,
+            dec_point=dec_point,
+            pa_point=pa_point,
+            verbose=verbose
+        )
+
+    def straylight(self, catalog=None, g_mag_max=15, sun_block=False, verbose=False):
         from astropy import constants as const
         from tqdm import tqdm 
         from astropy.io import fits
+        
         #######################################
         # straylight: AKA. main_offender: Alejandro S. Borlaff. NASA/Ames STA. a.s.borlaff@nasa.gov
         # -------------------------------
@@ -425,7 +459,7 @@ class exposure():
         #######################################
 
     
-        if self.TELESCOP != "Roman" and self.TELESCOP != "RST":
+        if self.TELESCOP != "Roman" and self.TELESCOP != "RST" and self.TELESCOP != "ROMAN":
             print("Straylight modeling is currently only available for Roman/WFI exposures.")
             return(None)
         #    stray_db = rosalia_stray(ra=self.RA_TARG, dec=self.DEC_TARG, PA=self.PA,
@@ -435,13 +469,16 @@ class exposure():
         #                figsize=figsize, mu_vmin=mu_vmin, mu_vmax=mu_vmax)
 
         # Find out which stars belong to each detector. 
-        
-        if catalog is None:
-            self.source_catalog = self.get_source_catalog(g_mag_max=15, verbose=False)
-        else:
-            self.source_catalog = rs.utils.fix_custom_catalog(catalog)
+        print(datetime.now().isoformat() + " > Fetching catalog")
+
+        if not hasattr(self, 'source_catalog'):
+            if catalog is None:
+                self.source_catalog = self.get_source_catalog(g_mag_max=g_mag_max, verbose=False)
+            else:
+                self.source_catalog = rs.utils.fix_custom_catalog(catalog)
 
         self.source_catalog = self.find_which_stars_are_inside_each_detector(verbose=False)
+        print(datetime.now().isoformat() + " > Done.")
 
         # If sun_block is True, then remove the Sun from the catalog.
         if sun_block:
@@ -466,35 +503,91 @@ class exposure():
         lambda_ref = self.FILTER_IDENTITY["filter_lambda_ref"]
         irradiance_stars = const.c*(lambda_max-lambda_min)/(lambda_ref**2)*((10**(-0.4*(synthetic_mag_outside+56.1)))*u.W/u.meter**2/u.Hz)
 
+        ##########################################
+        # Define the output tables and filenames #
+        ##########################################
+
+        # Save the stray-light full scale map
+        if "s3://" in self.FILENAME:
+            # 's3://stpubdata/roman/nexus/soc_simulations/tutorial_data/roman-2026.1/r0003201001001001004_0001_wfi01_f106_cal.asdf'
+            self.output_name = self.FILENAME.split("/")[-1].replace(".asdf", "_stray.fits")
+        else: 
+            self.output_name = self.FILENAME.replace(".fits", "_stray.fits")
+
+        self.main_offender_output_name = self.output_name.replace(".fits", "_main_off.fits")
+        self.straylight_db_output_name = self.output_name.replace(".fits", "_db.csv")
+
+ 
+
         ########################################
         # Here we estimate the stray-light
         ########################################
         # Reset the Roman / WFI loading bar:
-        rs.plots.ascii_progress_focal_plane.canvas = np.copy(rs.plots.ascii_progress_focal_plane.canvas_zero)
-
-        for SCIEXT_i in tqdm(self.SCIEXTS):
-            #name_column_is_star_inside_this_detector = "in_SCI" + str(SCIEXT_i)
-            if verbose: print("> Estimating stray-light in detector positions")
-            straylevel_image_db = rs.roman.roman_estimate_straylight_SCA(data_shape=self.DATA_SHAPE[SCIEXT_i-1],
-                                                                        wcs=self.ASTROPYWCS[SCIEXT_i-1],
-                                                                        SCA=SCIEXT_i,
-                                                                        filter_identity=self.FILTER_IDENTITY,
-                                                                        ra_stars=ra_stars_outside,
-                                                                        dec_stars=dec_stars_outside,
-                                                                        cat_id = cat_id_outside,
-                                                                        source_id=source_id_outside,
-                                                                        irradiance_stars=irradiance_stars,
-                                                                        ra_point=self.RA_TARG, dec_point=self.DEC_TARG,
-                                                                        pa_point=self.PA, verbose=verbose)
-            straylevel_image_i = straylevel_image_db["straylight_SCA"]
-            main_offender_image_i = straylevel_image_db["main_offender_SCA"]
-
-                #     return({"straylight_SCA": straylight_SCA, "main_offender_SCA": main_offender_SCA})
+        # rs.plots.ascii_progress_focal_plane.canvas = np.copy(rs.plots.ascii_progress_focal_plane.canvas_zero)
+        straylevel_all_SCAS = []
 
 
+        # Running parallel computation # 
+        straylevel_all_SCAS = []
+        t = datetime.now()
+        print(datetime.now().isoformat() + " > Starting Stray-light scan: ")
+        from concurrent.futures import ProcessPoolExecutor
+        from tqdm import tqdm
 
-            straylevel_list.append(straylevel_image_i)
-            main_offender_list.append(main_offender_image_i)
+        with ProcessPoolExecutor() as executor:
+            inputs = [
+                (
+                    DATA_SHAPE_i,
+                    ASTROPYWCS_i,
+                    SCIEXT_i,
+                    self.FILTER_IDENTITY,
+                    ra_stars_outside,
+                    dec_stars_outside,
+                    cat_id_outside,
+                    source_id_outside,
+                    irradiance_stars,
+                    self.RA_TARG,
+                    self.DEC_TARG,
+                    self.PA,
+                    verbose,
+                )
+                for SCIEXT_i, DATA_SHAPE_i, ASTROPYWCS_i in zip(self.SCIEXTS, self.DATA_SHAPE, self.ASTROPYWCS)
+            ]
+            results = list(tqdm(executor.map(self._parallel_worker, inputs),total=len(inputs),))
+            straylevel_all_SCAS.extend(results)
+
+        print(datetime.now().isoformat() + " > Done : " + str(datetime.now() - t) + " elapsed.")
+
+        ###########
+        # Reconstruct the stray-light maps and main offender maps from the straylevel_all_SCAS database. 
+        ###########
+        NSCAs = len(self.SCIEXTS)# NSCAs 
+        print(" > Reconstructing the Stray-light / Main offender map: ")
+        straylevel_list = [] 
+        main_offender_list = [] 
+        for SCA in range(len(self.SCIEXTS)):
+                # This is the canvas array where we will store all the straylight level.
+            straylight_SCA = np.zeros(self.DATA_SHAPE[0]).astype(np.float32)
+            # This is the canvas array where we will store the ID of the largest stray-light contributor
+            main_offender_SCA = np.zeros(self.DATA_SHAPE[0]).astype(np.float32)
+
+            for subarray_i in range(len(straylevel_all_SCAS[SCA])):
+                xmin = straylevel_all_SCAS[SCA]["xmin"].iloc[subarray_i]
+                xmax = straylevel_all_SCAS[SCA]["xmax"].iloc[subarray_i]
+                ymin = straylevel_all_SCAS[SCA]["ymin"].iloc[subarray_i]
+                ymax = straylevel_all_SCAS[SCA]["ymax"].iloc[subarray_i]
+                straylight_SCA[ymin:ymax, xmin:xmax] = straylevel_all_SCAS[SCA]["straylight_total"].iloc[subarray_i]
+                main_offender_SCA[ymin:ymax, xmin:xmax] = straylevel_all_SCAS[SCA]["mainoffender_total"].iloc[subarray_i]
+
+            
+            straylevel_list.append(straylight_SCA)
+            main_offender_list.append(main_offender_SCA)
+
+        straylevel_db = pd.concat(straylevel_all_SCAS)
+        straylevel_db.to_csv(self.straylight_db_output_name)
+
+        print(datetime.now().isoformat() + " > Done : ")
+
 
         ########################################
         # Save the results to a fits file.
@@ -503,24 +596,21 @@ class exposure():
         # Stray-light
         data_output = []
         header_output = []
-        for SCIEXT_i, straylevel_image_i in tqdm(zip(self.SCIEXTS, straylevel_list)):
+        for SCIEXT_i, straylevel_image_i, ASTROPYWCS_i in tqdm(zip(self.SCIEXTS, straylevel_list, self.ASTROPYWCS)):
             data_output.append(straylevel_image_i)
-            header_output.append(self.ASTROPYWCS[SCIEXT_i-1].to_header())
-        
-
-        self.output_name = self.FILENAME.replace(".fits", "_stray.fits")
+            header_output.append(ASTROPYWCS_i.to_header())
         
         rs.utils.save_fits(array=data_output, name=self.output_name, header=header_output,
-                        extname=None, overwrite=True, output_verify='silentfix')
+                           extname=None, overwrite=True, output_verify='silentfix')
+
         # Main-offender
         data_output = []
         header_output = []
-        for SCIEXT_i, main_offender_i in tqdm(zip(self.SCIEXTS, main_offender_list)):
+        for SCIEXT_i, main_offender_i, ASTROPYWCS_i in tqdm(zip(self.SCIEXTS, main_offender_list, self.ASTROPYWCS)):
             data_output.append(main_offender_i)
-            header_output.append(self.ASTROPYWCS[SCIEXT_i-1].to_header())
+            header_output.append(ASTROPYWCS_i.to_header())
 
 
-        self.main_offender_output_name = self.output_name.replace(".fits", "_main_off.fits")
         rs.utils.save_fits(array=data_output, 
                         name=self.main_offender_output_name, 
                         header=header_output,
@@ -530,8 +620,8 @@ class exposure():
 
 
         # Let's do one more step to include the needed metadata from the dummy file. 
-        stray_image = fits.open(self.output_name)
-        main_offender_image = fits.open(self.main_offender_output_name)
+        stray_image = fits.open(self.output_name, memmap=True)
+        main_offender_image = fits.open(self.main_offender_output_name, memmap=True)
         #exposure_identity_keys_to_copy = ["TELESCOP", "INSTRUME", "DETECTOR", "FILTER", "RA_TARG", "DEC_TARG", 
         #                                  "RA_PNT", "DEC_PNT", "X_PNT", "Y_PNT", "PA",
         #                                  "EXPTIME", "EXPSTART", "EXPSTART_ISOT"]
@@ -563,8 +653,11 @@ class exposure():
         main_offender_image.writeto(self.main_offender_output_name, overwrite=True)
         
         # Generate the drizzled and scaled version of the images
-        scaled_drz_names = rs.utils.generate_scaled_drz(stray_flc_name=self.output_name,
+        print(datetime.now().isoformat() + " > Drizzling maps... ")
+        scaled_drz_names = rs.utils.generate_scaled_drz(stray_flc_name=self.output_name, 
+                                                        straylevel_db=straylevel_db,
                                                         mainoff_flc_name=self.main_offender_output_name,
+                                                        #input_ext=self.SCIEXTS,
                                                         verbose=verbose)
         self.stray_drz_name = scaled_drz_names["stray_drz_name"]
         self.scaled_stray_drz_name = scaled_drz_names["scaled_stray_drz_name"]
@@ -582,10 +675,12 @@ class exposure():
         rs.utils.write_parameters_list([self.scaled_main_off_name], keywords, key_values, ext=0)
         rs.utils.write_parameters_list([self.scaled_main_off_name], ["PIXSCALE"], [[1]], ext=0)
         rs.utils.write_parameters_list([self.scaled_main_off_name], ["REBINNED"], [[10]], ext=0)
+        print(datetime.now().isoformat() + " > Done")
 
 
         ### Generate the straylight report pdf
 
+        print(datetime.now().isoformat() + " > Summary plots... ")
         self.pdf_report_name = rs.plots.make_straylight_plots(RA_TARG=self.RA_TARG, 
                                        DEC_TARG=self.DEC_TARG, 
                                        PA=self.PA, 
@@ -596,11 +691,221 @@ class exposure():
                                        scaled_main_off_name=self.scaled_main_off_name, 
                                        figsize=(10,7), mu_vmin = 25, 
                                        mu_vmax = 35, verbose=1)   
-        
+        print(datetime.now().isoformat() + " > Done")
+
         print("Output saved in: " + self.output_name)
         print("Report saved in: " + self.pdf_report_name)
 
-        return({"stray_flc_name": self.output_name,
+        return({"straylevel_db": straylevel_db, 
+                "stray_flc_name": self.output_name,
                 "mainoff_flc_name": self.scaled_main_off_name})
     
 
+
+    def psf_background(self, g_mag_max=15, catalog=None, verbose=False):
+        #######################################
+        # rosalia_psf: Alejandro S. Borlaff. NASA/Ames STA. a.s.borlaff@nasa.gov
+        # -------------------------------
+        # The objective of this program is to make a model of the stars inside a Roman WFI image
+        # --------------------------------
+        # History:
+        # v1 - 22 January 2026. First working version.
+        #
+        #######################################
+
+        '''
+        rosalia_psf: Alejandro S. Borlaff. NASA Ames Research Center.
+        Model the stars inside a Roman WFI image. This is useful for estimating the straylight from stars 
+        inside the field of view, and for subtracting the stars from the image.
+
+        Args:
+            ra (float): 
+                Right ascension of the pointing, in degrees.
+            
+            dec (float): 
+                Declination of the pointing, in degrees.
+            
+            PA (float): 
+                Position angle of the observation, in degrees.
+            
+            g_mag_max (float):
+                Maximum g magnitude of the stars to consider in the model.
+            
+            date (astropy.time.Time): 
+                Date of the observation in YYYY-MM-DDTHH:MM:SS format.
+            
+            bandpass (str): 
+                Bandpass of the observation in Roman WFI filter names (e.g., F062, F087, F106, F129, F158, F184, F213).
+            
+            exptime (float): 
+                Exposure time of the observation, in seconds.
+
+            input_catalog (pandas.DataFrame, optional): 
+                User-provided catalog of stars. Must contain columns: "ra", "dec", "source_id", "cat_id", "mag_lambda".
+            
+            verbose (bool, optional): 
+                If True, print more information about progress. Default is False.
+
+        '''
+        from tqdm import tqdm
+        from astropy.io import fits
+        import logging
+        logger = logging.getLogger()
+        logger.setLevel(logging.CRITICAL)
+
+        # Get the catalog of the stars around the FOV
+        if not hasattr(self, 'source_catalog'):
+            if catalog is None:
+                self.source_catalog = self.get_source_catalog(g_mag_max=g_mag_max, verbose=False)
+            else:
+                self.source_catalog = rs.utils.fix_custom_catalog(catalog)
+
+
+        # Generate the star stamps (PSFs)
+        print("TO DO: Make stamps with a more reasonable size. Dim stars can have smaller PSFs.")
+        print("To do this, make a profile of the Roman / PSF, and find out when would it be essentially 0.")
+        star_stamps = rs.psf.generate_star_stamps(hybrid_catalog=self.source_catalog,
+                                                # image_identity=image_identity),
+                                                 telescope=self.TELESCOP, 
+                                                 filename=self.FILENAME, 
+                                                 sciexts=self.SCIEXTS, 
+                                                 astropywcs=self.ASTROPYWCS,
+                                                 filter=self.FILTER_IDENTITY["wavelength"],
+                                                 pa=self.PA, verbose=verbose)
+        # def generate_star_stamps(hybrid_catalog, telescope, filename, sciexts, astropywcs, filter, pa, verbose=False):
+
+
+        # Now combine all the stamps in the mosaiced frame and blot back to the single SCAs.
+        # This is more efficient than reprojecting each star into all SCAs.
+        # Flattening the list of lists.
+        star_stamps_flat = []
+        for i in range(len(star_stamps)):
+            star_stamps_flat = star_stamps_flat + star_stamps[i]
+
+        # Making the combined frame.
+        os.system("swarp -dd > swarp.conf")
+        swarp_cmd_str = ""
+        for star_stamp in star_stamps_flat:
+            swarp_cmd_str = swarp_cmd_str + '"' + star_stamp +'" '
+
+        if verbose > 1: print("Combining star stamps into WCS frame...")
+        cmd = "swarp -c swarp.conf -SUBTRACT_BACK N -BLANK_BADPIXELS Y -COMBINE_TYPE SUM -VERBOSE_TYPE QUIET " + swarp_cmd_str
+        if verbose > 2: print(cmd)
+        rs.utils.execute_cmd(cmd)  # Run swarp on all the SCAs
+        star_swarp_name = self.FILENAME.replace(".fits", "_stars_drz.fits")
+        rs.utils.execute_cmd("mv coadd.fits " + star_swarp_name) # Make a compressed version, for easiest visualization.
+
+        # Now blot back to the dummy SCA per SCA frame
+        from reproject import reproject_interp
+        # Let's make a dummy copy to reproject the stars into
+        roman_dummy = fits.open(self.FILENAME, memmap=True)
+        star_model = fits.open(star_swarp_name, memmap=True)
+
+        if verbose: print("Storing stars in each SCA")
+        for SCIEXT_i in tqdm(self.SCIEXTS):
+            # Open the star fits
+            star_reprojected, footprint = reproject_interp(star_model[0],
+                                                           roman_dummy[SCIEXT_i].header, 
+                                                           parallel=True)
+            star_reprojected[np.isnan(star_reprojected)] = 0
+            roman_dummy[SCIEXT_i].data = roman_dummy[SCIEXT_i].data + star_reprojected
+
+        roman_dummy.verify("silentfix")
+        star_output_name = self.FILENAME.replace(".fits", "_stars.fits")
+        roman_dummy.writeto(star_output_name, overwrite=True)
+
+        # Now make again the drz, this time with the correct gaps.
+        drz_name, scaled_drz_name = rs.utils.run_swarp(pattern=star_output_name, 
+                                                       outname=star_output_name.replace(".fits","_drz.fits"), scale=0.11)
+
+
+        if verbose: 
+            print("In-field stray-light model completed. Level 2 multi-extension FITS: " + star_output_name)
+            print("Mosaic image: " + drz_name)
+            print("Scaled mosaic: " + scaled_drz_name)
+        return(star_output_name)
+
+
+
+    def zodiacal(self, zody_mode="zodipy", verbose=False, output_name=None, output_units="e/s"):
+        import astropy.wcs as astropy_wcs
+        from tqdm import tqdm
+        import logging
+        logger = logging.getLogger()
+        logger.setLevel(logging.CRITICAL)
+
+        nSCIEXTS = len(self.SCIEXTS)
+        # Make the Roman Dummy image
+        roman_dummy_name = self.FILENAME 
+        if output_name is None:
+            output_name = self.FILENAME.replace(".fits", "_zody.fits")
+
+        zodiacal_background_list = []
+        zodiacal_background_unit_list = []
+
+        print("Computing Zodiacal light...")
+        for i in tqdm(range(nSCIEXTS)):
+            zodiacal_background = rs.sky.get_zodiacal_background(self.ASTROPYWCS[i],
+                                                        wavelength=self.FILTER_IDENTITY,
+                                                        telescope=self.TELESCOP,
+                                                        instrument=self.INSTRUME,
+                                                        detector=self.DETECTOR,
+                                                        expstart=self.EXPSTART,
+                                                        step=1000, zody_mode=zody_mode,
+                                                        nbins_wavelength=10, obslocin=0,
+                                                        grid_method="random", 
+                                                        sca=self.SCIEXTS[i], 
+                                                        output_units=output_units,
+                                                        verbose=verbose)
+            # print(zodiacal_background)
+
+            
+
+            constant_pixel_011arcsec_scale_factor = 0.11/(astropy_wcs.utils.proj_plane_pixel_scales(self.ASTROPYWCS[i])[0]*60*60)
+            zodiacal_background = zodiacal_background/constant_pixel_011arcsec_scale_factor**2
+            zodiacal_background_list.append(zodiacal_background.value)
+            zodiacal_background_unit_list.append(zodiacal_background.unit.to_string())
+
+        ########################################
+        # Save the results to a fits file.
+        ########################################
+        header_list_output = []
+        for i in tqdm(range(nSCIEXTS)):
+            temp_header = self.ASTROPYWCS[i].to_header()
+            temp_header["UNITS"] = zodiacal_background_unit_list[i]
+            header_list_output.append(temp_header)
+
+        rs.utils.save_fits(array=zodiacal_background_list, name=output_name, header=header_list_output,
+                        extname=None, overwrite=True, output_verify='silentfix')
+
+        # Make the scaled model and the summary plot.
+        drz_name, scaled_drz_name = rs.utils.run_swarp(pattern=roman_dummy_name, 
+                                                    outname=roman_dummy_name.replace(".fits","_drz.fits"), scale=0.11)
+
+        print("Generating scaled mosaic...")
+        reprojected_images, reference_header = rs.utils.reproject_roman_wfi_fits(data_list=zodiacal_background_list,
+                                                                                wcs_list=header_list_output,
+                                                                                reference_name=scaled_drz_name,
+                                                                                reference_ext=1)
+        import bottleneck as bn
+        drz_zody = bn.nansum(np.array(reprojected_images), axis=0)
+        from astropy.io import fits 
+        scaled_drz = fits.open(scaled_drz_name, memmap=True)
+        drz_zody_name = output_name.replace(".fits","_drz.fits")
+        scaled_drz_zody_name = output_name.replace(".fits","_drz_scaled.fits")
+
+        
+        rs.utils.save_fits(array=drz_zody, name=scaled_drz_zody_name,
+                           header=scaled_drz[1].header,
+                           extname=None, overwrite=True, output_verify='silentfix')
+
+        rs.plots.make_stray_plot(input_name=scaled_drz_zody_name, ext=0, mode="fe2mu", 
+                                 vmin=None, vmax=None, 
+                                 color_label = 'Surface brightness (mag arcsec$^{-2}$)',
+                                 cmap="RdYlBu", output_name=None, figsize=(10,7), mu_vmin=None, mu_vmax=None)
+
+        print("Output saved in: " + output_name)
+
+        return({"zodi_list": zodiacal_background_list,
+                "output_name": output_name,
+                "reprojected_images": reprojected_images})
