@@ -1,9 +1,4 @@
-import os
-import sys
 import numpy as np
-import matplotlib.pyplot as plt
-import bottleneck as bn
-import pandas as pd
 from astropy.io import fits
 import rosalia as rs
 
@@ -66,7 +61,7 @@ def make_gnuastro_segmentation_map(input_name, ext, saturation_level=50000, clea
 
 ############################
 def make_wcs_clean_extension(input_name, ext):
-    input_fits = fits.open(input_name)
+    input_fits = fits.open(input_name, memmap=True)
     wcsname_location_in_header = np.where(np.array(input_fits[ext].header) == "WCSNAME")[0][0]
     #print(wcsname_location_in_header)
     output_name = input_name.replace(".fits", "_ext" + str(ext) + ".fits")
@@ -102,7 +97,7 @@ def astmkcatalog(input_name, ext, clean=True, verbose=False):
     rs.utils.execute_cmd(cmd)
 
     #output_name = output_name.replace(".csv", "_c.csv")
-    output_catalog = fits.open(output_name)
+    output_catalog = fits.open(output_name, memmap=True)
 
     if verbose:
         print("###############################################")

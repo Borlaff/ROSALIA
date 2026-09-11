@@ -5,7 +5,6 @@ def f_hst_attenuation(theta):
 
 
 def sort_hst_flcs_by_filter(filelist):
-    #print(filelist)
     filters_list_keywords = rs.utils.get_keys_from_header(filelist, ["FILTER1", "FILTER2"], ext=0)
     filters = []
     for i in tqdm(range(len(filelist))):
@@ -32,11 +31,12 @@ def sort_hst_flcs_by_filter(filelist):
     return(list_of_filters)
 #####################################################################
 
-def measure_sky_level_HST_ACS(exposure_name, zody_mode="stsci",verbose=False):
+
+def measure_sky_level_HST_ACS(exposure_name, verbose=False):
     # Open the fits file
     from astropy.io import fits
 
-    exposure_fits = fits.open(exposure_name) # We open the fits file with astropy
+    exposure_fits = fits.open(exposure_name, memmap=True) # We open the fits file with astropy
 
     # Try to retrieve a previous analysis that was performed in this exposure
     try:
@@ -64,9 +64,6 @@ def measure_sky_level_HST_ACS(exposure_name, zody_mode="stsci",verbose=False):
 
 
     # Lets import some more astropy packages to deal with the time, units, and coordinates.
-    import astropy.units as u
-    from astropy.time import Time
-    from astropy.coordinates import SkyCoord  # High-level coordinates
 
     # -------------------------------------- #
     # MODEL ZODIACAL LIGHT                   #
@@ -78,7 +75,7 @@ def measure_sky_level_HST_ACS(exposure_name, zody_mode="stsci",verbose=False):
                                                           instrument="ACS",
                                                           detector="WFC",
                                                           expstart=EXPSTART,
-                                                          step=4000, zody_mode=zody_mode,
+                                                          step=4000, zody_mode="zodipy",
                                                           nbins_wavelength=20, obslocin=3,
                                                           grid_method="random", verbose=False, interpolate=False)
     import bottleneck as bn

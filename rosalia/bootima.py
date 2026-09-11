@@ -14,26 +14,15 @@
 ##############################################################################
 
 import os
-# import uuid
-import sys
 import glob
 import psutil
-#import miniutils
 import multiprocessing
 import subprocess
 import numpy as np
-import pandas as pd
-import bottleneck as bn
 from tqdm import tqdm
 from astropy.io import fits
 import rosalia as rs
 
-# results = parallel_progbar(do_something_slow, my_list)
-# Equivalent to a parallel version of [do_something_slow(x) for x in my_list]
-
-
-# DO TO:
-# 2 - Avoid creating slices again if they are already in place.
 
 def does_it_fit_in_RAM(fits_list, ext, verbose=False):
     # Quite slow so far, we must paralelize this.
@@ -47,11 +36,7 @@ def does_it_fit_in_RAM(fits_list, ext, verbose=False):
     bitpix=[]
 
     if verbose: print("Getting NAXIS1")
-    nprocs = multiprocessing.cpu_count() - 2
     arguments = zip(np.array(fits_list), np.array([ext]*len(fits_list)), np.array(["NAXIS1"]*len(fits_list)))
-    #NAXIS1_out = miniutils.parallel_progbar(astheader, arguments)
-
-    #NAXIS1_out = miniutils.parallel_progbar(astheader, arguments, starmap=True, nprocs=nprocs)
 
 
     if verbose: print(arguments)
@@ -71,13 +56,10 @@ def does_it_fit_in_RAM(fits_list, ext, verbose=False):
     pool.terminate()
     ##########
 
-    #NAXIS1_out = list(tqdm(pool.starmap(astheader, arguments), total=len(fits_list)))
     NAXIS1 = [i[0] for i in NAXIS1_out]
 
     if verbose: print("Getting NAXIS2")
     arguments = zip(np.array(fits_list), np.array([ext]*len(fits_list)), np.array(["NAXIS2"]*len(fits_list)))
-    #NAXIS2_out = miniutils.parallel_progbar(astheader, arguments, starmap=True, nprocs=nprocs)
-
 
     ############
     if multiprocessing.cpu_count() > 2:
@@ -99,7 +81,6 @@ def does_it_fit_in_RAM(fits_list, ext, verbose=False):
 
     if verbose: print("Getting BITPIX")
     arguments = zip(np.array(fits_list), np.array([ext]*len(fits_list)), np.array(["BITPIX"]*len(fits_list)))
-    #bitpix_out = miniutils.parallel_progbar(astheader, arguments, starmap=True, nprocs=nprocs)
 
     ############
     if multiprocessing.cpu_count() > 2:
@@ -119,16 +100,8 @@ def does_it_fit_in_RAM(fits_list, ext, verbose=False):
 
     bitpix = [i[0] for i in bitpix_out]
 
-
-
     if verbose: print("Checking if dataset fits in RAM:")
-
     if verbose: print(NAXIS1)
-
-    #for i in tqdm(fits_list):
-    #    NAXIS1.append(astheader(i, ext, "NAXIS1")[0])
-    #    NAXIS2.append(astheader(i, ext, "NAXIS2")[0])
-    #    bitpix.append(astheader(i, ext, "BITPIX")[0])
 
     if not (len(set(NAXIS1))==1) and (len(set(NAXIS2))==1):
         if verbose: print("Error: All images must have the same dimensions")
@@ -162,7 +135,6 @@ def does_it_fit_in_RAM(fits_list, ext, verbose=False):
         print("----------> Running slice analysis")
         return([False, {"NAXIS1": NAXIS1, "NAXIS2": NAXIS2, "available_memory": available_memory,
                         "dataset_size": dataset_size, "nimages": nimages, "image_size": image_size, "bixpix": bitpix}])
-
 
 
 
@@ -227,10 +199,7 @@ def bootima_slice(fits_list, ext, nsimul, outname, clean=True, verbose=False, mo
 
     # We copy the files to a temporary directory
     # This is a suboptimal practice, but it is the only way to shorten the input line
-
-
     current_wd = os.getcwd()
-    fits_wd = os.path.dirname(os.path.abspath(fits_list[0]))
     if not os.path.exists("tmp_bootima"): os.mkdir("tmp_bootima")
 
     for file_name in fits_list:
@@ -239,7 +208,6 @@ def bootima_slice(fits_list, ext, nsimul, outname, clean=True, verbose=False, mo
         else:
             rs.utils.execute_cmd("cp " + file_name + " tmp_bootima")
 
-    # os.chdir(fits_wd)
     basename_fits_list = glob.glob("tmp_bootima/*.fits") # [os.path.basename(i) for i in fits_list]
 
 
@@ -264,7 +232,6 @@ def bootima_slice(fits_list, ext, nsimul, outname, clean=True, verbose=False, mo
 
         if len(set(ext)) == 1:
             str_ext_list = " -g" + str(ext[0])
-            # astarithmetic -h1 masked_ext1.fits -h2 masked_ext1.fits 0 gt nan where
         cmd_text = "astarithmetic --keepinputdir " + str_image_list + " " + str_ext_list + " " + str(len(boot_indexes)) + " " + mode + " --output=" + sim_output_name
         rs.utils.execute_cmd(cmd=cmd_text, verbose=verbose)
 
@@ -277,13 +244,10 @@ def bootima_slice(fits_list, ext, nsimul, outname, clean=True, verbose=False, mo
         basename_str_simulation_list = basename_str_simulation_list + " " + m
 
     # We calculate the median image
-
     cmd_text = "astarithmetic --keepinputdir " + str_simulation_list + " -g1 " + str(nsimul) + " " + mode + " --quiet --output=" + median_output_name
     rs.utils.execute_cmd(cmd=cmd_text, verbose=verbose)
 
     # We calculate the standard deviation image
-    #cmd_text = "astarithmetic --keepinputdir " + basename_str_simulation_list + " -g1 " + str(nsimul) + " std --output=" + std_output_name
-    #rs.utils.execute_cmd(cmd_text, verbose=verbose)
     cmd_text = "astarithmetic --keepinputdir " + str_simulation_list + " -g1 " + str(nsimul) + " 0.1586553 quantile --quiet --output=" + s1down_output_name
     rs.utils.execute_cmd(cmd=cmd_text, verbose=verbose)
 
@@ -429,7 +393,6 @@ def bootima(fits_list, ext, nsimul, outname, clean=True, verbose=False, mode="me
     if verbose:
         print("Bootima v2.5")
 
-    outpath = os.path.dirname(outname)
 
     # Check if the image list fits in RAM
     it_fits = does_it_fit_in_RAM(fits_list=fits_list, ext=ext)
@@ -455,9 +418,6 @@ def bootima(fits_list, ext, nsimul, outname, clean=True, verbose=False, mode="me
         print("- Slice size: " + str(slice_size) + " px")
 
 
-        # slice_archive=slice_fits(fits_list=fits_list, ext=ext, nslices=nslices)
-        nprocs = multiprocessing.cpu_count() - 2
-        #slice_archive = miniutils.parallel_progbar(slice_fits, zip(fits_list, [ext]*len(fits_list), [nslices]*len(fits_list)), starmap=True, nprocs=nprocs)
         slice_archive = []
 
         ############

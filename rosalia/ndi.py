@@ -29,7 +29,6 @@
 ##########################################################
 
 import numpy as np
-from scipy import interpolate
 from astropy import constants as const
 import astropy.units as u
 import rosalia as rs

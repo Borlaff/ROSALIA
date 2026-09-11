@@ -21,6 +21,9 @@ from astropy.coordinates import SkyCoord  # High-level coordinates
 from tqdm import tqdm
 import bottleneck as bn
 import rosalia as rs
+import asdf
+import s3fs
+
 
 ###############################
 # MULTIORDER HEALPIX ROUTINES #
@@ -48,40 +51,6 @@ def hp_resol2nside(resolution):
         hp_resolution = np.degrees(hp.pixelfunc.nside2resol(nside=nside)*u.radian)
         i = i + 1
     return(nside)
-
-#################################
-
-""" DEPRECATED
-def make_allsky_MOC(min_resolution):
-    import mhealpy as hmap
-    from astropy import units as u
-    nside = hp_resol2nside(min_resolution)
-    MOC = hmap.HealpixMap(nside=nside, density=True)
-    return({"MOC": MOC, "nside": nside})
-"""
-#################################
-
-""" DEPRECATED
-def make_polygon_MOC(ra_vert, dec_vert, min_resolution):
-    import healpy as hp
-    import mhealpy as hmap
-    from astropy import units as u
-
-    #min_resolution = 10*u.arcsec # arcsec
-    #ra_vert = np.array([-0.1, -0.1, 0.1, 0.1])
-    #dec_vert = np.array([-0.1, 0.1, 0.1, -0.1])
-
-    nside = hp_resol2nside(min_resolution)
-    mEq = hmap.HealpixBase(nside = nside)
-
-    vec = hp.ang2vec(ra_vert[::-1], dec_vert[::-1], lonlat=True)
-    polygon_pix = mEq.query_polygon(vec)
-
-    #print("Making MOC from pixels 1")
-    MOC = hmap.HealpixMap.moc_from_pixels(mEq.nside, polygon_pix, density=True)
-
-    return({"MOC": MOC, "nside": nside})
-"""
 
 ###############################
 
@@ -198,14 +167,15 @@ def execute_cmd(cmd, verbose=False):
     if verbose:
         print(cmd)
     try:
-        print(rs.plots.style.YELLOW)
+        if verbose: print(rs.plots.style.YELLOW)
         result = subprocess.check_output([cmd], shell=True, text=True, stderr=subprocess.STDOUT)
-        print(rs.plots.style.RESET)
+        if verbose: print(rs.plots.style.RESET)
         return(result)
 
     except subprocess.CalledProcessError as e:
-        print(e.returncode)
-        print(e.output)
+        if verbose:
+            print(e.returncode)
+            print(e.output)
         return(None)
 
 ############################
@@ -222,25 +192,57 @@ def exposure_inspector(input_name, verbose=False, lite=False):
     # If the input is a pattern with *, then we will use glob to find the files 
     # that match the pattern, then we will run convert_ASDF_to_FITS, 
     # and finally run exposure_inspector of the final product. 
-    list_of_files = glob.glob(input_name)
-    if "*" in input_name and input_name.endswith(".asdf"):
-        output_name = input_name.replace("*", "_").replace(".asdf", ".fits")
-        input_name = rs.utils.convert_ASDF_to_FITS(asdf_list=list_of_files, output=output_name)
-        exposure_identity = exposure_inspector_single(input_name, verbose=verbose, lite=lite)
-        return(exposure_identity)
+
+    #list_of_files = glob.glob(input_name)
+    #if "*" in input_name and input_name.endswith(".asdf"):
+    #    output_name = input_name.replace("*", "_").replace(".asdf", ".fits")
+    #    input_name = rs.utils.convert_ASDF_to_FITS(asdf_list=list_of_files, output=output_name)
+    #    exposure_identity = exposure_inspector_single(input_name, verbose=verbose, lite=lite)
+    #    return(exposure_identity)
 
     # If it is just a string without * wildcard, then we will run exposure_inspector_single directly.
-    if isinstance(input_name, (str,)):
+    if isinstance(input_name, (str,)) and (not "*" in input_name):
         exposure_identity = exposure_inspector_single(input_name, verbose=verbose, lite=lite)
         return(exposure_identity)
 
     # If we provide a list of files, then we will run exposure_inspector_single for each file,
     # and return a dataframe with the results.
+    if "*" in input_name:
+        
+        if "s3://" in input_name: # Then is a S3 bucket path. 
+            fs = s3fs.S3FileSystem(anon=True)
+            s3_files = fs.glob(input_name)
+            s3_dir = os.path.dirname(input_name)
+            s3_paths = []
+
+            for s3_file in s3_files:
+                s3_paths.append(s3_dir + "/" + os.path.basename(s3_file))
+            input_name = s3_paths
+            # print(input_name)
+        else:
+            input_name = glob.glob(input_name)
+
+
     if isinstance(input_name, (list,)):
         exposure_identities = []
+        DATA = []
+        ASTROPYWCS = []
+        DATA_SHAPE = []
+        SCIEXTS = []
+
         for i in tqdm(range(len(input_name))):
             exposure_identity = rs.utils.exposure_inspector(input_name[i], lite=lite)
-            exposure_identities.append(exposure_identity)
+            # exposure_identities.append(exposure_identity)
+            DATA.append(exposure_identity["DATA"][0])
+            DATA_SHAPE.append(exposure_identity["DATA_SHAPE"][0])
+            ASTROPYWCS.append(exposure_identity["ASTROPYWCS"][0])
+            SCIEXTS.append(exposure_identity["SCIEXTS"][0])
+
+        exposure_identity["DATA"] = DATA
+        exposure_identity["DATA_SHAPE"] = DATA_SHAPE
+        exposure_identity["ASTROPYWCS"] = ASTROPYWCS
+        exposure_identity["SCIEXTS"] = SCIEXTS
+        return(exposure_identity)
 
         if exposure_identity["TELESCOP"] == "ROMAN":
             print(rs.plots.style.YELLOW)
@@ -267,13 +269,10 @@ def exposure_inspector_single(input_name, verbose=False, lite=False):
     # If the input image is a FITS file, then use astropy.io.fits.open
     if file_extension == ".fits":
         exposure_identity = exposure_inspector_fits(input_name, verbose=verbose, lite=lite)
-        exposure_identity["FILETYPE"] = "FITS"
 
     # If the input image is a ASDF file, then use asdf.open
     if file_extension == ".asdf":
         exposure_identity = exposure_inspector_asdf(input_name, verbose=verbose, lite=lite)
-        exposure_identity["FILETYPE"] = "ASDF"
-        exposure_identity["SCIEXTS"] = np.array([0])
 
     # Add the position of the telescope to the identity.
     try:
@@ -288,22 +287,30 @@ def exposure_inspector_single(input_name, verbose=False, lite=False):
 
 
 def exposure_inspector_asdf(input_name, verbose=False, lite=False):
-    import asdf
-    input_asdf = asdf.open(input_name)
+    # print(input_name)
+    if "s3://" in input_name: 
+        if verbose: print("Nexus S3 bucket file detected")
+
+        fs = s3fs.S3FileSystem(anon=True)
+        input_asdf = asdf.open(fs.open(input_name, 'rb'))
+
+    else:
+        if verbose: print("Local ASDF file detected")
+        input_asdf = asdf.open(input_name)
 
     # Setting up keywords to store the info from the file
     exposure_identity = {}
     exposure_identity["FILENAME"] = input_name
 
-    keywords = ["TELESCOP", "INSTRUME", "DETECTOR", "RA_TARG", "DEC_TARG", "SUNANGLE", "BUNIT",
-                "EXPSTART", "EXPEND", "EXPTIME", "MOONANGL", "DRIZCORR",
-                "PHOTCORR", "PHOTFLAM", "PHOTPLAM"]
+    #keywords = ["TELESCOP", "INSTRUME", "DETECTOR", "RA_TARG", "DEC_TARG", "SUNANGLE", "BUNIT",
+    #            "EXPSTART", "EXPEND", "EXPTIME", "MOONANGL", "DRIZCORR",
+    #            "PHOTCORR", "PHOTFLAM", "PHOTPLAM"]
 
     exposure_identity["INSTRUME"] = input_asdf["roman"]["meta"]["instrument"]["name"]
 
     exposure_identity["TELESCOP"] = input_asdf["roman"]["meta"]["telescope"]
     if exposure_identity["TELESCOP"] == "ROMAN":
-        telescope_class = rs.telescopes.Roman
+        # telescope_class = rs.telescopes.Roman
         detector_svo = "WFI"
 
     exposure_identity["DETECTOR"] = input_asdf["roman"]["meta"]["instrument"]["detector"]
@@ -321,7 +328,7 @@ def exposure_inspector_asdf(input_name, verbose=False, lite=False):
     exposure_identity["pixel_area"] = input_asdf["roman"]["meta"]["photometry"]["pixel_area"]*((180/np.pi)*60*60)**2
     exposure_identity["EXPSTART_ISOT"] = input_asdf["roman"]["meta"]["exposure"]["start_time"].isot
     exposure_identity["SCA"] = int(input_asdf["roman"]["meta"]["instrument"]["detector"].replace("WFI",""))
-
+    exposure_identity["BUNIT"] = "DN/s" # input_asdf["roman"]["meta"]["photometry"]["flux_unit"]
 
     ############## Get the filter identity #######################
     try: 
@@ -345,20 +352,22 @@ def exposure_inspector_asdf(input_name, verbose=False, lite=False):
     gwcs = []
     astropywcs = []
     from astropy.wcs import WCS as astropy_wcs
-    nSCAs = 1 # Right now (October 2024) exposure inspector only accepts Roman/WFI images with one SCA per ASDF file.
-    for i in range(nSCAs):
-        data.append(np.array(input_asdf["roman"]["data"]))
-        gwcs.append(input_asdf["roman"]["meta"]["wcs"])
-        astropywcs.append(astropy_wcs(input_asdf["roman"]["meta"]["wcs"].to_fits()[0]))
+    #  nSCAs = 1 # Right now (October 2024) exposure inspector only accepts Roman/WFI images with one SCA per ASDF file.
+    data.append(np.array(input_asdf["roman"]["data"]))
+    gwcs.append(input_asdf["roman"]["meta"]["wcs"])
+    astropywcs.append(astropy_wcs(input_asdf["roman"]["meta"]["wcs"].to_fits()[0]))
 
     exposure_identity["DATA"] = data
+    exposure_identity['DATA_SHAPE'] = [data[0].shape]
     exposure_identity["GWCS"] = gwcs
     exposure_identity["ASTROPYWCS"] = astropywcs
 
     exposure_identity["RA_PNT"] =  input_asdf["roman"]["meta"]['pointing']['ra_v1']
     exposure_identity["DEC_PNT"] =  input_asdf["roman"]["meta"]['pointing']['dec_v1']
-    exposure_identity["PA"] = input_asdf["roman"]["meta"]['pointing']["pa_aperture"] # input_asdf["roman"]["meta"]['pointing']['pa_v3']
+    exposure_identity["PA"] =   input_asdf["roman"]["meta"]['pointing']["pa_aperture"] # input_asdf["roman"]["meta"]['pointing']['pa_v3']
 
+    exposure_identity["FILETYPE"] = "ASDF"
+    exposure_identity["SCIEXTS"] = [int(input_asdf["roman"]["meta"]["instrument"]["detector"].replace("WFI",""))]
 
 
     return(exposure_identity)
@@ -546,7 +555,7 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
 
             outname, outname_scaled = run_swarp(pattern=swarp_cmd_str, 
                                                 outname=input_name.replace(".fits", "_drz.fits"),
-                                                scale=0.1,
+                                                scale=0.11,
                                                 coveredfrac=1)
 
 
@@ -563,27 +572,51 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
 
     
     ################
+    exposure_identity["FILETYPE"] = "FITS"
 
     return(exposure_identity)
 
 
-def reproject_roman_wfi_fits(input_name, input_ext, reference_name, reference_ext):
-    from reproject import reproject_interp
-    from tqdm import tqdm
-    
-    hdu_reference = fits.open(reference_name)
-    hdu_input     = fits.open(input_name)
 
-    canvas = np.zeros(hdu_reference[reference_ext].data.shape)
-        
-    for SCAi in tqdm(input_ext-1):
-        array, footprint = reproject_interp(hdu_input[SCAi+1], 
-                                            hdu_reference[reference_ext].header, 
-                                            parallel=True)
-        
-        canvas = np.nansum(np.array([canvas, array]), axis=0)
-    return([canvas, hdu_reference[reference_ext].header])
-    
+#######################################
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#######################################
+
+
+def reproject_roman_wfi_fits(data_list, wcs_list, reference_name, reference_ext):
+    import os
+    from reproject import reproject_interp, reproject_exact
+    import copy
+    reprojected_images = []
+
+    reference_fits = fits.open(reference_name, memmap=True)
+    reference_header = reference_fits[reference_ext].header
+    reference_shape = reference_fits[reference_ext].data.shape
+    # Use all available CPU cores
+    num_cpus = os.cpu_count()
+
+    for data, wcs in tqdm(zip(data_list, wcs_list)):
+        data=np.float32(data)
+        array_out = np.memmap(filename='output.np', mode='w+',  
+                              shape=reference_shape, dtype='float32')
+        # print(wcs)
+        reproject_interp(
+            input_data=(data, wcs),
+            output_projection=reference_header,
+            parallel=num_cpus,  # Enables block-based multi-core processing
+            block_size='auto',   # Automatically determines chunk size 
+            return_footprint=False,
+            output_array=array_out
+            )
+
+        reprojected_image = copy.deepcopy(array_out)
+        reprojected_images.append(reprojected_image)
+        del array_out
+
+
+    return(reprojected_images, reference_header)
+
+
 
 def fix_custom_catalog(catalog):
 
@@ -599,31 +632,128 @@ def fix_custom_catalog(catalog):
     return(catalog)
 
 
-def generate_scaled_drz(stray_flc_name, mainoff_flc_name, verbose=False):
+def interpolate_skypoints_to_image(target_name, target_ext, ra, dec, z,
+                                   mask_original_nan=True,
+                                   method="linear"):
+    """
+    Interpolate scattered sky points (RA, Dec, Z) onto the pixel grid of a FITS image
+    using scipy.interpolate.RBFInterpolator (supports extrapolation).
+    """
+
+    from scipy.interpolate import RBFInterpolator
+    from astropy.io import fits
+    from astropy.wcs import WCS
+    import numpy as np
+
+    # Load FITS & WCS
+    target_fits = fits.open(target_name, memmap=True)
+    target_header = target_fits[target_ext].header
+    w = WCS(header=target_header, fobj=target_fits, naxis=2)
+
+    # Input point array for RBFInterpolator
+    ori_points = np.column_stack((ra, dec))
+
+    # Target pixel grid
+    X = np.arange(target_header["NAXIS1"])
+    Y = np.arange(target_header["NAXIS2"])
+    XX, YY = np.meshgrid(X, Y)
+    ra2, dec2 = w.wcs_pix2world(XX, YY, 0)
+    if method=="nearest":
+        from scipy.interpolate import griddata
+        ZZ = griddata(ori_points, z, (ra2, dec2), method=method)
+        if mask_original_nan: ZZ[np.isnan(target_fits[target_ext].data)] = np.nan
+        return(ZZ)
+    
+    else:
+        # Convert pixel grid → sky coordinates
+        target_points = np.column_stack((ra2.ravel(), dec2.ravel()))
+
+        # Build RBF model
+        # Note: smoothing=0 gives pure interpolation. Adjust if needed to reduce noise.
+        rbf = RBFInterpolator(ori_points, z, kernel=method, smoothing=0.0)
+
+        # Evaluate on target grid
+        ZZ = rbf(target_points).reshape(XX.shape)
+
+        # Mask original NaNs
+        if mask_original_nan:
+            ZZ[np.isnan(target_fits[target_ext].data)] = np.nan
+        return(ZZ)
+
+
+
+
+
+
+def generate_scaled_drz(stray_flc_name, mainoff_flc_name, straylevel_db, verbose=False):
     if verbose > 0: print("Generating ROSALIA summary report...")
 
     # Make the drizzle image of the straylight image
     stray_drz_name = stray_flc_name.replace(".fits","_drz.fits")
     stray_drz_name, scaled_stray_drz_name = rs.utils.run_swarp(pattern=stray_flc_name, 
-                                                             outname=stray_drz_name, 
-                                                             scale=0.1)
+                                                               outname=stray_drz_name, 
+                                                               scale=0.11)
     
     # Then reproject the main offender image to the same WCS as the straylight image.
-    data, header = rs.utils.reproject_roman_wfi_fits(input_name=mainoff_flc_name, 
-                                                     input_ext=rs.telescopes.Roman.WFI_SCAs,
-                                                     reference_name=scaled_stray_drz_name, 
-                                                     reference_ext=1)
-    
-    scaled_main_off_name = mainoff_flc_name.replace(".fits", "_scaled.fits")
-    rs.utils.save_fits(array=data, name=scaled_main_off_name, header=header, overwrite=True)
+    #data, header = rs.utils.reproject_roman_wfi_fits(input_name=mainoff_flc_name, 
+    #                                                 input_ext=input_ext,
+    #                                                 reference_name=scaled_stray_drz_name, 
+    #                                                 reference_ext=1)
 
+    
+    scaled_mainoff = interpolate_skypoints_to_image(target_name=scaled_stray_drz_name, target_ext=1,
+                                                    ra=straylevel_db["ramid"], 
+                                                    dec=straylevel_db["decmid"], 
+                                                    z=straylevel_db["mainoffender_total"], 
+                                                    mask_original_nan=True, 
+                                                    method="nearest")
+
+
+    scaled_stray = interpolate_skypoints_to_image(target_name=scaled_stray_drz_name, target_ext=1,
+                                                  ra=straylevel_db["ramid"], 
+                                                  dec=straylevel_db["decmid"], 
+                                                  z=straylevel_db["straylight_total"], 
+                                                  mask_original_nan=True, 
+                                                  method="linear")
+
+    ########### Make the full resolution, interpolated image #############
+    smooth_stray_list = []
+    for i in tqdm(rs.telescopes.Roman.WFI_SCAs):
+        straylevel_db_SCA = straylevel_db[straylevel_db["SCA"] == i]
+        smooth_stray = interpolate_skypoints_to_image(target_name=stray_flc_name, target_ext=i,
+                                                      ra=straylevel_db_SCA["ramid"], 
+                                                      dec=straylevel_db_SCA["decmid"], 
+                                                      z=straylevel_db_SCA["straylight_total"], 
+                                                      mask_original_nan=True, 
+                                                      method="linear")
+        smooth_stray_list.append(smooth_stray)
+
+    stray_flc = fits.open(stray_flc_name, memmap=True)
+    for ext in range(len(smooth_stray_list)):
+        stray_flc[ext+1].data = smooth_stray_list[ext]
+    stray_flc.verify("silentfix")
+    stray_flc.writeto(stray_flc_name, overwrite=True)
+    ################################################
+
+    stray_drz_name, scaled_stray_drz_name = rs.utils.run_swarp(pattern=stray_flc_name, 
+                                                               outname=stray_drz_name, 
+                                                               scale=0.11)
+    scaled_stray_drz = fits.open(scaled_stray_drz_name)
+    scaled_main_off_name = mainoff_flc_name.replace(".fits", "_scaled.fits")
+
+    rs.utils.save_fits(array=scaled_mainoff, name=scaled_main_off_name, header=scaled_stray_drz[1].header,  overwrite=True)
+    rs.utils.save_fits(array=scaled_stray,   name=scaled_stray_drz_name, header=scaled_stray_drz[1].header, overwrite=True)
+
+
+
+    # 
     return({"stray_drz_name": stray_drz_name,
             "scaled_stray_drz_name": scaled_stray_drz_name,
             "scaled_main_off_name": scaled_main_off_name})
 
 
 
-def run_swarp(pattern, outname, scale=1, coveredfrac=1, resample=True, verbose=False):
+def run_swarp(pattern, outname, scale=1, coveredfrac=1, celestial_type="NATIVE", resample=True, verbose=False):
     """
     run_swarp:
     This program runs SWARP on the input pattern of files, and generates a mosaic with the output name specified in outname. The pattern can be a string with the name of the file, a list of files, or a pattern with *. The output mosaic will be saved as outname, and if scale is different from 1, a scaled version of the mosaic will be saved as outname with the suffix "_scaled.fits". 
@@ -648,10 +778,10 @@ def run_swarp(pattern, outname, scale=1, coveredfrac=1, resample=True, verbose=F
     else:
         resample_str = "N"
     rs.utils.execute_cmd("swarp -d > swarp.conf", verbose=verbose) # Generate a default config file for swarp
-    rs.utils.execute_cmd("swarp -c swarp.conf -RESAMPLE " + resample_str + " -SUBTRACT_BACK N -BLANK_BADPIXELS Y -VERBOSE_TYPE QUIET " + pattern, verbose=verbose) # Run swarp on all the SCAs
+    rs.utils.execute_cmd("swarp -c swarp.conf -CELESTIAL_TYPE " + celestial_type + " -RESAMPLE " + resample_str + " -SUBTRACT_BACK N -BLANK_BADPIXELS N -VERBOSE_TYPE QUIET " + pattern, verbose=verbose) # Run swarp on all the SCAs
 
     # Mask all the 0s as NANs
-    hdu = fits.open("coadd.fits")
+    hdu = fits.open("coadd.fits", memmap=True)
     hdu[0].data[hdu[0].data == 0] = np.nan
     hdu.verify('silentfix') # Fix the header to make it compatible with astropy.io.fits
     hdu.writeto("coadd.fits", overwrite=True) # Save the mosaic as coadd.fits
@@ -867,20 +997,6 @@ def MJysr_to_jyarcsec2(flux_mjy_sr):
     return(flux_mjy_sr*(10**6)/(4.25e10))
 
 
-
-###############################################
-"""
-def get_pixscale(fits_name, ext):
-    # We look for the pixsize in the ext 0, if it doesnt work, go to ext 1.
-    input_fits = fits.open(fits_name)
-
-    try:
-        pixsize = np.abs(input_fits[ext].header["CDELT2"])*60*60
-    except:
-        pixsize = np.abs(input_fits[ext].header["CD2_2"])*60*60
-
-    return(pixsize)
-"""
 #################################
 
 def radec_to_xy(ra, dec, fits_name, ext):
@@ -1634,7 +1750,8 @@ def find_max_angular_size_of_image(wcs, ra_cen=None, dec_cen=None):
     :type wcs: :class:`astropy.wcs.wcs.WCS`
     :return: :float: The maximum angular extension of the image in sky coordinates in degrees.
     """
-    
+    # print(wcs)
+    # print(type(wcs))
     if isinstance(wcs, (astropy_wcs.WCS,)):  
         data_shape = wcs.array_shape
         ra_cen, dec_cen = wcs.wcs_pix2world(data_shape[0]/2, data_shape[1]/2, 0)
@@ -1846,7 +1963,7 @@ def get_keys_from_header(fits_list, index, ext=0):
 def write_parameters_list(fits_list, index, value, ext=0):
     for i in range(len(fits_list)):
         raw_name = fits_list[i]
-        print(raw_name)
+        # print(raw_name)
         raw_fits = fits.open(raw_name)
         for j in range(len(index)):
             try:
@@ -1870,8 +1987,6 @@ def get_astropywcs_info_from_sciexts(filename, sciexts):
         header_i = input_fits[sci_ext_i].header
         header_i["EXTNAME"] = "SCI"
         header_i["SCA"] = sci_ext_i      
-        # print("Hey!")
-        # print(input_fits[sci_ext_i].header) 
         header_list.append(input_fits[sci_ext_i].header)
         astropywcs_i = astropy_wcs.WCS(header=input_fits[sci_ext_i], fobj=input_fits, naxis=2)
         astropywcs.append(astropywcs_i)

@@ -11,20 +11,11 @@
 ##########################################################
 
 ############################
-import os
-import sys
-import pandas as pd
 import numpy as np
-import bottleneck as bn
-from tqdm import tqdm
 from astropy.io import fits
 import astropy.wcs as astropy_wcs
 import matplotlib.pyplot as plt
 import matplotlib.colors as matplotlib_colors
-from celluloid import Camera
-from astropy.io import ascii
-import astropy.units as u
-from astropy.coordinates import ICRS, Angle, SkyCoord
 import rosalia as rs
 
 # Suppress warnings. Comment this out if you wish to see the warning messages
@@ -202,7 +193,7 @@ def make_stray_plot(input_name, ext, mode="normal", catalog=None,
                     color_label = 'Surface brightness (mag arcsec$^{-2}$)',
                     cmap="RdYlBu", output_name=None, figsize=(10,7), mu_vmin=None, mu_vmax=None):
     import matplotlib.pyplot as plt
-    from astropy.utils.data import get_pkg_data_filename
+    # from astropy.utils.data import get_pkg_data_filename
     from astropy.wcs import WCS as astropy_wcs
     from astropy.io import fits
     import os
@@ -277,9 +268,10 @@ def make_stars_around_plot(flt_name, catalog,  astropywcs_list, RA_TARG, DEC_TAR
     
     # Get the detector corners: 
     detector_square_list = []
-    for SCIEXT_i in rs.telescopes.Roman.WFI_SCAs:
-        detector_corners = rs.detectors.get_detector_corners(wcs=astropywcs_list[SCIEXT_i-1])
-        detector_square_list.append(np.concatenate([detector_corners["corners_world"], detector_corners["corners_world"]]))
+    for i in range(len(astropywcs_list)):
+        detector_corners = rs.detectors.get_detector_corners(wcs=astropywcs_list[i])
+        detector_square_list.append(np.concatenate([detector_corners["corners_world"],
+                                                    detector_corners["corners_world"]]))
 
 
     # Make a cut in the plot for the stars closer than radius
@@ -555,12 +547,12 @@ def make_straylight_plots(RA_TARG, DEC_TARG, PA, source_catalog, ASTROPYWCS, str
     # Make the plots. 
     if verbose > 0: print("Plot: Stray-light surface brightness magnitude.")
     fe2mu_png = rs.plots.make_stray_plot(input_name=scaled_stray_drz_name,
-                                         ext=1, mode="fe2mu",
+                                         ext=0, mode="fe2mu",
                                          color_label = "Surface brightness (mag arcsec$^{-2}$)",
                                          figsize=figsize, mu_vmin=mu_vmin, mu_vmax=mu_vmax)
 
     if verbose > 0: print("Plot: Stray-light surface brightness flux.")
-    fe_png = rs.plots.make_stray_plot(input_name=scaled_stray_drz_name, ext=1, mode="fe", 
+    fe_png = rs.plots.make_stray_plot(input_name=scaled_stray_drz_name, ext=0, mode="fe", 
                                       color_label = "Flux (e/s/px)", cmap="RdYlBu_r", figsize=figsize)
 
     if verbose > 0: print("Plot: Main offender map.")
