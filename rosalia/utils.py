@@ -333,10 +333,10 @@ def exposure_inspector_asdf(input_name, verbose=False, lite=False):
     ############## Get the filter identity #######################
     try: 
         exposure_identity["FILTER_IDENTITY"] = rs.telescopes.find_filter_in_svo(wavelength=exposure_identity["FILTER"],
-                                                                            telescope=exposure_identity["TELESCOP"],
-                                                                            instrument=exposure_identity["INSTRUME"],
-                                                                            detector=detector_svo,
-                                                                            verbose=False)
+                                                                                telescope=exposure_identity["TELESCOP"],
+                                                                                instrument=exposure_identity["INSTRUME"],
+                                                                                detector=detector_svo,
+                                                                                verbose=False)
         
     except:
         print("The filter " + exposure_identity["FILTER"] + "/" + exposure_identity["TELESCOP"] +  "/" +  exposure_identity["INSTRUME"] + "/" + detector_svo + " was not found. Photometric calculations can be compromised.")
