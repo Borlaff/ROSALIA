@@ -862,8 +862,8 @@ class exposure():
 
             
 
-            constant_pixel_011arcsec_scale_factor = 0.11/(astropy_wcs.utils.proj_plane_pixel_scales(self.ASTROPYWCS[i])[0]*60*60)
-            zodiacal_background = zodiacal_background/constant_pixel_011arcsec_scale_factor**2
+            #constant_pixel_011arcsec_scale_factor = 0.11/(astropy_wcs.utils.proj_plane_pixel_scales(self.ASTROPYWCS[i])[0]*60*60)
+            #zodiacal_background = zodiacal_background/constant_pixel_011arcsec_scale_factor**2
             zodiacal_background_list.append(zodiacal_background.value)
             zodiacal_background_unit_list.append(zodiacal_background.unit.to_string())
 
@@ -876,12 +876,17 @@ class exposure():
             temp_header["UNITS"] = zodiacal_background_unit_list[i]
             header_list_output.append(temp_header)
 
-        rs.utils.save_fits(array=zodiacal_background_list, name=output_name, header=header_list_output,
-                        extname=None, overwrite=True, output_verify='silentfix')
+        rs.utils.save_fits(array=zodiacal_background_list, 
+                           name=output_name, 
+                           header=header_list_output,
+                           extname=None, 
+                           overwrite=True, 
+                           output_verify='silentfix')
 
         # Make the scaled model and the summary plot.
         drz_name, scaled_drz_name = rs.utils.run_swarp(pattern=roman_dummy_name, 
-                                                    outname=roman_dummy_name.replace(".fits","_drz.fits"), scale=0.11)
+                                                       outname=roman_dummy_name.replace(".fits","_drz.fits"), 
+                                                       scale=0.11)
 
         print("Generating scaled mosaic...")
         reprojected_images, reference_header = rs.utils.reproject_roman_wfi_fits(data_list=zodiacal_background_list,
