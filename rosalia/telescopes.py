@@ -90,75 +90,82 @@ def telescope_class_finder(telescope):
 #############################
 
 def find_filter_in_svo(wavelength, telescope, instrument, detector, verbose=False):
-    from astroquery.svo_fps import SvoFps
 
-    if verbose:
-        print("Input filter name " + wavelength + "")
-        print("Looking for " + wavelength + " in SVO library")
+    # Check if the filter is in cache. 
+    filter_cache_filename = os.environ['ROSALIACACHE'] + "/CORE/filters/" + telescope + "_" + instrument + "_" + detector + "_" + wavelength + ".pkl"
+    if os.path.exists(filter_cache_filename):
+        if verbose: print("Filter " + wavelength + " found in cache. Loading from " + filter_cache_filename)
+        filter_db = rs.utils.load_dict(filter_cache_filename)
+        return(filter_db)
 
-    # Handle exceptions with naming
-    # ----------------------------------- #
-    if telescope.lower() == "hubble" or telescope.lower() == "hst":
-        telescope = "HST"
-    if instrument.lower() == "acs/wfc" or instrument.lower() == "acs" or instrument.lower() == "acs/hrc" or instrument.lower() == "acs/sbc":
-        instrument = "ACS"
-    if telescope.lower() == "rst" or telescope.lower() == "roman" or telescope.lower() == "roman/wfi":
-        telescope = "Roman"
+    else:
 
-    #if True:
-    try:
-        filter_list = SvoFps.get_filter_list(facility=telescope, instrument=instrument).to_pandas()
+        from astroquery.svo_fps import SvoFps
 
-    except:
-        print("Filter " + wavelength +  " not found.")
-        print("Please use a wavelength between 0.5 - 2000 microns")
-        print("Or a STRAYCOR compatible filter name")
-        print("No filter found. Check input data")
-        print("Wavelength: " + wavelength)
-        print("Telescope: " + telescope)
-        print("Instrument: " + instrument)
-        print("Detector: " + detector)
+        if verbose:
+            print("Input filter name " + wavelength + "")
+            print("Looking for " + wavelength + " in SVO library")
 
-    #return(matched_filter)
+        # Handle exceptions with naming
+        # ----------------------------------- #
+        if telescope.lower() == "hubble" or telescope.lower() == "hst":
+            telescope = "HST"
+        if instrument.lower() == "acs/wfc" or instrument.lower() == "acs" or instrument.lower() == "acs/hrc" or instrument.lower() == "acs/sbc":
+            instrument = "ACS"
+        if telescope.lower() == "rst" or telescope.lower() == "roman" or telescope.lower() == "roman/wfi":
+            telescope = "Roman"
+
+        #if True:
+        try:
+            filter_list = SvoFps.get_filter_list(facility=telescope, instrument=instrument).to_pandas()
+
+        except:
+            print("Filter " + wavelength +  " not found.")
+            print("Please use a wavelength between 0.5 - 2000 microns")
+            print("Or a STRAYCOR compatible filter name")
+            print("No filter found. Check input data")
+            print("Wavelength: " + wavelength)
+            print("Telescope: " + telescope)
+            print("Instrument: " + instrument)
+            print("Detector: " + detector)
+
+        #return(matched_filter)
 
 
-    for i in range(len(filter_list)):
-        if wavelength in filter_list["filterID"][i] and detector in filter_list["filterID"][i]:
-            filter_id = filter_list["filterID"][i]
-            filter_transmission_curve = SvoFps.get_transmission_data(filter_id)
-            filter_lambda_ref= filter_list["WavelengthEff"][i]
-            filter_lambda_width= filter_list["WidthEff"][i]
+        for i in range(len(filter_list)):
+            if wavelength in filter_list["filterID"][i] and detector in filter_list["filterID"][i]:
+                filter_id = filter_list["filterID"][i]
+                filter_transmission_curve = SvoFps.get_transmission_data(filter_id)
+                filter_lambda_ref= filter_list["WavelengthEff"][i]
+                filter_lambda_width= filter_list["WidthEff"][i]
 
-            good = np.where(np.isfinite(filter_transmission_curve["Wavelength"]) & np.isfinite(filter_transmission_curve["Transmission"]))
-            wavelength_good = filter_transmission_curve["Wavelength"][good]
-            transmission_good = filter_transmission_curve["Transmission"][good]
-            transmission_interpolator = interpolate.interp1d(x=wavelength_good,
-                                                             y=transmission_good,
-                                                             kind="linear", fill_value="extrapolate")
-            transmission_ref = transmission_interpolator(filter_lambda_ref)
+                good = np.where(np.isfinite(filter_transmission_curve["Wavelength"]) & np.isfinite(filter_transmission_curve["Transmission"]))
+                wavelength_good = filter_transmission_curve["Wavelength"][good]
+                transmission_good = filter_transmission_curve["Transmission"][good]
+                transmission_interpolator = interpolate.interp1d(x=wavelength_good,
+                                                                y=transmission_good,
+                                                                kind="linear", fill_value="extrapolate")
+                transmission_ref = transmission_interpolator(filter_lambda_ref)
 
-            filter_lambda_min = wavelength_good[np.where(transmission_good > 0.05)[0][0]]
-            filter_lambda_max = wavelength_good[np.where(transmission_good > 0.05)[0][-1]]
+                filter_lambda_min = wavelength_good[np.where(transmission_good > 0.05)[0][0]]
+                filter_lambda_max = wavelength_good[np.where(transmission_good > 0.05)[0][-1]]
 
-    if True:
-        return({"filter_id": filter_id,
-            "filter_transmission_curve": filter_transmission_curve,
-            "filter_lambda_ref": filter_lambda_ref*u.AA,
-            "filter_lambda_min": filter_lambda_min*u.AA,
-            "filter_lambda_max": filter_lambda_max*u.AA,
-            "filter_lambda_width": filter_lambda_width*u.AA,
-            "filter_transmission_ref": transmission_ref,
-            "wavelength": wavelength,
-            "telescope": telescope,
-            "instrument": instrument,
-            "detector": detector})
+        filter_db = {"filter_id": filter_id,
+                    "filter_transmission_curve": filter_transmission_curve,
+                    "filter_lambda_ref": filter_lambda_ref*u.AA,
+                    "filter_lambda_min": filter_lambda_min*u.AA,
+                    "filter_lambda_max": filter_lambda_max*u.AA,
+                    "filter_lambda_width": filter_lambda_width*u.AA,
+                    "filter_transmission_ref": transmission_ref,
+                    "wavelength": wavelength,
+                    "telescope": telescope,
+                    "instrument": instrument,
+                    "detector": detector}
+    
+        rs.utils.save_dict(filter_db, filter_cache_filename)
 
-    if False:
-        print("No filter found. Check input data")
-        print("Wavelength: " + wavelength)
-        print("Telescope: " + telescope)
-        print("Instrument: " + instrument)
-        print("Detector: " + detector)
+        return(filter_db)
+
 
 
 

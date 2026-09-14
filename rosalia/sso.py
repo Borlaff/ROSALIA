@@ -27,8 +27,6 @@ def get_ephemeris(observer, object, MJD):
 
 
     astropy_time = Time(MJD, format="mjd")
-    astropy_time_yesterday = Time(MJD-1, format="mjd")
-    astropy_time_tomorrow = Time(MJD+1, format="mjd")
 
     obj = Horizons(id=object,
                    location=observer,
