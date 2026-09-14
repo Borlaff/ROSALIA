@@ -11,19 +11,25 @@
 # v.1.1 August 2026 integration with StSci zodiacal light calculator by SLN
 ##########################################################
 import os
-import glob
+import io
+import urllib
+import healpy as hp
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
 import bottleneck as bn
 import astropy.units as u
 from astropy.io import fits
-from astropy.io import ascii
 from astropy.time import Time
 from astropy.coordinates import SkyCoord
-from scipy import constants
 import matplotlib.pyplot as plt
 # import gunagala.sky as skies # Gunagala is not maintained. It requires to detach from astropy_helpers. https://github.com/astropy/astropy-helpers
+import copy
+from scipy.interpolate import interp1d
+from astropy.coordinates import get_body
+import warnings
+from astropy.utils.exceptions import AstropyWarning
+import urllib.request
 
 import rosalia as rs
 
@@ -226,7 +232,7 @@ def get_zodiacal_background(astropywcs, wavelength=None,
 
     # First we get the detector grid for interpolating the zodiacal measurements
     detector_grid = rs.detectors.make_detector_grid(w=astropywcs, step=step, mode=grid_method)
-    npoints_grid = len(detector_grid["grid_world"][0])
+
     # Then we query IRSA to get the Zody surface brightness at those positions and time
     if verbose:
         print("Year: " + str(year))
@@ -234,57 +240,28 @@ def get_zodiacal_background(astropywcs, wavelength=None,
         print("RA: " + str(np.median(detector_grid["grid_world"][0])))
         print("DEC: " + str(np.median(detector_grid["grid_world"][1])))
 
-    # The anticipated results are len(detector_grid)*2*nbins
-    db_irsa = np.zeros((npoints_grid, nbins_wavelength))*np.nan
+
 
     # For each wavelength bin, we do this query
-    if zody_mode == "IRSA":
-        print("Launching queries to IRSA/IPAC...")
-        nwavebins = len(rebinned_wavelength)
-        for i in range(len(rebinned_wavelength)):
-            print(i)
-            # IRSA queries must go in um so we need to multiply by 1E+7 the m above
-            db = rs.irsa.irsa_query(ra=detector_grid["grid_world"][0], dec=detector_grid["grid_world"][1],
-                                    wavelength=rebinned_wavelength[i].to("um").value, 
-                                    year=year, day=day, obslocin=obslocin)*rebinned_transmission[i]
+    if zody_mode.lower() == "irsa":
+        zody_MJysr = irsa_zody(ra=detector_grid["grid_world"][0], 
+                               dec=detector_grid["grid_world"][1], 
+                               wavelength=rebinned_wavelength, 
+                               weights=rebinned_transmission, 
+                               expstart=expstart, obslocin=3) 
 
-            db_irsa[:,i] = db['zody']
-        # Numerical integration of the zody surface brightness over the filter transmission curve
-        #db_irsa[:,i] = np.array(db["zody"]*dlambda*rebinned_transmission[i])/np.nansum(rebinned_transmission[i])
-        zody_Jyarcsec2 = np.nanmean(db_irsa, axis=1)
-        print("Average In Jy/arcsec2")
-        print(np.nanmedian(zody_Jyarcsec2))
-        print(-2.5*np.log10(np.nanmedian(zody_Jyarcsec2))+8.9)
-        zody_MJysr = zody_Jyarcsec2/rs.constants.MJysr_to_Jyarcsec2
 
-    if zody_mode == "zodipy":
-        #gunagala_zody(ra, dec, wavelength, year, day)
-        if verbose:
-            print("Estimating zodiacal light with Zodipy...")
-
-        #obspos = np.array([xyz_helio_pos[0].value,
-        #                   xyz_helio_pos[1].value,
-        #                   xyz_helio_pos[2].value])*u.AU
-
-        if verbose:
-            print("Heliocentric position of telescope:")
-            print(obspos)
+    if zody_mode.lower() == "zodipy":
+        if verbose: print("Zodiacal light model: Zodipy")
         zody_MJysr = zodipy_zody(ra=detector_grid["grid_world"][0],
                          dec=detector_grid["grid_world"][1],
                          wavelength=rebinned_wavelength.to("um").value,
                          weights=rebinned_transmission,
                          expstart=expstart,
                          obspos=obspos)
-        # print('ra',detector_grid["grid_world"][0])
-        # print('dec',detector_grid["grid_world"][1])
-        print('wavelength',rebinned_wavelength.to("um").value)
-        print('weights',rebinned_transmission)
-        print('expstart',expstart)
-        print('obspos',obspos)
-        print(zody_MJysr)
 
-    if zody_mode == "stsci":
-        #     print("Invalid zodiacal light mode entered. Using stsci model as default.")
+    if zody_mode.lower() == "stsci":
+        if verbose: print("Zodiacal light model: STScI")
         zody_MJysr = stsci_zody(ra=detector_grid["grid_world"][0],
                                  dec=detector_grid["grid_world"][1],
                                  wavelength=rebinned_wavelength.to("um").value,
@@ -326,10 +303,10 @@ def get_zodiacal_background(astropywcs, wavelength=None,
         zody_interp = rs.constants.MJysr_to_Jyarcsec2*zody_interp # Jy/arcsec2
         mu = -2.5*np.log10(zody_interp.value)+8.9
         zody_interp = rs.detectors.mu2fe(mu=mu, 
-                                            instrument="WFI",
-                                            filter_name=wavelength["wavelength"], 
-                                            telescope="Roman", 
-                                            verbose=verbose)
+                                         instrument="WFI",
+                                         filter_name=wavelength["wavelength"], 
+                                         telescope="Roman", 
+                                         verbose=verbose)
         
 
         if verbose: print("Output units: e/s")
@@ -429,6 +406,37 @@ def gunagala_zody(ra, dec, wavelength, year, day):
 
     return(d)
 
+
+
+
+
+##########################################
+
+
+def irsa_zody(ra, dec, wavelength, weights, expstart, obslocin=3):
+    # We calculate the expstart
+    t = Time(expstart, format='mjd', scale='utc')
+    year = t.yday.split(":")[0]
+    day = t.yday.split(":")[1]
+    # The anticipated results are len(detector_grid)*2*nbins
+    db_irsa = np.zeros((len(ra), len(wavelength)))*np.nan
+
+    nwavebins = len(wavelength)
+    for i in range(nwavebins):
+        # print(i)
+        # IRSA queries must go in um so we need to multiply by 1E+7 the m above
+        db = rs.irsa.irsa_query(ra=ra, dec=dec,
+                                wavelength=wavelength[i].to("um").value, 
+                                year=year, day=day, obslocin=obslocin)*weights[i]
+
+        db_irsa[:,i] = db['zody']
+
+    zody_Jyarcsec2 = np.nanmean(db_irsa, axis=1)
+    zody_MJysr = zody_Jyarcsec2/rs.constants.MJysr_to_Jyarcsec2
+    return(zody_MJysr)
+
+
+
 #########################################
 
 def zodipy_zody(ra, dec, wavelength, weights, expstart, obspos="earth"):
@@ -449,7 +457,6 @@ def zodipy_zody(ra, dec, wavelength, weights, expstart, obspos="earth"):
     """
 
     from astropy.coordinates import SkyCoord
-    import multiprocessing
     import pandas as pd
     import zodipy
     import astropy.units as u
@@ -512,11 +519,7 @@ def stsci_zody(ra, dec, wavelength, weights, expstart,verbose=False):
     emisison = surface brightness in MJy/sr
     """
 
-    from astropy.coordinates import SkyCoord
-    import multiprocessing
     import pandas as pd
-    import zodipy
-    import astropy.units as u
     from astropy.time import Time
 
     if not isinstance(ra, (list, pd.core.series.Series, np.ndarray)):
@@ -600,7 +603,7 @@ def stsci_zody(ra, dec, wavelength, weights, expstart,verbose=False):
 # for speed to quickly check the filename of a given ra and dec
 def get_healpix(nside, ra, dec):
     """Map (RA, DEC) to the cache file path via healpix indexing."""
-    healpix_idx = healpy.pixelfunc.ang2pix(nside, ra, dec, nest=False, lonlat=True)
+    healpix_idx = hp.pixelfunc.ang2pix(nside, ra, dec, nest=False, lonlat=True)
     healpix_str_pad = str(healpix_idx).zfill(6)
     return f"{healpix_str_pad[0:4]}/sl_pix_{healpix_str_pad}.bin"
 
@@ -658,7 +661,7 @@ class background:
 
     def myfile_from_healpix(self, ra, dec):
         """Map (RA, DEC) to the cache file path via healpix indexing."""
-        healpix_idx = healpy.pixelfunc.ang2pix(self.nside, ra, dec, nest=False, lonlat=True)
+        healpix_idx = hp.pixelfunc.ang2pix(self.nside, ra, dec, nest=False, lonlat=True)
         healpix_str_pad = str(healpix_idx).zfill(6)
         return f"{healpix_str_pad[0:4]}/sl_pix_{healpix_str_pad}.bin"
 
