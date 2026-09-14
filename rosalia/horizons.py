@@ -11,9 +11,63 @@ from astropy.time import Time
 from scipy.interpolate import interp1d
 
 
+def get_heliocoords(mjd, body):
+    
+    from astroquery.jplhorizons import Horizons
+    from astropy.time import Time
+
+    jpl_code_body = get_jpl_observer_name(body)
+
+    try:
+        jpl_horizons_query = Horizons(id=jpl_code_body, epochs=Time(mjd, format="mjd").jd)
+        vectors = jpl_horizons_query.vectors()
+
+    except ValueError as error:
+        print(error)
+        print("Using Lagrange point L2 as a fallback for the observer position.")
+        jpl_code_body = get_jpl_observer_name("L2")
+        jpl_horizons_query = Horizons(id=jpl_code_body, epochs=Time(mjd, format="mjd").jd)
+        vectors = jpl_horizons_query.vectors()
+
+    return(vectors) 
+
+
+
+def get_heliocentric_position_body(mjd, body="earth"):
+    """
+    get_heliocentric_position_body(mjd, body) returns the heliocentric position of a celestial body in AU for a given Modified Julian Date (MJD).
+    It uses the astropy library to compute the barycentric position of the body and Sun, and then calculates the heliocentric position of the body by subtracting the Sun's barycentric position from the body's barycentric position.
+
+    inputs:
+    mjd: Modified Julian Date (float or array-like)
+    body: Name of the celestial body (string)
+    outputs:
+    heliocentric: Heliocentric position of the body in AU (astropy.coordinates.CartesianRepresentation)
+    """
+
+    from astropy.coordinates import get_body_barycentric_posvel
+
+    # Pick your epoch
+    t = Time(mjd, format="mjd")
+
+    # Earth’s position and velocity relative to the solar system barycenter
+    earth_posvel = get_body_barycentric_posvel(body, t)
+
+    # To convert to a heliocentric position, subtract the Sun's barycentric position
+    sun_posvel = get_body_barycentric_posvel('sun', t)
+
+    earth_heliocentric = earth_posvel[0] - sun_posvel[0]
+
+    # print("Heliocentric position of Earth (in AU):")
+    return(earth_heliocentric.xyz.to(u.au))
+
+
 def get_jpl_observer_name(observer_name):
-    obs_center = ep.core.jpl_name_translation(observer_name)
-    return(obs_center)
+    if observer_name.lower() == "l2": return("32")
+    if observer_name.lower() == "hst" or observer_name.lower() == "hubble": return("-48")
+    if observer_name.lower() == "jwst": return("-170")
+    if observer_name.lower() == "rst" or observer_name.lower() == "roman": return("-211")
+    if observer_name.lower() == "euclid": return("-680")
 
 
 
@@ -273,4 +327,5 @@ def interpolate_Roman_state_vectors(mjd):
         f = interp1d(df["DATE"], df[col].values, kind="linear", fill_value="extrapolate")
         result[col] = f(mjd)
     return result
+
 

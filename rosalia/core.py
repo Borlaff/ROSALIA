@@ -201,8 +201,8 @@ class exposure():
                                                                 telescope=observer["FILTER_PARAMS"]["TELESCOPE"],
                                                                 instrument=observer["FILTER_PARAMS"]["INSTRUMENT"],
                                                                 detector=observer["FILTER_PARAMS"]["DETECTOR"], verbose=False)
-        state_vectors = rs.horizons.interpolate_Roman_state_vectors(self.EXPSTART)
-        self.XYZ_HELIO_POS = [state_vectors['X'], state_vectors['Y'], state_vectors['Z']]
+        state_vectors = rs.horizons.get_heliocoords(self.EXPSTART, body=self.TELESCOP) # rs.horizons.interpolate_Roman_state_vectors(self.EXPSTART)
+        self.XYZ_HELIO_POS = [state_vectors["x"].to("AU").value[0], state_vectors["y"].to("AU").value[0], state_vectors["z"].to("AU").value[0]]*u.AU # in AU. 
 
         if "FILENAME" not in observer:
             # If the user did not define an output filename, do it for them
@@ -843,9 +843,9 @@ class exposure():
         zodiacal_background_list = []
         zodiacal_background_unit_list = []
 
-        obspos = np.array([self.XYZ_HELIO_POS[0],
-                           self.XYZ_HELIO_POS[1],
-                           self.XYZ_HELIO_POS[2]])*u.AU
+        #obspos = np.array([self.XYZ_HELIO_POS[0],
+        #                   self.XYZ_HELIO_POS[1],
+        #                   self.XYZ_HELIO_POS[2]])*u.AU
 
         print("Computing Zodiacal light...")
         for i in tqdm(range(nSCIEXTS)):
@@ -855,7 +855,7 @@ class exposure():
                                                                  step=1000, zody_mode=zody_mode,
                                                                  nbins_wavelength=10, obslocin=0,
                                                                  grid_method="random",
-                                                                 obspos = obspos,
+                                                                 obspos = self.XYZ_HELIO_POS,
                                                                  output_units=output_units,
                                                                  verbose=verbose)
             # print(zodiacal_background)
