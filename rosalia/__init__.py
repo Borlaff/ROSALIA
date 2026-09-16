@@ -6,8 +6,16 @@ NASA Ames Research Center, Moffett Field, 94035, California, USA.
 a.s.borlaff@nasa.gov
 """
 
+from importlib.metadata import version, PackageNotFoundError
+from pathlib import Path
+import re
+
+try:
+    __version__ = version("rosalia-wfi")
+except PackageNotFoundError:
+   __version__ = "1.2.4.dev0"
+
 __name__ = "ROSALIA"
-__version__ = "1.2.1"
 __author__ = "Alejandro S. Borlaff"
 __author_email__ = "a.s.borlaff@nasa.gov"
 __description__ = "A software to calibrate the sky background of Space Telescope images"
