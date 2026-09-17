@@ -1,8 +1,19 @@
 =========
 Changelog
 =========
+v1.3.0
+======
 
-v1.2.0
+Added or Changed
+----------------
+- Massive library clean-up. 
+- New tutorials with each background. 
+- Removed skysurf module. 
+- Now the stray-light, zodipy, and thermal modules are independent of each other inside the core class. 
+- New thermal module, which allows to compute the thermal background of the Roman Space Telescope.
+
+
+v1.2.4
 ======
 
 Added or Changed

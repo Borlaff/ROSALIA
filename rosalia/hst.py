@@ -1,3 +1,11 @@
+import rosalia as rs
+import os
+import numpy as np
+import pandas as pd
+from astropy import constants as const
+import astropy.units as u
+
+
 def f_hst_attenuation(theta):
     return(10**f_hst_attenuation_interpolator(np.log10(theta)))
 
@@ -94,3 +102,48 @@ def measure_sky_level_HST_ACS(exposure_name, verbose=False):
     exposure_fits.close()
 
     return({"zody": median_zody_jy_arcsec2, "sky": median_sky_jy_arcsec2})
+
+
+
+def hst_estimate_straylight_SCA(
+            wcs, 
+            filter,
+            catalog,
+            instrument,
+            verbose=True):
+
+    # Make the detector grid
+    detector_grid = rs.detectors.make_detector_grid(wcs, step=200, mode="random")
+    ra_detector = detector_grid["grid_world"][0]
+    dec_detector = detector_grid["grid_world"][1]
+
+    # Get the stars
+    sep_angle_dict = rs.utils.separation_and_position_angle(ra1=ra_detector, dec1=dec_detector,
+                                                            ra2=np.array(catalog["ra"]), dec2=np.array(catalog["dec"]))
+    star_dist = sep_angle_dict["distance"]
+    star_pa = sep_angle_dict["position_angle"]
+
+    # Load HST NDI function. 
+    ndi_db = pd.read_csv(os.environ["ROSALIACACHE"] + "/CORE/NDI/HST/ndi_HST_legacy_bely2003.csv")
+    pixsize = rs.telescopes.Hubble.get_physical_pixelsize(instrument)
+
+    # Make the NDI conversion 
+    lambda_max = filter["filter_lambda_max"].to("m").value
+    lambda_min = filter["filter_lambda_min"].to("m").value
+    lambda_ref = filter["filter_lambda_ref"].to("m").value
+    transmission = filter["filter_transmission_ref"]
+
+    mag = np.array(catalog["mag_lambda"])
+    irradiance_stars = const.c*(lambda_max-lambda_min)/(lambda_ref**2)*((10**(-0.4*(mag+56.1)))*u.W/u.meter**2/u.Hz)
+
+    NDI_conversion_factor = ((pixsize**2)*transmission*lambda_ref/const.c/const.h)
+    NDI_transfer_function = np.interp(x=star_dist, xp=np.array(ndi_db["theta"]), fp=np.array(ndi_db["NDI"]), right=0)
+    
+
+    straylight_lvl = np.zeros(len(ra_detector))
+
+    for i in range(NDI_transfer_function.shape[0]):
+        straylight_lvl[i] = np.nansum((NDI_transfer_function[i,:]*NDI_conversion_factor*irradiance_stars).decompose()).value
+
+    return(ra_detector, dec_detector, straylight_lvl)
+ 

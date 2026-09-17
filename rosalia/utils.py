@@ -364,8 +364,8 @@ def exposure_inspector_asdf(input_name, verbose=False, lite=False):
 
     exposure_identity["RA_PNT"] =  input_asdf["roman"]["meta"]['pointing']['ra_v1']
     exposure_identity["DEC_PNT"] =  input_asdf["roman"]["meta"]['pointing']['dec_v1']
-    exposure_identity["PA"] =   input_asdf["roman"]["meta"]['pointing']["pa_aperture"] # input_asdf["roman"]["meta"]['pointing']['pa_v3']
-
+    # exposure_identity["PA"] =  # input_asdf["roman"]["meta"]['pointing']["pa_v3"] - 60  # input_asdf["roman"]["meta"]['pointing']["pa_aperture"] # input_asdf["roman"]["meta"]['pointing']['pa_v3']
+    exposure_identity["PA"] = input_asdf["roman"]["meta"]['pointing']["pa_aperture"]
     exposure_identity["FILETYPE"] = "ASDF"
     exposure_identity["SCIEXTS"] = [int(input_asdf["roman"]["meta"]["instrument"]["detector"].replace("WFI",""))]
 
@@ -1995,3 +1995,34 @@ def get_astropywcs_info_from_sciexts(filename, sciexts):
             "DATA_SHAPE": data_shape,
             "ASTROPYWCS": astropywcs,
             "PIXSCALE": np.abs(astropywcs[0].proj_plane_pixel_scales()[0])})
+
+
+
+
+
+
+######################
+
+def generate_mosaic(data, astropywcs, resolution=None):
+    import astropy.units as u
+    from reproject import reproject_interp
+    from reproject.mosaicking import reproject_and_coadd, find_optimal_celestial_wcs
+
+    input_data_for_reproject = list(zip(data, astropywcs))
+
+    if resolution is not None:
+        resolution = resolution*u.arcsec
+
+    optimal_wcs = find_optimal_celestial_wcs(input_data=input_data_for_reproject, 
+                                            resolution=resolution)
+
+    output = reproject_and_coadd(input_data=input_data_for_reproject, 
+                                output_projection=optimal_wcs[0], 
+                                shape_out=optimal_wcs[1],
+                                reproject_function=reproject_interp,
+                                #progress_bar=True,
+                                intermediate_memmap=True)
+
+    data = np.array(output[0].data)
+    data[data==0] = np.nan
+    return(data, optimal_wcs[0].to_header())
