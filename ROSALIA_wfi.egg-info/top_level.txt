@@ -1,1 +1,8 @@
+PAPER_I
+bin
+build
+dist
+docs
+images
+notebooks
 rosalia

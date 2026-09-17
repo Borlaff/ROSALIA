@@ -2,16 +2,15 @@
 # telescope = {"pointing": [RA_TARG, DEC_TARG], "PA_Y": PA_Y, "detector_shape": [NAXIS1, NAXIS2], "pixscale": pixscale,
 #              "R_mirror": R_mirror, "OBSLOC": OBSLOC, "EXPSTART": EXPSTART, "EXPTIME": EXPTIME}
 
-from astropy.time import Time
-import astropy.units as u
-import numpy as np
-import matplotlib.pyplot as plt
-import rosalia as rs
-from astropy.coordinates import SkyCoord
-from rosalia.correct import rosalia_stray
 import os
-from datetime import datetime
+import numpy as np
 import pandas as pd
+import rosalia as rs
+from datetime import datetime
+import matplotlib.pyplot as plt
+import astropy.units as u
+from astropy.time import Time
+from astropy.coordinates import SkyCoord
 
 class exposure():
     """
@@ -228,11 +227,6 @@ class exposure():
         self.DATA_SHAPE = astropywcs_info["DATA_SHAPE"]
         self.PIXSCALE = astropywcs_info["PIXSCALE"]
         self.FPA_NEAR_RADIUS = self.get_max_angular_size()
-        #    exposure_identity["HEADERS"] = header_list
-        #    exposure_identity["DATA_SHAPE"] = data_shape
-        #    exposure_identity["ASTROPYWCS"] = astropywcs
-        #    exposure_identity["PIXSCALE"] = np.abs(astropywcs[0].proj_plane_pixel_scales()[0])
-
 
         return(self)
     
@@ -461,6 +455,11 @@ class exposure():
             verbose=verbose
         )
 
+
+#####################################################################################
+### Straylight ######################################################################
+#####################################################################################
+
     def straylight(self, catalog=None, g_mag_max=15, sun_block=False, verbose=False):
         from astropy import constants as const
         from tqdm import tqdm 
@@ -594,7 +593,7 @@ class exposure():
             print(" > Reconstructing the Stray-light / Main offender map: ")
             straylevel_list = [] 
             main_offender_list = [] 
-            for SCA in range(len(self.SCIEXTS)):
+            for SCA in range(NSCAs):
                     # This is the canvas array where we will store all the straylight level.
                 straylight_SCA = np.zeros(self.DATA_SHAPE[0]).astype(np.float32)
                 # This is the canvas array where we will store the ID of the largest stray-light contributor
@@ -629,8 +628,12 @@ class exposure():
                 data_output.append(straylevel_image_i)
                 header_output.append(ASTROPYWCS_i.to_header())
             
-            rs.utils.save_fits(array=data_output, name=self.output_name, header=header_output,
-                            extname=None, overwrite=True, output_verify='silentfix')
+            rs.utils.save_fits(array=data_output, 
+                               name=self.output_name, 
+                               header=header_output,
+                               extname=None, 
+                               overwrite=True, 
+                               output_verify='silentfix')
 
             # Main-offender
             data_output = []
@@ -639,13 +642,12 @@ class exposure():
                 data_output.append(main_offender_i)
                 header_output.append(ASTROPYWCS_i.to_header())
 
-
             rs.utils.save_fits(array=data_output, 
-                            name=self.main_offender_output_name, 
-                            header=header_output,
-                            extname=None, 
-                            overwrite=True, 
-                            output_verify='silentfix')
+                               name=self.main_offender_output_name, 
+                               header=header_output,
+                               extname=None, 
+                               overwrite=True, 
+                               output_verify='silentfix')
 
 
             # Let's do one more step to include the needed metadata from the dummy file. 
@@ -696,6 +698,8 @@ class exposure():
                                                             mainoff_flc_name=self.main_offender_output_name,
                                                             #input_ext=self.SCIEXTS,
                                                             verbose=verbose)
+
+            
             self.stray_drz_name = scaled_drz_names["stray_drz_name"]
             self.scaled_stray_drz_name = scaled_drz_names["scaled_stray_drz_name"]
             self.scaled_main_off_name = scaled_drz_names["scaled_main_off_name"]
@@ -741,6 +745,9 @@ class exposure():
             print("Straylight modeling is currently only available for Roman/WFI exposures.")
             return(None)
 
+#####################################################################################
+### PSF         ########################################################################
+#####################################################################################
 
 
     def psf(self, g_mag_max=15, catalog=None, verbose=False):
@@ -866,7 +873,9 @@ class exposure():
             print("Scaled mosaic: " + scaled_drz_name)
         return(star_output_name)
 
-
+#####################################################################################
+### Zodiacal ########################################################################
+#####################################################################################
 
     def zodiacal(self, zody_mode="zodipy", verbose=False, output_name=None, output_units="e/s"):
         import astropy.wcs as astropy_wcs
