@@ -200,6 +200,15 @@ def exposure_inspector(input_name, verbose=False, lite=False):
     #    exposure_identity = exposure_inspector_single(input_name, verbose=verbose, lite=lite)
     #    return(exposure_identity)
 
+    # If the input is a MAST stream, bypass the following. 
+    import roman_datamodels.datamodels._datamodels
+    if isinstance(input_name, roman_datamodels.datamodels._datamodels.ImageModel):
+        exposure_identity = exposure_inspector_single(input_name, verbose=verbose, lite=lite)
+
+        # If the input is a stream, it needs a local basename. 
+        exposure_identity["FILENAME"] = input_name["meta"]["filename"]
+        return(exposure_identity)
+
     # If it is just a string without * wildcard, then we will run exposure_inspector_single directly.
     if isinstance(input_name, (str,)) and (not "*" in input_name):
         exposure_identity = exposure_inspector_single(input_name, verbose=verbose, lite=lite)
@@ -263,8 +272,17 @@ def exposure_inspector_single(input_name, verbose=False, lite=False):
     :return: Exposure identity - A dictionary with critical information about the exposure, including pointing (right ascension and declination), position angle, telescope, instrument, detector, filter, and a WCS (Astropy and GWCS).
     :rtype: dict
     """
+
+    # If the input is a MAST stream, bypass the following. 
+    import roman_datamodels.datamodels._datamodels
+    if isinstance(input_name, roman_datamodels.datamodels._datamodels.ImageModel):
+        exposure_identity = exposure_inspector_asdf(input_name, verbose=verbose, lite=lite)
+        return(exposure_identity)
+    
     # Extract input file extension
     filename, file_extension = os.path.splitext(input_name)
+
+
 
     # If the input image is a FITS file, then use astropy.io.fits.open
     if file_extension == ".fits":
@@ -286,17 +304,22 @@ def exposure_inspector_single(input_name, verbose=False, lite=False):
     return(exposure_identity)
 
 
-def exposure_inspector_asdf(input_name, verbose=False, lite=False):
+def exposure_inspector_asdf(input_name, telescope="roman", verbose=False, lite=False):
     # print(input_name)
-    if "s3://" in input_name: 
-        if verbose: print("Nexus S3 bucket file detected")
+    import roman_datamodels.datamodels._datamodels
+    if isinstance(input_name, roman_datamodels.datamodels._datamodels.ImageModel):
+        input_asdf = input_name
 
-        fs = s3fs.S3FileSystem(anon=True)
-        input_asdf = asdf.open(fs.open(input_name, 'rb'))
+    if isinstance(input_name, str):
+        if "s3://" in input_name: 
+            if verbose: print("Nexus S3 bucket file detected")
 
-    else:
-        if verbose: print("Local ASDF file detected")
-        input_asdf = asdf.open(input_name)
+            fs = s3fs.S3FileSystem(anon=True)
+            input_asdf = asdf.open(fs.open(input_name, 'rb'))[telescope]
+
+        else:
+            if verbose: print("Local ASDF file detected")
+            input_asdf = asdf.open(input_name)[telescope]
 
     # Setting up keywords to store the info from the file
     exposure_identity = {}
@@ -306,29 +329,29 @@ def exposure_inspector_asdf(input_name, verbose=False, lite=False):
     #            "EXPSTART", "EXPEND", "EXPTIME", "MOONANGL", "DRIZCORR",
     #            "PHOTCORR", "PHOTFLAM", "PHOTPLAM"]
 
-    exposure_identity["INSTRUME"] = input_asdf["roman"]["meta"]["instrument"]["name"]
+    exposure_identity["INSTRUME"] = input_asdf["meta"]["instrument"]["name"]
 
-    exposure_identity["TELESCOP"] = input_asdf["roman"]["meta"]["telescope"]
+    exposure_identity["TELESCOP"] = input_asdf["meta"]["telescope"]
     if exposure_identity["TELESCOP"] == "ROMAN":
         # telescope_class = rs.telescopes.Roman
         detector_svo = "WFI"
 
-    exposure_identity["DETECTOR"] = input_asdf["roman"]["meta"]["instrument"]["detector"]
-    exposure_identity["FILTER"] = input_asdf["roman"]["meta"]["instrument"]["optical_element"]
+    exposure_identity["DETECTOR"]   = input_asdf["meta"]["instrument"]["detector"]
+    exposure_identity["FILTER"]     = input_asdf["meta"]["instrument"]["optical_element"]
 
-    exposure_identity["RA_TARG"] = input_asdf["roman"]["meta"]["pointing"]["target_ra"]
-    exposure_identity["DEC_TARG"] = input_asdf["roman"]["meta"]["pointing"]["target_dec"]
-    #exposure_identity["SUNANGLE"] = input_asdf["roman"]["meta"]["ephemeris"]["sun_angle"]
-    #exposure_identity["MOONANGL"] = input_asdf["roman"]["meta"]["ephemeris"]["moon_angle"]
+    exposure_identity["RA_TARG"]    = input_asdf["meta"]["pointing"]["target_ra"]
+    exposure_identity["DEC_TARG"]   = input_asdf["meta"]["pointing"]["target_dec"]
+    #exposure_identity["SUNANGLE"]  = input_asdf["roman"]["meta"]["ephemeris"]["sun_angle"]
+    #exposure_identity["MOONANGL"]  = input_asdf["roman"]["meta"]["ephemeris"]["moon_angle"]
     #exposure_identity["EARTHANGL"] = input_asdf["roman"]["meta"]["ephemeris"]["earth_angle"]
-    exposure_identity["EXPSTART"] = input_asdf["roman"]["meta"]["exposure"]["start_time"].mjd
-    exposure_identity["EXPEND"] = input_asdf["roman"]["meta"]["exposure"]["end_time"].mjd
-    exposure_identity["EXPTIME"] = input_asdf["roman"]["meta"]["exposure"]["exposure_time"]
-    exposure_identity["conversion_megajanskys"] = input_asdf["roman"]["meta"]["photometry"]["conversion_megajanskys"]
-    exposure_identity["pixel_area"] = input_asdf["roman"]["meta"]["photometry"]["pixel_area"]*((180/np.pi)*60*60)**2
-    exposure_identity["EXPSTART_ISOT"] = input_asdf["roman"]["meta"]["exposure"]["start_time"].isot
-    exposure_identity["SCA"] = int(input_asdf["roman"]["meta"]["instrument"]["detector"].replace("WFI",""))
-    exposure_identity["BUNIT"] = "DN/s" # input_asdf["roman"]["meta"]["photometry"]["flux_unit"]
+    exposure_identity["EXPSTART"]   = input_asdf["meta"]["exposure"]["start_time"].mjd
+    exposure_identity["EXPEND"]     = input_asdf["meta"]["exposure"]["end_time"].mjd
+    exposure_identity["EXPTIME"]    = input_asdf["meta"]["exposure"]["exposure_time"]
+    exposure_identity["conversion_megajanskys"] = input_asdf["meta"]["photometry"]["conversion_megajanskys"]
+    exposure_identity["pixel_area"] = input_asdf["meta"]["photometry"]["pixel_area"]*((180/np.pi)*60*60)**2
+    exposure_identity["EXPSTART_ISOT"] = input_asdf["meta"]["exposure"]["start_time"].isot
+    exposure_identity["SCA"]        = int(input_asdf["meta"]["instrument"]["detector"].replace("WFI",""))
+    exposure_identity["BUNIT"]      = "DN/s" # input_asdf["roman"]["meta"]["photometry"]["flux_unit"]
 
     ############## Get the filter identity #######################
     try: 
@@ -336,7 +359,7 @@ def exposure_inspector_asdf(input_name, verbose=False, lite=False):
                                                                                 telescope=exposure_identity["TELESCOP"],
                                                                                 instrument=exposure_identity["INSTRUME"],
                                                                                 detector=detector_svo,
-                                                                                verbose=False)
+                                                                                verbose=True)
         
     except:
         print("The filter " + exposure_identity["FILTER"] + "/" + exposure_identity["TELESCOP"] +  "/" +  exposure_identity["INSTRUME"] + "/" + detector_svo + " was not found. Photometric calculations can be compromised.")
@@ -353,24 +376,25 @@ def exposure_inspector_asdf(input_name, verbose=False, lite=False):
     astropywcs = []
     from astropy.wcs import WCS as astropy_wcs
     #  nSCAs = 1 # Right now (October 2024) exposure inspector only accepts Roman/WFI images with one SCA per ASDF file.
-    data.append(np.array(input_asdf["roman"]["data"]))
-    gwcs.append(input_asdf["roman"]["meta"]["wcs"])
-    astropywcs.append(astropy_wcs(input_asdf["roman"]["meta"]["wcs"].to_fits()[0]))
+    data.append(np.array(input_asdf["data"]))
+    gwcs.append(input_asdf["meta"]["wcs"])
+    astropywcs.append(astropy_wcs(input_asdf["meta"]["wcs"].to_fits()[0]))
 
     exposure_identity["DATA"] = data
     exposure_identity['DATA_SHAPE'] = [data[0].shape]
     exposure_identity["GWCS"] = gwcs
     exposure_identity["ASTROPYWCS"] = astropywcs
 
-    exposure_identity["RA_PNT"] =  input_asdf["roman"]["meta"]['pointing']['ra_v1']
-    exposure_identity["DEC_PNT"] =  input_asdf["roman"]["meta"]['pointing']['dec_v1']
+    exposure_identity["RA_PNT"] =  input_asdf["meta"]['pointing']['ra_v1']
+    exposure_identity["DEC_PNT"] =  input_asdf["meta"]['pointing']['dec_v1']
     # exposure_identity["PA"] =  # input_asdf["roman"]["meta"]['pointing']["pa_v3"] - 60  # input_asdf["roman"]["meta"]['pointing']["pa_aperture"] # input_asdf["roman"]["meta"]['pointing']['pa_v3']
-    exposure_identity["PA"] = input_asdf["roman"]["meta"]['pointing']["pa_aperture"]
+    exposure_identity["PA"] = input_asdf["meta"]['pointing']["pa_aperture"]
     exposure_identity["FILETYPE"] = "ASDF"
-    exposure_identity["SCIEXTS"] = [int(input_asdf["roman"]["meta"]["instrument"]["detector"].replace("WFI",""))]
+    exposure_identity["SCIEXTS"] = [int(input_asdf["meta"]["instrument"]["detector"].replace("WFI",""))]
 
 
     return(exposure_identity)
+
 
 
 def exposure_inspector_fits(input_name, verbose=False, lite=False):

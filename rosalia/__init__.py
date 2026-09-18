@@ -25,6 +25,7 @@ import rosalia.hst
 import rosalia.gaia
 import rosalia.gnu
 import rosalia.roman
+import rosalia.mast
 import rosalia.sky
 import rosalia.thermal
 import rosalia.sso

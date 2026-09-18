@@ -3,12 +3,11 @@ sphinx-rtd-theme
 sphinx-design
 sphinx-tabs
 astropy
-astroquery
 Bottleneck
 drizzlepac
 matplotlib
 miniutils
-numpy
+numpy=>2.0.0
 pandas
 scipy
 tqdm
@@ -28,6 +27,7 @@ ephem
 pysolar
 numexpr
 reproject
+astroquery @ git+https://github.com/snbianco/astroquery.git@mast-beta-release 
 scipy>=1.18.0
 pyarrow
 ephessos
@@ -35,3 +35,4 @@ crds
 twine
 s3fs
 zodipy
+dotenv
