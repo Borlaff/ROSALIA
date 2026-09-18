@@ -23,15 +23,16 @@
    horizons
    hst
    irsa
+   mast
    ndi
    plots
    psf
    render
    roman
    sky
-   skysurf
    skywalker
    sso
    telescopes
    tests
+   thermal
    utils

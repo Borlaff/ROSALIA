@@ -1,4 +1,4 @@
-﻿rosalia.plots
+rosalia.plots
 =============
 
 .. automodule:: rosalia.plots

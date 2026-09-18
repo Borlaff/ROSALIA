@@ -1,6 +1,15 @@
 =========
 Changelog
 =========
+
+v1.3.1
+======
+
+Added or Changed
+----------------
+- Astromatic/Swarp has been removed from most functions, in favor of Python/Reproject https://reproject.readthedocs.io/en/stable/
+- rosalia.core.exposure now accepts MAST query objects. 
+
 v1.3.0
 ======
 

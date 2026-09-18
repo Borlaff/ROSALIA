@@ -19,7 +19,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="rosalia.skysurf" href="rosalia.skysurf.html" />
+    <link rel="next" title="rosalia.skywalker" href="rosalia.skywalker.html" />
     <link rel="prev" title="rosalia.roman" href="rosalia.roman.html" /> 
 </head>
 
@@ -53,6 +53,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Additional Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../usage.html">How to use</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../nexus.html">Roman Research Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../commissioning.html">Roman Commissioning Stray-light Activities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../whoarewe.html">Who is ROSALIA?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../rosalia.html">ROSALIA package</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
@@ -70,17 +71,18 @@
 <li class="toctree-l3"><a class="reference internal" href="rosalia.horizons.html">rosalia.horizons</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.hst.html">rosalia.hst</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.irsa.html">rosalia.irsa</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.mast.html">rosalia.mast</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.ndi.html">rosalia.ndi</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.plots.html">rosalia.plots</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.psf.html">rosalia.psf</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.render.html">rosalia.render</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.roman.html">rosalia.roman</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">rosalia.sky</a></li>
-<li class="toctree-l3"><a class="reference internal" href="rosalia.skysurf.html">rosalia.skysurf</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.skywalker.html">rosalia.skywalker</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.sso.html">rosalia.sso</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.telescopes.html">rosalia.telescopes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.tests.html">rosalia.tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.thermal.html">rosalia.thermal</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.utils.html">rosalia.utils</a></li>
 </ul>
 </li>
@@ -122,11 +124,17 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.sky.correct_flat_sky" title="rosalia.sky.correct_flat_sky"><code class="xref py py-obj docutils literal notranslate"><span class="pre">correct_flat_sky</span></code></a>(input_name, ext[, ...])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.sky.get_zodiacal_background" title="rosalia.sky.get_zodiacal_background"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_zodiacal_background</span></code></a>([input_name, ext, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.sky.get_healpix" title="rosalia.sky.get_healpix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_healpix</span></code></a>(nside, ra, dec)</p></td>
+<td><p>Map (RA, DEC) to the cache file path via healpix indexing.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.sky.get_zodiacal_background" title="rosalia.sky.get_zodiacal_background"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_zodiacal_background</span></code></a>(astropywcs[, ...])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.sky.gunagala_zody" title="rosalia.sky.gunagala_zody"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gunagala_zody</span></code></a>(ra, dec, wavelength, year, day)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.sky.gunagala_zody" title="rosalia.sky.gunagala_zody"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gunagala_zody</span></code></a>(ra, dec, wavelength, year, day)</p></td>
 <td><p>This program makes use of the Gunagala Zodiacal model to estimate the Zodiacal light surface brightness in a given position, at a wavelength, day and year.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.sky.irsa_zody" title="rosalia.sky.irsa_zody"><code class="xref py py-obj docutils literal notranslate"><span class="pre">irsa_zody</span></code></a>(ra, dec, wavelength, weights, expstart)</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.sky.rebin" title="rosalia.sky.rebin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rebin</span></code></a>(a, newshape)</p></td>
 <td><p>Rebin an array to a new shape.</p></td>
@@ -137,8 +145,22 @@
 <tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.sky.remove_zodiacal_light_acs" title="rosalia.sky.remove_zodiacal_light_acs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_zodiacal_light_acs</span></code></a>(input_name[, verbose])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.sky.zodipy_zody" title="rosalia.sky.zodipy_zody"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zodipy_zody</span></code></a>(ra, dec, wavelength, weights, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.sky.stsci_zody" title="rosalia.sky.stsci_zody"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stsci_zody</span></code></a>(ra, dec, wavelength, weights, ...)</p></td>
+<td><p>This program makes use of the STSci's Zodiacal model for Roman to estimate the Zodiacal light surface brightness in a given position, at a wavelength, day and year.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.sky.zodipy_zody" title="rosalia.sky.zodipy_zody"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zodipy_zody</span></code></a>(ra, dec, wavelength, weights, ...)</p></td>
 <td><p>This program makes use of the Zodipy Zodiacal model to estimate the Zodiacal light surface brightness in a given position, at a wavelength, day and year.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Classes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.sky.background" title="rosalia.sky.background"><code class="xref py py-obj docutils literal notranslate"><span class="pre">background</span></code></a>(ra, dec[, verbose])</p></td>
+<td><p>Main background class.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.sky.compute_visibility" title="rosalia.sky.compute_visibility"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_visibility</span></code></a>(targets_coordinates[, ...])</p></td>
+<td><p></p></td>
 </tr>
 </tbody>
 </table>
@@ -149,7 +171,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="rosalia.roman.html" class="btn btn-neutral float-left" title="rosalia.roman" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="rosalia.skysurf.html" class="btn btn-neutral float-right" title="rosalia.skysurf" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="rosalia.skywalker.html" class="btn btn-neutral float-right" title="rosalia.skywalker" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

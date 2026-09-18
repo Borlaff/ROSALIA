@@ -160,9 +160,13 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="rosalia.html#module-rosalia.horizons">rosalia.horizons module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.horizons.find_moon_and_jupiter_in_HST_history"><code class="docutils literal notranslate"><span class="pre">find_moon_and_jupiter_in_HST_history()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.horizons.get_heliocentric_position_body"><code class="docutils literal notranslate"><span class="pre">get_heliocentric_position_body()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.horizons.get_heliocoords"><code class="docutils literal notranslate"><span class="pre">get_heliocoords()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.horizons.get_jpl_observer_name"><code class="docutils literal notranslate"><span class="pre">get_jpl_observer_name()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.horizons.get_mpc_observer_name"><code class="docutils literal notranslate"><span class="pre">get_mpc_observer_name()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.horizons.horizons_query"><code class="docutils literal notranslate"><span class="pre">horizons_query()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.horizons.interpolate_Roman_state_vectors"><code class="docutils literal notranslate"><span class="pre">interpolate_Roman_state_vectors()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.horizons.read_oem_to_dataframe"><code class="docutils literal notranslate"><span class="pre">read_oem_to_dataframe()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.horizons.single_horizons_query"><code class="docutils literal notranslate"><span class="pre">single_horizons_query()</span></code></a></li>
 </ul>
 </li>
@@ -272,24 +276,38 @@
 <li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.roman.make_romanisim_dummy"><code class="docutils literal notranslate"><span class="pre">make_romanisim_dummy()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.roman.roman_WFI_NDI_estimator_direct"><code class="docutils literal notranslate"><span class="pre">roman_WFI_NDI_estimator_direct()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.roman.roman_estimate_straylight_SCA"><code class="docutils literal notranslate"><span class="pre">roman_estimate_straylight_SCA()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.roman.translate_bandpass_name"><code class="docutils literal notranslate"><span class="pre">translate_bandpass_name()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="rosalia.html#module-rosalia.sky">rosalia.sky module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.sky.background"><code class="docutils literal notranslate"><span class="pre">background</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosalia.html#rosalia.sky.background.interpolate_spec"><code class="docutils literal notranslate"><span class="pre">background.interpolate_spec()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosalia.html#rosalia.sky.background.modify_background"><code class="docutils literal notranslate"><span class="pre">background.modify_background()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosalia.html#rosalia.sky.background.myfile_from_healpix"><code class="docutils literal notranslate"><span class="pre">background.myfile_from_healpix()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosalia.html#rosalia.sky.background.read_bkg_data_from_url"><code class="docutils literal notranslate"><span class="pre">background.read_bkg_data_from_url()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosalia.html#rosalia.sky.background.read_static_data"><code class="docutils literal notranslate"><span class="pre">background.read_static_data()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.sky.compute_visibility"><code class="docutils literal notranslate"><span class="pre">compute_visibility</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosalia.html#rosalia.sky.compute_visibility.format_time"><code class="docutils literal notranslate"><span class="pre">compute_visibility.format_time()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosalia.html#rosalia.sky.compute_visibility.get_good_angles"><code class="docutils literal notranslate"><span class="pre">compute_visibility.get_good_angles()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosalia.html#rosalia.sky.compute_visibility.initialize_dataframe"><code class="docutils literal notranslate"><span class="pre">compute_visibility.initialize_dataframe()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosalia.html#rosalia.sky.compute_visibility.set_sampled_times"><code class="docutils literal notranslate"><span class="pre">compute_visibility.set_sampled_times()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.sky.correct_flat_sky"><code class="docutils literal notranslate"><span class="pre">correct_flat_sky()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.sky.get_healpix"><code class="docutils literal notranslate"><span class="pre">get_healpix()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.sky.get_zodiacal_background"><code class="docutils literal notranslate"><span class="pre">get_zodiacal_background()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.sky.gunagala_zody"><code class="docutils literal notranslate"><span class="pre">gunagala_zody()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.sky.irsa_zody"><code class="docutils literal notranslate"><span class="pre">irsa_zody()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.sky.rebin"><code class="docutils literal notranslate"><span class="pre">rebin()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.sky.rebin_transmission_curve"><code class="docutils literal notranslate"><span class="pre">rebin_transmission_curve()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.sky.remove_zodiacal_light_acs"><code class="docutils literal notranslate"><span class="pre">remove_zodiacal_light_acs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.sky.stsci_zody"><code class="docutils literal notranslate"><span class="pre">stsci_zody()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.sky.zodipy_zody"><code class="docutils literal notranslate"><span class="pre">zodipy_zody()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="rosalia.html#module-rosalia.skysurf">rosalia.skysurf module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.skysurf.find_obsid_in_skysurf"><code class="docutils literal notranslate"><span class="pre">find_obsid_in_skysurf()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.skysurf.load_skysurf"><code class="docutils literal notranslate"><span class="pre">load_skysurf()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.skysurf.load_skysurf_filter"><code class="docutils literal notranslate"><span class="pre">load_skysurf_filter()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="rosalia.html#rosalia-skysurf-module">rosalia.skysurf module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rosalia.html#module-rosalia.sso">rosalia.sso module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.sso.get_SS0s_loc_magnitude"><code class="docutils literal notranslate"><span class="pre">get_SS0s_loc_magnitude()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.sso.get_SSOs_ephemeris"><code class="docutils literal notranslate"><span class="pre">get_SSOs_ephemeris()</span></code></a></li>
@@ -459,6 +477,7 @@
 <li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.utils.flambda_to_fnu"><code class="docutils literal notranslate"><span class="pre">flambda_to_fnu()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.utils.fnu_to_flambda"><code class="docutils literal notranslate"><span class="pre">fnu_to_flambda()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.utils.generate_image_interpolator"><code class="docutils literal notranslate"><span class="pre">generate_image_interpolator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.utils.generate_mosaic"><code class="docutils literal notranslate"><span class="pre">generate_mosaic()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.utils.generate_scaled_drz"><code class="docutils literal notranslate"><span class="pre">generate_scaled_drz()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.utils.get_astropywcs_info_from_sciexts"><code class="docutils literal notranslate"><span class="pre">get_astropywcs_info_from_sciexts()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.utils.get_data_and_wcs"><code class="docutils literal notranslate"><span class="pre">get_data_and_wcs()</span></code></a></li>
@@ -468,6 +487,7 @@
 <li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.utils.great_circle_ra_dec_shift"><code class="docutils literal notranslate"><span class="pre">great_circle_ra_dec_shift()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.utils.hp_resol2nside"><code class="docutils literal notranslate"><span class="pre">hp_resol2nside()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.utils.interpolate_location_in_fits"><code class="docutils literal notranslate"><span class="pre">interpolate_location_in_fits()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.utils.interpolate_skypoints_to_image"><code class="docutils literal notranslate"><span class="pre">interpolate_skypoints_to_image()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.utils.load_dict"><code class="docutils literal notranslate"><span class="pre">load_dict()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.utils.make_ds9_region"><code class="docutils literal notranslate"><span class="pre">make_ds9_region()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.html#rosalia.utils.make_profile"><code class="docutils literal notranslate"><span class="pre">make_profile()</span></code></a></li>

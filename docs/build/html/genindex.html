@@ -138,10 +138,12 @@
 <h2 id="B">B</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="rosalia.html#rosalia.plots.style.BLACK">BLACK (rosalia.plots.style attribute)</a>
+      <li><a href="rosalia.html#rosalia.sky.background">background (class in rosalia.sky)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="rosalia.html#rosalia.plots.style.BLACK">BLACK (rosalia.plots.style attribute)</a>
+</li>
       <li><a href="rosalia.html#rosalia.plots.style.BLUE">BLUE (rosalia.plots.style attribute)</a>
 </li>
   </ul></td>
@@ -165,6 +167,8 @@
       <li><a href="rosalia.html#rosalia.utils.circular_hist">circular_hist() (in module rosalia.utils)</a>
 </li>
       <li><a href="rosalia.html#rosalia.astrometry.clean_crs">clean_crs() (in module rosalia.astrometry)</a>
+</li>
+      <li><a href="rosalia.html#rosalia.sky.compute_visibility">compute_visibility (class in rosalia.sky)</a>
 </li>
       <li><a href="rosalia.html#rosalia.utils.convert_ASDF_to_FITS">convert_ASDF_to_FITS() (in module rosalia.utils)</a>
 </li>
@@ -312,8 +316,6 @@
 </li>
       <li><a href="rosalia.html#rosalia.utils.find_nearest_index">find_nearest_index() (in module rosalia.utils)</a>
 </li>
-      <li><a href="rosalia.html#rosalia.skysurf.find_obsid_in_skysurf">find_obsid_in_skysurf() (in module rosalia.skysurf)</a>
-</li>
       <li><a href="rosalia.html#rosalia.gaia.find_ra_dec_constraints">find_ra_dec_constraints() (in module rosalia.gaia)</a>
 </li>
       <li><a href="rosalia.html#rosalia.utils.find_SCA_EXTNAME">find_SCA_EXTNAME() (in module rosalia.utils)</a>
@@ -332,6 +334,8 @@
 </li>
       <li><a href="rosalia.html#rosalia.utils.fnu_to_flambda">fnu_to_flambda() (in module rosalia.utils)</a>
 </li>
+      <li><a href="rosalia.html#rosalia.sky.compute_visibility.format_time">format_time() (rosalia.sky.compute_visibility method)</a>
+</li>
       <li><a href="rosalia.html#rosalia.ndi.ndi_euclid.FxVIS">FxVIS (rosalia.ndi.ndi_euclid attribute)</a>
 </li>
       <li><a href="rosalia.html#rosalia.ndi.ndi_euclid.FxyVIS">FxyVIS (rosalia.ndi.ndi_euclid attribute)</a>
@@ -347,6 +351,8 @@
       <li><a href="rosalia.html#rosalia.psf.gaia_find_stars_in_and_out">gaia_find_stars_in_and_out() (in module rosalia.psf)</a>
 </li>
       <li><a href="rosalia.html#rosalia.utils.generate_image_interpolator">generate_image_interpolator() (in module rosalia.utils)</a>
+</li>
+      <li><a href="rosalia.html#rosalia.utils.generate_mosaic">generate_mosaic() (in module rosalia.utils)</a>
 </li>
       <li><a href="rosalia.html#rosalia.attitude.generate_power_law_sampling">generate_power_law_sampling() (in module rosalia.attitude)</a>
 </li>
@@ -400,6 +406,14 @@
       </ul></li>
       <li><a href="rosalia.html#rosalia.telescopes.Roman.get_Gennaro_bestPA">get_Gennaro_bestPA() (rosalia.telescopes.Roman method)</a>
 </li>
+      <li><a href="rosalia.html#rosalia.sky.compute_visibility.get_good_angles">get_good_angles() (rosalia.sky.compute_visibility method)</a>
+</li>
+      <li><a href="rosalia.html#rosalia.sky.get_healpix">get_healpix() (in module rosalia.sky)</a>
+</li>
+      <li><a href="rosalia.html#rosalia.horizons.get_heliocentric_position_body">get_heliocentric_position_body() (in module rosalia.horizons)</a>
+</li>
+      <li><a href="rosalia.html#rosalia.horizons.get_heliocoords">get_heliocoords() (in module rosalia.horizons)</a>
+</li>
       <li><a href="rosalia.html#rosalia.telescopes.Hubble.get_HST_ACS_psf">get_HST_ACS_psf() (rosalia.telescopes.Hubble method)</a>
 </li>
       <li><a href="rosalia.html#rosalia.psf.get_hybrid_catalog">get_hybrid_catalog() (in module rosalia.psf)</a>
@@ -408,6 +422,8 @@
 </li>
       <li><a href="rosalia.html#rosalia.utils.get_keys_from_header">get_keys_from_header() (in module rosalia.utils)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rosalia.html#rosalia.attitude.get_large_aperture">get_large_aperture() (in module rosalia.attitude)</a>
 </li>
       <li><a href="rosalia.html#rosalia.telescopes.Hubble.get_location">get_location() (rosalia.telescopes.Hubble method)</a>
@@ -416,8 +432,6 @@
         <li><a href="rosalia.html#rosalia.telescopes.Roman.get_location">(rosalia.telescopes.Roman method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rosalia.html#rosalia.horizons.get_mpc_observer_name">get_mpc_observer_name() (in module rosalia.horizons)</a>
 </li>
       <li><a href="rosalia.html#rosalia.astrometry.get_parameters_list">get_parameters_list() (in module rosalia.astrometry)</a>
@@ -518,13 +532,23 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rosalia.html#rosalia.psf.identify_stars_in_out_field">identify_stars_in_out_field() (in module rosalia.psf)</a>
 </li>
+      <li><a href="rosalia.html#rosalia.sky.compute_visibility.initialize_dataframe">initialize_dataframe() (rosalia.sky.compute_visibility method)</a>
+</li>
       <li><a href="rosalia.html#rosalia.utils.interpolate_location_in_fits">interpolate_location_in_fits() (in module rosalia.utils)</a>
+</li>
+      <li><a href="rosalia.html#rosalia.horizons.interpolate_Roman_state_vectors">interpolate_Roman_state_vectors() (in module rosalia.horizons)</a>
+</li>
+      <li><a href="rosalia.html#rosalia.utils.interpolate_skypoints_to_image">interpolate_skypoints_to_image() (in module rosalia.utils)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="rosalia.html#rosalia.sky.background.interpolate_spec">interpolate_spec() (rosalia.sky.background method)</a>
+</li>
       <li><a href="rosalia.html#rosalia.irsa.irsa_query">irsa_query() (in module rosalia.irsa)</a>
 </li>
       <li><a href="rosalia.html#rosalia.irsa.irsa_query_single">irsa_query_single() (in module rosalia.irsa)</a>
+</li>
+      <li><a href="rosalia.html#rosalia.sky.irsa_zody">irsa_zody() (in module rosalia.sky)</a>
 </li>
       <li><a href="rosalia.html#rosalia.attitude.RomanPointing.is_visible">is_visible() (rosalia.attitude.RomanPointing method)</a>
 </li>
@@ -556,10 +580,10 @@
         <li><a href="rosalia.html#rosalia.telescopes.Passbands.WISE.W4.lambda_ref">(rosalia.telescopes.Passbands.WISE.W4 attribute)</a>
 </li>
       </ul></li>
-      <li><a href="rosalia.html#rosalia.irsa.launch_irsa_query">launch_irsa_query() (in module rosalia.irsa)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="rosalia.html#rosalia.irsa.launch_irsa_query">launch_irsa_query() (in module rosalia.irsa)</a>
+</li>
       <li><a href="rosalia.html#rosalia.utils.load_dict">load_dict() (in module rosalia.utils)</a>
 </li>
       <li><a href="rosalia.html#rosalia.telescopes.ARRAKIHS.load_example_TLE">load_example_TLE() (rosalia.telescopes.ARRAKIHS method)</a>
@@ -573,10 +597,6 @@
       <li><a href="rosalia.html#rosalia.telescopes.CSST.load_example_TLE_CSST">load_example_TLE_CSST() (rosalia.telescopes.CSST method)</a>
 </li>
       <li><a href="rosalia.html#rosalia.telescopes.Hubble.load_HST_TLEs">load_HST_TLEs() (rosalia.telescopes.Hubble method)</a>
-</li>
-      <li><a href="rosalia.html#rosalia.skysurf.load_skysurf">load_skysurf() (in module rosalia.skysurf)</a>
-</li>
-      <li><a href="rosalia.html#rosalia.skysurf.load_skysurf_filter">load_skysurf_filter() (in module rosalia.skysurf)</a>
 </li>
       <li><a href="rosalia.html#rosalia.attitude.load_targets">load_targets() (in module rosalia.attitude)</a>
 </li>
@@ -662,6 +682,8 @@
 </li>
       <li><a href="rosalia.html#rosalia.telescopes.ARRAKIHS.modified_make_dummy_exposure">modified_make_dummy_exposure() (rosalia.telescopes.ARRAKIHS method)</a>
 </li>
+      <li><a href="rosalia.html#rosalia.sky.background.modify_background">modify_background() (rosalia.sky.background method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rosalia.html#rosalia.utils.modify_keyword_hdr">modify_keyword_hdr() (in module rosalia.utils)</a>
@@ -698,6 +720,8 @@
 </li>
         <li><a href="generated/rosalia.irsa.html#module-rosalia.irsa">rosalia.irsa</a>, <a href="rosalia.html#module-rosalia.irsa">[1]</a>
 </li>
+        <li><a href="generated/rosalia.mast.html#module-rosalia.mast">rosalia.mast</a>
+</li>
         <li><a href="generated/rosalia.ndi.html#module-rosalia.ndi">rosalia.ndi</a>, <a href="rosalia.html#module-rosalia.ndi">[1]</a>
 </li>
         <li><a href="generated/rosalia.plots.html#module-rosalia.plots">rosalia.plots</a>, <a href="rosalia.html#module-rosalia.plots">[1]</a>
@@ -710,8 +734,6 @@
 </li>
         <li><a href="generated/rosalia.sky.html#module-rosalia.sky">rosalia.sky</a>, <a href="rosalia.html#module-rosalia.sky">[1]</a>
 </li>
-        <li><a href="generated/rosalia.skysurf.html#module-rosalia.skysurf">rosalia.skysurf</a>, <a href="rosalia.html#module-rosalia.skysurf">[1]</a>
-</li>
         <li><a href="generated/rosalia.skywalker.html#module-rosalia.skywalker">rosalia.skywalker</a>
 </li>
         <li><a href="generated/rosalia.sso.html#module-rosalia.sso">rosalia.sso</a>, <a href="rosalia.html#module-rosalia.sso">[1]</a>
@@ -719,6 +741,8 @@
         <li><a href="generated/rosalia.telescopes.html#module-rosalia.telescopes">rosalia.telescopes</a>, <a href="rosalia.html#module-rosalia.telescopes">[1]</a>
 </li>
         <li><a href="generated/rosalia.tests.html#module-rosalia.tests">rosalia.tests</a>, <a href="rosalia.html#module-rosalia.tests">[1]</a>
+</li>
+        <li><a href="generated/rosalia.thermal.html#module-rosalia.thermal">rosalia.thermal</a>
 </li>
         <li><a href="generated/rosalia.utils.html#module-rosalia.utils">rosalia.utils</a>, <a href="rosalia.html#module-rosalia.utils">[1]</a>
 </li>
@@ -737,6 +761,8 @@
         <li><a href="rosalia.html#rosalia.telescopes.SPHEREx.mu2fe">(rosalia.telescopes.SPHEREx method)</a>
 </li>
       </ul></li>
+      <li><a href="rosalia.html#rosalia.sky.background.myfile_from_healpix">myfile_from_healpix() (rosalia.sky.background method)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -863,11 +889,17 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rosalia.html#rosalia.utils.radec_to_xy">radec_to_xy() (in module rosalia.utils)</a>
 </li>
+      <li><a href="rosalia.html#rosalia.sky.background.read_bkg_data_from_url">read_bkg_data_from_url() (rosalia.sky.background method)</a>
+</li>
       <li><a href="rosalia.html#rosalia.utils.read_ds9reg">read_ds9reg() (in module rosalia.utils)</a>
 </li>
       <li><a href="rosalia.html#rosalia.irsa.read_irsa_query">read_irsa_query() (in module rosalia.irsa)</a>
 </li>
       <li><a href="rosalia.html#rosalia.albedo.read_MODIS_albedo">read_MODIS_albedo() (in module rosalia.albedo)</a>
+</li>
+      <li><a href="rosalia.html#rosalia.horizons.read_oem_to_dataframe">read_oem_to_dataframe() (in module rosalia.horizons)</a>
+</li>
+      <li><a href="rosalia.html#rosalia.sky.background.read_static_data">read_static_data() (rosalia.sky.background method)</a>
 </li>
       <li><a href="rosalia.html#rosalia.sky.rebin">rebin() (in module rosalia.sky)</a>
 </li>
@@ -963,6 +995,8 @@
         <li><a href="generated/rosalia.gaia.html#module-rosalia.gaia">module</a>, <a href="rosalia.html#module-rosalia.gaia">[1]</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     rosalia.gnu
 
@@ -970,8 +1004,6 @@
         <li><a href="generated/rosalia.gnu.html#module-rosalia.gnu">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     rosalia.horizons
 
@@ -991,6 +1023,13 @@
 
       <ul>
         <li><a href="generated/rosalia.irsa.html#module-rosalia.irsa">module</a>, <a href="rosalia.html#module-rosalia.irsa">[1]</a>
+</li>
+      </ul></li>
+      <li>
+    rosalia.mast
+
+      <ul>
+        <li><a href="generated/rosalia.mast.html#module-rosalia.mast">module</a>
 </li>
       </ul></li>
       <li>
@@ -1036,13 +1075,6 @@
 </li>
       </ul></li>
       <li>
-    rosalia.skysurf
-
-      <ul>
-        <li><a href="generated/rosalia.skysurf.html#module-rosalia.skysurf">module</a>, <a href="rosalia.html#module-rosalia.skysurf">[1]</a>
-</li>
-      </ul></li>
-      <li>
     rosalia.skywalker
 
       <ul>
@@ -1068,6 +1100,13 @@
 
       <ul>
         <li><a href="generated/rosalia.tests.html#module-rosalia.tests">module</a>, <a href="rosalia.html#module-rosalia.tests">[1]</a>
+</li>
+      </ul></li>
+      <li>
+    rosalia.thermal
+
+      <ul>
+        <li><a href="generated/rosalia.thermal.html#module-rosalia.thermal">module</a>
 </li>
       </ul></li>
       <li>
@@ -1111,6 +1150,8 @@
 </li>
       <li><a href="rosalia.html#rosalia.utils.separation_and_position_angle">separation_and_position_angle() (in module rosalia.utils)</a>
 </li>
+      <li><a href="rosalia.html#rosalia.sky.compute_visibility.set_sampled_times">set_sampled_times() (rosalia.sky.compute_visibility method)</a>
+</li>
       <li><a href="rosalia.html#rosalia.attitude.RomanPointing.set_target">set_target() (rosalia.attitude.RomanPointing method)</a>
 </li>
       <li><a href="rosalia.html#rosalia.attitude.RomanPointing.set_target_using_radec">set_target_using_radec() (rosalia.attitude.RomanPointing method)</a>
@@ -1132,6 +1173,8 @@
       <li><a href="rosalia.html#rosalia.telescopes.Roman.stpsf_get_psf">stpsf_get_psf() (rosalia.telescopes.Roman method)</a>
 </li>
       <li><a href="rosalia.html#rosalia.ndi.straylight_flux">straylight_flux() (in module rosalia.ndi)</a>
+</li>
+      <li><a href="rosalia.html#rosalia.sky.stsci_zody">stsci_zody() (in module rosalia.sky)</a>
 </li>
       <li><a href="rosalia.html#rosalia.plots.style">style (class in rosalia.plots)</a>
 </li>
@@ -1169,10 +1212,10 @@
 </li>
       <li><a href="rosalia.html#rosalia.ndi.ndi_euclid.theta2e">theta2e (rosalia.ndi.ndi_euclid attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rosalia.html#rosalia.ndi.ndi_euclid.theta2s">theta2s (rosalia.ndi.ndi_euclid attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rosalia.html#rosalia.utils.thetaphi_2_radec">thetaphi_2_radec() (in module rosalia.utils)</a>
 </li>
       <li><a href="rosalia.html#rosalia.ndi.ndi_euclid.thetawd1">thetawd1 (rosalia.ndi.ndi_euclid attribute)</a>
@@ -1201,6 +1244,8 @@
         <li><a href="rosalia.html#rosalia.telescopes.SPHEREx.TLE_tuple">(rosalia.telescopes.SPHEREx method)</a>
 </li>
       </ul></li>
+      <li><a href="rosalia.html#rosalia.roman.translate_bandpass_name">translate_bandpass_name() (in module rosalia.roman)</a>
+</li>
   </ul></td>
 </tr></table>
 

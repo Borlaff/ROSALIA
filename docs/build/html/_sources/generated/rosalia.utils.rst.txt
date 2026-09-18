@@ -1,4 +1,4 @@
-﻿rosalia.utils
+rosalia.utils
 =============
 
 .. automodule:: rosalia.utils
@@ -40,6 +40,7 @@
       flambda_to_fnu
       fnu_to_flambda
       generate_image_interpolator
+      generate_mosaic
       generate_scaled_drz
       get_astropywcs_info_from_sciexts
       get_data_and_wcs
@@ -49,6 +50,7 @@
       great_circle_ra_dec_shift
       hp_resol2nside
       interpolate_location_in_fits
+      interpolate_skypoints_to_image
       load_dict
       make_ds9_region
       make_profile

@@ -1,6 +1,7 @@
 {
-    "generated/rosalia": 0.032,
-    "installation": 0.011,
-    "measuringstray": 0.016,
-    "rosalia": 2.184
+    "generated/rosalia.skysurf": 0.01,
+    "measuringstray": 0.01,
+    "rosalia": 1.241,
+    "tutorials": 0.01,
+    "zodiacal": 0.003
 }

@@ -22,6 +22,7 @@ rosalia/gnu.py
 rosalia/horizons.py
 rosalia/hst.py
 rosalia/irsa.py
+rosalia/mast.py
 rosalia/ndi.py
 rosalia/plots.py
 rosalia/psf.py

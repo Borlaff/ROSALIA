@@ -1,4 +1,4 @@
-﻿rosalia.correct
+rosalia.correct
 ===============
 
 .. automodule:: rosalia.correct
