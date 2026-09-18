@@ -162,7 +162,8 @@ class exposure():
             self.FILETYPE = exposure_identity['FILETYPE']
             self.MPC_OBSLOC = rs.horizons.get_mpc_observer_name(self.TELESCOP)
             self.JPL_OBSLOC = rs.horizons.get_jpl_observer_name(self.TELESCOP)
-            # self.XYZ_HELIO_POS = exposure_identity['XYZ_HELIO_POS']
+            state_vectors = rs.horizons.get_heliocoords(self.EXPSTART, body=self.TELESCOP) # rs.horizons.interpolate_Roman_state_vectors(self.EXPSTART)
+            self.XYZ_HELIO_POS = [state_vectors["x"].to("AU").value[0], state_vectors["y"].to("AU").value[0], state_vectors["z"].to("AU").value[0]]*u.AU # in AU.
             self.FPA_NEAR_RADIUS = self.get_max_angular_size()
 
         self.fits_keywords = {"TELESCOP": self.TELESCOP, "INSTRUME": self.INSTRUME, "DETECTOR": self.DETECTOR, 
@@ -481,7 +482,7 @@ class exposure():
         if data_list is None: data_list = self.DATA
         if wcs_list is None: wcs_list = self.ASTROPYWCS
         if keywords is None: keywords = self.fits_keywords
-        
+
         headers_output = []
         for ASTROPYWCS_i in wcs_list:
             header = ASTROPYWCS_i.to_header()
@@ -863,7 +864,7 @@ class exposure():
 ### Zodiacal ########################################################################
 #####################################################################################
 
-    def zodiacal(self, zody_mode="zodipy", verbose=False, output_name=None, output_units="e/s"):
+    def zodiacal(self, zody_mode="zodipy", verbose=False, output_name=None, output_units="e/s", resolution=1):
         import astropy.wcs as astropy_wcs
         from tqdm import tqdm
         import logging
@@ -874,7 +875,7 @@ class exposure():
         # Make the Roman Dummy image
         roman_dummy_name = self.FILENAME 
         if output_name is None:
-            output_name = self.FILENAME.replace(".fits", "_zody.fits")
+            output_name = self.FILENAME.replace(".fits", "_zody.fits").replace(".asdf", "_zody.fits")
 
         zodiacal_background_list = []
         zodiacal_background_unit_list = []
@@ -906,6 +907,8 @@ class exposure():
         ########################################
         # Save the results to a fits file.
         ########################################
+
+        """
         header_list_output = []
         for i in tqdm(range(nSCIEXTS)):
             temp_header = self.ASTROPYWCS[i].to_header()
@@ -935,13 +938,21 @@ class exposure():
         scaled_drz = fits.open(scaled_drz_name, memmap=True)
         drz_zody_name = output_name.replace(".fits","_drz.fits")
         scaled_drz_zody_name = output_name.replace(".fits","_drz_scaled.fits")
-
-        
         rs.utils.save_fits(array=drz_zody, name=scaled_drz_zody_name,
-                           header=scaled_drz[1].header,
-                           extname=None, overwrite=True, output_verify='silentfix')
+                    header=scaled_drz[1].header,
+                    extname=None, overwrite=True, output_verify='silentfix')
+        """
+        # Save the Zodiacal light FLC file
+        self.drz_zody_name = output_name.replace(".fits","_drz.fits")
+        self.save_flc(outname=output_name, data_list=zodiacal_background_list, wcs_list=self.ASTROPYWCS)
 
-        rs.plots.make_stray_plot(input_name=scaled_drz_zody_name, ext=0, mode="fe2mu", 
+        # Save the Zodiacal light DRZ file 
+        self.save_drz(outname=self.drz_zody_name, data_list=zodiacal_background_list, wcs_list=self.ASTROPYWCS, resolution=resolution)
+
+        rs.plots.make_stray_plot(input_name=self.drz_zody_name, ext=0, mode="fe", 
+                                 color_label = "Flux (e/s/px)", cmap="RdYlBu_r", figsize=(10,7))
+
+        rs.plots.make_stray_plot(input_name=self.drz_zody_name, ext=0, mode="fe2mu", 
                                  vmin=None, vmax=None, 
                                  color_label = 'Surface brightness (mag arcsec$^{-2}$)',
                                  cmap="RdYlBu", output_name=None, figsize=(10,7), mu_vmin=None, mu_vmax=None)
@@ -949,8 +960,7 @@ class exposure():
         print("Output saved in: " + output_name)
 
         return({"zodi_list": zodiacal_background_list,
-                "output_name": output_name,
-                "reprojected_images": reprojected_images})
+                "output_name": output_name})
 
 
 

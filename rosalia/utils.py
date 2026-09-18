@@ -1050,8 +1050,8 @@ def create_radial_mask(xsize, ysize, q=1, theta=0, center=None, radius=None):
     Y_gal = (X_image*np.sin(np.radians(-theta))+Y_image*np.cos(np.radians(-theta)))   # Y in galactic frame
 
     radial_array = np.sqrt(X_gal**2 + Y_gal**2)
-    return(np.flip(radial_array,axis=1))
-    #return(radial_array)
+    # return(np.flip(radial_array,axis=1))
+    return(radial_array)
 
 ###########################################
 
@@ -1130,7 +1130,7 @@ def make_profile(image, radial_mask=None, ext=None, ra_cen=None, dec_cen=None, x
 
     if radial_mask is None:
         radial_mask = create_radial_mask(xsize=shape_image[1], ysize=shape_image[0],
-                                               q=q, theta=theta, center=[xcen,ycen], radius=None)
+                                         q=q, theta=theta, center=[xcen, ycen], radius=None)
 
     if rbins is None:
         print("No rbins provided.")
