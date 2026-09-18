@@ -448,6 +448,15 @@ class exposure():
 
         return(straylight_images)
 
+    def make_close_stars_ds9_region(self, radius=5, output="nearby_stars.reg"):
+        import numpy as np
+        source_coords = SkyCoord(ra=np.array(self.source_catalog["ra"])*u.deg, dec=np.array(self.source_catalog["dec"])*u.deg, frame="icrs")
+        pointing_coords = SkyCoord(ra=self.RA_TARG*u.deg, dec=self.DEC_TARG*u.deg, frame="icrs")
+        sep = source_coords.separation(pointing_coords)
+        close_catalog = self.source_catalog[sep < radius*u.deg]
+        rs.utils.make_ds9_region(ra=np.array(close_catalog["ra"]), dec=np.array(close_catalog["dec"]), 
+                                 radius=np.array([1]), label=np.array(close_catalog["source_id"]), output=output)
+        print(output)
 
 
 #####################################################################################

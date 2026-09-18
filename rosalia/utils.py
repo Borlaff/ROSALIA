@@ -896,7 +896,7 @@ def find_SCA_EXTNAME(EXTNAME):
 
 
 ############################
-def make_ds9_region(ra, dec, output="ds9.reg"):
+def make_ds9_region(ra, dec, radius=[1], label=None, output="ds9.reg"):
     # This program generates a DS9 region file for DS9.
 
     with open(output, 'w') as the_file:
@@ -905,9 +905,12 @@ def make_ds9_region(ra, dec, output="ds9.reg"):
         the_file.write('fk5\n')
 
         counter = 0
-        for ra_i, dec_i in zip(ra, dec):
-            label = str(counter).zfill(4)
-            the_file.write('circle(' + str(ra_i) + ',' + str(dec_i) + ',1")  # color=red width=4 font="helvetica 16 normal roman" text={'+ label +'}\n')
+        if len(radius)!=len(ra):
+            radius = ra*0 + radius
+
+        for ra_i, dec_i, radius_i, label_i in zip(ra, dec, radius, label):
+            if label is None: label = str(counter).zfill(4)
+            the_file.write('circle(' + str(ra_i) + ',' + str(dec_i) + ',' + str(radius_i) + '")  # color=red width=4 font="helvetica 16 normal roman" text={'+ str(label_i) +'}\n')
             counter = counter + 1
     return(output)
 ############################
