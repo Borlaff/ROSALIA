@@ -17,6 +17,7 @@ notebooks/*.xml
 notebooks/*/*.png
 notebooks/*/*.csv
 notebooks/*/*.pdf
+notebooks/DEVEL
 
 .DS_Store
  
