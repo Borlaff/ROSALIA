@@ -72,10 +72,11 @@ def roman_query(criteria=None, coordinates=None, radius=None, filter=None, detec
     # Re-order the column names 
     # results = results[col_list]
     products = missions.get_unique_product_list(results)
-    products, unique_roots = pack_exposures(products)
-
 
     if file_suffix is not None:
         products = missions.filter_products(products, file_suffix='_cal')
+
+    products, unique_roots = pack_exposures(products)
+
     return(results, products, unique_roots)
 

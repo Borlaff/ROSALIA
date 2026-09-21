@@ -874,7 +874,6 @@ class exposure():
 #####################################################################################
 
     def zodiacal(self, zody_mode="zodipy", verbose=False, output_name=None, output_units="e/s", resolution=1):
-        import astropy.wcs as astropy_wcs
         from tqdm import tqdm
         import logging
         logger = logging.getLogger()
@@ -889,10 +888,6 @@ class exposure():
         zodiacal_background_list = []
         zodiacal_background_unit_list = []
 
-        #obspos = np.array([self.XYZ_HELIO_POS[0],
-        #                   self.XYZ_HELIO_POS[1],
-        #                   self.XYZ_HELIO_POS[2]])*u.AU
-
         print("Computing Zodiacal light...")
         for i in tqdm(range(nSCIEXTS)):
             zodiacal_background = rs.sky.get_zodiacal_background(astropywcs=self.ASTROPYWCS[i],
@@ -904,54 +899,13 @@ class exposure():
                                                                  obspos = self.XYZ_HELIO_POS,
                                                                  output_units=output_units,
                                                                  verbose=verbose)
-            # print(zodiacal_background)
 
-            
-
-            #constant_pixel_011arcsec_scale_factor = 0.11/(astropy_wcs.utils.proj_plane_pixel_scales(self.ASTROPYWCS[i])[0]*60*60)
-            #zodiacal_background = zodiacal_background/constant_pixel_011arcsec_scale_factor**2
             zodiacal_background_list.append(zodiacal_background.value)
             zodiacal_background_unit_list.append(zodiacal_background.unit.to_string())
 
         ########################################
-        # Save the results to a fits file.
-        ########################################
-
-        """
-        header_list_output = []
-        for i in tqdm(range(nSCIEXTS)):
-            temp_header = self.ASTROPYWCS[i].to_header()
-            temp_header["UNITS"] = zodiacal_background_unit_list[i]
-            header_list_output.append(temp_header)
-
-        rs.utils.save_fits(array=zodiacal_background_list, 
-                           name=output_name, 
-                           header=header_list_output,
-                           extname=None, 
-                           overwrite=True, 
-                           output_verify='silentfix')
-
-        # Make the scaled model and the summary plot.
-        drz_name, scaled_drz_name = rs.utils.run_swarp(pattern=roman_dummy_name, 
-                                                       outname=roman_dummy_name.replace(".fits","_drz.fits"), 
-                                                       scale=0.11)
-
-        print("Generating scaled mosaic...")
-        reprojected_images, reference_header = rs.utils.reproject_roman_wfi_fits(data_list=zodiacal_background_list,
-                                                                                wcs_list=header_list_output,
-                                                                                reference_name=scaled_drz_name,
-                                                                                reference_ext=1)
-        import bottleneck as bn
-        drz_zody = bn.nansum(np.array(reprojected_images), axis=0)
-        from astropy.io import fits 
-        scaled_drz = fits.open(scaled_drz_name, memmap=True)
-        drz_zody_name = output_name.replace(".fits","_drz.fits")
-        scaled_drz_zody_name = output_name.replace(".fits","_drz_scaled.fits")
-        rs.utils.save_fits(array=drz_zody, name=scaled_drz_zody_name,
-                    header=scaled_drz[1].header,
-                    extname=None, overwrite=True, output_verify='silentfix')
-        """
         # Save the Zodiacal light FLC file
+        ########################################
         self.drz_zody_name = output_name.replace(".fits","_drz.fits")
         self.save_flc(outname=output_name, data_list=zodiacal_background_list, wcs_list=self.ASTROPYWCS)
 
