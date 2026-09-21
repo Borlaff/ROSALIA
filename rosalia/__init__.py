@@ -24,6 +24,7 @@ import rosalia.psf
 import rosalia.hst
 import rosalia.gaia
 import rosalia.gnu
+import rosalia.inspector
 import rosalia.roman
 import rosalia.mast
 import rosalia.sky

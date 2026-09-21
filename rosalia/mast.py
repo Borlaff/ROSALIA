@@ -13,6 +13,18 @@ def stream_roman_mast(products, row=0):
 
 ####################
 
+
+def pack_exposures(products):
+    # if True:
+    # print(products["filename"])
+    root_id = []
+    for i in range(len(products["filename"])):
+        split_filename = products["filename"][i].split("_")
+        root_id.append(split_filename[0] + "_" + split_filename[1])
+    unique_roots = list(set(root_id))
+    products["exposure_id"] = root_id
+    return(products, unique_roots)
+
 def roman_query(criteria=None, coordinates=None, radius=None, filter=None, detector=None, file_suffix=None):
 
     """
@@ -60,9 +72,10 @@ def roman_query(criteria=None, coordinates=None, radius=None, filter=None, detec
     # Re-order the column names 
     # results = results[col_list]
     products = missions.get_unique_product_list(results)
+    products, unique_roots = pack_exposures(products)
+
 
     if file_suffix is not None:
         products = missions.filter_products(products, file_suffix='_cal')
-    return(results, products)
+    return(results, products, unique_roots)
 
-    

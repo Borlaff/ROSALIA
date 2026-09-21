@@ -135,7 +135,7 @@ class exposure():
                                                 "_PA_" + '{:06.2f}'.format(self.PA) + ".fits"
 
         if filename is not None:
-            exposure_identity = rs.utils.exposure_inspector(filename, lite=False)
+            exposure_identity = rs.inspector.exposure_inspector(filename, lite=False)
             self.DATA = exposure_identity['DATA']
             self.FILENAME = exposure_identity['FILENAME']
             self.TELESCOP = exposure_identity['TELESCOP']
@@ -501,7 +501,7 @@ class exposure():
             headers_output.append(header)
 
         drz_data, drz_wcs = rs.utils.generate_mosaic(data=data_list, astropywcs=headers_output, resolution=resolution)
-        rs.utils.save_fits(array=drz_data, name=outname, header=drz_wcs,
+        rs.utils.save_fits(array=np.float32(drz_data), name=outname, header=drz_wcs,
                            extname=extname, 
                            overwrite=overwrite, 
                            output_verify='silentfix')
