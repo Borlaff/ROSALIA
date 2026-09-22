@@ -170,6 +170,10 @@ def exposure_inspector_asdf(input_name, telescope="roman", verbose=False, lite=F
 
     exposure_identity["RA_TARG"]    = input_asdf["meta"]["pointing"]["target_ra"]
     exposure_identity["DEC_TARG"]   = input_asdf["meta"]["pointing"]["target_dec"]
+    exposure_identity["photometry"] = input_asdf["meta"]["photometry"]# ["conversion_megajanskys"]
+    # exposure_identity["photometry"] = input_asdf["meta"]["photometry"]["conversion_megajanskys_uncertainty"]
+    # exposure_identity["pixel_area"] = input_asdf["meta"]["photometry"]["pixel_area"]
+    # data_stream["meta"]["photometry"]["conversion_megajanskys_uncertainty"]
     #exposure_identity["SUNANGLE"]  = input_asdf["roman"]["meta"]["ephemeris"]["sun_angle"]
     #exposure_identity["MOONANGL"]  = input_asdf["roman"]["meta"]["ephemeris"]["moon_angle"]
     #exposure_identity["EARTHANGL"] = input_asdf["roman"]["meta"]["ephemeris"]["earth_angle"]

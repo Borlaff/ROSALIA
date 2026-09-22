@@ -25,7 +25,7 @@ def pack_exposures(products):
     products["exposure_id"] = root_id
     return(products, unique_roots)
 
-def roman_query(criteria=None, coordinates=None, radius=None, filter=None, detector=None, file_suffix=None):
+def roman_query(criteria=None, coordinates=None, radius=None, filter=None, detector=None, file_suffix=None, exposure_id=None):
 
     """
     # Create a dictionary of search criteria
@@ -75,6 +75,12 @@ def roman_query(criteria=None, coordinates=None, radius=None, filter=None, detec
 
     if file_suffix is not None:
         products = missions.filter_products(products, file_suffix='_cal')
+
+    if exposure_id is not None:
+        found_index = []
+        for i in range(len(products["dataset"])):
+            if exposure_id in products["dataset"][i]: found_index.append(i)
+        products = products[found_index]
 
     products, unique_roots = pack_exposures(products)
 

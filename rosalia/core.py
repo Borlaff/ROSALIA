@@ -148,6 +148,7 @@ class exposure():
             self.EXPMID = (Time(self.EXPSTART, format="mjd") + self.EXPTIME*u.s/2).mjd
             self.EXPEND = (Time(self.EXPSTART, format="mjd") + self.EXPTIME*u.s).mjd
             self.BUNIT = exposure_identity['BUNIT']
+            self.PHOTOMETRY = exposure_identity['photometry']
             self.EXPSTART_ISOT = exposure_identity['EXPSTART_ISOT']
             self.PA = exposure_identity['PA']
             # self.SCA = exposure_identity['SCA']
@@ -184,6 +185,7 @@ class exposure():
         observer['INSTRUME'] = "WFI"
         observer['DETECTOR'] = "WFI"
         observer['DATA_SHAPE'] = [4088, 4088]
+        observer['DATA'] = 18*[np.zeros(observer['DATA_SHAPE'])]
         observer['PIXSCALE'] = rs.telescopes.Roman.get_pixscale(instrument=observer['INSTRUME']).to("degree").value
         observer['FILTER_PARAMS'] = {"NAME": observer["FILTER"], "TELESCOPE": "RST", "INSTRUMENT": "WFI", "DETECTOR": "WFI"}
         
@@ -508,6 +510,19 @@ class exposure():
         return(drz_data, drz_wcs, outname)
 
 
+
+    def get_mosaic_wcs(self):
+        from reproject.mosaicking import find_optimal_celestial_wcs
+        resolution = self.PIXSCALE*u.arcsec
+        input_data_for_reproject = list(zip(self.DATA, self.ASTROPYWCS))
+
+        optimal_wcs = find_optimal_celestial_wcs(input_data=input_data_for_reproject, 
+                                                resolution=resolution)
+
+        return(optimal_wcs[0], optimal_wcs[1])
+
+
+
     from concurrent.futures import ProcessPoolExecutor
     from tqdm import tqdm
 
@@ -692,9 +707,6 @@ class exposure():
             # Save the results to a fits file.
             ########################################
             # Stray-light
-
-
-
             # Save the stray-light FLC file
             self.save_flc(outname=self.output_name, data_list=straylevel_list, wcs_list=self.ASTROPYWCS, keywords=self.fits_keywords)
 

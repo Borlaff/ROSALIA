@@ -8,6 +8,7 @@ subprocess.out
 temp*
 *temp
 *catalog.csv
+*.np
 *.pyc
 notebooks/DEVEL/snap/snap*.png
 notebooks/CAR171/CAR171*.png

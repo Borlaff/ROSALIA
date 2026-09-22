@@ -181,38 +181,6 @@ def execute_cmd(cmd, verbose=False):
 #######################################
 
 
-def reproject_roman_wfi_fits(data_list, wcs_list, reference_name, reference_ext):
-    import os
-    from reproject import reproject_interp, reproject_exact
-    import copy
-    reprojected_images = []
-
-    reference_fits = fits.open(reference_name, memmap=True)
-    reference_header = reference_fits[reference_ext].header
-    reference_shape = reference_fits[reference_ext].data.shape
-    # Use all available CPU cores
-    num_cpus = os.cpu_count()
-
-    for data, wcs in tqdm(zip(data_list, wcs_list)):
-        data=np.float32(data)
-        array_out = np.memmap(filename='output.np', mode='w+',  
-                              shape=reference_shape, dtype='float32')
-        # print(wcs)
-        reproject_interp(
-            input_data=(data, wcs),
-            output_projection=reference_header,
-            parallel=num_cpus,  # Enables block-based multi-core processing
-            block_size='auto',   # Automatically determines chunk size 
-            return_footprint=False,
-            output_array=array_out
-            )
-
-        reprojected_image = copy.deepcopy(array_out)
-        reprojected_images.append(reprojected_image)
-        del array_out
-
-
-    return(reprojected_images, reference_header)
 
 
 
@@ -1601,8 +1569,42 @@ def get_astropywcs_info_from_sciexts(filename, sciexts):
 
 
 
-
 ######################
+
+
+def reproject_roman_wfi_fits(data_list, wcs_list, mosaic_wcs):
+    import os
+    from reproject import reproject_interp
+    import copy
+    reprojected_images = []
+
+    # reference_fits = fits.open(reference_name, memmap=True)
+    reference_header = mosaic_wcs.to_header() # reference_fits[reference_ext].header
+    reference_shape = reference_fits[reference_ext].data.shape
+    # Use all available CPU cores
+    num_cpus = os.cpu_count()
+
+    for data, wcs in tqdm(zip(data_list, wcs_list)):
+        data=np.float32(data)
+        array_out = np.memmap(filename='output.np', mode='w+',  
+                              shape=reference_shape, dtype='float32')
+        # print(wcs)
+        reproject_interp(
+            input_data=(data, wcs),
+            output_projection=reference_header,
+            parallel=num_cpus,  # Enables block-based multi-core processing
+            block_size='auto',   # Automatically determines chunk size 
+            return_footprint=False,
+            output_array=array_out
+            )
+
+        reprojected_image = copy.deepcopy(array_out)
+        reprojected_images.append(reprojected_image)
+        del array_out
+
+
+    return(reprojected_images, reference_header)
+
 
 def generate_mosaic(data, astropywcs, resolution=None):
     import astropy.units as u
@@ -1615,7 +1617,7 @@ def generate_mosaic(data, astropywcs, resolution=None):
         resolution = resolution*u.arcsec
 
     optimal_wcs = find_optimal_celestial_wcs(input_data=input_data_for_reproject, 
-                                            resolution=resolution)
+                                             resolution=resolution)
 
     output = reproject_and_coadd(input_data=input_data_for_reproject, 
                                 output_projection=optimal_wcs[0], 
