@@ -459,7 +459,7 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
 
     # Initialize the minimal storage arrays: straylight, mainoffender, ra, dec
     straylight_total   = np.zeros((n_subarrays,)).astype(np.float32) 
-    mainoffender_total = np.zeros((n_subarrays,)).astype(np.float32) 
+    mainoffender_total = np.zeros((n_subarrays,)).astype(np.int32) 
 
     xmid = subarray_locations_db["xmid"]
     ymid = subarray_locations_db["ymid"]

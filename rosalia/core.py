@@ -721,6 +721,25 @@ class exposure():
             self.mainoff_drz_name = self.main_offender_output_name.replace(".fits","_drz.fits")
             self.save_drz(outname=self.mainoff_drz_name, data_list=main_offender_list, wcs_list=self.ASTROPYWCS, keywords=self.fits_keywords, resolution=resolution)
 
+            # --------------
+            # We need to apply one extra correction to the Main_offender DRZ file
+            # so no drizzling artifacts are included in the plots.
+            # -------------- 
+            main_off_map = fits.open(self.mainoff_drz_name)
+            mask_main_off_ok = np.zeros(main_off_map[0].data.shape)
+            main_offenders = list(set(straylevel_db["mainoffender_total"]))
+
+            # Remove all those pixels that have values not included in the list of main offenders 
+            for i in range(len(main_offenders)):
+                main_off_id = main_offenders[i]
+                main_offended_pixels = np.where(main_off_map[0].data == main_off_id)
+                mask_main_off_ok[main_offended_pixels] = 1
+
+            main_off_map[0].data[mask_main_off_ok == 0] = np.nan
+            main_off_map.verify("silentfix")
+            main_off_map.writeto(self.mainoff_drz_name, overwrite=True)
+    
+
             ################################################################
             ############ Generate the straylight report pdf ################
             ################################################################
