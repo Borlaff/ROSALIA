@@ -3,6 +3,7 @@ import asdf
 import s3fs
 from tqdm import tqdm
 import rosalia as rs
+import numpy as np
 from astropy.io import fits
 import roman_datamodels.datamodels._datamodels
 import astropy.table.table
