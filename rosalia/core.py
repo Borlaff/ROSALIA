@@ -319,6 +319,53 @@ class exposure():
             loader.stop()
         return(hybrid_catalog)
 
+    def find_closest_detector(self, ra, dec):
+        """
+        Finds the closest detector for target sources using vectorized math.
+        
+        Parameters:
+        -----------
+        ra : float or numpy.ndarray
+            RA coordinate(s) in degrees.
+        dec : float or numpy.ndarray
+            Dec coordinate(s) in degrees.
+            
+        Returns:
+        --------
+        closest_indices : numpy.ndarray or int
+            The index (or array of indices) of the closest WCS in `wcs_list`.
+            Returns a scalar integer if single floats were passed.
+        """
+        closest_indices = rs.utils.find_closest_detector(detector_wcs_list=self.ASTROPYWCS,
+                                                        ra=ra,
+                                                        dec=dec)     
+        return closest_indices
+
+
+    def is_inside_wfi(self, ra, dec, width=500):
+        """
+        Checks if given RA/Dec source(s) fall inside the WFI detector footprint.
+        
+        Parameters:
+        -----------
+        ra : float, list, or numpy.ndarray
+            Right Ascension of the source(s) in degrees.
+        dec : float, list, or numpy.ndarray
+            Declination of the source(s) in degrees.
+        width : int or float, optional
+            Pixel padding to extend (or shrink, if negative) the footprint border. Default is 500.
+            
+        Returns:
+        --------
+        inside : bool or numpy.ndarray of bool
+            A boolean (or array of booleans) indicating if each source falls within the boundary.
+        """
+        inside = rs.utils.check_sources_in_footprint(detector_wcs_list=self.ASTROPYWCS,
+                                                     detector_shapes=self.DATA_SHAPE,
+                                                     ra=ra,
+                                                     dec=dec,
+                                                     width=width)
+        return inside
 
 
     def find_which_stars_are_inside_each_detector(self, verbose=False):
@@ -750,6 +797,7 @@ class exposure():
         from tqdm import tqdm
         from astropy.io import fits
         import logging
+        from reproject.mosaicking import find_optimal_celestial_wcs
         logger = logging.getLogger()
         logger.setLevel(logging.CRITICAL)
 
@@ -760,6 +808,19 @@ class exposure():
             else:
                 self.source_catalog = rs.utils.fix_custom_catalog(catalog)
 
+        # Get the optimal wcs
+        self.optimal_wcs, self.shape_out = find_optimal_celestial_wcs([(self.SCIEXTS[i], self.ASTROPYWCS[i]) for i in range(len(self.SCIEXTS))])    
+
+
+        # Find stars around the entire WFI footprint
+        stars_in_footprint = self.is_inside_wfi(ra=self.source_catalog["ra"], dec=self.source_catalog["dec"])
+        stars_catalog = self.source_catalog[stars_in_footprint]
+
+        # Find the closest detector to each star
+        stars_catalog["detector_id"] = self.find_closest_detector(ra=stars_catalog["ra"], dec=stars_catalog["dec"]) + 1
+
+
+        
 
         # Generate the star stamps (PSFs)
         print("TO DO: Make stamps with a more reasonable size. Dim stars can have smaller PSFs.")

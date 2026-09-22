@@ -1975,6 +1975,126 @@ def write_parameters_list(fits_list, index, value, ext=0):
         raw_fits.close()
     return()
 
+def check_sources_in_footprint(detector_wcs_list, detector_shapes, ra, dec, width=0):
+    """
+    Checks if given RA/Dec source(s) fall inside the unrotated mosaic footprint,
+    automatically aligning the orientation angle with the first detector chip.
+    
+    Parameters:
+    -----------
+    detector_wcs_list : list of astropy.wcs.WCS
+        The WCS objects for each detector chip. The first item ([0]) is used
+        as the reference for the physical observation rotation angle.
+    detector_shapes : list of tuples
+        The (ny, nx) shapes of each detector chip matching the order of detector_wcs_list.
+    ra : float, list, or numpy.ndarray
+        Right Ascension of the source(s) in degrees.
+    dec : float, list, or numpy.ndarray
+        Declination of the source(s) in degrees.
+    width : int or float, optional
+        Pixel padding to extend (or shrink, if negative) the footprint border. Default is 0.
+        
+    Returns:
+    --------
+    inside : bool or numpy.ndarray of bool
+        A boolean (or array of booleans) indicating if each source falls within the boundary.
+    """
+    # Use the very first detector chip as the master orientation anchor
+    reference_wcs = detector_wcs_list[0]
+    
+    # --- 1. Calculate the Unrotated Canvas Bounding Box ---
+    all_sky_coords = []
+    for wcs_det, shape_det in zip(detector_wcs_list, detector_shapes):
+        ny, nx = shape_det
+        # 4 corners of each detector (1-indexed base for FITS)
+        corners_pix = np.array([[1, 1], [nx, 1], [nx, ny], [1, ny]])
+        sky_corners = wcs_det.pixel_to_world(corners_pix[:, 0], corners_pix[:, 1])
+        all_sky_coords.extend(sky_corners)
+        
+    world_coords = SkyCoord(all_sky_coords)
+    
+    # Project all detector corners into the reference unrotated frame
+    ref_x, ref_y = reference_wcs.world_to_pixel(world_coords)
+    
+    # Find the bounding limits of the entire mosaic in this reference frame
+    min_x, min_y = np.min(ref_x), np.min(ref_y)
+    max_x, max_y = np.max(ref_x), np.max(ref_y)
+    
+    # Calculate the ultimate shape of the unrotated mosaic canvas
+    canvas_width_pixels = np.ceil(max_x - min_x)
+    canvas_height_pixels = np.ceil(max_y - min_y)
+
+    # --- 2. Project Input Sources into the Same Reference Frame ---
+    source_coords = SkyCoord(ra, dec, unit="deg")
+    src_ref_x, src_ref_y = reference_wcs.world_to_pixel(source_coords)
+    
+    # Shift source coordinates so they map to the final normalized canvas space (where 1,1 is bottom-left)
+    src_canvas_x = src_ref_x - min_x + 1
+    src_canvas_y = src_ref_y - min_y + 1
+    
+    # --- 3. Apply the Bounding Box Check with Width Padding ---
+    x_min_bound = 1 - width
+    x_max_bound = canvas_width_pixels + width
+    y_min_bound = 1 - width
+    y_max_bound = canvas_height_pixels + width
+    
+    # Check boundary conditions
+    inside_x = (src_canvas_x >= x_min_bound) & (src_canvas_x <= x_max_bound)
+    inside_y = (src_canvas_y >= y_min_bound) & (src_canvas_y <= y_max_bound)
+    inside = inside_x & inside_y
+    
+    # Return a scalar boolean if inputs were scalar, or a numpy boolean array
+    if np.isscalar(ra):
+        return bool(inside)
+    return inside
+
+def find_closest_detector(detector_wcs_list, ra, dec):
+        """
+        Finds the closest detector for target sources using vectorized math.
+        
+        Parameters:
+        -----------
+        ra : float or numpy.ndarray
+            RA coordinate(s) in degrees.
+        dec : float or numpy.ndarray
+            Dec coordinate(s) in degrees.
+            
+        Returns:
+        --------
+        closest_indices : numpy.ndarray or int
+            The index (or array of indices) of the closest WCS in `wcs_list`.
+            Returns a scalar integer if single floats were passed.
+        """
+        # 1. Extract exact geometric centers for all detectors (M, 2)
+        # calc_footprint returns corners; taking the mean yields the exact center
+        det_centers = np.array([w.calc_footprint().mean(axis=0) for w in detector_wcs_list])
+        
+        # 2. Force inputs into numpy arrays and match dimensions for broadcasting
+        ra_arr = np.atleast_1d(ra)
+        dec_arr = np.atleast_1d(dec)
+        
+        r_obj_ra = np.radians(ra_arr)[:, np.newaxis]   # Shape (N, 1)
+        r_obj_dec = np.radians(dec_arr)[:, np.newaxis] # Shape (N, 1)
+        
+        r_det_ra = np.radians(det_centers[:, 0])[np.newaxis, :]   # Shape (1, M)
+        r_det_dec = np.radians(det_centers[:, 1])[np.newaxis, :] # Shape (1, M)
+        
+        # 3. Vectorized Great-Circle distance matrix (Law of Cosines) -> Shape (N, M)
+        cos_separation = (np.sin(r_obj_dec) * np.sin(r_det_dec) + 
+                        np.cos(r_obj_dec) * np.cos(r_det_dec) * np.cos(r_obj_ra - r_det_ra))
+        
+        # Clip for floating-point safety
+        np.clip(cos_separation, -1.0, 1.0, out=cos_separation)
+        
+        # 4. Find the detector index that maximizes the cosine (minimizes distance)
+        closest_indices = np.argmax(cos_separation, axis=1)
+        
+        # 5. Return scalar if the original input was a scalar float
+        if np.isscalar(ra) and np.isscalar(dec):
+            return int(closest_indices[0])
+            
+        return closest_indices  
+
 def get_astropywcs_info_from_sciexts(filename, sciexts):
     data_shape = []
     astropywcs = []

@@ -25,4 +25,4 @@ observer={"TELESCOP": "Roman/WFI",
 prefix = "alphacen"
 custom_roman_exposure = rs.core.exposure(observer=observer, prefix=prefix) 
 
-psf_out = custom_roman_exposure.psf()
+# psf_out = custom_roman_exposure.psf()
