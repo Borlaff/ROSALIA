@@ -73,10 +73,10 @@ def exposure_inspector(input_name, verbose=False, lite=False):
 
         for i in tqdm(range(len(input_name))):
             if isinstance(input_name, (list,)): 
-                exposure_identity = rs.utils.exposure_inspector(input_name[i], lite=lite)
+                exposure_identity = rs.inspector.exposure_inspector(input_name[i], lite=lite)
             elif isinstance(input_name, (astropy.table.table.Table,)): 
                 data_stream = rs.mast.stream_roman_mast(products=input_name, row=i)
-                exposure_identity = rs.utils.exposure_inspector(data_stream, lite=lite)
+                exposure_identity = rs.inspector.exposure_inspector(data_stream, lite=lite)
             # exposure_identities.append(exposure_identity)
             DATA.append(exposure_identity["DATA"][0])
             DATA_SHAPE.append(exposure_identity["DATA_SHAPE"][0])

@@ -1183,7 +1183,7 @@ def convert_ASDF_to_FITS(asdf_list, output):
     extname_list = []
 
     for asdf_name in tqdm(asdf_list):
-        exposure_identity = rs.utils.exposure_inspector(asdf_name)
+        exposure_identity = rs.inspector.exposure_inspector(asdf_name)
         array_list.append(exposure_identity["DATA"][0])
         header = exposure_identity["ASTROPYWCS"][0].to_header()
 
