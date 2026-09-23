@@ -819,9 +819,9 @@ class exposure():
         # Find the closest detector to each star
         stars_catalog["detector_id"] = self.find_closest_detector(ra=stars_catalog["ra"], dec=stars_catalog["dec"]) + 1
 
-
         
-
+        
+        
         # Generate the star stamps (PSFs)
         print("TO DO: Make stamps with a more reasonable size. Dim stars can have smaller PSFs.")
         print("To do this, make a profile of the Roman / PSF, and find out when would it be essentially 0.")

@@ -21,11 +21,140 @@ import astropy.wcs as astropy_wcs
 import matplotlib.pyplot as plt
 import astropy.units as u
 from astropy.coordinates import SkyCoord
+from scipy.interpolate import interp1d
 import rosalia as rs
 
 # Suppress warnings. Comment this out if you wish to see the warning messages
 import warnings
 warnings.filterwarnings('ignore')
+
+
+#%%
+class Star:
+    '''
+    Class representing a star in a image. This class would help create the PSF in the images. 
+    '''
+    def __init__(self, row):
+        ''' Initialize class star with basic information from the catalog row.'''
+        self.ra = row["ra"]
+        self.dec = row["dec"]
+        self.source_id = row["source_id"]
+        self.WFI = row["detector_id"]
+        self.set_magnitudes(row)
+        self.make_interpolator()
+
+    def set_magnitudes(self, row):
+        wavelengths = {
+        'phot_bp_mean_mag': 5319.87e-10,      # Gaia BP (blue photometer) ~505 nm
+        'phot_g_mean_mag': 6719.55e-10,       # Gaia G ~632 nm
+        'phot_rp_mean_mag': 7939.10e-10,      # Gaia RP (red photometer) ~797 nm
+        'phot_w1_mean_mag_AB': 33526.00e-10,      # WISE W1 ~3.4 μm
+        'phot_w2_mean_mag_AB': 46028.00e-10,      # WISE W2 ~4.6 μm
+        'phot_w3_mean_mag_AB': 115608.00e-10,     # WISE W3 ~12.0 μm
+        'phot_w4_mean_mag_AB': 220883.00e-10,     # WISE W4 ~22.0 μm
+        'phot_j_mean_mag_AB': 12350.00e-10,     # 2MASS J ~1.235 μm
+        'phot_h_mean_mag_AB': 16620.00e-10,     # 2MASS H ~1.662 μm
+        'phot_ks_mean_mag_AB': 21590.00e-10,    # 2MASS Ks ~2.159 μm
+        }
+        self.bp = row["phot_bp_mean_mag"]
+        self.bp_wave = wavelengths['phot_bp_mean_mag']
+        self.g = row["phot_g_mean_mag"]
+        self.g_wave = wavelengths['phot_g_mean_mag']        
+        self.rp = row["phot_rp_mean_mag"]
+        self.rp_wave = wavelengths['phot_rp_mean_mag']
+        self.w1 = row["phot_w1_mean_mag_AB"]
+        self.w1_wave = wavelengths['phot_w1_mean_mag_AB']
+        self.w2 = row["phot_w2_mean_mag_AB"]
+        self.w2_wave = wavelengths['phot_w2_mean_mag_AB']
+        self.w3 = row["phot_w3_mean_mag_AB"]
+        self.w3_wave = wavelengths['phot_w3_mean_mag_AB']
+        self.w4 = row["phot_w4_mean_mag_AB"]
+        self.w4_wave = wavelengths['phot_w4_mean_mag_AB']
+        self.j = row["phot_j_mean_mag_AB"]
+        self.j_wave = wavelengths['phot_j_mean_mag_AB']
+        self.h = row["phot_h_mean_mag_AB"]
+        self.h_wave = wavelengths['phot_h_mean_mag_AB']
+        self.ks = row["phot_ks_mean_mag_AB"]
+        self.ks_wave = wavelengths['phot_ks_mean_mag_AB']
+
+        self.mag = np.array([self.bp, self.g, self.rp, self.w1, self.w2, self.w3, self.w4, self.j, self.h, self.ks])
+        self.wave = np.array([self.bp_wave, self.g_wave, self.rp_wave, self.w1_wave, self.w2_wave, self.w3_wave, self.w4_wave, self.j_wave, self.h_wave, self.ks_wave])
+
+    def make_interpolator(self):
+        self.interpolator = interp1d(self.wave, self.mag, kind='cubic', bounds_error=False, fill_value="extrapolate")
+
+    def get_galsim_sed(self):
+        import galsim
+
+        self.fnu = 3631e-23 * 10**(-0.4 * self.mag)
+
+        # 1. Build a continuous spectrum via LookupTable interpolation
+        self.spectrum_table = galsim.LookupTable(
+            x=self.wave*1e9,  # Convert from meters to nanometers
+            f=self.fnu, 
+            interpolant='linear' # or 'cubic' if you have plenty of points and want smooth curves
+        )
+
+        # 4. Turn the table into a GalSim SED object
+        self.star_sed = galsim.SED(
+            spec=self.spectrum_table, 
+            wave_type='nm', 
+            flux_type='fnu'
+        )
+
+        # 5. Define your spatial star model (a point source) and apply the SED
+        # This creates a ChromaticObject representing the star
+        self.star_profile = galsim.DeltaFunction() * self.star_sed
+
+    def plot_spectrum(self):
+        import matplotlib.pyplot as plt
+
+        dense_waves = np.linspace(self.wave.min()*1e9, self.wave.max()*1e9, 1000)
+        fig, ax = plt.subplots()
+        ax.plot(dense_waves, self.star_sed(dense_waves),  label="GalSim Interpolator", color='royalblue', lw=2)
+        ax.scatter(self.wave*1e9, self.fnu, label='Photometry', color='darkorange', edgecolors='black', s=80, zorder=3)
+        ax.set_xlabel("Wavelength ($\mathrm{nm}$)", fontsize=12)
+        ax.set_ylabel("Flux Density $f_\\nu$ ($\mathrm{erg/s/Hz/cm^2}$)", fontsize=12)
+        ax.legend()
+        return fig, ax
+
+    def get_detector_position_telescope_frame(self, WCS, shape, telescope):
+        """
+        Convert detector position to telescope frame coordinates.
+        
+        Parameters
+        ----------
+        WCS : astropy.wcs.WCS
+            World Coordinate System object for the image.
+        shape : tuple
+            Shape of the detector (ny, nx).
+            
+        Returns
+        -------
+        thetax : float
+            V2 position in telescope frame (radians)
+        thetay : float
+            V3 position in telescope frame (radians)
+        """
+        from stpsf.stpsf_core import get_siaf_with_caching
+        
+        siaf = get_siaf_with_caching('roman')
+        aperture_name = f'WFI{self.WFI:02d}_FULL'
+        
+        if aperture_name not in siaf.apertures:
+            raise ValueError(f"Aperture {aperture_name} not found in SIAF")
+        
+        aperture = siaf.apertures[aperture_name]
+        thetax_deg, thetay_deg = aperture.idl_to_tel(idl_x, idl_y)
+        
+        # Convert from degrees to radians
+        thetax_rad = thetax_deg * np.pi / 180 / 60 / 60
+        thetay_rad = thetay_deg * np.pi / 180 / 60 / 60
+        
+        return thetax_rad, thetay_rad
+
+
+#%%
 
 ############################
 
@@ -1176,3 +1305,89 @@ def generate_star_stamps(hybrid_catalog, telescope, filename, sciexts, astropywc
     return(stars_outnames)
 
 ##########################
+
+def moffat_function_sb(r, mu0, alpha, beta):
+    """
+    Moffat surface brightness profile in magnitudes per square arcsecond.
+
+    Parameters
+    ----------
+        r : float or np.ndarray
+            Radial distance from the center.
+        mu0 : float
+            Central surface brightness.
+        alpha : float
+            Scale parameter.
+        beta : float
+            Shape parameter.
+
+    Returns
+    -------
+        float or np.ndarray: 
+            Surface brightness at radius r.
+    """
+    return mu0 + 2.5 * beta * np.log10(1 + (r/alpha)**2)
+
+def moffat_2d(shape, mu0, alpha, beta):
+    """
+    Generate a 2D Moffat profile.
+
+    Parameters
+    ----------
+        shape : tuple of int
+            Shape of the 2D array to generate.
+        mu0 : float
+            Central surface brightness.
+        alpha : float
+            Scale parameter.
+        beta : float
+            Shape parameter.
+
+    Returns
+    -------
+        np.ndarray
+            2D array representing the surface brightness at each point.
+    """
+    # Create grid of given shape
+    y, x = np.indices(shape)
+    y_cen = (shape[0] - 1) / 2
+    x_cen = (shape[1] - 1) / 2
+    r = np.sqrt((x - x_cen)**2 + (y - y_cen)**2)
+    return mu0 + 2.5 * beta * np.log10(1 + (r/alpha)**2)
+
+def get_psf_extension_moffat(mag, depth=30, alpha=0.08, beta=1.52):
+    """
+    Analytically calculate the PSF extension based on a standard Moffat profile at a given depth.
+    
+    Parameters
+    ----------
+        mag: float or array-like
+            Magnitude(s) of the star.
+        depth: float, optional
+            Depth at the extension in mag arcsecond^-2. Default is 30.
+        alpha : float, optional
+            Scale parameter of the Moffat profile. Default is 0.08.
+        beta : float, optional
+            Shape parameter of the Moffat profile. Default is 1.52.
+        
+    Returns
+    -------
+        float or np.ndarray
+            Exact PSF extension in arcseconds.
+    """
+    mag = np.asarray(mag)
+
+    # Measure the mu0 from integrating the moffat function analytically
+    term = (np.pi * alpha**2) / (beta - 1)
+    mu0 = mag + 2.5 * np.log10(term)
+    
+    # Invert the Moffat surface brightness equation to solve for r
+    exponent = (depth - mu0) / (2.5 * beta)
+    term = 10**exponent - 1
+    
+    # Prevent np.sqrt from encountering negative numbers if depth < mag
+    term = np.maximum(term, 0) 
+    
+    extension = alpha * np.sqrt(term)
+    
+    return extension.item() if extension.ndim == 0 else extension

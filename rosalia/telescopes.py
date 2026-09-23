@@ -463,6 +463,7 @@ class Roman:
         return(np.array([vectors["x"].value, vectors["y"].value, vectors["z"].value])*u.AU)
 
     def stpsf_get_psf(detector_position, detector, filter_name, fov_pixels=1024, oversample=1):
+        import stpsf
         # This is just a wrapper for the stpsf wfi module to generate Roman's PSF.
         # import stpsf
         wfi = stpsf.roman.WFI()
@@ -527,6 +528,34 @@ class Roman:
             return(pav3)
 
     def get_psf(detector_position, detector, filter_name):
+        """Generate a Roman WFI point-spread function for one detector position.
+
+        Parameters
+        ----------
+        detector_position : sequence of float
+            Two-dimensional detector coordinates ``(x, y)`` in pixels. These
+            coordinates are passed to GalSim as the SCA position at which the
+            PSF should be evaluated.
+        detector : int
+            Roman WFI SCA number, from 1 through 18.
+        filter_name : str
+            Roman WFI filter name, for example ``"F158"``. The filter must be
+            available in ``romanisim.bandpass.roman2galsim_bandpass`` and in
+            the SVO filter data used by :func:`find_filter_in_svo`.
+
+        Returns
+        -------
+        astropy.io.fits.PrimaryHDU
+            The rendered PSF image in the primary HDU. The image is produced
+            with GalSim's Roman PSF model and has the default output image
+            size used by ``drawImage``.
+
+        Notes
+        -----
+        A temporary FITS file named ``temp_psf_<filter>_SCA<nn>.fits`` is
+        written in the current working directory and removed before the
+        function returns. The returned HDU remains available in memory.
+        """
         SCA = detector
         from romanisim.bandpass import roman2galsim_bandpass
         import galsim
