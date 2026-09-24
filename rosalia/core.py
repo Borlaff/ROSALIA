@@ -885,7 +885,8 @@ class exposure():
 ### Zodiacal ########################################################################
 #####################################################################################
 
-    def zodiacal(self, zody_mode="zodipy", verbose=False, output_name=None, output_units="e/s", resolution=1):
+    def zodiacal(self, zody_mode="zodipy", verbose=False, output_name=None, output_units="e/s", resolution=1,
+                 grid_method="random"):
         from tqdm import tqdm
         import logging
         logger = logging.getLogger()
@@ -907,7 +908,7 @@ class exposure():
                                                                  expstart=self.EXPSTART,
                                                                  step=1000, zody_mode=zody_mode,
                                                                  nbins_wavelength=10, obslocin=0,
-                                                                 grid_method="random",
+                                                                 grid_method=grid_method,
                                                                  obspos = self.XYZ_HELIO_POS,
                                                                  output_units=output_units,
                                                                  verbose=verbose)

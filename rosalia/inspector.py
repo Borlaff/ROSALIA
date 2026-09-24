@@ -7,6 +7,7 @@ import numpy as np
 from astropy.io import fits
 import roman_datamodels.datamodels._datamodels
 import astropy.table.table
+import os
 
 ############################
 def exposure_inspector(input_name, verbose=False, lite=False):
@@ -344,7 +345,7 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
     # exposure_identity["PIXSCALE"] = telescope_class.get_pixscale(instrument=exposure_identity["INSTRUME"])
 
     # Find which extensions are SCI
-    exposure_identity["SCIEXTS"] = detect_sci_extensions(input_name)
+    exposure_identity["SCIEXTS"] = rs.utils.detect_sci_extensions(input_name)
 
     # Emancipate this as a separate program.
     # Find the central coordinates of the Multiextension fits.

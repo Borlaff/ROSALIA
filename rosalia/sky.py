@@ -182,7 +182,7 @@ def get_zodiacal_background(astropywcs, wavelength=None,
                             expstart=None, step=1000, zody_mode="stsci",
                             obspos = None,
                             nbins_wavelength=20, obslocin=3, grid_method="random",
-                            output_units=None, verbose=False, interpolate=True):
+                            output_units=None, verbose=False, dointerpolate=True):
 
     from scipy import interpolate
     import astropy.wcs as astropy_wcs
@@ -248,7 +248,7 @@ def get_zodiacal_background(astropywcs, wavelength=None,
                                dec=detector_grid["grid_world"][1], 
                                wavelength=rebinned_wavelength, 
                                weights=rebinned_transmission, 
-                               expstart=expstart, obslocin=3) 
+                               expstart=expstart, obslocin=obslocin)
 
 
     if zody_mode.lower() == "zodipy":
@@ -277,7 +277,7 @@ def get_zodiacal_background(astropywcs, wavelength=None,
     xv, yv = np.meshgrid(y_lin, x_lin, indexing='ij')
     points = [(x[i], y[i]) for i in range(len(x))]
 
-    if interpolate:
+    if dointerpolate:
         zody_interp =  interpolate.griddata(points, zody_MJysr, (xv, yv), method="cubic")
     else:
         zody_interp = zody_MJysr
