@@ -1330,6 +1330,8 @@ def find_max_angular_size_of_image(wcs, ra_cen=None, dec_cen=None):
     
     if isinstance(wcs, (list,)) and (ra_cen is not None) and (dec_cen is not None):
         distance_per_detector = []
+
+
         for i in range(len(wcs)):
             data_shape = wcs[i].array_shape
             corners = rs.detectors.get_detector_corners(wcs=wcs[i])

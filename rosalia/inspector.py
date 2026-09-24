@@ -1,3 +1,4 @@
+import os
 import glob
 import asdf
 import s3fs
@@ -6,7 +7,10 @@ import rosalia as rs
 import numpy as np
 from astropy.io import fits
 import roman_datamodels.datamodels._datamodels
-import astropy.table.table
+import astropy.table
+from collections import defaultdict
+from types import SimpleNamespace
+
 
 ############################
 def exposure_inspector(input_name, verbose=False, lite=False):
@@ -34,8 +38,6 @@ def exposure_inspector(input_name, verbose=False, lite=False):
 
     # If it is just a string without * wildcard, then we will run exposure_inspector_single directly.
     if isinstance(input_name, (str,)):
-
-
         # If we provide a list of files, then we will run exposure_inspector_single for each file,
         # and return a dataframe with the results.
         if "*" in input_name:
@@ -66,11 +68,21 @@ def exposure_inspector(input_name, verbose=False, lite=False):
 
 
     # isinstance("Hello", (float, int, str, list, dict, tuple))     
-    if isinstance(input_name, (list, astropy.table.table.Table)):
+    if isinstance(input_name, (list, astropy.table.Table)):
+        """
         DATA = []
         ASTROPYWCS = []
         DATA_SHAPE = []
         SCIEXTS = []
+        SCAS = []
+        # PHOTOMETRY = []
+        conversion_megajanskys = []
+        conversion_megajanskys_uncertainty = []
+        pixel_area = []
+        # {'conversion_megajanskys': 0.6901055870968528,
+        # 'conversion_megajanskys_uncertainty': 0.02684817117080749,
+        # 'pixel_area': 2.6492509187216547e-13}
+
 
         for i in tqdm(range(len(input_name))):
             if isinstance(input_name, (list,)): 
@@ -83,12 +95,40 @@ def exposure_inspector(input_name, verbose=False, lite=False):
             DATA_SHAPE.append(exposure_identity["DATA_SHAPE"][0])
             ASTROPYWCS.append(exposure_identity["ASTROPYWCS"][0])
             SCIEXTS.append(exposure_identity["SCIEXTS"][0])
+            SCAS.append(exposure_identity["SCA"])
+            conversion_megajanskys.append(exposure_identity["photometry"]["conversion_megajanskys"])
+            conversion_megajanskys_uncertainty.append(exposure_identity["photometry"]["conversion_megajanskys_uncertainty"])
+            pixel_area.append(exposure_identity["photometry"]["pixel_area"])
+            # print()
+            #PHOTOMETRY.append(exposure_identity["photometry"])
+
 
         exposure_identity["DATA"] = DATA
         exposure_identity["DATA_SHAPE"] = DATA_SHAPE
         exposure_identity["ASTROPYWCS"] = ASTROPYWCS
         exposure_identity["SCIEXTS"] = SCIEXTS
-        return(exposure_identity)
+        exposure_identity["SCAS"] = SCAS
+        #exposure_identity["PHOTOMETRY"] = PHOTOMETRY
+        exposure_identity["conversion_megajanskys"] = conversion_megajanskys
+        exposure_identity["conversion_megajanskys_uncertainty"] = conversion_megajanskys_uncertainty
+        exposure_identity["pixel_area"] = pixel_area
+
+        """
+        exposure_identities = []
+        for i in tqdm(range(len(input_name))):
+            if isinstance(input_name, (list,)): 
+                exposure_identity = rs.inspector.exposure_inspector(input_name[i], lite=lite)
+                
+            elif isinstance(input_name, (astropy.table.table.Table,)): 
+                data_stream = rs.mast.stream_roman_mast(products=input_name, row=i)
+                exposure_identity = rs.inspector.exposure_inspector(data_stream, lite=lite)
+                
+            exposure_identities.append(exposure_identity)
+
+        exposure_identities = combine_dicts(exposure_identities)
+
+
+        return(exposure_identities)
 
 
 def exposure_inspector_single(input_name, verbose=False, lite=False):
@@ -165,6 +205,8 @@ def exposure_inspector_asdf(input_name, telescope="roman", verbose=False, lite=F
         # telescope_class = rs.telescopes.Roman
         detector_svo = "WFI"
 
+    print('Location is stored in data_stream["meta"]["ephemeris"]! ')
+
     exposure_identity["DETECTOR"]   = input_asdf["meta"]["instrument"]["detector"]
     exposure_identity["FILTER"]     = input_asdf["meta"]["instrument"]["optical_element"]
 
@@ -181,6 +223,7 @@ def exposure_inspector_asdf(input_name, telescope="roman", verbose=False, lite=F
     exposure_identity["EXPEND"]     = input_asdf["meta"]["exposure"]["end_time"].mjd
     exposure_identity["EXPTIME"]    = input_asdf["meta"]["exposure"]["exposure_time"]
     exposure_identity["conversion_megajanskys"] = input_asdf["meta"]["photometry"]["conversion_megajanskys"]
+    exposure_identity["conversion_megajanskys_uncertainty"] = input_asdf["meta"]["photometry"]["conversion_megajanskys_uncertainty"]
     exposure_identity["pixel_area"] = input_asdf["meta"]["photometry"]["pixel_area"]*((180/np.pi)*60*60)**2
     exposure_identity["EXPSTART_ISOT"] = input_asdf["meta"]["exposure"]["start_time"].isot
     exposure_identity["SCA"]        = int(input_asdf["meta"]["instrument"]["detector"].replace("WFI",""))
@@ -192,7 +235,7 @@ def exposure_inspector_asdf(input_name, telescope="roman", verbose=False, lite=F
                                                                                 telescope=exposure_identity["TELESCOP"],
                                                                                 instrument=exposure_identity["INSTRUME"],
                                                                                 detector=detector_svo,
-                                                                                verbose=True)
+                                                                                verbose=verbose)
         
     except:
         print("The filter " + exposure_identity["FILTER"] + "/" + exposure_identity["TELESCOP"] +  "/" +  exposure_identity["INSTRUME"] + "/" + detector_svo + " was not found. Photometric calculations can be compromised.")
@@ -213,17 +256,17 @@ def exposure_inspector_asdf(input_name, telescope="roman", verbose=False, lite=F
     gwcs.append(input_asdf["meta"]["wcs"])
     astropywcs.append(astropy_wcs(input_asdf["meta"]["wcs"].to_fits()[0]))
 
-    exposure_identity["DATA"] = data
-    exposure_identity['DATA_SHAPE'] = [data[0].shape]
-    exposure_identity["GWCS"] = gwcs
-    exposure_identity["ASTROPYWCS"] = astropywcs
+    exposure_identity["DATA"] = data[0]
+    exposure_identity['DATA_SHAPE'] = data[0].shape
+    exposure_identity["GWCS"] = gwcs[0]
+    exposure_identity["ASTROPYWCS"] = astropywcs[0]
 
     exposure_identity["RA_PNT"] =  input_asdf["meta"]['pointing']['ra_v1']
     exposure_identity["DEC_PNT"] =  input_asdf["meta"]['pointing']['dec_v1']
     # exposure_identity["PA"] =  # input_asdf["roman"]["meta"]['pointing']["pa_v3"] - 60  # input_asdf["roman"]["meta"]['pointing']["pa_aperture"] # input_asdf["roman"]["meta"]['pointing']['pa_v3']
     exposure_identity["PA"] = input_asdf["meta"]['pointing']["pa_aperture"]
     exposure_identity["FILETYPE"] = "ASDF"
-    exposure_identity["SCIEXTS"] = [int(input_asdf["meta"]["instrument"]["detector"].replace("WFI",""))]
+    exposure_identity["SCIEXTS"] = int(input_asdf["meta"]["instrument"]["detector"].replace("WFI",""))
     return(exposure_identity)
 
 
@@ -432,3 +475,114 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
     return(exposure_identity)
 
 
+
+
+######################################################
+######################################################
+######################################################
+
+
+def combine_dicts(items: list[dict]) -> dict:
+    """Combines a list of dictionaries sharing the same keys
+
+    into a single dictionary where each key maps to a list of values.
+    """
+    # Guard against an empty list input
+    if not items:
+        return {}
+
+    # Iterate over the keys of the first dictionary and gather values from all dictionaries
+    return {key: [d[key] for d in items] for key in items[0]}
+
+import numpy as np
+
+
+def values_are_equal(v1, v2) -> bool:
+    """Recursively checks if two values are equal, safely handling
+
+    NumPy arrays, PyTorch/TensorFlow tensors, Pandas structures, and nested containers.
+    """
+    # 1. Check if both are the exact same instance in memory (fast-path)
+    if v1 is v2:
+        return True
+
+    # 2. Check type matching (allow numeric scalar types to compare cleanly)
+    if type(v1) is not type(v2) and not (
+        isinstance(v1, (int, float, complex))
+        and isinstance(v2, (int, float, complex))
+    ):
+        return False
+
+    # 3. Handle NumPy Arrays
+    if isinstance(v1, np.ndarray):
+        return np.array_equal(v1, v2, equal_nan=True)
+
+    # 4. Handle PyTorch Tensors (if torch is installed)
+    if "torch" in type(v1).__module__:
+        import torch
+
+        if isinstance(v1, torch.Tensor):
+            return (
+                v1.shape == v2.shape
+                and bool(torch.equal(v1, v2))
+                or bool(torch.all(torch.isnan(v1) == torch.isnan(v2)))
+            )
+
+    # 5. Handle Pandas DataFrame / Series (if pandas is installed)
+    if "pandas" in type(v1).__module__:
+        import pandas as pd
+
+        if isinstance(v1, (pd.DataFrame, pd.Series)):
+            return v1.equals(v2)
+
+    # 6. Handle nested Dictionaries
+    if isinstance(v1, dict):
+        if v1.keys() != v2.keys():
+            return False
+        return all(values_are_equal(v1[k], v2[k]) for k in v1)
+
+    # 7. Handle nested Lists / Tuples
+    if isinstance(v1, (list, tuple)):
+        if len(v1) != len(v2):
+            return False
+        return all(values_are_equal(item1, item2) for item1, item2 in zip(v1, v2))
+
+    # 8. Handle Sets
+    if isinstance(v1, (set, frozenset)):
+        return v1 == v2
+
+    # 9. Fallback comparison wrapped with array check
+    try:
+        result = v1 == v2
+        # If the result itself is an array or collection of bools
+        if isinstance(result, np.ndarray):
+            return bool(result.all())
+        return bool(result)
+    except (ValueError, TypeError):
+        return False
+
+
+def are_all_dicts_equal(dict_list: list[dict]) -> bool:
+    """Compares all dictionaries in a list against the first element recursively."""
+    if not dict_list:
+        return True
+
+    ref_dict = dict_list[0]
+    return all(values_are_equal(d, ref_dict) for d in dict_list)
+
+
+def longest_common_substring(strings: list[str]) -> str:
+    """Finds the longest contiguous substring common to all strings."""
+    if not strings:
+        return ""
+
+    shortest_str = min(strings, key=len)
+    substr = shortest_str
+
+    # Narrow down the substring until all items contain it
+    for length in range(len(shortest_str), 0, -1):
+        for start in range(len(shortest_str) - length + 1):
+            candidate = shortest_str[start : start + length]
+            if all(candidate in s for s in strings):
+                return candidate
+    return ""

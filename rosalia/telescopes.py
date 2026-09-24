@@ -175,7 +175,10 @@ def find_filter_in_svo(wavelength, telescope, instrument, detector, verbose=Fals
 #################################################################
 
 def get_filter(telescope, instrument, detector, filter_name, verbose=False):
-    svo_filter_identity = rs.telescopes.find_filter_in_svo(wavelength=filter_name, telescope=telescope, instrument=instrument, detector=detector, verbose=False)
+    svo_filter_identity = rs.telescopes.find_filter_in_svo(wavelength=filter_name, 
+                                                           telescope=telescope, 
+                                                           instrument=instrument, 
+                                                           detector=detector, verbose=False)
     if verbose: print(svo_filter_identity)
     wavelength_bins = np.array(svo_filter_identity["filter_transmission_curve"]["Wavelength"])*u.AA
     transmission_bins = svo_filter_identity["filter_transmission_curve"]["Transmission"]
@@ -367,7 +370,8 @@ class Hubble:
 
 
     def get_filter(instrument, filter_name, verbose=False):
-        return(rs.telescopes.get_filter(telescope="HST", instrument=instrument, detector=instrument, filter_name=filter_name, verbose=False))
+        return(rs.telescopes.get_filter(telescope="HST", 
+                                        instrument=instrument, detector=instrument, filter_name=filter_name, verbose=False))
 
     def make_dummy_exposure(ra, dec, pa, outname):
         exp_name = "/Users/aborlaff/NASA/SPARKLES/notebooks/SATELLITES/HST_ACS_mock_es.fits"

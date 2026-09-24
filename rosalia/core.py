@@ -110,7 +110,7 @@ class exposure():
                 self.FILTER_IDENTITY = rs.telescopes.find_filter_in_svo(wavelength=telescope["FILTER_PARAMS"]["NAME"],
                                                                         telescope=telescope["FILTER_PARAMS"]["TELESCOPE"],
                                                                         instrument=telescope["FILTER_PARAMS"]["INSTRUMENT"],
-                                                                        detector=telescope["FILTER_PARAMS"]["DETECTOR"], verbose=False)
+                                                                        detector=telescope["FILTER_PARAMS"]["DETECTOR"], verbose=verbose)
                 # self.XYZ_HELIO_POS = exposure_identity['XYZ_HELIO_POS']
 
 
@@ -136,6 +136,7 @@ class exposure():
 
         if filename is not None:
             exposure_identity = rs.inspector.exposure_inspector(filename, lite=False)
+            
             self.DATA = exposure_identity['DATA']
             self.FILENAME = exposure_identity['FILENAME']
             self.TELESCOP = exposure_identity['TELESCOP']
@@ -148,10 +149,12 @@ class exposure():
             self.EXPMID = (Time(self.EXPSTART, format="mjd") + self.EXPTIME*u.s/2).mjd
             self.EXPEND = (Time(self.EXPSTART, format="mjd") + self.EXPTIME*u.s).mjd
             self.BUNIT = exposure_identity['BUNIT']
-            self.PHOTOMETRY = exposure_identity['photometry']
+            self.conversion_megajanskys = exposure_identity['conversion_megajanskys']
+            self.conversion_megajanskys_uncertainty = exposure_identity['conversion_megajanskys_uncertainty']
+            self.pixel_area = exposure_identity['pixel_area']
             self.EXPSTART_ISOT = exposure_identity['EXPSTART_ISOT']
             self.PA = exposure_identity['PA']
-            # self.SCA = exposure_identity['SCA']
+            self.SCA = exposure_identity['SCA']
             # self.HST_TYPE = exposure_identity['HST_TYPE']
             self.FILTER = exposure_identity['FILTER']
             self.FILTER_IDENTITY = exposure_identity['FILTER_IDENTITY']
@@ -161,11 +164,39 @@ class exposure():
             self.DATA_SHAPE = exposure_identity['DATA_SHAPE']
             self.ASTROPYWCS = exposure_identity['ASTROPYWCS']
             self.FILETYPE = exposure_identity['FILETYPE']
+
+            # Simplify the attributes that are supposed to be constant across the exposure. 
+            if len(list(set(self.TELESCOP))) == 1: self.TELESCOP = self.TELESCOP[0]
+            if len(list(set(self.INSTRUME))) == 1: self.INSTRUME = self.INSTRUME[0]
+            if len(list(set(self.DETECTOR))) == 1: self.DETECTOR = self.DETECTOR[0]
+            if len(list(set(self.RA_TARG))) == 1: self.RA_TARG = self.RA_TARG[0]
+            if len(list(set(self.DEC_TARG))) == 1: self.DEC_TARG = self.DEC_TARG[0]
+            if len(list(set(self.FILTER))) == 1: self.FILTER = self.FILTER[0]
+            # Check if all dictionaries in the list are identical copies
+            are_all_FILTERS_same = not self.FILTER_IDENTITY or rs.inspector.are_all_dicts_equal(self.FILTER_IDENTITY)
+            if are_all_FILTERS_same: self.FILTER_IDENTITY = self.FILTER_IDENTITY[0] 
+            #print(self.FILTER_IDENTITY[0])
+            if len(list(set(self.EXPSTART_ISOT))) == 1: self.EXPSTART_ISOT = self.EXPSTART_ISOT[0] 
+            if len(list(set(self.EXPSTART))) == 1: self.EXPSTART = self.EXPSTART[0] 
+            if len(list(set(self.EXPTIME))) == 1: self.EXPTIME = self.EXPTIME[0] 
+            if len(list(set(self.EXPMID))) == 1: self.EXPMID = self.EXPMID[0] 
+            if len(list(set(self.EXPEND))) == 1: self.EXPEND = self.EXPEND[0] 
+
+
+            print("TEMP WARNING: RA_TARG is set to element 0 - This has to be fixed on MAST")
+            print("TEMP WARNING: DEC_TARG is set to element 0 - This has to be fixed on MAST")
+            print("TEMP WARNING: PA is set to element 0 - This has to be fixed on MAST")
+            self.RA_TARG = self.RA_TARG[0]
+            self.DEC_TARG = self.DEC_TARG[0]
+            self.PA = self.PA[0]
+            # --------------------------------------------------------- #
+            self.ROOTNAME = rs.inspector.longest_common_substring(self.FILENAME)
             self.MPC_OBSLOC = rs.horizons.get_mpc_observer_name(self.TELESCOP)
             self.JPL_OBSLOC = rs.horizons.get_jpl_observer_name(self.TELESCOP)
             state_vectors = rs.horizons.get_heliocoords(self.EXPSTART, body=self.TELESCOP) # rs.horizons.interpolate_Roman_state_vectors(self.EXPSTART)
             self.XYZ_HELIO_POS = [state_vectors["x"].to("AU").value[0], state_vectors["y"].to("AU").value[0], state_vectors["z"].to("AU").value[0]]*u.AU # in AU.
-            self.FPA_NEAR_RADIUS = self.get_max_angular_size()
+            self.FPA_NEAR_RADIUS = 0.6 # Temporary fix until 'target.ra' 'target.dec' are fixed -> Switch to self.get_max_angular_size() when done (Borlaff - Sept 23, 2026)
+
 
         self.fits_keywords = {"TELESCOP": self.TELESCOP, "INSTRUME": self.INSTRUME, "DETECTOR": self.DETECTOR, 
             "FILTER": self.FILTER_IDENTITY["wavelength"], 
@@ -178,7 +209,7 @@ class exposure():
             "WAVEMAX": self.FILTER_IDENTITY["filter_lambda_max"].to("nm").value}
 
     def roman_wfi_exposure(self, observer, prefix=""):
-        print("> roman_wfi_exposure")
+        print("> Synthetic Roman_wfi_exposure")
         # Here we expect observer={"TELESCOP": "Roman/WFI", "pointing": [RA_TARG, DEC_TARG], "FILTER":FILTER, "PA_Y": PA_Y, "EXPSTART": EXPSTART, "EXPTIME": EXPTIME}
         # Fixed parameters for Roman/WFI 
         observer['TELESCOP'] = "Roman"
@@ -212,7 +243,7 @@ class exposure():
         self.FILTER_IDENTITY = rs.telescopes.find_filter_in_svo(wavelength=observer["FILTER_PARAMS"]["NAME"],
                                                                 telescope=observer["FILTER_PARAMS"]["TELESCOPE"],
                                                                 instrument=observer["FILTER_PARAMS"]["INSTRUMENT"],
-                                                                detector=observer["FILTER_PARAMS"]["DETECTOR"], verbose=False)
+                                                                detector=observer["FILTER_PARAMS"]["DETECTOR"], verbose=verbose)
         state_vectors = rs.horizons.get_heliocoords(self.EXPSTART, body=self.TELESCOP) # rs.horizons.interpolate_Roman_state_vectors(self.EXPSTART)
         self.XYZ_HELIO_POS = [state_vectors["x"].to("AU").value[0], state_vectors["y"].to("AU").value[0], state_vectors["z"].to("AU").value[0]]*u.AU # in AU. 
 
@@ -239,7 +270,7 @@ class exposure():
         self.ASTROPYWCS = astropywcs_info["ASTROPYWCS"]
         self.DATA_SHAPE = astropywcs_info["DATA_SHAPE"]
         self.PIXSCALE = astropywcs_info["PIXSCALE"]
-        self.FPA_NEAR_RADIUS = self.get_max_angular_size()
+        self.FPA_NEAR_RADIUS = 0.6 # Temporary fix until 'target.ra' 'target.dec' are fixed -> Switch to self.get_max_angular_size() when done (Borlaff - Sept 23, 2026)
 
         return(self)
     
@@ -251,11 +282,12 @@ class exposure():
     
 
     def get_max_angular_size(self):
+        # print(self.ASTROPYWCS)
         return(rs.utils.find_max_angular_size_of_image(wcs=self.ASTROPYWCS, ra_cen=self.RA_TARG, dec_cen=self.DEC_TARG))
     
 
     def plot_footprint(self, figsize=(10,10), verbose=True, ax=None, color='red', label=None):
-        print("Hey! plot_footprint")
+        # print("Hey! plot_footprint")
         if verbose: print("Finding ra dec constraints")
         # ra_dec_constraints = rs.gaia.find_ra_dec_constraints(self.RA_TARG, self.DEC_TARG, radius=self.FPA_NEAR_RADIUS, verbose=verbose)
         if verbose: print("Getting detector corners")
@@ -293,9 +325,8 @@ class exposure():
         
 
     def get_source_catalog(self, g_mag_max=15, verbose=False):
-        import pandas as pd
 
-        self.source_catalog_filename = os.path.splitext(os.path.basename(self.FILENAME))[0] + "_source_catalog.csv" #
+        self.source_catalog_filename = os.path.basename(self.ROOTNAME) + "_source_catalog.csv" #
         
         search_radius = 1.5*self.get_max_angular_size()
 
@@ -436,7 +467,7 @@ class exposure():
                                                                 filter=self.FILTER_IDENTITY,
                                                                 catalog=source_catalog,
                                                                 instrument="ACS",
-                                                                verbose=True)
+                                                                verbose=False)
 
             # Now interpolate the skypoints to the original image
 
@@ -471,15 +502,28 @@ class exposure():
         if keywords is None: keywords = self.fits_keywords
 
         headers_output = []
-        for ASTROPYWCS_i in wcs_list:
+        for i in range(len(wcs_list)):
+            ASTROPYWCS_i = wcs_list[i]
             header = ASTROPYWCS_i.to_header()
+
+            if isinstance(keywords["DETECTOR"], (list,)):
+                keywords["DETECTOR"] = rs.inspector.longest_common_substring(self.DETECTOR)
+
             for key in keywords.keys():
                 header[key] = keywords[key]
 
+            header["EXTNAME"] = "SCI"
+            header["SCA"] = self.SCA[i]
+            header["RA_TARG"] = self.RA_TARG
+            header["DEC_TARG"] = self.DEC_TARG
+            header["EXPSTART"] = self.EXPSTART
+            header["EXPEND"] = self.EXPEND
+            header["PA"] = self.PA
+            header["TELESCOP"] = self.TELESCOP
+            header["INSTRUME"] = self.INSTRUME
+
             headers_output.append(header)
 
-
-        
         rs.utils.save_fits(array=data_list, 
                            name=outname, 
                            header=headers_output,
@@ -494,15 +538,36 @@ class exposure():
         if wcs_list is None: wcs_list = self.ASTROPYWCS
         if keywords is None: keywords = self.fits_keywords
 
+        if isinstance(keywords["DETECTOR"], (list,)):
+            keywords["DETECTOR"] = rs.inspector.longest_common_substring(self.DETECTOR)
+            
         headers_output = []
-        for ASTROPYWCS_i in wcs_list:
+        for i in range(len(wcs_list)):
+            ASTROPYWCS_i = wcs_list[i]
             header = ASTROPYWCS_i.to_header()
+
+            header["EXTNAME"] = "DRZ"
+            header["RA_TARG"] = self.RA_TARG
+            header["DEC_TARG"] = self.DEC_TARG
+            header["EXPSTART"] = self.EXPSTART
+            header["EXPEND"] = self.EXPEND
+            header["PA"] = self.PA
+            header["TELESCOP"] = self.TELESCOP
+            header["INSTRUME"] = self.INSTRUME
+            header["BUNIT"] = "MJy sr-1"
+
+            # Convert the output units to MJy/sr
+            data_list[i] = data_list[i]*self.conversion_megajanskys[i]
+            keywords["DETECTOR"] = rs.inspector.longest_common_substring(self.DETECTOR)
             for key in keywords.keys():
                 header[key] = keywords[key]
 
             headers_output.append(header)
 
         drz_data, drz_wcs = rs.utils.generate_mosaic(data=data_list, astropywcs=headers_output, resolution=resolution)
+
+
+
         rs.utils.save_fits(array=np.float32(drz_data), name=outname, header=drz_wcs,
                            extname=extname, 
                            overwrite=overwrite, 
@@ -579,7 +644,7 @@ class exposure():
 
         elif self.TELESCOP.lower() == "roman" or self.TELESCOP.lower() == "rst":
             # Find out which stars belong to each detector. 
-            print(datetime.now().isoformat() + " > Fetching catalog")
+            print(datetime.now().isoformat() + " > Fetching source catalog")
 
             if not hasattr(self, 'source_catalog'):
                 if catalog is None:
@@ -622,9 +687,9 @@ class exposure():
                 # 's3://stpubdata/roman/nexus/soc_simulations/tutorial_data/roman-2026.1/r0003201001001001004_0001_wfi01_f106_cal.asdf'
                 self.output_name = self.FILENAME.split("/")[-1].replace(".asdf", "_stray.fits")
             elif "asdf" in self.FILENAME:
-                self.output_name = self.FILENAME.replace(".asdf", "_stray.fits")
+                self.output_name = self.ROOTNAME + "_stray.fits"
             else: 
-                self.output_name = self.FILENAME.replace(".fits", "_stray.fits")
+                self.output_name = self.ROOTNAME + "_stray.fits"
 
             self.main_offender_output_name = self.output_name.replace(".fits", "_main_off.fits")
             self.straylight_db_output_name = self.output_name.replace(".fits", "_db.csv")
