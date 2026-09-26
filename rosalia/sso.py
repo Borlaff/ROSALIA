@@ -126,7 +126,7 @@ def get_SS0s_loc_magnitude(observer, MJD, lambda_ref, verbose=False):
     if observer == "Chandra" or observer == "CXO":
         observer = "500@-151"
 
-    if observer == "Roman" or observer == "ROMAN" or observer == "RST" or observer == "NGRST" or observer == "Euclid": # All of them are in L2.
+    if observer.lower() == "roman" or observer.lower() == "euclid": # All of them are in L2.
         observer = "500@-680"
 
 

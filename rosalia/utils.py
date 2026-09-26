@@ -1631,3 +1631,40 @@ def generate_mosaic(data, astropywcs, resolution=None):
     data = np.array(output[0].data)
     data[data==0] = np.nan
     return(data, optimal_wcs[0].to_header())
+
+
+def distance_to_galactic_plane(ra, dec):
+    """
+    Calculate the angular distance from a sky position to the galactic plane.
+    
+    Parameters:
+    -----------
+    ra : float
+        Right Ascension
+    dec : float
+        Declination
+    ra_unit : str
+        Unit for RA ('degree' or 'hour'), default is 'degree'
+    dec_unit : str
+        Unit for Dec ('degree'), default is 'degree'
+    
+    Returns:
+    --------
+    distance : float
+        Angular distance to the galactic plane in degrees
+    galactic_lat : float
+        Galactic latitude in degrees (signed)
+    galactic_lon : float
+        Galactic longitude in degrees
+    """
+    
+    # Create SkyCoord object in equatorial coordinates
+    coord = SkyCoord(ra=ra*u.degree, dec=dec*u.degree, frame='icrs')
+    
+    # Transform to galactic coordinates
+    galactic_coord = coord.galactic
+    
+    # Distance to galactic plane is the absolute value of galactic latitude
+    distance = abs(galactic_lat)
+    
+    return distance

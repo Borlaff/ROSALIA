@@ -208,7 +208,7 @@ class exposure():
             "WAVEMIN": self.FILTER_IDENTITY["filter_lambda_min"].to("Angstrom").value, 
             "WAVEMAX": self.FILTER_IDENTITY["filter_lambda_max"].to("nm").value}
 
-    def roman_wfi_exposure(self, observer, prefix=""):
+    def roman_wfi_exposure(self, observer, prefix="", verbose=False):
         print("> Synthetic Roman_wfi_exposure")
         # Here we expect observer={"TELESCOP": "Roman/WFI", "pointing": [RA_TARG, DEC_TARG], "FILTER":FILTER, "PA_Y": PA_Y, "EXPSTART": EXPSTART, "EXPTIME": EXPTIME}
         # Fixed parameters for Roman/WFI 
@@ -239,6 +239,7 @@ class exposure():
         self.EXPSTART_ISOT = self.EXPSTART_ASTROPY.isot
         self.MPC_OBSLOC = rs.horizons.get_mpc_observer_name(observer['TELESCOP'])
         self.JPL_OBSLOC = rs.horizons.get_jpl_observer_name(observer['TELESCOP'])
+        self.SCA = rs.telescopes.Roman.WFI_SCAs
 
         self.FILTER_IDENTITY = rs.telescopes.find_filter_in_svo(wavelength=observer["FILTER_PARAMS"]["NAME"],
                                                                 telescope=observer["FILTER_PARAMS"]["TELESCOPE"],
@@ -251,12 +252,17 @@ class exposure():
             # If the user did not define an output filename, do it for them
             if prefix != "":
                 prefix = prefix + "_"
-            observer["FILENAME"] = os.getcwd() + "/" + prefix + self.TELESCOP +\
+
+            observer["ROOTNAME"] = os.getcwd() + "/" + prefix + self.TELESCOP +\
                                     "_RA_" + '{:07.3f}'.format(self.RA_TARG) +\
                                     "_DEC_" + '{:07.3f}'.format(self.DEC_TARG) +\
                                     "_MJD_" + '{:07.5f}'.format(self.EXPSTART) +\
-                                    "_PA_" + '{:06.2f}'.format(self.PA) + ".fits"
+                                    "_PA_" + '{:06.2f}'.format(self.PA)
+            observer["FILENAME"] = observer["ROOTNAME"] + ".fits"
             self.FILENAME = observer["FILENAME"]
+            self.ROOTNAME = observer["ROOTNAME"]
+
+
 
         central_coords = SkyCoord(self.RA_TARG, self.DEC_TARG, frame="icrs", unit="deg")
 
@@ -270,6 +276,7 @@ class exposure():
         self.ASTROPYWCS = astropywcs_info["ASTROPYWCS"]
         self.DATA_SHAPE = astropywcs_info["DATA_SHAPE"]
         self.PIXSCALE = astropywcs_info["PIXSCALE"]
+        self.conversion_megajanskys = len(self.SCIEXTS)*[0.6] # Average value
         self.FPA_NEAR_RADIUS = 0.6 # Temporary fix until 'target.ra' 'target.dec' are fixed -> Switch to self.get_max_angular_size() when done (Borlaff - Sept 23, 2026)
 
         return(self)
@@ -732,7 +739,16 @@ class exposure():
                     )
                     for SCIEXT_i, DATA_SHAPE_i, ASTROPYWCS_i in zip(self.SCIEXTS, self.DATA_SHAPE, self.ASTROPYWCS)
                 ]
-                results = list(tqdm(executor.map(self._parallel_roman_estimate_straylight_SCA, inputs),total=len(inputs),))
+
+                print(len(inputs))
+                print(inputs)  
+                # results = list(tqdm(executor.map(self._parallel_roman_estimate_straylight_SCA, inputs),total=len(inputs),))
+                
+                results = []
+                for i in range(len()):
+                    inputs = self._parallel_roman_estimate_straylight_SCA(inputs)
+                                                )
+                
                 straylevel_all_SCAS.extend(results)
 
             print(datetime.now().isoformat() + " > Done : " + str(datetime.now() - t) + " elapsed.")
@@ -795,6 +811,8 @@ class exposure():
             main_offenders = list(set(straylevel_db["mainoffender_total"]))
 
             # Remove all those pixels that have values not included in the list of main offenders 
+            print("main_offenders")
+            print(main_offenders)
             for i in range(len(main_offenders)):
                 main_off_id = main_offenders[i]
                 main_offended_pixels = np.where(main_off_map[0].data == main_off_id)
