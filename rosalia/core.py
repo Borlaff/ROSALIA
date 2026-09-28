@@ -809,7 +809,7 @@ class exposure():
                 self.source_catalog = rs.utils.fix_custom_catalog(catalog)
 
         # Get the optimal wcs
-        self.optimal_wcs, self.shape_out = find_optimal_celestial_wcs([(self.SCIEXTS[i], self.ASTROPYWCS[i]) for i in range(len(self.SCIEXTS))])    
+        self.optimal_wcs, self.shape_out = find_optimal_celestial_wcs([(self.DATA_SHAPE[i], self.ASTROPYWCS[i]) for i in range(len(self.SCIEXTS))])    
 
 
         # Find stars around the entire WFI footprint
@@ -819,7 +819,6 @@ class exposure():
         # Find the closest detector to each star
         stars_catalog["detector_id"] = self.find_closest_detector(ra=stars_catalog["ra"], dec=stars_catalog["dec"]) + 1
 
-        
         
         
         # Generate the star stamps (PSFs)

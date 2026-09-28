@@ -31,37 +31,80 @@ warnings.filterwarnings('ignore')
 
 #%%
 class Star:
-    '''
-    Class representing a star in a image. This class would help create the PSF in the images. 
-    '''
+    """Represent a catalog star with broadband photometry and an interpolated SED.
+
+    The input catalog row is expected to contain ``ra``, ``dec``, ``source_id``,
+    and the AB-magnitude columns consumed by :meth:`set_magnitudes` for Gaia,
+    2MASS, and WISE. If ``detector_id`` is present, it is also stored as
+    ``WFI``. Photometry is associated with fixed representative wavelengths;
+    :meth:`sed` linearly interpolates (and extrapolates beyond) those samples
+    in AB magnitude as a function of wavelength.
+
+    This interpolation is a convenient approximate stellar SED, not a
+    spectrophotometric model. In particular, :meth:`get_magnitudes` returns a
+    transmission-weighted average of interpolated magnitudes; it does not
+    perform a flux-space synthetic-photometry integration.
+    """
     def __init__(self, row):
-        ''' Initialize class star with basic information from the catalog row.'''
+        """Initialize a star from one catalog row.
+
+        Parameters
+        ----------
+        row : pandas.Series
+            Catalog record. Must provide ``ra``, ``dec``, ``source_id`` and
+            all photometric columns accessed by :meth:`set_magnitudes`:
+            ``phot_bp_mean_mag_AB``, ``phot_g_mean_mag_AB``,
+            ``phot_rp_mean_mag_AB``, ``phot_w1_mean_mag_AB``,
+            ``phot_w2_mean_mag_AB``, ``phot_w3_mean_mag_AB``,
+            ``phot_w4_mean_mag_AB``, ``phot_j_mean_mag_AB``,
+            ``phot_h_mean_mag_AB``, and ``phot_ks_mean_mag_AB``. An optional
+            ``detector_id`` value is stored as ``self.WFI``.
+
+        Notes
+        -----
+        Initialization stores the photometry and creates its wavelength
+        interpolator. Missing required keys raise ``KeyError``.
+        """
         self.ra = row["ra"]
         self.dec = row["dec"]
         self.source_id = row["source_id"]
-        self.WFI = row["detector_id"]
+        if 'detector_id' in row.keys():
+            self.WFI = row["detector_id"]
         self.set_magnitudes(row)
         self.make_interpolator()
 
     def set_magnitudes(self, row):
+        """Load the catalog's AB magnitudes and their representative wavelengths.
+
+        The wavelengths are fixed reference values in Angstroms for the Gaia,
+        2MASS, and WISE bands. This method populates the per-band attributes
+        (for example, ``bp`` and ``bp_wave``), plus the ``mag`` and ``wave``
+        arrays used to construct the interpolated SED.
+
+        Parameters
+        ----------
+        row : pandas.Series
+            Catalog record containing the photometry columns listed in
+            :class:`Star`'s constructor documentation.
+        """
         wavelengths = {
-        'phot_bp_mean_mag': 5319.87e-10,      # Gaia BP (blue photometer) ~505 nm
-        'phot_g_mean_mag': 6719.55e-10,       # Gaia G ~632 nm
-        'phot_rp_mean_mag': 7939.10e-10,      # Gaia RP (red photometer) ~797 nm
-        'phot_w1_mean_mag_AB': 33526.00e-10,      # WISE W1 ~3.4 μm
-        'phot_w2_mean_mag_AB': 46028.00e-10,      # WISE W2 ~4.6 μm
-        'phot_w3_mean_mag_AB': 115608.00e-10,     # WISE W3 ~12.0 μm
-        'phot_w4_mean_mag_AB': 220883.00e-10,     # WISE W4 ~22.0 μm
-        'phot_j_mean_mag_AB': 12350.00e-10,     # 2MASS J ~1.235 μm
-        'phot_h_mean_mag_AB': 16620.00e-10,     # 2MASS H ~1.662 μm
-        'phot_ks_mean_mag_AB': 21590.00e-10,    # 2MASS Ks ~2.159 μm
+        'phot_bp_mean_mag_AB': 531.987,         # Gaia BP (blue photometer) ~505 nm
+        'phot_g_mean_mag_AB': 671.955,          # Gaia G ~632 nm
+        'phot_rp_mean_mag_AB': 793.910,         # Gaia RP (red photometer) ~797 nm
+        'phot_w1_mean_mag_AB': 3352.60,        # WISE W1 ~3.4 μm
+        'phot_w2_mean_mag_AB': 4602.80,        # WISE W2 ~4.6 μm
+        'phot_w3_mean_mag_AB': 11560.8,       # WISE W3 ~12.0 μm
+        'phot_w4_mean_mag_AB': 22088.3,       # WISE W4 ~22.0 μm
+        'phot_j_mean_mag_AB': 1235.00,         # 2MASS J ~1.235 μm
+        'phot_h_mean_mag_AB': 1662.00,         # 2MASS H ~1.662 μm
+        'phot_ks_mean_mag_AB': 2159.00,        # 2MASS Ks ~2.159 μm
         }
-        self.bp = row["phot_bp_mean_mag"]
-        self.bp_wave = wavelengths['phot_bp_mean_mag']
-        self.g = row["phot_g_mean_mag"]
-        self.g_wave = wavelengths['phot_g_mean_mag']        
-        self.rp = row["phot_rp_mean_mag"]
-        self.rp_wave = wavelengths['phot_rp_mean_mag']
+        self.bp = row["phot_bp_mean_mag_AB"]
+        self.bp_wave = wavelengths['phot_bp_mean_mag_AB']
+        self.g = row["phot_g_mean_mag_AB"]
+        self.g_wave = wavelengths['phot_g_mean_mag_AB']        
+        self.rp = row["phot_rp_mean_mag_AB"]
+        self.rp_wave = wavelengths['phot_rp_mean_mag_AB']
         self.w1 = row["phot_w1_mean_mag_AB"]
         self.w1_wave = wavelengths['phot_w1_mean_mag_AB']
         self.w2 = row["phot_w2_mean_mag_AB"]
@@ -79,13 +122,167 @@ class Star:
 
         self.mag = np.array([self.bp, self.g, self.rp, self.w1, self.w2, self.w3, self.w4, self.j, self.h, self.ks])
         self.wave = np.array([self.bp_wave, self.g_wave, self.rp_wave, self.w1_wave, self.w2_wave, self.w3_wave, self.w4_wave, self.j_wave, self.h_wave, self.ks_wave])
+        self.wave_units = u.nm
+
+        self.make_interpolator()
 
     def make_interpolator(self):
-        self.interpolator = interp1d(self.wave, self.mag, kind='cubic', bounds_error=False, fill_value="extrapolate")
+        """Create a linear AB-magnitude interpolator over the stored samples.
 
+        The interpolator allows extrapolation outside the sampled wavelength
+        range. It is stored as ``self._interpolator`` and used by :meth:`sed`.
+        """
+        self._interpolator = interp1d(self.wave, self.mag, kind='linear', bounds_error=False, fill_value="extrapolate")
+
+    def sed(self, wave):
+        """Evaluate the interpolated SED in AB magnitudes.
+        
+        Parameters
+        ----------
+            wave : astropy.units.Quantity
+                Wavelength(s) at which to evaluate the SED. Any length unit
+                supported by Astropy is accepted; values are converted to
+                Angstroms internally.
+        Returns
+        -------
+        numpy.ndarray or numpy scalar
+            Interpolated AB magnitudes. The returned values are plain numeric
+            magnitudes, not an Astropy ``Quantity``. Values outside the
+            photometric wavelength range are linearly extrapolated.
+        """
+        if not hasattr(self, '_interpolator'):
+            self.make_interpolator()
+        
+        # Check units using astropy
+        if not isinstance(wave, u.Quantity):
+            wave = wave * self.wave_units
+            raise warnings.warn(f"If the input wavelength is not an astropy Quantity, the units assumed are {self.wave_units}.")
+        
+        wave = wave.to(self.wave_units).value
+        return self._interpolator(wave)
+
+    def get_magnitudes(self, bandpass, instrument='WFI', return_weights=False):
+        """Estimate an AB magnitude for a Roman/WFI filter.
+        
+        Parameters
+        ----------
+            bandpass : str
+                Roman/WFI filter name, such as ``"F158"``.
+            instrument : str, optional
+                Name of the instrument containing the specified filterband. Default is 'WFI'.
+        
+        Returns
+        -------
+        float
+            Transmission-weighted mean of the interpolated AB magnitudes at
+            the filter's sampled wavelengths.
+
+        Notes
+        -----
+        This is an approximate average in magnitude space, calculated as
+        ``sum(magnitude * transmission) / sum(transmission)``. It is not the
+        standard flux-space synthetic AB magnitude. The filter curve is
+        retrieved through :meth:`rosalia.telescopes.Roman.get_filter`.
+        """
+
+        band = rs.telescopes.Roman.get_filter(instrument=instrument, filter_name=bandpass)
+        wave = band['wavelength_bins']
+        transmission = band['transmission_bins']
+
+        # Integrate the SED over the filter transmission to get the magnitude
+        mags = self.sed(wave)
+        mag_weights = mags * transmission/np.sum(transmission)
+        mag_weighted = np.sum(mag_weights)
+
+        output = (mag_weighted, (wave.to(u.nm).value, mag_weights)) if return_weights else mag_weighted
+        return output
+
+    def get_magnitude_weights(self, bandpass, instrument='WFI'):
+        """Return each wavelength sample's contribution to the approximate magnitude.
+        
+        Parameters
+        ----------
+            bandpass : str
+                Roman/WFI filter name, such as ``"F158"``.
+            instrument : str, optional
+                Name of the instrument containing the specified filterband. Default is 'WFI'.
+        
+        Returns
+        ----------
+            numpy.ndarray
+                Values ``magnitude(wavelength) * transmission / sum(transmission)``
+                at the filter's sampled wavelengths. Their sum equals the value
+                returned by :meth:`get_magnitudes` (up to floating-point error).
+
+        Notes
+        -----
+        Despite the method name, these are magnitude contributions, not
+        dimensionless SED weights. They use the same approximate magnitude-
+        space averaging as :meth:`get_magnitudes`.
+        """
+        
+        band = rs.telescopes.Roman.get_filter(instrument=instrument, filter_name=bandpass)
+        wave = band['wavelength_bins']
+        transmission = band['transmission_bins']
+
+        # Get the SED weights
+        mags = self.sed(wave)
+        mag_weights = mags * transmission/np.sum(transmission)
+
+        return (wave.to(u.nm).value, mag_weights)
+
+    def get_linear_weights(self, bandpass, instrument='WFI', zp=23.9, scale=0.11):
+        """Return each wavelength sample's contribution to the approximate magnitude.
+                
+        Parameters
+        ----------
+            bandpass : str
+                Roman/WFI filter name, such as ``"F158"``.
+            instrument : str, optional
+                Name of the instrument containing the specified filterband. Default is 'WFI'.
+        
+        Returns
+        ----------
+            numpy.ndarray
+                Values ``magnitude(wavelength) * transmission / sum(transmission)``
+                at the filter's sampled wavelengths. Their sum equals the value
+                returned by :meth:`get_magnitudes` (up to floating-point error).
+
+        Notes
+        -----
+        Despite the method name, these are magnitude contributions, not
+        dimensionless SED weights. They use the same approximate magnitude-
+        space averaging as :meth:`get_magnitudes`.
+        """
+        
+        band = rs.telescopes.Roman.get_filter(instrument=instrument, filter_name=bandpass)
+        wave = band['wavelength_bins']
+        transmission = band['transmission_bins']
+
+        # Get the SED weights
+        mags = self.sed(wave)
+        fnu = 10**(0.4 * (zp - mags)) * scale**2
+        fnu_weights = fnu * transmission/np.sum(transmission)
+
+        return (wave.to(u.nm).value, fnu_weights)
+    
     def get_galsim_sed(self):
+        """Build and store a GalSim SED from the catalog photometry.
+
+        Converts the stored AB magnitudes to flux densities and constructs a
+        linearly interpolated GalSim spectrum. The resulting objects are
+        stored on ``self`` as ``fnu``, ``spectrum_table``, ``galsim_sed``, and
+        ``profile``; the latter is a delta-function point source multiplied
+        by the SED.
+
+        Returns
+        -------
+        None
+            The GalSim objects are assigned to instance attributes.
+        """
         import galsim
 
+        # 0. Convert to flux density for galsim
         self.fnu = 3631e-23 * 10**(-0.4 * self.mag)
 
         # 1. Build a continuous spectrum via LookupTable interpolation
@@ -95,63 +292,37 @@ class Star:
             interpolant='linear' # or 'cubic' if you have plenty of points and want smooth curves
         )
 
-        # 4. Turn the table into a GalSim SED object
-        self.star_sed = galsim.SED(
+        # 2. Turn the table into a GalSim SED object
+        self.galsim_sed = galsim.SED(
             spec=self.spectrum_table, 
             wave_type='nm', 
-            flux_type='fnu'
+            flux_type='fnu',
         )
 
-        # 5. Define your spatial star model (a point source) and apply the SED
+        # 3. Define a spatial star model (a point source) and apply the SED
         # This creates a ChromaticObject representing the star
-        self.star_profile = galsim.DeltaFunction() * self.star_sed
+        self.profile = galsim.DeltaFunction() * self.galsim_sed
 
     def plot_spectrum(self):
-        import matplotlib.pyplot as plt
+        """Plot the interpolated AB-magnitude SED and its catalog samples.
 
-        dense_waves = np.linspace(self.wave.min()*1e9, self.wave.max()*1e9, 1000)
-        fig, ax = plt.subplots()
-        ax.plot(dense_waves, self.star_sed(dense_waves),  label="GalSim Interpolator", color='royalblue', lw=2)
-        ax.scatter(self.wave*1e9, self.fnu, label='Photometry', color='darkorange', edgecolors='black', s=80, zorder=3)
-        ax.set_xlabel("Wavelength ($\mathrm{nm}$)", fontsize=12)
-        ax.set_ylabel("Flux Density $f_\\nu$ ($\mathrm{erg/s/Hz/cm^2}$)", fontsize=12)
-        ax.legend()
-        return fig, ax
-
-    def get_detector_position_telescope_frame(self, WCS, shape, telescope):
-        """
-        Convert detector position to telescope frame coordinates.
-        
-        Parameters
-        ----------
-        WCS : astropy.wcs.WCS
-            World Coordinate System object for the image.
-        shape : tuple
-            Shape of the detector (ny, nx).
-            
         Returns
         -------
-        thetax : float
-            V2 position in telescope frame (radians)
-        thetay : float
-            V3 position in telescope frame (radians)
+        tuple[matplotlib.figure.Figure, matplotlib.axes.Axes]
+            Figure and axes containing the spectrum. The magnitude axis is
+            inverted, as is conventional for plotting magnitudes.
         """
-        from stpsf.stpsf_core import get_siaf_with_caching
-        
-        siaf = get_siaf_with_caching('roman')
-        aperture_name = f'WFI{self.WFI:02d}_FULL'
-        
-        if aperture_name not in siaf.apertures:
-            raise ValueError(f"Aperture {aperture_name} not found in SIAF")
-        
-        aperture = siaf.apertures[aperture_name]
-        thetax_deg, thetay_deg = aperture.idl_to_tel(idl_x, idl_y)
-        
-        # Convert from degrees to radians
-        thetax_rad = thetax_deg * np.pi / 180 / 60 / 60
-        thetay_rad = thetay_deg * np.pi / 180 / 60 / 60
-        
-        return thetax_rad, thetay_rad
+        import matplotlib.pyplot as plt
+
+        dense_waves = np.linspace(self.wave.min(), self.wave.max(), 1000)*u.nm
+        fig, ax = plt.subplots()
+        ax.plot(dense_waves, self.sed(dense_waves),  label="Interpolator", color='royalblue', lw=2)
+        ax.scatter(self.wave, self.mag, label='Photometry', color='darkorange', edgecolors='black', s=80, zorder=3)
+        ax.invert_yaxis()
+        ax.set_xlabel("Wavelength ($\mathrm{nm}$)", fontsize=12)
+        ax.set_ylabel("AB Magnitude", fontsize=12)
+        ax.legend()
+        return fig, ax
 
 
 #%%
@@ -1236,7 +1407,54 @@ def find_SCA_for_a_target(file_name, ra, dec, include_border=True):
     return(IN_SCA)
 ##########################
 
-def generate_star_stamps(hybrid_catalog, telescope, filename, sciexts, astropywcs, filter, pa, verbose=False):
+def generate_star_in_footprint(hybrid_catalog, sciexts, astropywcs, telescope='Roman', filter='F129', verbose=False):
+    """
+    Deprecated version of the generate_star_stamps function.
+    This function generates star stamps for each SCIEXT in the input catalog.
+    """
+    canvas = None
+
+
+
+
+    return canvas
+
+
+def generate_star_stamps_deprecated(hybrid_catalog, telescope, filename, sciexts, astropywcs, filter, pa, verbose=False):
+    """Generate individual PSF-based FITS stamps for catalog stars.
+
+    Parameters
+    ----------
+    hybrid_catalog : pandas.DataFrame
+        Catalog containing at least ``ra``, ``dec``, and ``mag_lambda`` columns.
+    telescope : str
+        Telescope name used to select the telescope-specific PSF implementation.
+    filename : str
+        Input FITS exposure used to determine each star's detector/SCA.
+    sciexts : iterable of int
+        Science-extension or detector identifiers to process.
+    astropywcs : sequence of astropy.wcs.WCS
+        WCS objects corresponding to the science extensions.
+    filter : str
+        Roman filter name used to generate the PSF and calculate stellar flux.
+    pa : float
+        Position angle in degrees written to each generated stamp's WCS.
+    verbose : bool or int, optional
+        Controls progress and diagnostic output. Values greater than 1 enable
+        more detailed progress reporting.
+
+    Returns
+    -------
+    list of list of str
+        Output FITS filenames grouped by science extension.
+
+    Notes
+    -----
+    This function is deprecated. It creates a directory named
+    ``<filename without .fits>_star_stamps`` and generates one FITS PSF stamp
+    per catalog star. Existing stamp files are reused.
+    """
+
     # For each SCIEXT.
     foldername = filename.replace(".fits", "_star_stamps")
     
@@ -1327,6 +1545,192 @@ def moffat_function_sb(r, mu0, alpha, beta):
             Surface brightness at radius r.
     """
     return mu0 + 2.5 * beta * np.log10(1 + (r/alpha)**2)
+
+def galsim_roman_psf(position, SCA, bandpass, shape=None, SED=None, **kwargs):
+    '''
+    Generate a Roman WFI point-spread function using GalSim.
+
+    Parameters
+    ----------
+        position : sequence of float
+            Two-dimensional detector coordinates ``(x, y)`` in pixels.
+        SCA : int
+            Roman WFI SCA number, from 1 through 18.
+        bandpass : str
+            Roman WFI filter name, for example ``"F158"``.
+        shape : tuple of int, optional
+            The shape of the output PSF image in pixels, as ``(ny, nx)``. If
+            ``None``, the default size used by GalSim's ``drawImage`` is used.
+        SED : galsim.SED or None, optional
+            The spectral energy distribution to use for the PSF. If ``None``, a plane SED is used.
+        method : str, optional
+            The method to use for PSF generation. Default is ``'stpsf'``.
+        kwargs : dict, optional
+            Additional keyword arguments to pass to the galsim.GSParams.
+
+    Returns
+    -------
+        astropy.io.fits.PrimaryHDU
+            The rendered PSF image in the primary HDU.
+    '''
+    from romanisim.bandpass import roman2galsim_bandpass
+    import galsim
+    import galsim.roman
+
+    # Transforms bandpass formating to galsim format and to the banspass galsim object
+    bandpass = roman2galsim_bandpass[bandpass]
+    bandpass_galsim = galsim.roman.getBandpasses()[bandpass]
+
+    # Set up the GalSim parameters for high-accuracy PSF rendering and override defaults with any additional kwargs
+    gsparams_kwargs = dict(maximum_fft_size=2**16, maxk_threshold=1.e-10, folding_threshold=1.e-6, **kwargs)
+    gsparams = galsim.GSParams(**gsparams_kwargs)
+
+    # Set the SCA position for the PSF rendering
+    SCA_pos = galsim.PositionD(position[0], position[1])
+
+    # Call galsim to generate the PSF for the specified SCA, bandpass, and position
+    psf = galsim.roman.getPSF(SCA, bandpass, SCA_pos=SCA_pos, pupil_bin=1, wcs=None,
+                                n_waves=10, extra_aberrations=None,
+                                gsparams=gsparams, logger=None,
+                                high_accuracy=None, approximate_struts=None)
+
+    # Define the default flat SED if none is provided
+    if SED is None:
+        SED = galsim.SED(spec=lambda wave: 1.0, wave_type='nm', flux_type='fnu')
+    elif not isinstance(SED, galsim.SED):
+        raise TypeError("SED must be an instance of galsim.SED")
+
+    # Convolve the PSF with the SED using a delta function to create the final image profile
+    psf = galsim.Convolve([psf, SED*galsim.DeltaFunction()])
+
+    # Draw the final image using the convolved PSF and the specified bandpass
+    img = psf.drawImage(nx=shape[1], ny=shape[0], bandpass=bandpass_galsim) if shape is not None else psf.drawImage(bandpass=bandpass_galsim)
+    output = fits.PrimaryHDU(data=img.array, header=img.wcs.writeToFitsHeader(fits.Header(), img.bounds))
+    
+    return output
+
+def stpsf_roman_psf(position, SCA, bandpass, shape=None, SED=None, magnitude_weights=None, wave_weights=None, normalize=False, **kwargs):
+    '''
+    Parameters
+    ----------
+        position : sequence of float
+            Two-dimensional detector coordinates ``(x, y)`` in pixels.
+        SCA : int
+            Roman WFI SCA number, from 1 through 18.
+        bandpass : str
+            Roman WFI filter name, for example ``"F158"``.
+        shape : tuple of int, optional
+            The shape of the output PSF image in pixels, as ``(ny, nx)``. If
+            ``None``, the default size of 91x91 pixels is used.
+        SED : galsim.SED or methor or None, optional
+            The spectral energy distribution to use for the PSF. If ``None``, a plane SED is used.
+        magnitude_weights: array-like or None, optional
+            The weights to apply to each wavelength when constructing the chromatic PSF. If ``None``, equal weights are used.
+        wave_weights: array-like or None, optional
+            The wavelength of each corresponding weight in the ``weights`` array. If ``None``, equal spacing across the bandpass is assumed.
+            the units should be nanometers.
+            
+    Returns
+    -------
+        astropy.io.fits.PrimaryHDU
+            The rendered chromatic PSF image in the primary HDU.
+    '''
+    import galsim
+    import stpsf
+    import numpy as np
+    from scipy.interpolate import interp1d
+    from romanisim.bandpass import roman2galsim_bandpass
+
+    # Validate magnitude_weights and wave_weights arrays if provided
+    if magnitude_weights is not None and wave_weights is None:
+        raise ValueError("wave_weights must be provided if magnitude_weights are specified.")
+    elif magnitude_weights is None and wave_weights is not None:
+        raise ValueError("magnitude_weights must be provided if wave_weights are specified.")
+    else: 
+        magnitude_weights = np.array(magnitude_weights)
+        wave_weights = np.array(wave_weights)
+        if len(magnitude_weights) != len(wave_weights):
+            raise ValueError("magnitude_weights and wave_weights must have the same length.")
+
+    # 1. Determine FOV size based on shape
+    if shape is not None:
+        ny, nx = shape
+        fov = max(ny, nx)
+    else:
+        fov = 91
+        ny, nx = fov, fov
+
+    # 2. Get filter wavelength boundaries using GalSim (convert nm to meters)
+    bp = rs.telescopes.Roman.get_filter(instrument="WFI", filter_name="F158")
+    wave_min = np.min(bp['wavelength_bins'].to(u.nm).value)
+    wave_max = np.max(bp['wavelength_bins'].to(u.nm).value)
+    
+    # 3. Configure the Roman WFI model using STPSF
+    wfi = stpsf.roman.WFI()
+    wfi.filter = bandpass
+    wfi.detector = f'SCA{SCA:02d}'
+    wfi.detector_position = position
+    
+    # 4. Build the fast interpolator (sample 10 points across the bandpass)
+    wave_anchors = np.linspace(wave_min, wave_max, 10)
+    psf_cube = np.zeros((len(wave_anchors), fov, fov))
+    
+    for i, w in enumerate(wave_anchors):
+        pst = wfi.calc_psf(fov_pixels=fov, monochromatic=w, oversample=1)
+        psf_cube[i] = pst[0].data
+        
+    psf_interpolator = interp1d(wave_anchors, psf_cube, axis=0, kind='linear', 
+                                bounds_error=False, fill_value='extrapolate')
+
+    # 5. Setup weights for integration
+    if magnitude_weights is None and SED is None:
+        wave_weights = np.linspace(wave_min, wave_max, 100)
+        weights = np.ones_like(wave_weights)
+    elif magnitude_weights is None and SED is not None:
+        wave_weights = np.linspace(wave_min, wave_max, 100)
+        bp_interp = interp1d(bp['wavelength_bins'].to(u.nm).value, bp['throughput'].value, kind='linear',
+                            bounds_error=False, fill_value="extrapolate")
+        magnitudes = -2.5 * np.log10(SED(wave_weights)/3631e-23)
+        magnitude_weights = bp_interp(wave_weights)*magnitudes
+        weights = 10**((23.9 - magnitude_weights + 5 * np.log10(0.11)) / 2.5)
+    else: 
+        weights = 10**((23.9 - magnitude_weights + 5 * np.log10(0.11)) / 2.5)
+        
+    # 6. Manually integrate across 100 fine steps
+    chromatic_psf = np.zeros((fov, fov))
+
+    for wave,weight in zip(wave_weights, weights):    
+        if weight <= 0 or np.isnan(weight):
+            continue
+        
+        # Extract and accumulate the weighted PSF slice
+        temp_psf = psf_interpolator(wave)
+        norm = weight / np.sum(temp_psf)
+        chromatic_psf += temp_psf * norm
+
+    # 7. Normalize the result
+    if normalize and np.sum(chromatic_psf) > 0:
+        chromatic_psf /= np.sum(chromatic_psf)
+    
+        
+
+    # Crop to requested rectangular shape if ny != nx
+    if shape is not None and ny != nx:
+        y_start = (fov - ny) // 2
+        x_start = (fov - nx) // 2
+        chromatic_psf = chromatic_psf[y_start:y_start+ny, x_start:x_start+nx]
+
+    # 8. Package into an Astropy FITS HDU
+    hdu = fits.PrimaryHDU(data=chromatic_psf)
+    hdu.header['TELESCOP'] = 'ROMAN'
+    hdu.header['INSTRUME'] = 'WFI'
+    hdu.header['DETECTOR'] = wfi.detector
+    hdu.header['FILTER'] = bandpass
+    hdu.header['X_POS'] = position[0]
+    hdu.header['Y_POS'] = position[1]
+    
+    return hdu
+
 
 def moffat_2d(shape, mu0, alpha, beta):
     """
