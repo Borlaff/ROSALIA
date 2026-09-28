@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<RomanProgram schemaVersion="29" APTVersion="Version 2026.2.1  " xmlns="http://www.stsci.edu/Roman/APT">
+<RomanProgram schemaVersion="31" APTVersion="Version 2026.4.3  " xmlns="http://www.stsci.edu/Roman/APT">
     <ProgramInformation>
         <ProgramPhase>Approved</ProgramPhase>
         <Title>CAR171 - Ghosts and Scattered light</Title>
@@ -117,7 +117,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="13 47 3.2889 +49 01 40.50"/>
+            <EquatorialCoordinates Value="13 46 12.6862 +49 06 42.30"/>
         </FixedTarget>
         <FixedTarget>
             <Number>2</Number>
@@ -132,7 +132,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="13 46 48.0536 +49 05 30.19"/>
+            <EquatorialCoordinates Value="13 46 11.9152 +49 11 16.39"/>
         </FixedTarget>
         <FixedTarget>
             <Number>3</Number>
@@ -147,7 +147,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="13 46 37.5477 +49 34 3.72"/>
+            <EquatorialCoordinates Value="13 47 35.1773 +49 36 28.37"/>
         </FixedTarget>
         <FixedTarget>
             <Number>4</Number>
@@ -162,7 +162,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="13 46 28.7269 +49 29 43.13"/>
+            <EquatorialCoordinates Value="13 47 13.5466 +49 33 32.22"/>
         </FixedTarget>
         <FixedTarget>
             <Number>5</Number>
@@ -177,7 +177,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="14 37 35.3769 +53 49 33.12"/>
+            <EquatorialCoordinates Value="14 36 57.4819 +53 54 45.62"/>
         </FixedTarget>
         <FixedTarget>
             <Number>6</Number>
@@ -192,7 +192,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="14 37 47.9399 +54 13 54.49"/>
+            <EquatorialCoordinates Value="14 38 39.8441 +54 14 1.56"/>
         </FixedTarget>
         <FixedTarget>
             <Number>7</Number>
@@ -207,7 +207,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="13 47 3.2889 +49 01 40.50"/>
+            <EquatorialCoordinates Value="13 46 12.6862 +49 06 42.30"/>
         </FixedTarget>
         <FixedTarget>
             <Number>8</Number>
@@ -222,7 +222,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="13 46 48.0536 +49 05 30.19"/>
+            <EquatorialCoordinates Value="13 46 11.9152 +49 11 16.39"/>
         </FixedTarget>
         <FixedTarget>
             <Number>9</Number>
@@ -237,7 +237,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="13 46 37.5477 +49 34 3.72"/>
+            <EquatorialCoordinates Value="13 47 35.1773 +49 36 28.37"/>
         </FixedTarget>
         <FixedTarget>
             <Number>10</Number>
@@ -252,7 +252,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="13 46 28.7269 +49 29 43.13"/>
+            <EquatorialCoordinates Value="13 47 13.5466 +49 33 32.22"/>
         </FixedTarget>
         <FixedTarget>
             <Number>11</Number>
@@ -267,7 +267,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="14 37 35.3769 +53 49 33.12"/>
+            <EquatorialCoordinates Value="14 36 57.4819 +53 54 45.62"/>
         </FixedTarget>
         <FixedTarget>
             <Number>12</Number>
@@ -282,7 +282,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="14 37 47.9399 +54 13 54.49"/>
+            <EquatorialCoordinates Value="14 38 39.8441 +54 14 1.56"/>
         </FixedTarget>
         <FixedTarget>
             <Number>13</Number>
@@ -297,7 +297,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="05 52 57.4530 -48 31 57.98"/>
+            <EquatorialCoordinates Value="05 42 11.5412 -51 51 34.16"/>
         </FixedTarget>
         <FixedTarget>
             <Number>14</Number>
@@ -312,7 +312,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="05 45 15.4397 -55 47 22.60"/>
+            <EquatorialCoordinates Value="06 04 17.4062 -58 30 23.07"/>
         </FixedTarget>
         <FixedTarget>
             <Number>15</Number>
@@ -327,7 +327,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="06 12 49.5949 -58 39 28.07"/>
+            <EquatorialCoordinates Value="06 40 16.1288 -58 24 50.68"/>
         </FixedTarget>
         <FixedTarget>
             <Number>16</Number>
@@ -342,7 +342,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="06 58 44.2942 -55 01 45.73"/>
+            <EquatorialCoordinates Value="07 00 13.6929 -51 45 32.81"/>
         </FixedTarget>
         <FixedTarget>
             <Number>17</Number>
@@ -357,7 +357,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="06 56 16.1683 -50 10 17.81"/>
+            <EquatorialCoordinates Value="06 42 3.9716 -47 51 50.04"/>
         </FixedTarget>
         <FixedTarget>
             <Number>18</Number>
@@ -372,7 +372,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="06 18 35.4823 -46 35 35.41"/>
+            <EquatorialCoordinates Value="05 59 3.9180 -47 58 33.14"/>
         </FixedTarget>
         <FixedTarget>
             <Number>19</Number>
@@ -387,7 +387,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="05 46 1.5060 -50 04 25.11"/>
+            <EquatorialCoordinates Value="05 41 17.8276 -53 45 55.57"/>
         </FixedTarget>
         <FixedTarget>
             <Number>20</Number>
@@ -402,7 +402,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="05 41 27.0482 -53 58 31.37"/>
+            <EquatorialCoordinates Value="05 52 47.0971 -57 22 59.55"/>
         </FixedTarget>
         <FixedTarget>
             <Number>21</Number>
@@ -417,7 +417,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="06 17 53.6858 -51 20 45.36"/>
+            <EquatorialCoordinates Value="06 13 58.5090 -52 05 4.94"/>
         </FixedTarget>
         <FixedTarget>
             <Number>22</Number>
@@ -432,7 +432,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="06 16 47.7651 -53 56 23.63"/>
+            <EquatorialCoordinates Value="06 22 46.0654 -54 19 34.54"/>
         </FixedTarget>
         <FixedTarget>
             <Number>23</Number>
@@ -447,7 +447,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="06 24 10.5540 -52 37 41.48"/>
+            <EquatorialCoordinates Value="06 23 53.3915 -52 37 14.54"/>
         </FixedTarget>
         <FixedTarget>
             <Number>24</Number>
@@ -462,7 +462,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="06 24 8.3529 -52 45 56.44"/>
+            <EquatorialCoordinates Value="06 24 21.9177 -52 44 16.53"/>
         </FixedTarget>
         <FixedTarget>
             <Number>25</Number>
@@ -477,7 +477,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="06 24 0.7296 -52 33 28.52"/>
+            <EquatorialCoordinates Value="06 23 29.7743 -52 34 34.21"/>
         </FixedTarget>
         <FixedTarget>
             <Number>26</Number>
@@ -492,7 +492,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="06 23 56.7612 -52 50 1.47"/>
+            <EquatorialCoordinates Value="06 24 27.4007 -52 48 38.49"/>
         </FixedTarget>
         <FixedTarget>
             <Number>27</Number>
@@ -507,7 +507,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="05 54 51.8343 -48 04 20.73"/>
+            <EquatorialCoordinates Value="05 42 23.1451 -51 18 4.86"/>
         </FixedTarget>
         <FixedTarget>
             <Number>28</Number>
@@ -522,7 +522,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="05 54 1.8826 -48 13 19.38"/>
+            <EquatorialCoordinates Value="05 42 7.4892 -51 30 5.00"/>
         </FixedTarget>
         <FixedTarget>
             <Number>29</Number>
@@ -537,7 +537,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="05 53 11.9493 -48 22 13.26"/>
+            <EquatorialCoordinates Value="05 41 51.7877 -51 42 0.49"/>
         </FixedTarget>
         <FixedTarget>
             <Number>30</Number>
@@ -552,7 +552,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="05 52 21.4294 -48 31 8.78"/>
+            <EquatorialCoordinates Value="05 41 35.8476 -51 53 59.94"/>
         </FixedTarget>
         <FixedTarget>
             <Number>31</Number>
@@ -567,7 +567,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="05 51 30.6194 -48 40 2.69"/>
+            <EquatorialCoordinates Value="05 41 19.7590 -52 05 59.02"/>
         </FixedTarget>
         <FixedTarget>
             <Number>32</Number>
@@ -582,7 +582,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="05 50 40.7436 -48 48 42.23"/>
+            <EquatorialCoordinates Value="05 41 3.9087 -52 17 40.53"/>
         </FixedTarget>
         <FixedTarget>
             <Number>33</Number>
@@ -597,7 +597,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="05 49 48.4247 -48 57 42.39"/>
+            <EquatorialCoordinates Value="05 40 47.2190 -52 29 51.78"/>
         </FixedTarget>
         <FixedTarget>
             <Number>34</Number>
@@ -612,7 +612,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="05 46 1.8019 -50 04 25.57"/>
+            <EquatorialCoordinates Value="05 41 18.1259 -53 45 54.42"/>
         </FixedTarget>
         <FixedTarget>
             <Number>35</Number>
@@ -627,7 +627,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="05 48 6.2269 -49 33 23.04"/>
+            <EquatorialCoordinates Value="05 41 19.4899 -53 08 56.51"/>
         </FixedTarget>
         <FixedTarget>
             <Number>36</Number>
@@ -642,7 +642,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="05 44 34.3715 -50 56 11.37"/>
+            <EquatorialCoordinates Value="05 43 11.7618 -54 36 51.72"/>
         </FixedTarget>
         <FixedTarget>
             <Number>37</Number>
@@ -657,7 +657,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="05 41 21.8610 -50 46 25.53"/>
+            <EquatorialCoordinates Value="05 39 39.0369 -54 45 25.57"/>
         </FixedTarget>
         <FixedTarget>
             <Number>38</Number>
@@ -672,7 +672,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="05 43 41.7910 -49 50 48.63"/>
+            <EquatorialCoordinates Value="05 38 20.0935 -53 46 36.63"/>
         </FixedTarget>
         <FixedTarget>
             <Number>39</Number>
@@ -687,7 +687,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="05 46 8.0805 -49 21 4.92"/>
+            <EquatorialCoordinates Value="05 38 47.4056 -53 08 48.42"/>
         </FixedTarget>
         <FixedTarget>
             <Number>40</Number>
@@ -702,7 +702,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="05 46 24.3936 -51 01 57.51"/>
+            <EquatorialCoordinates Value="05 45 13.4000 -54 32 7.65"/>
         </FixedTarget>
         <FixedTarget>
             <Number>41</Number>
@@ -717,7 +717,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="05 48 34.7348 -50 16 6.60"/>
+            <EquatorialCoordinates Value="05 44 20.1136 -53 42 26.94"/>
         </FixedTarget>
         <FixedTarget>
             <Number>42</Number>
@@ -732,7 +732,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="05 50 27.1664 -49 47 12.33"/>
+            <EquatorialCoordinates Value="05 44 17.2721 -53 08 22.23"/>
         </FixedTarget>
         <FixedTarget>
             <Number>43</Number>
@@ -747,7 +747,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="05 42 17.4154 -50 18 33.52"/>
+            <EquatorialCoordinates Value="05 38 44.9429 -54 17 16.09"/>
         </FixedTarget>
         <FixedTarget>
             <Number>44</Number>
@@ -762,7 +762,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="05 45 17.7984 -50 31 2.00"/>
+            <EquatorialCoordinates Value="05 42 16.4109 -54 12 3.52"/>
         </FixedTarget>
         <FixedTarget>
             <Number>45</Number>
@@ -777,7 +777,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="05 47 23.6677 -50 38 33.60"/>
+            <EquatorialCoordinates Value="05 44 38.8287 -54 07 26.17"/>
         </FixedTarget>
         <FixedTarget>
             <Number>46</Number>
@@ -792,7 +792,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="05 38 52.1710 -51 53 15.48"/>
+            <EquatorialCoordinates Value="05 41 43.7297 -55 53 58.44"/>
         </FixedTarget>
         <FixedTarget>
             <Number>47</Number>
@@ -807,7 +807,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="05 42 39.6246 -51 59 43.82"/>
+            <EquatorialCoordinates Value="05 45 35.6911 -55 39 34.92"/>
         </FixedTarget>
         <FixedTarget>
             <Number>48</Number>
@@ -822,7 +822,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="05 44 37.4427 -52 02 54.72"/>
+            <EquatorialCoordinates Value="05 47 34.3764 -55 31 59.62"/>
         </FixedTarget>
         <FixedTarget>
             <Number>49</Number>
@@ -837,7 +837,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="05 41 27.3686 -53 58 31.91"/>
+            <EquatorialCoordinates Value="05 52 47.4188 -57 22 58.32"/>
         </FixedTarget>
         <FixedTarget>
             <Number>50</Number>
@@ -852,7 +852,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="05 42 22.7634 -54 34 19.63"/>
+            <EquatorialCoordinates Value="05 56 14.2021 -57 47 1.74"/>
         </FixedTarget>
         <FixedTarget>
             <Number>51</Number>
@@ -867,7 +867,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="05 42 1.9177 -53 05 21.89"/>
+            <EquatorialCoordinates Value="05 49 30.5587 -56 36 46.21"/>
         </FixedTarget>
         <FixedTarget>
             <Number>52</Number>
@@ -882,7 +882,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="05 38 29.7709 -53 03 47.17"/>
+            <EquatorialCoordinates Value="05 46 14.0545 -56 53 52.13"/>
         </FixedTarget>
         <FixedTarget>
             <Number>53</Number>
@@ -897,7 +897,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="05 38 31.2376 -54 03 24.60"/>
+            <EquatorialCoordinates Value="05 50 33.0370 -57 42 9.44"/>
         </FixedTarget>
         <FixedTarget>
             <Number>54</Number>
@@ -912,7 +912,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="05 39 49.1092 -54 39 20.76"/>
+            <EquatorialCoordinates Value="05 54 22.3120 -58 04 19.93"/>
         </FixedTarget>
         <FixedTarget>
             <Number>55</Number>
@@ -927,7 +927,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="05 44 3.4357 -53 05 46.60"/>
+            <EquatorialCoordinates Value="05 51 20.3662 -56 26 35.04"/>
         </FixedTarget>
         <FixedTarget>
             <Number>56</Number>
@@ -942,7 +942,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="05 44 30.7362 -53 55 40.77"/>
+            <EquatorialCoordinates Value="05 55 16.3372 -57 04 48.65"/>
         </FixedTarget>
         <FixedTarget>
             <Number>57</Number>
@@ -957,7 +957,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="05 45 22.3813 -54 28 41.73"/>
+            <EquatorialCoordinates Value="05 58 25.6226 -57 26 59.93"/>
         </FixedTarget>
         <FixedTarget>
             <Number>58</Number>
@@ -972,7 +972,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="05 38 15.3068 -53 32 49.35"/>
+            <EquatorialCoordinates Value="05 48 5.2111 -57 18 46.13"/>
         </FixedTarget>
         <FixedTarget>
             <Number>59</Number>
@@ -987,7 +987,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="05 41 45.8731 -53 31 15.13"/>
+            <EquatorialCoordinates Value="05 51 5.9176 -56 59 15.21"/>
         </FixedTarget>
         <FixedTarget>
             <Number>60</Number>
@@ -1002,7 +1002,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="05 44 9.4410 -53 30 51.97"/>
+            <EquatorialCoordinates Value="05 53 11.3051 -56 46 31.00"/>
         </FixedTarget>
         <FixedTarget>
             <Number>61</Number>
@@ -1017,7 +1017,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="06 24 11.3503 -52 34 41.63"/>
+            <EquatorialCoordinates Value="06 23 43.0636 -52 34 41.09"/>
         </FixedTarget>
         <FixedTarget>
             <Number>62</Number>
@@ -1032,7 +1032,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="06 24 10.9524 -52 36 11.55"/>
+            <EquatorialCoordinates Value="06 23 48.2250 -52 35 57.82"/>
         </FixedTarget>
         <FixedTarget>
             <Number>63</Number>
@@ -1047,7 +1047,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="06 24 10.5540 -52 37 41.48"/>
+            <EquatorialCoordinates Value="06 23 53.3915 -52 37 14.54"/>
         </FixedTarget>
         <FixedTarget>
             <Number>64</Number>
@@ -1062,7 +1062,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="06 24 10.1551 -52 39 11.41"/>
+            <EquatorialCoordinates Value="06 23 58.5630 -52 38 31.24"/>
         </FixedTarget>
         <FixedTarget>
             <Number>65</Number>
@@ -1077,7 +1077,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="06 24 9.7558 -52 40 41.33"/>
+            <EquatorialCoordinates Value="06 24 3.7395 -52 39 47.93"/>
         </FixedTarget>
         <FixedTarget>
             <Number>66</Number>
@@ -1092,7 +1092,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="06 24 11.4232 -52 37 41.80"/>
+            <EquatorialCoordinates Value="06 23 54.1328 -52 37 10.39"/>
         </FixedTarget>
         <FixedTarget>
             <Number>67</Number>
@@ -1107,7 +1107,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="06 24 11.1861 -52 37 41.71"/>
+            <EquatorialCoordinates Value="06 23 53.9306 -52 37 11.52"/>
         </FixedTarget>
         <FixedTarget>
             <Number>68</Number>
@@ -1122,7 +1122,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="06 24 10.9491 -52 37 41.62"/>
+            <EquatorialCoordinates Value="06 23 53.7284 -52 37 12.65"/>
         </FixedTarget>
         <FixedTarget>
             <Number>69</Number>
@@ -1137,7 +1137,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="06 24 10.6725 -52 37 41.52"/>
+            <EquatorialCoordinates Value="06 23 53.4926 -52 37 13.97"/>
         </FixedTarget>
         <FixedTarget>
             <Number>70</Number>
@@ -1152,7 +1152,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="06 24 10.4355 -52 37 41.44"/>
+            <EquatorialCoordinates Value="06 23 53.2904 -52 37 15.10"/>
         </FixedTarget>
         <FixedTarget>
             <Number>71</Number>
@@ -1167,7 +1167,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="06 24 10.1589 -52 37 41.33"/>
+            <EquatorialCoordinates Value="06 23 53.0545 -52 37 16.42"/>
         </FixedTarget>
         <FixedTarget>
             <Number>72</Number>
@@ -1182,7 +1182,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="06 24 9.9219 -52 37 41.25"/>
+            <EquatorialCoordinates Value="06 23 52.8524 -52 37 17.55"/>
         </FixedTarget>
         <FixedTarget>
             <Number>73</Number>
@@ -1197,7 +1197,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="06 24 9.6848 -52 37 41.16"/>
+            <EquatorialCoordinates Value="06 23 52.6502 -52 37 18.68"/>
         </FixedTarget>
         <FixedTarget>
             <Number>74</Number>
@@ -1212,7 +1212,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="06 24 0.6392 -52 33 48.66"/>
+            <EquatorialCoordinates Value="06 23 30.9285 -52 34 51.41"/>
         </FixedTarget>
         <FixedTarget>
             <Number>75</Number>
@@ -1227,7 +1227,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="06 23 58.7910 -52 33 37.88"/>
+            <EquatorialCoordinates Value="06 23 28.7342 -52 34 51.82"/>
         </FixedTarget>
         <FixedTarget>
             <Number>76</Number>
@@ -1242,7 +1242,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="06 23 58.8817 -52 33 17.74"/>
+            <EquatorialCoordinates Value="06 23 27.5802 -52 34 34.63"/>
         </FixedTarget>
         <FixedTarget>
             <Number>77</Number>
@@ -1257,7 +1257,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="06 24 0.8200 -52 33 8.37"/>
+            <EquatorialCoordinates Value="06 23 28.6203 -52 34 17.01"/>
         </FixedTarget>
         <FixedTarget>
             <Number>78</Number>
@@ -1272,7 +1272,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="06 24 2.6679 -52 33 19.15"/>
+            <EquatorialCoordinates Value="06 23 30.8142 -52 34 16.59"/>
         </FixedTarget>
         <FixedTarget>
             <Number>79</Number>
@@ -1287,7 +1287,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="06 24 2.5778 -52 33 39.29"/>
+            <EquatorialCoordinates Value="06 23 31.9684 -52 34 33.79"/>
         </FixedTarget>
         <FixedTarget>
             <Number>80</Number>
@@ -1302,7 +1302,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="06 24 0.6392 -52 33 48.66"/>
+            <EquatorialCoordinates Value="06 23 30.9285 -52 34 51.41"/>
         </FixedTarget>
         <FixedTarget>
             <Number>81</Number>
@@ -1317,7 +1317,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="06 25 5.5439 -52 46 8.30"/>
+            <EquatorialCoordinates Value="06 25 10.0235 -52 39 36.64"/>
         </FixedTarget>
         <FixedTarget>
             <Number>82</Number>
@@ -1332,7 +1332,7 @@ o NOTES:
             <AnnualParallax></AnnualParallax>
             <Category>Calibration</Category>
             <Keywords>Stray light test</Keywords>
-            <EquatorialCoordinates Value="06 25 7.4973 -52 38 9.83"/>
+            <EquatorialCoordinates Value="06 24 42.3726 -52 32 49.46"/>
         </FixedTarget>
     </Targets>
     <MosaicPatterns/>
@@ -1340,7 +1340,6 @@ o NOTES:
         <PassPlan Number="1">
             <Label>CAR171.1</Label>
             <TargetSelection>Fixed: 1</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -1355,7 +1354,6 @@ o NOTES:
         <PassPlan Number="2">
             <Label>CAR171.1</Label>
             <TargetSelection>Fixed: 2</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -1370,7 +1368,6 @@ o NOTES:
         <PassPlan Number="3">
             <Label>CAR171.1</Label>
             <TargetSelection>Fixed: 3</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -1385,7 +1382,6 @@ o NOTES:
         <PassPlan Number="4">
             <Label>CAR171.1</Label>
             <TargetSelection>Fixed: 4</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -1400,7 +1396,6 @@ o NOTES:
         <PassPlan Number="5">
             <Label>CAR171.1</Label>
             <TargetSelection>Fixed: 5</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -1415,7 +1410,6 @@ o NOTES:
         <PassPlan Number="6">
             <Label>CAR171.1</Label>
             <TargetSelection>Fixed: 6</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -1430,7 +1424,6 @@ o NOTES:
         <PassPlan Number="7">
             <Label>CAR171.1</Label>
             <TargetSelection>Fixed: 7</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -1508,7 +1501,6 @@ o NOTES:
         <PassPlan Number="8">
             <Label>CAR171.1</Label>
             <TargetSelection>Fixed: 8</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -1586,7 +1578,6 @@ o NOTES:
         <PassPlan Number="9">
             <Label>CAR171.1</Label>
             <TargetSelection>Fixed: 9</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -1664,7 +1655,6 @@ o NOTES:
         <PassPlan Number="10">
             <Label>CAR171.1</Label>
             <TargetSelection>Fixed: 10</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -1742,7 +1732,6 @@ o NOTES:
         <PassPlan Number="11">
             <Label>CAR171.1</Label>
             <TargetSelection>Fixed: 11</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -1820,7 +1809,6 @@ o NOTES:
         <PassPlan Number="12">
             <Label>CAR171.1</Label>
             <TargetSelection>Fixed: 12</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -1898,7 +1886,6 @@ o NOTES:
         <PassPlan Number="13">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 13</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -1914,7 +1901,6 @@ o NOTES:
         <PassPlan Number="14">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 14</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -1930,7 +1916,6 @@ o NOTES:
         <PassPlan Number="15">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 15</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -1946,7 +1931,6 @@ o NOTES:
         <PassPlan Number="16">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 16</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -1962,7 +1946,6 @@ o NOTES:
         <PassPlan Number="17">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 17</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -1978,7 +1961,6 @@ o NOTES:
         <PassPlan Number="18">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 18</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -1994,7 +1976,6 @@ o NOTES:
         <PassPlan Number="19">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 19</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2010,7 +1991,6 @@ o NOTES:
         <PassPlan Number="20">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 20</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2026,7 +2006,6 @@ o NOTES:
         <PassPlan Number="21">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 21</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2042,7 +2021,6 @@ o NOTES:
         <PassPlan Number="22">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 22</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2058,7 +2036,6 @@ o NOTES:
         <PassPlan Number="23">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 23</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2074,7 +2051,6 @@ o NOTES:
         <PassPlan Number="24">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 24</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2090,7 +2066,6 @@ o NOTES:
         <PassPlan Number="25">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 25</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2106,7 +2081,6 @@ o NOTES:
         <PassPlan Number="26">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 26</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2122,7 +2096,6 @@ o NOTES:
         <PassPlan Number="27">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 27</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2138,7 +2111,6 @@ o NOTES:
         <PassPlan Number="28">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 28</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2154,7 +2126,6 @@ o NOTES:
         <PassPlan Number="29">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 29</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2170,7 +2141,6 @@ o NOTES:
         <PassPlan Number="30">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 30</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2186,7 +2156,6 @@ o NOTES:
         <PassPlan Number="31">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 31</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2202,7 +2171,6 @@ o NOTES:
         <PassPlan Number="32">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 32</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2218,7 +2186,6 @@ o NOTES:
         <PassPlan Number="33">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 33</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2234,7 +2201,6 @@ o NOTES:
         <PassPlan Number="34">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 34</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2250,7 +2216,6 @@ o NOTES:
         <PassPlan Number="35">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 35</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2266,7 +2231,6 @@ o NOTES:
         <PassPlan Number="36">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 36</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2282,7 +2246,6 @@ o NOTES:
         <PassPlan Number="37">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 37</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2298,7 +2261,6 @@ o NOTES:
         <PassPlan Number="38">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 38</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2314,7 +2276,6 @@ o NOTES:
         <PassPlan Number="39">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 39</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2330,7 +2291,6 @@ o NOTES:
         <PassPlan Number="40">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 40</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2346,7 +2306,6 @@ o NOTES:
         <PassPlan Number="41">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 41</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2362,7 +2321,6 @@ o NOTES:
         <PassPlan Number="42">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 42</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2378,7 +2336,6 @@ o NOTES:
         <PassPlan Number="43">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 43</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2394,7 +2351,6 @@ o NOTES:
         <PassPlan Number="44">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 44</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2410,7 +2366,6 @@ o NOTES:
         <PassPlan Number="45">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 45</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2426,7 +2381,6 @@ o NOTES:
         <PassPlan Number="46">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 46</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2442,7 +2396,6 @@ o NOTES:
         <PassPlan Number="47">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 47</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2458,7 +2411,6 @@ o NOTES:
         <PassPlan Number="48">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 48</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2474,7 +2426,6 @@ o NOTES:
         <PassPlan Number="49">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 49</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2490,7 +2441,6 @@ o NOTES:
         <PassPlan Number="50">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 50</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2506,7 +2456,6 @@ o NOTES:
         <PassPlan Number="51">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 51</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2522,7 +2471,6 @@ o NOTES:
         <PassPlan Number="52">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 52</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2538,7 +2486,6 @@ o NOTES:
         <PassPlan Number="53">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 53</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2554,7 +2501,6 @@ o NOTES:
         <PassPlan Number="54">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 54</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2570,7 +2516,6 @@ o NOTES:
         <PassPlan Number="55">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 55</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2586,7 +2531,6 @@ o NOTES:
         <PassPlan Number="56">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 56</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2602,7 +2546,6 @@ o NOTES:
         <PassPlan Number="57">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 57</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2618,7 +2561,6 @@ o NOTES:
         <PassPlan Number="58">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 58</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2634,7 +2576,6 @@ o NOTES:
         <PassPlan Number="59">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 59</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2650,7 +2591,6 @@ o NOTES:
         <PassPlan Number="60">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 60</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2666,7 +2606,6 @@ o NOTES:
         <PassPlan Number="61">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 61</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2682,7 +2621,6 @@ o NOTES:
         <PassPlan Number="62">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 62</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2698,7 +2636,6 @@ o NOTES:
         <PassPlan Number="63">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 63</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2714,7 +2651,6 @@ o NOTES:
         <PassPlan Number="64">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 64</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2730,7 +2666,6 @@ o NOTES:
         <PassPlan Number="65">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 65</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2746,7 +2681,6 @@ o NOTES:
         <PassPlan Number="66">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 66</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2762,7 +2696,6 @@ o NOTES:
         <PassPlan Number="67">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 67</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2778,7 +2711,6 @@ o NOTES:
         <PassPlan Number="68">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 68</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2794,7 +2726,6 @@ o NOTES:
         <PassPlan Number="69">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 69</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2810,7 +2741,6 @@ o NOTES:
         <PassPlan Number="70">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 70</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2826,7 +2756,6 @@ o NOTES:
         <PassPlan Number="71">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 71</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2842,7 +2771,6 @@ o NOTES:
         <PassPlan Number="72">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 72</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2858,7 +2786,6 @@ o NOTES:
         <PassPlan Number="73">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 73</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2874,7 +2801,6 @@ o NOTES:
         <PassPlan Number="74">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 74</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2890,7 +2816,6 @@ o NOTES:
         <PassPlan Number="75">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 75</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2906,7 +2831,6 @@ o NOTES:
         <PassPlan Number="76">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 76</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2922,7 +2846,6 @@ o NOTES:
         <PassPlan Number="77">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 77</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2938,7 +2861,6 @@ o NOTES:
         <PassPlan Number="78">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 78</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2954,7 +2876,6 @@ o NOTES:
         <PassPlan Number="79">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 79</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2970,7 +2891,6 @@ o NOTES:
         <PassPlan Number="80">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 80</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -2986,7 +2906,6 @@ o NOTES:
         <PassPlan Number="81">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 81</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -3002,7 +2921,6 @@ o NOTES:
         <PassPlan Number="82">
             <Label>CAR171.2</Label>
             <TargetSelection>Fixed: 82</TargetSelection>
-            <ReferenceCoords></ReferenceCoords>
             <Observation>
                 <Target></Target>
                 <Sector>NONE</Sector>
@@ -3021,574 +2939,574 @@ o NOTES:
         <SurveyPlanStep uid="2c46693f">
             <PassPlan>1</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="142.67953710251396 Degrees" OrientMax="142.67953710251396 Degrees"/>
+                <OrientRange OrientMin="174.17748272926755 Degrees" OrientMax="174.17748272926755 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="507e1bba">
             <PassPlan>2</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="142.63125079442796 Degrees" OrientMax="142.63125079442796 Degrees"/>
+                <OrientRange OrientMin="174.17471899710802 Degrees" OrientMax="174.17471899710802 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="a548582c">
             <PassPlan>3</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="142.59622465145475 Degrees" OrientMax="142.59622465145475 Degrees"/>
+                <OrientRange OrientMin="174.43629966243347 Degrees" OrientMax="174.43629966243347 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="1f92f306">
             <PassPlan>4</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="142.56853325675297 Degrees" OrientMax="142.56853325675297 Degrees"/>
+                <OrientRange OrientMin="174.3679494529384 Degrees" OrientMax="174.3679494529384 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="37faec33">
             <PassPlan>5</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="154.3391008776705 Degrees" OrientMax="154.3391008776705 Degrees"/>
+                <OrientRange OrientMin="187.78828939604892 Degrees" OrientMax="187.78828939604892 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="1ec4ce16">
             <PassPlan>6</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="154.38014293645676 Degrees" OrientMax="154.38014293645676 Degrees"/>
+                <OrientRange OrientMin="188.13234253355753 Degrees" OrientMax="188.13234253355753 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="708737a8">
             <PassPlan>7</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="142.67953710251396 Degrees" OrientMax="142.67953710251396 Degrees"/>
+                <OrientRange OrientMin="174.17748272926755 Degrees" OrientMax="174.17748272926755 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="5051e329">
             <PassPlan>8</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="142.63125079442796 Degrees" OrientMax="142.63125079442796 Degrees"/>
+                <OrientRange OrientMin="174.17471899710802 Degrees" OrientMax="174.17471899710802 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="2649ee41">
             <PassPlan>9</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="142.59622465145475 Degrees" OrientMax="142.59622465145475 Degrees"/>
+                <OrientRange OrientMin="174.43629966243347 Degrees" OrientMax="174.43629966243347 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="ac8539f7">
             <PassPlan>10</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="142.56853325675297 Degrees" OrientMax="142.56853325675297 Degrees"/>
+                <OrientRange OrientMin="174.3679494529384 Degrees" OrientMax="174.3679494529384 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="d0d69558">
             <PassPlan>11</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="154.3391008776705 Degrees" OrientMax="154.3391008776705 Degrees"/>
+                <OrientRange OrientMin="187.78828939604892 Degrees" OrientMax="187.78828939604892 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="7a66cebe">
             <PassPlan>12</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="154.38014293645676 Degrees" OrientMax="154.38014293645676 Degrees"/>
+                <OrientRange OrientMin="188.13234253355753 Degrees" OrientMax="188.13234253355753 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="e3772aa7">
             <PassPlan>13</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="158.22514198825647 Degrees" OrientMax="158.22514198825647 Degrees"/>
+                <OrientRange OrientMin="126.59344998907942 Degrees" OrientMax="126.59344998907942 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="bbd9c3a3">
             <PassPlan>14</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="160.27424017134857 Degrees" OrientMax="160.27424017134857 Degrees"/>
+                <OrientRange OrientMin="122.57491914864474 Degrees" OrientMax="122.57491914864474 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="f9bc5887">
             <PassPlan>15</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="154.83841053235335 Degrees" OrientMax="154.83841053235335 Degrees"/>
+                <OrientRange OrientMin="115.26767327758938 Degrees" OrientMax="115.26767327758938 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="4eec3ef9">
             <PassPlan>16</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="145.18359218153768 Degrees" OrientMax="145.18359218153768 Degrees"/>
+                <OrientRange OrientMin="111.13683369296368 Degrees" OrientMax="111.13683369296368 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="e5c2806b">
             <PassPlan>17</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="145.9883845907237 Degrees" OrientMax="145.9883845907237 Degrees"/>
+                <OrientRange OrientMin="114.9222429437382 Degrees" OrientMax="114.9222429437382 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="7e2e6153">
             <PassPlan>18</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="153.47214669975793 Degrees" OrientMax="153.47214669975793 Degrees"/>
+                <OrientRange OrientMin="123.34302561797016 Degrees" OrientMax="123.34302561797016 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="54178c93">
             <PassPlan>19</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="159.60996635121396 Degrees" OrientMax="159.60996635121396 Degrees"/>
+                <OrientRange OrientMin="126.84244043550696 Degrees" OrientMax="126.84244043550696 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="b8b78c6f">
             <PassPlan>20</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="160.84108970394502 Degrees" OrientMax="160.84108970394502 Degrees"/>
+                <OrientRange OrientMin="124.80127785483504 Degrees" OrientMax="124.80127785483504 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="74f697f5">
             <PassPlan>21</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="153.54754107825903 Degrees" OrientMax="153.54754107825903 Degrees"/>
+                <OrientRange OrientMin="120.4280127258984 Degrees" OrientMax="120.4280127258984 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="f3e7602e">
             <PassPlan>22</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="153.80559014424503 Degrees" OrientMax="153.80559014424503 Degrees"/>
+                <OrientRange OrientMin="118.70700987353383 Degrees" OrientMax="118.70700987353383 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="75dcc44a">
             <PassPlan>23</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="152.31118689789812 Degrees" OrientMax="152.31118689789812 Degrees"/>
+                <OrientRange OrientMin="118.46623101356452 Degrees" OrientMax="118.46623101356452 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="38b1bb23">
             <PassPlan>24</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="152.3187236413854 Degrees" OrientMax="152.3187236413854 Degrees"/>
+                <OrientRange OrientMin="118.37194915461563 Degrees" OrientMax="118.37194915461563 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="1354b1be">
             <PassPlan>25</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="152.34374322808648 Degrees" OrientMax="152.34374322808648 Degrees"/>
+                <OrientRange OrientMin="118.54444364874342 Degrees" OrientMax="118.54444364874342 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="716825e2">
             <PassPlan>26</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="152.35747319752704 Degrees" OrientMax="152.35747319752704 Degrees"/>
+                <OrientRange OrientMin="118.354036012828 Degrees" OrientMax="118.354036012828 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="2a751136">
             <PassPlan>27</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="157.8538158613464 Degrees" OrientMax="157.8538158613464 Degrees"/>
+                <OrientRange OrientMin="126.54009968343244 Degrees" OrientMax="126.54009968343244 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="7bbc1d87">
             <PassPlan>28</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="158.01320572054192 Degrees" OrientMax="158.01320572054192 Degrees"/>
+                <OrientRange OrientMin="126.59544172836264 Degrees" OrientMax="126.59544172836264 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="446292ab">
             <PassPlan>29</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="158.17314877345893 Degrees" OrientMax="158.17314877345893 Degrees"/>
+                <OrientRange OrientMin="126.65132374080484 Degrees" OrientMax="126.65132374080484 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="ade3aff1">
             <PassPlan>30</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="158.33558406005696 Degrees" OrientMax="158.33558406005696 Degrees"/>
+                <OrientRange OrientMin="126.70843313056874 Degrees" OrientMax="126.70843313056874 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="e84dfefa">
             <PassPlan>31</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="158.49956472169197 Degrees" OrientMax="158.49956472169197 Degrees"/>
+                <OrientRange OrientMin="126.76645039098972 Degrees" OrientMax="126.76645039098972 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="6e47258c">
             <PassPlan>32</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="158.661119569452 Degrees" OrientMax="158.661119569452 Degrees"/>
+                <OrientRange OrientMin="126.82396766256754 Degrees" OrientMax="126.82396766256754 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="1e70a8ae">
             <PassPlan>33</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="158.8312052140571 Degrees" OrientMax="158.8312052140571 Degrees"/>
+                <OrientRange OrientMin="126.88490655150328 Degrees" OrientMax="126.88490655150328 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="8926576c">
             <PassPlan>34</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="159.6090480004977 Degrees" OrientMax="159.6090480004977 Degrees"/>
+                <OrientRange OrientMin="126.84146510896691 Degrees" OrientMax="126.84146510896691 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="a0ea8ff0">
             <PassPlan>35</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="159.18461159958542 Degrees" OrientMax="159.18461159958542 Degrees"/>
+                <OrientRange OrientMin="126.80853623066125 Degrees" OrientMax="126.80853623066125 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="331b80c2">
             <PassPlan>36</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="159.95105971608308 Degrees" OrientMax="159.95105971608308 Degrees"/>
+                <OrientRange OrientMin="126.51836314899002 Degrees" OrientMax="126.51836314899002 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="ca30d8e3">
             <PassPlan>37</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="160.54623608171 Degrees" OrientMax="160.54623608171 Degrees"/>
+                <OrientRange OrientMin="127.21470789211884 Degrees" OrientMax="127.21470789211884 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="bcdb2df4">
             <PassPlan>38</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="160.0300629907587 Degrees" OrientMax="160.0300629907587 Degrees"/>
+                <OrientRange OrientMin="127.41422868692769 Degrees" OrientMax="127.41422868692769 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="183334fe">
             <PassPlan>39</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="159.53859352818412 Degrees" OrientMax="159.53859352818412 Degrees"/>
+                <OrientRange OrientMin="127.29551133573672 Degrees" OrientMax="127.29551133573672 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="c083f7ed">
             <PassPlan>40</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="159.60958323356732 Degrees" OrientMax="159.60958323356732 Degrees"/>
+                <OrientRange OrientMin="126.12007318252331 Degrees" OrientMax="126.12007318252331 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="fed521a4">
             <PassPlan>41</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="159.1421678378861 Degrees" OrientMax="159.1421678378861 Degrees"/>
+                <OrientRange OrientMin="126.25253970048902 Degrees" OrientMax="126.25253970048902 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="2eb66991">
             <PassPlan>42</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="158.75851477418811 Degrees" OrientMax="158.75851477418811 Degrees"/>
+                <OrientRange OrientMin="126.23740864882318 Degrees" OrientMax="126.23740864882318 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="5d23a565">
             <PassPlan>43</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="160.33137960952786 Degrees" OrientMax="160.33137960952786 Degrees"/>
+                <OrientRange OrientMin="127.36212041078022 Degrees" OrientMax="127.36212041078022 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="d3decd59">
             <PassPlan>44</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="159.78059011214845 Degrees" OrientMax="159.78059011214845 Degrees"/>
+                <OrientRange OrientMin="126.67551497155765 Degrees" OrientMax="126.67551497155765 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="4dbb9541">
             <PassPlan>45</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="159.3925455412698 Degrees" OrientMax="159.3925455412698 Degrees"/>
+                <OrientRange OrientMin="126.21155414890416 Degrees" OrientMax="126.21155414890416 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="12e77c93">
             <PassPlan>46</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="161.12773621811334 Degrees" OrientMax="161.12773621811334 Degrees"/>
+                <OrientRange OrientMin="126.88189724570935 Degrees" OrientMax="126.88189724570935 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="2c355aea">
             <PassPlan>47</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="160.4089208035269 Degrees" OrientMax="160.4089208035269 Degrees"/>
+                <OrientRange OrientMin="126.1101169129963 Degrees" OrientMax="126.1101169129963 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="7cfb6614">
             <PassPlan>48</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="160.0350855287167 Degrees" OrientMax="160.0350855287167 Degrees"/>
+                <OrientRange OrientMin="125.71521924544642 Degrees" OrientMax="125.71521924544642 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="9cf71f90">
             <PassPlan>49</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="160.84005127456243 Degrees" OrientMax="160.84005127456243 Degrees"/>
+                <OrientRange OrientMin="124.80019014449688 Degrees" OrientMax="124.80019014449688 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="ba877f34">
             <PassPlan>50</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="160.72068478940284 Degrees" OrientMax="160.72068478940284 Degrees"/>
+                <OrientRange OrientMin="124.1408587234316 Degrees" OrientMax="124.1408587234316 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="3df55eb1">
             <PassPlan>51</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="160.6357621160468 Degrees" OrientMax="160.6357621160468 Degrees"/>
+                <OrientRange OrientMin="125.39959438392772 Degrees" OrientMax="125.39959438392772 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="648f5830">
             <PassPlan>52</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="161.3230697812525 Degrees" OrientMax="161.3230697812525 Degrees"/>
+                <OrientRange OrientMin="126.06501052920906 Degrees" OrientMax="126.06501052920906 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="a3524639">
             <PassPlan>53</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="161.4286117085414 Degrees" OrientMax="161.4286117085414 Degrees"/>
+                <OrientRange OrientMin="125.26736764983258 Degrees" OrientMax="125.26736764983258 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="fd759217">
             <PassPlan>54</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="161.23946166542967 Degrees" OrientMax="161.23946166542967 Degrees"/>
+                <OrientRange OrientMin="124.53273601705932 Degrees" OrientMax="124.53273601705932 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="20885043">
             <PassPlan>55</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="160.24068129317004 Degrees" OrientMax="160.24068129317004 Degrees"/>
+                <OrientRange OrientMin="125.02772353316335 Degrees" OrientMax="125.02772353316335 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="72812294">
             <PassPlan>56</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="160.23163522917517 Degrees" OrientMax="160.23163522917517 Degrees"/>
+                <OrientRange OrientMin="124.28775936924684 Degrees" OrientMax="124.28775936924684 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="6dc1877e">
             <PassPlan>57</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="160.11547200028943 Degrees" OrientMax="160.11547200028943 Degrees"/>
+                <OrientRange OrientMin="123.6826993428855 Degrees" OrientMax="123.6826993428855 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="d7dcaba6">
             <PassPlan>58</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="161.4234472797921 Degrees" OrientMax="161.4234472797921 Degrees"/>
+                <OrientRange OrientMin="125.72816523069038 Degrees" OrientMax="125.72816523069038 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="9ace3291">
             <PassPlan>59</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="160.7318327051165 Degrees" OrientMax="160.7318327051165 Degrees"/>
+                <OrientRange OrientMin="125.109586353376 Degrees" OrientMax="125.109586353376 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="c1469cd6">
             <PassPlan>60</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="160.26116150338487 Degrees" OrientMax="160.26116150338487 Degrees"/>
+                <OrientRange OrientMin="124.682319828408 Degrees" OrientMax="124.682319828408 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="b02b9456">
             <PassPlan>61</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="152.3084986226636 Degrees" OrientMax="152.3084986226636 Degrees"/>
+                <OrientRange OrientMin="118.50036427668124 Degrees" OrientMax="118.50036427668124 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="d55371ad">
             <PassPlan>62</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="152.30983941731816 Degrees" OrientMax="152.30983941731816 Degrees"/>
+                <OrientRange OrientMin="118.48330602210224 Degrees" OrientMax="118.48330602210224 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="9a95545e">
             <PassPlan>63</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="152.31118689789812 Degrees" OrientMax="152.31118689789812 Degrees"/>
+                <OrientRange OrientMin="118.46623101356452 Degrees" OrientMax="118.46623101356452 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="30f59441">
             <PassPlan>64</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="152.3125410763988 Degrees" OrientMax="152.3125410763988 Degrees"/>
+                <OrientRange OrientMin="118.44913922581571 Degrees" OrientMax="118.44913922581571 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="74e34cec">
             <PassPlan>65</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="152.31390196485307 Degrees" OrientMax="152.31390196485307 Degrees"/>
+                <OrientRange OrientMin="118.43203063356124 Degrees" OrientMax="118.43203063356124 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="6b6fc6be">
             <PassPlan>66</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="152.30829938540626 Degrees" OrientMax="152.30829938540626 Degrees"/>
+                <OrientRange OrientMin="118.4637672597921 Degrees" OrientMax="118.4637672597921 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="6bd47c4c">
             <PassPlan>67</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="152.30908689393218 Degrees" OrientMax="152.30908689393218 Degrees"/>
+                <OrientRange OrientMin="118.4644391796875 Degrees" OrientMax="118.4644391796875 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="da85a344">
             <PassPlan>68</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="152.30987439861906 Degrees" OrientMax="152.30987439861906 Degrees"/>
+                <OrientRange OrientMin="118.46511110929664 Degrees" OrientMax="118.46511110929664 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="8b193f95">
             <PassPlan>69</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="152.31079314923434 Degrees" OrientMax="152.31079314923434 Degrees"/>
+                <OrientRange OrientMin="118.46589503945096 Degrees" OrientMax="118.46589503945096 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="50a288ce">
             <PassPlan>70</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="152.31158064560188 Degrees" OrientMax="152.31158064560188 Degrees"/>
+                <OrientRange OrientMin="118.46656699010649 Degrees" OrientMax="118.46656699010649 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="a8491ce3">
             <PassPlan>71</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="152.31249938651024 Degrees" OrientMax="152.31249938651024 Degrees"/>
+                <OrientRange OrientMin="118.46735094481498 Degrees" OrientMax="118.46735094481498 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="8745942c">
             <PassPlan>72</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="152.3132868745566 Degrees" OrientMax="152.3132868745566 Degrees"/>
+                <OrientRange OrientMin="118.4680229165169 Degrees" OrientMax="118.4680229165169 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="3e7aed13">
             <PassPlan>73</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="152.31407435876193 Degrees" OrientMax="152.31407435876193 Degrees"/>
+                <OrientRange OrientMin="118.46869489793258 Degrees" OrientMax="118.46869489793258 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="84eaa7e6">
             <PassPlan>74</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="152.34404847688592 Degrees" OrientMax="152.34404847688592 Degrees"/>
+                <OrientRange OrientMin="118.54063033538128 Degrees" OrientMax="118.54063033538128 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="b8866fe1">
             <PassPlan>75</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="152.35018057326076 Degrees" OrientMax="152.35018057326076 Degrees"/>
+                <OrientRange OrientMin="118.54790959281726 Degrees" OrientMax="118.54790959281726 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="43c6173e">
             <PassPlan>76</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="152.34987434264812 Degrees" OrientMax="152.34987434264812 Degrees"/>
+                <OrientRange OrientMin="118.5517218963145 Degrees" OrientMax="118.5517218963145 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="fe30bcc8">
             <PassPlan>77</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="152.34343831572818 Degrees" OrientMax="152.34343831572818 Degrees"/>
+                <OrientRange OrientMin="118.5482561239398 Degrees" OrientMax="118.5482561239398 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="5b8de5c1">
             <PassPlan>78</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="152.33730687090974 Degrees" OrientMax="152.33730687090974 Degrees"/>
+                <OrientRange OrientMin="118.54097870423112 Degrees" OrientMax="118.54097870423112 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="57663a67">
             <PassPlan>79</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="152.33761080136566 Degrees" OrientMax="152.33761080136566 Degrees"/>
+                <OrientRange OrientMin="118.53716521950078 Degrees" OrientMax="118.53716521950078 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="a283e388">
             <PassPlan>80</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="152.34404847688592 Degrees" OrientMax="152.34404847688592 Degrees"/>
+                <OrientRange OrientMin="118.54063033538128 Degrees" OrientMax="118.54063033538128 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="b162ee95">
             <PassPlan>81</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="152.1283824701913 Degrees" OrientMax="152.1283824701913 Degrees"/>
+                <OrientRange OrientMin="118.21189217501744 Degrees" OrientMax="118.21189217501744 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
         <SurveyPlanStep uid="2477a6d7">
             <PassPlan>82</PassPlan>
             <SpecialRequirements>
-                <OrientRange OrientMin="152.12192528807486 Degrees" OrientMax="152.12192528807486 Degrees"/>
+                <OrientRange OrientMin="118.30344040852192 Degrees" OrientMax="118.30344040852192 Degrees"/>
             </SpecialRequirements>
             <ToolData/>
         </SurveyPlanStep>
@@ -3749,8 +3667,8 @@ o NOTES:
     </Activities>
     <ExecutionPlans/>
     <Cycles>
-        <CycleInfo CycleNumber="0" StartDate="2026-06-30 00:00:00" EndDate="2027-04-01 00:00:00" Active="true"/>
-        <CycleInfo CycleNumber="1" StartDate="2026-11-01 00:00:00" EndDate="2029-04-01 00:00:00" Active="true"/>
+        <CycleInfo CycleNumber="0" StartDate="2026-06-30 00:00:00" EndDate="2027-02-27 23:59:59" Active="true"/>
+        <CycleInfo CycleNumber="1" StartDate="2026-09-28 00:00:00" EndDate="2029-02-28 00:00:00" Active="true"/>
     </Cycles>
     <ProgramHistory>
         <HistoryEntry Date="Wed Apr 01 18:54:50 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Draft" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA_DEVEL/Untitled.apt"/>
@@ -3845,20 +3763,30 @@ o NOTES:
         <HistoryEntry Date="Tue May 12 18:33:06 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Approved" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA/notebooks/CAR171/CAR171.apt"/>
         <HistoryEntry Date="Tue May 12 18:33:31 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Approved" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA/notebooks/CAR171/CAR171.apt"/>
         <HistoryEntry Date="Tue May 12 18:35:38 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Approved" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA/notebooks/CAR171/CAR171.apt"/>
-        <HistoryEntry Date="Fri Jun 05 23:22:37 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Approved" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA/notebooks/CAR171/CAR171_orient.apt"/>
-        <HistoryEntry Date="Fri Jun 05 23:22:40 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Approved" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA/notebooks/CAR171/CAR171_orient.apt"/>
-        <HistoryEntry Date="Fri Jun 05 23:22:41 GMT 2026" APTVersion="Version 2026.2.1  " SchemaVersion="29" ProgramPhase="Approved" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA/notebooks/CAR171/CAR171_orient.apt"/>
+        <HistoryEntry Date="Sat Sep 26 02:34:58 GMT 2026" APTVersion="Version 2026.4.3  " SchemaVersion="31" ProgramPhase="Approved" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA/notebooks/CAR171/CAR171_orient.apt"/>
+        <HistoryEntry Date="Sat Sep 26 02:40:28 GMT 2026" APTVersion="Version 2026.4.3  " SchemaVersion="31" ProgramPhase="Approved" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA/notebooks/CAR171/CAR171_orient.apt"/>
+        <HistoryEntry Date="Sat Sep 26 02:40:38 GMT 2026" APTVersion="Version 2026.4.3  " SchemaVersion="31" ProgramPhase="Approved" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA/notebooks/CAR171/CAR171_orient.apt"/>
+        <HistoryEntry Date="Sat Sep 26 02:40:39 GMT 2026" APTVersion="Version 2026.4.3  " SchemaVersion="31" ProgramPhase="Approved" User="aborlaff" Platform="Mac OS X - aarch64" FileLocation="/Users/aborlaff/NASA/ROSALIA/notebooks/CAR171/CAR171_orient.apt"/>
     </ProgramHistory>
     <ToolData>
         <ToolData Name="Phase2SubmissionData">
-            <ToolValue Name="AptVersion">Version 2026.2.1  </ToolValue>
+            <ToolValue Name="AptVersion">Version 2026.4.3  </ToolValue>
             <ToolValue Name="Cycle">0</ToolValue>
             <ToolValue Name="ErrorText"></ToolValue>
             <ToolValue Name="HasErrors">false</ToolValue>
             <ToolValue Name="NotificationAddress">a.s.borlaff@nasa.gov</ToolValue>
             <ToolValue Name="Phase2DiagnosticJustification">There is one author to be included in the program. Alejandro Serrano Borlaff (NASA/Ames) a.s.borlaff@nasa.gov
 </ToolValue>
-            <ToolValue Name="SubmissionComments">v1.2: June 5th, 2026. A.S.Borlaff - NASA/ARC
+            <ToolValue Name="SubmissionComments">v1.4, September 26th, 2026. A.S.Borlaff - NASA/ARC
+- Resubmission with APT 2026.4.3.
+- Updating the pointings with new approximate date for observations. Assuming 2026-10-28T00:00:00.0
+- Build with ROSALIA 1.3.2 - beta 'mosaic_tests' 390f0ff1bb062e373607cded53488f800ca92112
+
+
+v1.3, June 18th, 2026. A.S.Borlaff - NASA/ARC
+- Resubmission with APT 2026.4. No changes from 1.2. 
+
+v1.2: June 5th, 2026. A.S.Borlaff - NASA/ARC
 - Automatic updating of coordinates and APT based on ROSALIA/WFS: https://rosalia.readthedocs.io/en/latest/commissioning.html
 - ROSALIA now uses exposure class instead of rosalia_stray method. Bug fixed that led to a several arcmin mismatch of the WFICEN in the simulated exposures. 
 
@@ -3866,20 +3794,20 @@ v.1.1: April 3rd 2026, A.S.Borlaff - NASA/ARC
 - PAV3 bug fixed. RA DEC PAV3 calculated for Dec 1st, 2026. 
 
 v.1.0: April 3rd 2026, A.S.Borlaff - NASA/ARC 
-- WARNING: All the observations in this APT require specific V3PA angles. There is a discrepancy between the internally calculated V3PA angles and the scheduling windows calculated by the APT. This is being investigated in the Roman HelpDesk INC0221379.</ToolValue>
-            <ToolValue Name="SubmissionCommentsCheckSum">-146895815</ToolValue>
-            <ToolValue Name="SubmissionCounter">4</ToolValue>
+- WARNING: All the observations in this APT require specific V3PA angles. There is a discrepancy between the internally calculated V3PA angles and the scheduling windows calculated by the APT. This is being investigated in the Roman HelpDesk INC022</ToolValue>
+            <ToolValue Name="SubmissionCommentsCheckSum">1477784335</ToolValue>
+            <ToolValue Name="SubmissionCounter">6</ToolValue>
             <ToolValue Name="SubmissionLog">----- Attempting Submission 1 (Fri Apr 03 23:17:07 GMT 2026) -----
 Roman Approved Proposal 1023 successfully submitted.
 Receipt: # 1023-1
 
 ----- Attempting Submission 2 (Sat Apr 04 00:11:27 GMT 2026) -----
 
------ Attempting Submission 4 (Fri Jun 05 23:22:40 GMT 2026) -----
+----- Attempting Submission 6 (Sat Sep 26 02:40:38 GMT 2026) -----
 Roman Approved Proposal 1023 successfully submitted.
-Receipt: # 1023-4</ToolValue>
+Receipt: # 1023-6</ToolValue>
             <ToolValue Name="SubmissionMode"></ToolValue>
-            <ToolValue Name="SubmissionSuccessCounter">4</ToolValue>
+            <ToolValue Name="SubmissionSuccessCounter">6</ToolValue>
             <ToolData Name="SystemInformation">
                 <ToolValue Name="Runtime.maxMemory">6000</ToolValue>
                 <ToolValue Name="java.version">21.0.3</ToolValue>
@@ -3887,8 +3815,8 @@ Receipt: # 1023-4</ToolValue>
                 <ToolValue Name="linux.version">not available</ToolValue>
                 <ToolValue Name="os.arch">aarch64</ToolValue>
                 <ToolValue Name="os.name">Mac OS X</ToolValue>
-                <ToolValue Name="os.version">26.5.1</ToolValue>
-                <ToolValue Name="screens">1728x1117,2560x1440,2560x1440</ToolValue>
+                <ToolValue Name="os.version">26.7</ToolValue>
+                <ToolValue Name="screens">1728x1117,2560x1440</ToolValue>
             </ToolData>
         </ToolData>
         <ToolData Name="SubmissionData">

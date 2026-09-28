@@ -459,7 +459,7 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
 
     # Initialize the minimal storage arrays: straylight, mainoffender, ra, dec
     straylight_total   = np.zeros((n_subarrays,)).astype(np.float32) 
-    mainoffender_total = np.zeros((n_subarrays,)).astype(np.float32) 
+    mainoffender_total = np.zeros((n_subarrays,)).astype(np.int32) 
 
     xmid = subarray_locations_db["xmid"]
     ymid = subarray_locations_db["ymid"]
@@ -539,7 +539,7 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
 
         else:
             stray_main_offender_level_1 = 0
-            straylight_level_1 = np.array([0/u.s])
+            straylight_level_1 = np.array([0])/u.s
             id_main_offender_level_1 = 0
             where_max_stray = 0
             source_id_main_offender_level_1 = None
@@ -572,7 +572,7 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
             # max_NDI_level_2 = NDI_level_2[where_max_stray]
 
         else:
-            straylight_level_2 = np.array([0/u.s])
+            straylight_level_2 = np.array([0])/u.s
             id_main_offender_level_2 = 0
             stray_main_offender_level_2 = 0
             where_max_stray = 0
@@ -606,7 +606,7 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
             # max_NDI_level_3 = NDI_level_3[where_max_stray]
 
         else:
-            straylight_level_3 = np.array([0/u.s])#
+            straylight_level_3 = np.array([0])/u.s
             id_main_offender_level_3 = 0
             stray_main_offender_level_3 = 0
             where_max_stray = 0

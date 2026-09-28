@@ -110,7 +110,7 @@ class exposure():
                 self.FILTER_IDENTITY = rs.telescopes.find_filter_in_svo(wavelength=telescope["FILTER_PARAMS"]["NAME"],
                                                                         telescope=telescope["FILTER_PARAMS"]["TELESCOPE"],
                                                                         instrument=telescope["FILTER_PARAMS"]["INSTRUMENT"],
-                                                                        detector=telescope["FILTER_PARAMS"]["DETECTOR"], verbose=False)
+                                                                        detector=telescope["FILTER_PARAMS"]["DETECTOR"], verbose=verbose)
                 # self.XYZ_HELIO_POS = exposure_identity['XYZ_HELIO_POS']
 
 
@@ -136,6 +136,7 @@ class exposure():
 
         if filename is not None:
             exposure_identity = rs.inspector.exposure_inspector(filename, lite=False)
+            
             self.DATA = exposure_identity['DATA']
             self.FILENAME = exposure_identity['FILENAME']
             self.TELESCOP = exposure_identity['TELESCOP']
@@ -148,10 +149,12 @@ class exposure():
             self.EXPMID = (Time(self.EXPSTART, format="mjd") + self.EXPTIME*u.s/2).mjd
             self.EXPEND = (Time(self.EXPSTART, format="mjd") + self.EXPTIME*u.s).mjd
             self.BUNIT = exposure_identity['BUNIT']
-            self.PHOTOMETRY = exposure_identity['photometry']
+            self.conversion_megajanskys = exposure_identity['conversion_megajanskys']
+            self.conversion_megajanskys_uncertainty = exposure_identity['conversion_megajanskys_uncertainty']
+            self.pixel_area = exposure_identity['pixel_area']
             self.EXPSTART_ISOT = exposure_identity['EXPSTART_ISOT']
             self.PA = exposure_identity['PA']
-            # self.SCA = exposure_identity['SCA']
+            self.SCA = exposure_identity['SCA']
             # self.HST_TYPE = exposure_identity['HST_TYPE']
             self.FILTER = exposure_identity['FILTER']
             self.FILTER_IDENTITY = exposure_identity['FILTER_IDENTITY']
@@ -161,11 +164,41 @@ class exposure():
             self.DATA_SHAPE = exposure_identity['DATA_SHAPE']
             self.ASTROPYWCS = exposure_identity['ASTROPYWCS']
             self.FILETYPE = exposure_identity['FILETYPE']
+
+            # If the number of SCIEXTS is larger than 1: 
+            if isinstance(self.SCIEXTS, (list,)): 
+                # Simplify the attributes that are supposed to be constant across the exposure. 
+                if len(list(set(self.TELESCOP))) == 1: self.TELESCOP = self.TELESCOP[0]
+                if len(list(set(self.INSTRUME))) == 1: self.INSTRUME = self.INSTRUME[0]
+                if len(list(set(self.DETECTOR))) == 1: self.DETECTOR = self.DETECTOR[0]
+                if len(list(set(self.RA_TARG))) == 1: self.RA_TARG = self.RA_TARG[0]
+                if len(list(set(self.DEC_TARG))) == 1: self.DEC_TARG = self.DEC_TARG[0]
+                if len(list(set(self.FILTER))) == 1: self.FILTER = self.FILTER[0]
+                # Check if all dictionaries in the list are identical copies
+                are_all_FILTERS_same = not self.FILTER_IDENTITY or rs.inspector.are_all_dicts_equal(self.FILTER_IDENTITY)
+                if are_all_FILTERS_same: self.FILTER_IDENTITY = self.FILTER_IDENTITY[0] 
+                #print(self.FILTER_IDENTITY[0])
+                if len(list(set(self.EXPSTART_ISOT))) == 1: self.EXPSTART_ISOT = self.EXPSTART_ISOT[0] 
+                if len(list(set(self.EXPSTART))) == 1: self.EXPSTART = self.EXPSTART[0] 
+                if len(list(set(self.EXPTIME))) == 1: self.EXPTIME = self.EXPTIME[0] 
+                if len(list(set(self.EXPMID))) == 1: self.EXPMID = self.EXPMID[0] 
+                if len(list(set(self.EXPEND))) == 1: self.EXPEND = self.EXPEND[0] 
+
+
+                print("TEMP WARNING: RA_TARG is set to element 0 - This has to be fixed on MAST")
+                print("TEMP WARNING: DEC_TARG is set to element 0 - This has to be fixed on MAST")
+                print("TEMP WARNING: PA is set to element 0 - This has to be fixed on MAST")
+                self.RA_TARG = self.RA_TARG[0]
+                self.DEC_TARG = self.DEC_TARG[0]
+                self.PA = self.PA[0]
+            # --------------------------------------------------------- #
+            self.ROOTNAME = rs.inspector.longest_common_substring(self.FILENAME)
             self.MPC_OBSLOC = rs.horizons.get_mpc_observer_name(self.TELESCOP)
             self.JPL_OBSLOC = rs.horizons.get_jpl_observer_name(self.TELESCOP)
             state_vectors = rs.horizons.get_heliocoords(self.EXPSTART, body=self.TELESCOP) # rs.horizons.interpolate_Roman_state_vectors(self.EXPSTART)
             self.XYZ_HELIO_POS = [state_vectors["x"].to("AU").value[0], state_vectors["y"].to("AU").value[0], state_vectors["z"].to("AU").value[0]]*u.AU # in AU.
-            self.FPA_NEAR_RADIUS = self.get_max_angular_size()
+            self.FPA_NEAR_RADIUS = 0.6 # Temporary fix until 'target.ra' 'target.dec' are fixed -> Switch to self.get_max_angular_size() when done (Borlaff - Sept 23, 2026)
+
 
         self.fits_keywords = {"TELESCOP": self.TELESCOP, "INSTRUME": self.INSTRUME, "DETECTOR": self.DETECTOR, 
             "FILTER": self.FILTER_IDENTITY["wavelength"], 
@@ -177,8 +210,8 @@ class exposure():
             "WAVEMIN": self.FILTER_IDENTITY["filter_lambda_min"].to("Angstrom").value, 
             "WAVEMAX": self.FILTER_IDENTITY["filter_lambda_max"].to("nm").value}
 
-    def roman_wfi_exposure(self, observer, prefix=""):
-        print("> roman_wfi_exposure")
+    def roman_wfi_exposure(self, observer, prefix="", verbose=False):
+        print("> Synthetic Roman_wfi_exposure")
         # Here we expect observer={"TELESCOP": "Roman/WFI", "pointing": [RA_TARG, DEC_TARG], "FILTER":FILTER, "PA_Y": PA_Y, "EXPSTART": EXPSTART, "EXPTIME": EXPTIME}
         # Fixed parameters for Roman/WFI 
         observer['TELESCOP'] = "Roman"
@@ -208,11 +241,12 @@ class exposure():
         self.EXPSTART_ISOT = self.EXPSTART_ASTROPY.isot
         self.MPC_OBSLOC = rs.horizons.get_mpc_observer_name(observer['TELESCOP'])
         self.JPL_OBSLOC = rs.horizons.get_jpl_observer_name(observer['TELESCOP'])
+        self.SCA = rs.telescopes.Roman.WFI_SCAs
 
         self.FILTER_IDENTITY = rs.telescopes.find_filter_in_svo(wavelength=observer["FILTER_PARAMS"]["NAME"],
                                                                 telescope=observer["FILTER_PARAMS"]["TELESCOPE"],
                                                                 instrument=observer["FILTER_PARAMS"]["INSTRUMENT"],
-                                                                detector=observer["FILTER_PARAMS"]["DETECTOR"], verbose=False)
+                                                                detector=observer["FILTER_PARAMS"]["DETECTOR"], verbose=verbose)
         state_vectors = rs.horizons.get_heliocoords(self.EXPSTART, body=self.TELESCOP) # rs.horizons.interpolate_Roman_state_vectors(self.EXPSTART)
         self.XYZ_HELIO_POS = [state_vectors["x"].to("AU").value[0], state_vectors["y"].to("AU").value[0], state_vectors["z"].to("AU").value[0]]*u.AU # in AU. 
 
@@ -220,12 +254,17 @@ class exposure():
             # If the user did not define an output filename, do it for them
             if prefix != "":
                 prefix = prefix + "_"
-            observer["FILENAME"] = os.getcwd() + "/" + prefix + self.TELESCOP +\
+
+            observer["ROOTNAME"] = os.getcwd() + "/" + prefix + self.TELESCOP +\
                                     "_RA_" + '{:07.3f}'.format(self.RA_TARG) +\
                                     "_DEC_" + '{:07.3f}'.format(self.DEC_TARG) +\
                                     "_MJD_" + '{:07.5f}'.format(self.EXPSTART) +\
-                                    "_PA_" + '{:06.2f}'.format(self.PA) + ".fits"
+                                    "_PA_" + '{:06.2f}'.format(self.PA)
+            observer["FILENAME"] = observer["ROOTNAME"] + ".fits"
             self.FILENAME = observer["FILENAME"]
+            self.ROOTNAME = observer["ROOTNAME"]
+
+
 
         central_coords = SkyCoord(self.RA_TARG, self.DEC_TARG, frame="icrs", unit="deg")
 
@@ -239,7 +278,8 @@ class exposure():
         self.ASTROPYWCS = astropywcs_info["ASTROPYWCS"]
         self.DATA_SHAPE = astropywcs_info["DATA_SHAPE"]
         self.PIXSCALE = astropywcs_info["PIXSCALE"]
-        self.FPA_NEAR_RADIUS = self.get_max_angular_size()
+        self.conversion_megajanskys = len(self.SCIEXTS)*[1] # Average value
+        self.FPA_NEAR_RADIUS = 0.6 # Temporary fix until 'target.ra' 'target.dec' are fixed -> Switch to self.get_max_angular_size() when done (Borlaff - Sept 23, 2026)
 
         return(self)
     
@@ -251,11 +291,12 @@ class exposure():
     
 
     def get_max_angular_size(self):
+        # print(self.ASTROPYWCS)
         return(rs.utils.find_max_angular_size_of_image(wcs=self.ASTROPYWCS, ra_cen=self.RA_TARG, dec_cen=self.DEC_TARG))
     
 
     def plot_footprint(self, figsize=(10,10), verbose=True, ax=None, color='red', label=None):
-        print("Hey! plot_footprint")
+        # print("Hey! plot_footprint")
         if verbose: print("Finding ra dec constraints")
         # ra_dec_constraints = rs.gaia.find_ra_dec_constraints(self.RA_TARG, self.DEC_TARG, radius=self.FPA_NEAR_RADIUS, verbose=verbose)
         if verbose: print("Getting detector corners")
@@ -293,9 +334,8 @@ class exposure():
         
 
     def get_source_catalog(self, g_mag_max=15, verbose=False):
-        import pandas as pd
 
-        self.source_catalog_filename = os.path.splitext(os.path.basename(self.FILENAME))[0] + "_source_catalog.csv" #
+        self.source_catalog_filename = os.path.basename(self.ROOTNAME) + "_source_catalog.csv" #
         
         search_radius = 1.5*self.get_max_angular_size()
 
@@ -436,7 +476,7 @@ class exposure():
                                                                 filter=self.FILTER_IDENTITY,
                                                                 catalog=source_catalog,
                                                                 instrument="ACS",
-                                                                verbose=True)
+                                                                verbose=False)
 
             # Now interpolate the skypoints to the original image
 
@@ -471,15 +511,28 @@ class exposure():
         if keywords is None: keywords = self.fits_keywords
 
         headers_output = []
-        for ASTROPYWCS_i in wcs_list:
+        for i in range(len(wcs_list)):
+            ASTROPYWCS_i = wcs_list[i]
             header = ASTROPYWCS_i.to_header()
+
+            if isinstance(keywords["DETECTOR"], (list,)):
+                keywords["DETECTOR"] = rs.inspector.longest_common_substring(self.DETECTOR)
+
             for key in keywords.keys():
                 header[key] = keywords[key]
 
+            header["EXTNAME"] = "SCI"
+            header["SCA"] = self.SCA[i]
+            header["RA_TARG"] = self.RA_TARG
+            header["DEC_TARG"] = self.DEC_TARG
+            header["EXPSTART"] = self.EXPSTART
+            header["EXPEND"] = self.EXPEND
+            header["PA"] = self.PA
+            header["TELESCOP"] = self.TELESCOP
+            header["INSTRUME"] = self.INSTRUME
+
             headers_output.append(header)
 
-
-        
         rs.utils.save_fits(array=data_list, 
                            name=outname, 
                            header=headers_output,
@@ -489,20 +542,39 @@ class exposure():
 
         return(outname)
         
-    def save_drz(self, outname,  data_list=None, wcs_list=None, keywords=None, resolution=1, extname=None, overwrite=True):
+    def save_drz(self, outname, data_list=None, wcs_list=None, keywords=None, resolution=1, extname=None, overwrite=True):
         if data_list is None: data_list = self.DATA
         if wcs_list is None: wcs_list = self.ASTROPYWCS
         if keywords is None: keywords = self.fits_keywords
 
+        if isinstance(keywords["DETECTOR"], (list,)):
+            keywords["DETECTOR"] = rs.inspector.longest_common_substring(self.DETECTOR)
+            
         headers_output = []
-        for ASTROPYWCS_i in wcs_list:
+        for i in range(len(wcs_list)):
+            ASTROPYWCS_i = wcs_list[i]
             header = ASTROPYWCS_i.to_header()
+
+            header["EXTNAME"] = "DRZ"
+            header["RA_TARG"] = self.RA_TARG
+            header["DEC_TARG"] = self.DEC_TARG
+            header["EXPSTART"] = self.EXPSTART
+            header["EXPEND"] = self.EXPEND
+            header["PA"] = self.PA
+            header["TELESCOP"] = self.TELESCOP
+            header["INSTRUME"] = self.INSTRUME
+            header["BUNIT"] = "MJy sr-1"
+
+            keywords["DETECTOR"] = rs.inspector.longest_common_substring(self.DETECTOR)
             for key in keywords.keys():
                 header[key] = keywords[key]
 
             headers_output.append(header)
 
         drz_data, drz_wcs = rs.utils.generate_mosaic(data=data_list, astropywcs=headers_output, resolution=resolution)
+
+
+
         rs.utils.save_fits(array=np.float32(drz_data), name=outname, header=drz_wcs,
                            extname=extname, 
                            overwrite=overwrite, 
@@ -579,7 +651,7 @@ class exposure():
 
         elif self.TELESCOP.lower() == "roman" or self.TELESCOP.lower() == "rst":
             # Find out which stars belong to each detector. 
-            print(datetime.now().isoformat() + " > Fetching catalog")
+            print(datetime.now().isoformat() + " > Fetching source catalog")
 
             if not hasattr(self, 'source_catalog'):
                 if catalog is None:
@@ -622,9 +694,9 @@ class exposure():
                 # 's3://stpubdata/roman/nexus/soc_simulations/tutorial_data/roman-2026.1/r0003201001001001004_0001_wfi01_f106_cal.asdf'
                 self.output_name = self.FILENAME.split("/")[-1].replace(".asdf", "_stray.fits")
             elif "asdf" in self.FILENAME:
-                self.output_name = self.FILENAME.replace(".asdf", "_stray.fits")
+                self.output_name = self.ROOTNAME + "_stray.fits"
             else: 
-                self.output_name = self.FILENAME.replace(".fits", "_stray.fits")
+                self.output_name = self.ROOTNAME + "_stray.fits"
 
             self.main_offender_output_name = self.output_name.replace(".fits", "_main_off.fits")
             self.straylight_db_output_name = self.output_name.replace(".fits", "_db.csv")
@@ -667,7 +739,15 @@ class exposure():
                     )
                     for SCIEXT_i, DATA_SHAPE_i, ASTROPYWCS_i in zip(self.SCIEXTS, self.DATA_SHAPE, self.ASTROPYWCS)
                 ]
+
+                # print(len(inputs))
+                #print(inputs)  
                 results = list(tqdm(executor.map(self._parallel_roman_estimate_straylight_SCA, inputs),total=len(inputs),))
+                
+                # results = []
+                #for i in range(len(inputs)):
+                #    results.append(self._parallel_roman_estimate_straylight_SCA(inputs[i]))
+                #
                 straylevel_all_SCAS.extend(results)
 
             print(datetime.now().isoformat() + " > Done : " + str(datetime.now() - t) + " elapsed.")
@@ -679,11 +759,13 @@ class exposure():
             print(" > Reconstructing the Stray-light / Main offender map: ")
             straylevel_list = [] 
             main_offender_list = [] 
+            unique_main_offenders = []
             for SCA in range(NSCAs):
                     # This is the canvas array where we will store all the straylight level.
                 straylight_SCA = np.zeros(self.DATA_SHAPE[0]).astype(np.float32)
                 # This is the canvas array where we will store the ID of the largest stray-light contributor
                 main_offender_SCA = np.zeros(self.DATA_SHAPE[0]).astype(np.float32)
+                unique_main_offenders = unique_main_offenders + list(set(straylevel_all_SCAS[SCA]["mainoffender_total"]))
 
                 for subarray_i in range(len(straylevel_all_SCAS[SCA])):
                     xmin = straylevel_all_SCAS[SCA]["xmin"].iloc[subarray_i]
@@ -692,8 +774,7 @@ class exposure():
                     ymax = straylevel_all_SCAS[SCA]["ymax"].iloc[subarray_i]
                     straylight_SCA[ymin:ymax, xmin:xmax] = straylevel_all_SCAS[SCA]["straylight_total"].iloc[subarray_i]
                     main_offender_SCA[ymin:ymax, xmin:xmax] = straylevel_all_SCAS[SCA]["mainoffender_total"].iloc[subarray_i]
-
-                
+                    
                 straylevel_list.append(straylight_SCA)
                 main_offender_list.append(main_offender_SCA)
 
@@ -712,6 +793,8 @@ class exposure():
 
             # Save the stray-light DRZ file 
             self.stray_drz_name = self.output_name.replace(".fits","_drz.fits")
+            for i in range(len(straylevel_list)):
+                straylevel_list[i] = straylevel_list[i]*self.conversion_megajanskys[i]
             self.save_drz(outname=self.stray_drz_name, data_list=straylevel_list, wcs_list=self.ASTROPYWCS, keywords=self.fits_keywords, resolution=resolution)
 
             # Save the main-offender FLC file
@@ -720,6 +803,31 @@ class exposure():
             # Save the main-offender DRZ file 
             self.mainoff_drz_name = self.main_offender_output_name.replace(".fits","_drz.fits")
             self.save_drz(outname=self.mainoff_drz_name, data_list=main_offender_list, wcs_list=self.ASTROPYWCS, keywords=self.fits_keywords, resolution=resolution)
+
+            # --------------
+            # We need to apply one extra correction to the Main_offender DRZ file
+            # so no drizzling artifacts are included in the plots.
+            # -------------- 
+
+            # Remove all those pixels that have values not included in the list of main offenders 
+            #"""
+
+            #if False:
+            main_off_map = fits.open(self.mainoff_drz_name)
+            mask_main_off_ok = np.zeros(main_off_map[0].data.shape)
+
+
+            for i in range(len(unique_main_offenders)):
+                main_off_id = unique_main_offenders[i]
+                #print(main_off_id)
+                # main_offended_pixels = np.where()
+                mask_main_off_ok[np.where(main_off_map[0].data == main_off_id)] = 1
+
+            
+            main_off_map[0].data[mask_main_off_ok != 1] = np.nan
+            main_off_map.verify("silentfix")
+            main_off_map.writeto(self.mainoff_drz_name, overwrite=True)
+                #"""
 
             ################################################################
             ############ Generate the straylight report pdf ################

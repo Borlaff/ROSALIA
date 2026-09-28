@@ -11,12 +11,21 @@
 ##########################################################
 
 ############################
+import os
+import pandas as pd
 import numpy as np
 from astropy.io import fits
 import astropy.wcs as astropy_wcs
+from astroquery.simbad import Simbad
+import astropy.units as u
+from astropy.coordinates import SkyCoord
 import matplotlib.pyplot as plt
 import matplotlib.colors as matplotlib_colors
 import rosalia as rs
+from scipy import interpolate
+
+import matplotlib.cm as cm
+
 
 # Suppress warnings. Comment this out if you wish to see the warning messages
 import warnings
@@ -26,8 +35,6 @@ from itertools import cycle
 from shutil import get_terminal_size
 from threading import Thread
 from time import sleep
-
-
 # Class of different styles
 class style():
     BLACK = '\033[30m'
@@ -88,12 +95,7 @@ class Loader:
 
 
 def main_offender_find_fraction_of_map(mainoff_name, catalog):
-    from astropy.io import fits
-    import numpy as np
-    import pandas as pd
-    from astroquery.simbad import Simbad
-    import astropy.units as u
-    from astropy.coordinates import SkyCoord
+
 
     hdu = fits.open(mainoff_name)
     data = hdu[0].data
@@ -192,20 +194,14 @@ def make_stray_plot(input_name, ext, mode="normal", catalog=None,
                     vmin=None, vmax=None, 
                     color_label = 'Surface brightness (mag arcsec$^{-2}$)',
                     cmap="RdYlBu", output_name=None, figsize=(10,7), mu_vmin=None, mu_vmax=None):
-    import matplotlib.pyplot as plt
-    # from astropy.utils.data import get_pkg_data_filename
-    from astropy.wcs import WCS as astropy_wcs
-    from astropy.io import fits
-    import os
-    import numpy as np
-    import rosalia as rs
+
     if output_name is None:
         output_name = input_name.replace(".fits", "_" + mode + ".png")
     plt.style.use(os.path.dirname(rs.__file__) + "/style/nature_style.mplstyle")
 
     hdu = fits.open(input_name)
-    data = hdu[ext].data
-    wcs = astropy_wcs(hdu[ext].header)
+    data = hdu[ext].data.copy()
+    wcs = astropy_wcs.WCS(hdu[ext].header)
 
     
     #if mode == "main_offender":
@@ -253,15 +249,12 @@ def make_stray_plot(input_name, ext, mode="normal", catalog=None,
     return(output_name)
 
 
-def make_stars_around_plot(flt_name, catalog,  astropywcs_list, RA_TARG, DEC_TARG, radius = 0.6, output_name=None, figsize=(10,7)):
+def make_stars_around_plot(flt_name, catalog,  astropywcs_list, RA_TARG, DEC_TARG, radius = 0.6, output_name=None, figsize=(10,7), verbose=False):
     if output_name is None:
         output_name = flt_name.replace(".fits", "_stars_close.png")
         
     # if True:
-    import matplotlib.pyplot as plt
-    import numpy as np
-    from astropy.coordinates import SkyCoord
-    import astropy.units as u
+
 
     # Open the original flt file
     # image_identity = rs.utils.exposure_inspector(input_name=flt_name, verbose=False, lite=True)
@@ -282,8 +275,11 @@ def make_stars_around_plot(flt_name, catalog,  astropywcs_list, RA_TARG, DEC_TAR
     hybrid_catalog_close = catalog[separation.value<5*radius]
 
     if len(hybrid_catalog_close)==0:
-        print(rs.plots.style.YELLOW + "WARNING: No stars found within " + str(radius) + " degrees. Plotting all stars." + rs.plots.style.RESET)
+        if verbose: print(rs.plots.style.YELLOW + "WARNING: No stars found within " + str(radius) + " degrees. Plotting all stars." + rs.plots.style.RESET)
         hybrid_catalog_close = catalog
+        radius = 1.1*np.nanmax(separation.value)/2
+
+    print(radius)
 
     fig, ax = plt.subplots(figsize=figsize)
     
@@ -315,12 +311,7 @@ def make_stars_around_plot(flt_name, catalog,  astropywcs_list, RA_TARG, DEC_TAR
 
 
 def plot_ndi_main_offenders(RA_TARG, DEC_TARG, PA, scaled_main_off, catalog, ndi_level, figsize=(10,7)):
-    import os
-    import numpy as np
-    import matplotlib.pyplot as plt
-    from astropy.io import fits
-    import astropy.wcs as astropy_wcs
-    import matplotlib.colors as matplotlib_colors
+
 
     main_offender_db, multiline_text = rs.plots.main_offender_find_fraction_of_map(scaled_main_off, catalog)
     
@@ -365,7 +356,6 @@ def plot_ndi_main_offenders(RA_TARG, DEC_TARG, PA, scaled_main_off, catalog, ndi
     
     # CAR locations 
     alpha = 1
-    import matplotlib.cm as cm
 
     for i in range(np.min([len(main_offender_db["ra"]), 3])):
         # CAR 1 A
@@ -459,7 +449,7 @@ def plot_stars_around(ax, catalog, max_plot_size=50, min_plot_size=5, alpha=0.2)
 
     ### Give the plot sizes and representative magnitudes. 
     mag_lambda_range = np.unique(mag_lambda[np.isfinite(mag_lambda)].astype("int"))
-    from scipy import interpolate
+
     plot_size_interpolator = interpolate.interp1d(x=mag_lambda[np.isfinite(mag_lambda)],
                                               y=plot_size, kind="linear",
                                               fill_value="extrapolate")
