@@ -23,15 +23,12 @@ rosalia.utils
       create_radial_mask
       delta_angular_separation
       detect_sci_extensions
+      distance_to_galactic_plane
       divide_array_in_chunks
       download_file
       ds9tomask
       erwinspacing
       execute_cmd
-      exposure_inspector
-      exposure_inspector_asdf
-      exposure_inspector_fits
-      exposure_inspector_single
       find_SCA_EXTNAME
       find_max_angular_size_of_image
       find_nearest_index

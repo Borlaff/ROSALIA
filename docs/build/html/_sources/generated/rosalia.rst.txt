@@ -22,6 +22,7 @@
    gnu
    horizons
    hst
+   inspector
    irsa
    mast
    ndi

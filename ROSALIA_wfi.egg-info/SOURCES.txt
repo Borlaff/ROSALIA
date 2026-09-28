@@ -21,6 +21,7 @@ rosalia/gaia.py
 rosalia/gnu.py
 rosalia/horizons.py
 rosalia/hst.py
+rosalia/inspector.py
 rosalia/irsa.py
 rosalia/mast.py
 rosalia/ndi.py

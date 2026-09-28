@@ -8,6 +8,7 @@ rosalia.mast
 
    .. autosummary::
    
+      pack_exposures
       roman_query
       stream_roman_mast
    

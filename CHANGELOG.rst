@@ -2,6 +2,18 @@
 Changelog
 =========
 
+
+v1.3.2
+======
+
+Added or Changed
+----------------
+- rosalia.core.exposure now uses a multi-extension approach for retrieving ASDF and FITS metadata. 
+- Multiple fixes in DRZ and FLC generation. 
+- Multiple fixes in summary plots. 
+- Added parallel keywork in reproject. 
+
+
 v1.3.1
 ======
 
