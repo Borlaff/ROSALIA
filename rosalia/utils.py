@@ -22,6 +22,10 @@ import bottleneck as bn
 import rosalia as rs
 
 
+import logging
+
+# Set the root logger to only display WARNING, ERROR, or CRITICAL logs
+logging.getLogger().setLevel(logging.WARNING)
 
 ###############################
 # MULTIORDER HEALPIX ROUTINES #
@@ -1626,6 +1630,7 @@ def generate_mosaic(data, astropywcs, resolution=None):
                                 shape_out=optimal_wcs[1],
                                 reproject_function=reproject_interp,
                                 #progress_bar=True,
+                                parallel=True,
                                 intermediate_memmap=True)
 
     data = np.array(output[0].data)

@@ -165,30 +165,32 @@ class exposure():
             self.ASTROPYWCS = exposure_identity['ASTROPYWCS']
             self.FILETYPE = exposure_identity['FILETYPE']
 
-            # Simplify the attributes that are supposed to be constant across the exposure. 
-            if len(list(set(self.TELESCOP))) == 1: self.TELESCOP = self.TELESCOP[0]
-            if len(list(set(self.INSTRUME))) == 1: self.INSTRUME = self.INSTRUME[0]
-            if len(list(set(self.DETECTOR))) == 1: self.DETECTOR = self.DETECTOR[0]
-            if len(list(set(self.RA_TARG))) == 1: self.RA_TARG = self.RA_TARG[0]
-            if len(list(set(self.DEC_TARG))) == 1: self.DEC_TARG = self.DEC_TARG[0]
-            if len(list(set(self.FILTER))) == 1: self.FILTER = self.FILTER[0]
-            # Check if all dictionaries in the list are identical copies
-            are_all_FILTERS_same = not self.FILTER_IDENTITY or rs.inspector.are_all_dicts_equal(self.FILTER_IDENTITY)
-            if are_all_FILTERS_same: self.FILTER_IDENTITY = self.FILTER_IDENTITY[0] 
-            #print(self.FILTER_IDENTITY[0])
-            if len(list(set(self.EXPSTART_ISOT))) == 1: self.EXPSTART_ISOT = self.EXPSTART_ISOT[0] 
-            if len(list(set(self.EXPSTART))) == 1: self.EXPSTART = self.EXPSTART[0] 
-            if len(list(set(self.EXPTIME))) == 1: self.EXPTIME = self.EXPTIME[0] 
-            if len(list(set(self.EXPMID))) == 1: self.EXPMID = self.EXPMID[0] 
-            if len(list(set(self.EXPEND))) == 1: self.EXPEND = self.EXPEND[0] 
+            # If the number of SCIEXTS is larger than 1: 
+            if isinstance(self.SCIEXTS, (list,)): 
+                # Simplify the attributes that are supposed to be constant across the exposure. 
+                if len(list(set(self.TELESCOP))) == 1: self.TELESCOP = self.TELESCOP[0]
+                if len(list(set(self.INSTRUME))) == 1: self.INSTRUME = self.INSTRUME[0]
+                if len(list(set(self.DETECTOR))) == 1: self.DETECTOR = self.DETECTOR[0]
+                if len(list(set(self.RA_TARG))) == 1: self.RA_TARG = self.RA_TARG[0]
+                if len(list(set(self.DEC_TARG))) == 1: self.DEC_TARG = self.DEC_TARG[0]
+                if len(list(set(self.FILTER))) == 1: self.FILTER = self.FILTER[0]
+                # Check if all dictionaries in the list are identical copies
+                are_all_FILTERS_same = not self.FILTER_IDENTITY or rs.inspector.are_all_dicts_equal(self.FILTER_IDENTITY)
+                if are_all_FILTERS_same: self.FILTER_IDENTITY = self.FILTER_IDENTITY[0] 
+                #print(self.FILTER_IDENTITY[0])
+                if len(list(set(self.EXPSTART_ISOT))) == 1: self.EXPSTART_ISOT = self.EXPSTART_ISOT[0] 
+                if len(list(set(self.EXPSTART))) == 1: self.EXPSTART = self.EXPSTART[0] 
+                if len(list(set(self.EXPTIME))) == 1: self.EXPTIME = self.EXPTIME[0] 
+                if len(list(set(self.EXPMID))) == 1: self.EXPMID = self.EXPMID[0] 
+                if len(list(set(self.EXPEND))) == 1: self.EXPEND = self.EXPEND[0] 
 
 
-            print("TEMP WARNING: RA_TARG is set to element 0 - This has to be fixed on MAST")
-            print("TEMP WARNING: DEC_TARG is set to element 0 - This has to be fixed on MAST")
-            print("TEMP WARNING: PA is set to element 0 - This has to be fixed on MAST")
-            self.RA_TARG = self.RA_TARG[0]
-            self.DEC_TARG = self.DEC_TARG[0]
-            self.PA = self.PA[0]
+                print("TEMP WARNING: RA_TARG is set to element 0 - This has to be fixed on MAST")
+                print("TEMP WARNING: DEC_TARG is set to element 0 - This has to be fixed on MAST")
+                print("TEMP WARNING: PA is set to element 0 - This has to be fixed on MAST")
+                self.RA_TARG = self.RA_TARG[0]
+                self.DEC_TARG = self.DEC_TARG[0]
+                self.PA = self.PA[0]
             # --------------------------------------------------------- #
             self.ROOTNAME = rs.inspector.longest_common_substring(self.FILENAME)
             self.MPC_OBSLOC = rs.horizons.get_mpc_observer_name(self.TELESCOP)
@@ -276,7 +278,7 @@ class exposure():
         self.ASTROPYWCS = astropywcs_info["ASTROPYWCS"]
         self.DATA_SHAPE = astropywcs_info["DATA_SHAPE"]
         self.PIXSCALE = astropywcs_info["PIXSCALE"]
-        self.conversion_megajanskys = len(self.SCIEXTS)*[0.6] # Average value
+        self.conversion_megajanskys = len(self.SCIEXTS)*[1] # Average value
         self.FPA_NEAR_RADIUS = 0.6 # Temporary fix until 'target.ra' 'target.dec' are fixed -> Switch to self.get_max_angular_size() when done (Borlaff - Sept 23, 2026)
 
         return(self)
@@ -540,7 +542,7 @@ class exposure():
 
         return(outname)
         
-    def save_drz(self, outname,  data_list=None, wcs_list=None, keywords=None, resolution=1, extname=None, overwrite=True):
+    def save_drz(self, outname, data_list=None, wcs_list=None, keywords=None, resolution=1, extname=None, overwrite=True):
         if data_list is None: data_list = self.DATA
         if wcs_list is None: wcs_list = self.ASTROPYWCS
         if keywords is None: keywords = self.fits_keywords
@@ -563,8 +565,6 @@ class exposure():
             header["INSTRUME"] = self.INSTRUME
             header["BUNIT"] = "MJy sr-1"
 
-            # Convert the output units to MJy/sr
-            data_list[i] = data_list[i]*self.conversion_megajanskys[i]
             keywords["DETECTOR"] = rs.inspector.longest_common_substring(self.DETECTOR)
             for key in keywords.keys():
                 header[key] = keywords[key]
@@ -740,15 +740,14 @@ class exposure():
                     for SCIEXT_i, DATA_SHAPE_i, ASTROPYWCS_i in zip(self.SCIEXTS, self.DATA_SHAPE, self.ASTROPYWCS)
                 ]
 
-                print(len(inputs))
-                print(inputs)  
-                # results = list(tqdm(executor.map(self._parallel_roman_estimate_straylight_SCA, inputs),total=len(inputs),))
+                # print(len(inputs))
+                #print(inputs)  
+                results = list(tqdm(executor.map(self._parallel_roman_estimate_straylight_SCA, inputs),total=len(inputs),))
                 
-                results = []
-                for i in range(len()):
-                    inputs = self._parallel_roman_estimate_straylight_SCA(inputs)
-                                                )
-                
+                # results = []
+                #for i in range(len(inputs)):
+                #    results.append(self._parallel_roman_estimate_straylight_SCA(inputs[i]))
+                #
                 straylevel_all_SCAS.extend(results)
 
             print(datetime.now().isoformat() + " > Done : " + str(datetime.now() - t) + " elapsed.")
@@ -760,11 +759,13 @@ class exposure():
             print(" > Reconstructing the Stray-light / Main offender map: ")
             straylevel_list = [] 
             main_offender_list = [] 
+            unique_main_offenders = []
             for SCA in range(NSCAs):
                     # This is the canvas array where we will store all the straylight level.
                 straylight_SCA = np.zeros(self.DATA_SHAPE[0]).astype(np.float32)
                 # This is the canvas array where we will store the ID of the largest stray-light contributor
                 main_offender_SCA = np.zeros(self.DATA_SHAPE[0]).astype(np.float32)
+                unique_main_offenders = unique_main_offenders + list(set(straylevel_all_SCAS[SCA]["mainoffender_total"]))
 
                 for subarray_i in range(len(straylevel_all_SCAS[SCA])):
                     xmin = straylevel_all_SCAS[SCA]["xmin"].iloc[subarray_i]
@@ -773,8 +774,7 @@ class exposure():
                     ymax = straylevel_all_SCAS[SCA]["ymax"].iloc[subarray_i]
                     straylight_SCA[ymin:ymax, xmin:xmax] = straylevel_all_SCAS[SCA]["straylight_total"].iloc[subarray_i]
                     main_offender_SCA[ymin:ymax, xmin:xmax] = straylevel_all_SCAS[SCA]["mainoffender_total"].iloc[subarray_i]
-
-                
+                    
                 straylevel_list.append(straylight_SCA)
                 main_offender_list.append(main_offender_SCA)
 
@@ -793,6 +793,8 @@ class exposure():
 
             # Save the stray-light DRZ file 
             self.stray_drz_name = self.output_name.replace(".fits","_drz.fits")
+            for i in range(len(straylevel_list)):
+                straylevel_list[i] = straylevel_list[i]*self.conversion_megajanskys[i]
             self.save_drz(outname=self.stray_drz_name, data_list=straylevel_list, wcs_list=self.ASTROPYWCS, keywords=self.fits_keywords, resolution=resolution)
 
             # Save the main-offender FLC file
@@ -806,22 +808,26 @@ class exposure():
             # We need to apply one extra correction to the Main_offender DRZ file
             # so no drizzling artifacts are included in the plots.
             # -------------- 
-            main_off_map = fits.open(self.mainoff_drz_name)
-            mask_main_off_ok = np.zeros(main_off_map[0].data.shape)
-            main_offenders = list(set(straylevel_db["mainoffender_total"]))
 
             # Remove all those pixels that have values not included in the list of main offenders 
-            print("main_offenders")
-            print(main_offenders)
-            for i in range(len(main_offenders)):
-                main_off_id = main_offenders[i]
-                main_offended_pixels = np.where(main_off_map[0].data == main_off_id)
-                mask_main_off_ok[main_offended_pixels] = 1
+            #"""
 
-            main_off_map[0].data[mask_main_off_ok == 0] = np.nan
+            #if False:
+            main_off_map = fits.open(self.mainoff_drz_name)
+            mask_main_off_ok = np.zeros(main_off_map[0].data.shape)
+
+
+            for i in range(len(unique_main_offenders)):
+                main_off_id = unique_main_offenders[i]
+                #print(main_off_id)
+                # main_offended_pixels = np.where()
+                mask_main_off_ok[np.where(main_off_map[0].data == main_off_id)] = 1
+
+            
+            main_off_map[0].data[mask_main_off_ok != 1] = np.nan
             main_off_map.verify("silentfix")
             main_off_map.writeto(self.mainoff_drz_name, overwrite=True)
-    
+                #"""
 
             ################################################################
             ############ Generate the straylight report pdf ################
