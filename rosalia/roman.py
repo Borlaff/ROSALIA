@@ -8,9 +8,11 @@ from astropy.coordinates import SkyCoord  # High-level coordinates
 import astropy.units as u
 from astropy import constants as const
 from datetime import datetime
-import logging
 import healpy as hp
 import pickle
+
+import logging
+
 logger = logging.getLogger()
 logger.setLevel(logging.CRITICAL)
 

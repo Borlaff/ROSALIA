@@ -1627,7 +1627,7 @@ def generate_mosaic(data, astropywcs, resolution=None):
 
     output = reproject_and_coadd(input_data=input_data_for_reproject, 
                                 output_projection=optimal_wcs[0], 
-                                shape_out=optimal_wcs[1],
+                                shape_out=optimal_wcs[1], combine_function="mean",
                                 reproject_function=reproject_interp,
                                 #progress_bar=True,
                                 parallel=True,

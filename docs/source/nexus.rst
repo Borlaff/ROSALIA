@@ -5,6 +5,18 @@ Roman Research Nexus
 
 *ROSALIA is in the process to be integrated into the Roman Research Nexus. We will update this section as soon as the integration is complete. Suggestions are welcome!*
 
+Installation of ROSALIA in the Roman Research Nexus
+------------------------------------------------------
+
+/home/rosalia-admin/.local/share/jupyter/kernels/rosalia/kernel.json, 
+
+{ "argv": [ "/home/rosalia-admin/envs/conda/rosalia/bin/python", 
+            "-Xfrozen_modules=off", "-m", "ipykernel_launcher", "-f", "{connection_file}" ],
+             "display_name": "rosalia", "language": "python", "metadata": { "debugger": true, "supported_encryption": "curve" }, 
+             "kernel_protocol_version": "5.5", 
+             "env": { "ROSALIACACHE": "/teams/rosalia/CACHE/rosalia_cache/" }} 
+
+
 How to use ROSALIA in the Roman Research Nexus
 -----------------------------
 

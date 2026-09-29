@@ -8,7 +8,7 @@ Preparing your system
 
 ROSALIA is based on multiple packages, including `Astropy <https://www.astropy.org/>`_, `Astroquery <https://astroquery.readthedocs.io/en/latest/>`_, `Romanisim <https://romanisim.readthedocs.io/en/latest/>`_, `NumPy <https://numpy.org/>`_, `SciPy <https://scipy.org>`_, `Matplotlib <https://matplotlib.org/>`_ among many others. The easiest way to install all the dependencies is through a package manager like `Conda <https://anaconda.org/anaconda/conda>`_ or `Mamba <https://github.com/mamba-org/mamba>`_. If you have a *Conda/Mamba* package manager already installed in your system, skip to the following section. If you do not have a package manager, follow the Conda installation instructions at the `Space Telescope *stenv* environment webpage <https://stenv.readthedocs.io/getting_started.html>`_. 
 
-There are many versions of Conda managers. We recommend using free `Miniforge <https://github.com/conda-forge/miniforge>` with mamba as the package manager. You can install Miniforge by following the instructions at the `Miniforge GitHub repository <https://github.com/conda-forge/miniforge>`_. As a summary, use the following commands: 
+There are many versions of Conda managers. We recommend using free `Miniforge <https://github.com/conda-forge/miniforge>`_ with mamba as the package manager. You can install Miniforge by following the instructions at the `Miniforge GitHub repository <https://github.com/conda-forge/miniforge>`_. As a summary, use the following commands: 
 
 Downloading Miniforge for Linux
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

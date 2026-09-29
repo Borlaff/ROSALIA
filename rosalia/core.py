@@ -151,6 +151,8 @@ class exposure():
             self.BUNIT = exposure_identity['BUNIT']
             self.conversion_megajanskys = exposure_identity['conversion_megajanskys']
             self.conversion_megajanskys_uncertainty = exposure_identity['conversion_megajanskys_uncertainty']
+            self.helio_x = exposure_identity['spatial_x']
+            self.spatial_x = exposure_identity['spatial_x']
             self.pixel_area = exposure_identity['pixel_area']
             self.EXPSTART_ISOT = exposure_identity['EXPSTART_ISOT']
             self.PA = exposure_identity['PA']
@@ -195,8 +197,10 @@ class exposure():
             self.ROOTNAME = rs.inspector.longest_common_substring(self.FILENAME)
             self.MPC_OBSLOC = rs.horizons.get_mpc_observer_name(self.TELESCOP)
             self.JPL_OBSLOC = rs.horizons.get_jpl_observer_name(self.TELESCOP)
-            state_vectors = rs.horizons.get_heliocoords(self.EXPSTART, body=self.TELESCOP) # rs.horizons.interpolate_Roman_state_vectors(self.EXPSTART)
-            self.XYZ_HELIO_POS = [state_vectors["x"].to("AU").value[0], state_vectors["y"].to("AU").value[0], state_vectors["z"].to("AU").value[0]]*u.AU # in AU.
+            # state_vectors = rs.horizons.get_heliocoords(self.EXPSTART, body=self.TELESCOP) # rs.horizons.interpolate_Roman_state_vectors(self.EXPSTART)
+            self.XYZ_HELIO_POS = [exposure_identity['spatial_x']*u.km.to("AU").value[0], 
+                                  exposure_identity['spatial_y']*u.km.to("AU").value[0], 
+                                  exposure_identity['spatial_z']*u.km.to("AU").value[0]]*u.AU # in AU.
             self.FPA_NEAR_RADIUS = 0.6 # Temporary fix until 'target.ra' 'target.dec' are fixed -> Switch to self.get_max_angular_size() when done (Borlaff - Sept 23, 2026)
 
 

@@ -113,7 +113,10 @@ def exposure_inspector(input_name, verbose=False, lite=False):
 
         """
         exposure_identities = []
-        for i in tqdm(range(len(input_name))):
+        pbar = tqdm(range(len(input_name)))
+
+        for i in pbar:
+            pbar.set_description("Retrieving " + input_name[i])
             if isinstance(input_name, (list,)): 
                 exposure_identity = rs.inspector.exposure_inspector(input_name[i], lite=lite)
                 
@@ -203,7 +206,8 @@ def exposure_inspector_asdf(input_name, telescope="roman", verbose=False, lite=F
         # telescope_class = rs.telescopes.Roman
         detector_svo = "WFI"
 
-    print('Location is stored in data_stream["meta"]["ephemeris"]! ')
+    
+    #print('Location is stored in data_stream["meta"]["ephemeris"]! ')
 
     exposure_identity["DETECTOR"]   = input_asdf["meta"]["instrument"]["detector"]
     exposure_identity["FILTER"]     = input_asdf["meta"]["instrument"]["optical_element"]
@@ -220,6 +224,9 @@ def exposure_inspector_asdf(input_name, telescope="roman", verbose=False, lite=F
     exposure_identity["EXPSTART"]   = input_asdf["meta"]["exposure"]["start_time"].mjd
     exposure_identity["EXPEND"]     = input_asdf["meta"]["exposure"]["end_time"].mjd
     exposure_identity["EXPTIME"]    = input_asdf["meta"]["exposure"]["exposure_time"]
+    exposure_identity["spatial_x"]   = input_asdf["meta"]["ephemeris"]["spatial_x"]
+    exposure_identity["spatial_y"]   = input_asdf["meta"]["ephemeris"]["spatial_y"]
+    exposure_identity["spatial_z"]   = input_asdf["meta"]["ephemeris"]["spatial_z"]
     exposure_identity["conversion_megajanskys"] = input_asdf["meta"]["photometry"]["conversion_megajanskys"]
     exposure_identity["conversion_megajanskys_uncertainty"] = input_asdf["meta"]["photometry"]["conversion_megajanskys_uncertainty"]
     exposure_identity["pixel_area"] = input_asdf["meta"]["photometry"]["pixel_area"]*((180/np.pi)*60*60)**2
