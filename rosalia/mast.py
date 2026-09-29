@@ -5,6 +5,8 @@ import xml.etree.ElementTree as ET
 import astropy.units as u
 import logging
 from astropy.time import Time
+import rosalia as rs
+from tqdm import tqdm 
 
 # Supress info from MAST
 logger = logging.getLogger()
@@ -167,7 +169,7 @@ class query():
     def stream_roman_mast(products, row=0):
         missions = MastMissions(mission='roman')
         token = os.getenv("MAST_API_TOKEN")    
-        missions.login(token=token)
+        missions.login(token=token, store_token=True)
         af = missions.read_product(products[row]['filename'])
         dm = rdm.open(af)
         return(dm)
@@ -255,10 +257,10 @@ class query():
                 if exposure_id in products["dataset"][i]: found_index.append(i)
             products = products[found_index]
 
-        products, unique_roots = pack_exposures(products)
+        products, unique_roots = rs.mast.query.pack_exposures(products)
 
         if download_products:
-            downloaded_files = download_results(products=products, exposures=unique_roots)
+            downloaded_files = rs.mast.query.download_results(products=products, exposures=unique_roots)
             return(results, products, unique_roots, downloaded_files)
         else:
             return(results, products, unique_roots, None)

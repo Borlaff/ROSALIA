@@ -116,12 +116,12 @@ def exposure_inspector(input_name, verbose=False, lite=False):
         pbar = tqdm(range(len(input_name)))
 
         for i in pbar:
-            pbar.set_description("Retrieving " + input_name[i])
+            pbar.set_description("Retrieving exposure ")
             if isinstance(input_name, (list,)): 
                 exposure_identity = rs.inspector.exposure_inspector(input_name[i], lite=lite)
                 
             elif isinstance(input_name, (astropy.table.table.Table,)): 
-                data_stream = rs.mast.stream_roman_mast(products=input_name, row=i)
+                data_stream = rs.mast.query.stream_roman_mast(products=input_name, row=i)
                 exposure_identity = rs.inspector.exposure_inspector(data_stream, lite=lite)
                 
             exposure_identities.append(exposure_identity)
