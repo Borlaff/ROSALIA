@@ -169,7 +169,7 @@ class query():
     def stream_roman_mast(products, row=0):
         missions = MastMissions(mission='roman')
         token = os.getenv("MAST_API_TOKEN")    
-        missions.login(token=token)
+        missions.login(token=token, store_token=False)
         af = missions.read_product(products[row]['filename'])
         dm = rdm.open(af)
         return(dm)
@@ -210,7 +210,7 @@ class query():
 
         # Login to search and retrieve Roman data
         token = os.getenv("MAST_API_TOKEN")    
-        missions.login(token=token)
+        missions.login(token=token, store_token=False)
                     
         print(f'Mission: {missions.mission}')
         print(f'Service: {missions.service}')

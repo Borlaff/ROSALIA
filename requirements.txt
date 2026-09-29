@@ -36,3 +36,4 @@ twine
 s3fs
 zodipy
 dotenv
+roman_datamodels @ git+https://github.com/spacetelescope/roman_datamodels
