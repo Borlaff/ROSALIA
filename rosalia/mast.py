@@ -4,6 +4,7 @@ from astroquery.mast import MastMissions # pip install git+https://github.com/sn
 import xml.etree.ElementTree as ET
 import astropy.units as u
 import logging
+from astropy.time import Time
 
 # Supress info from MAST
 logger = logging.getLogger()
@@ -161,7 +162,7 @@ class APT():
     # new_min = [142.1, 143.2, 144.3, ...]
     # new_max = [142.1, 143.2, 144.3, ...]
 
-class mast():
+class query():
     ################
     def stream_roman_mast(products, row=0):
         missions = MastMissions(mission='roman')
