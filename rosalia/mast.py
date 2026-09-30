@@ -283,7 +283,7 @@ class query():
             outname = exposures[i] + ".fits"
             pbar.set_description(f"Downloading {outname}")
             if verbose: print(outname)
-            if not os.path.exists(outname): 
+            if not os.path.exists(bandpass+ "/" + outname): 
                 exposure_products = products[products["exposure_id"] == exposures[i]]
                 roman_exposure = rs.core.exposure(exposure_products)
                 bandpass = roman_exposure.FILTER
