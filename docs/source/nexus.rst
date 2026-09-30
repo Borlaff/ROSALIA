@@ -8,13 +8,16 @@ Roman Research Nexus
 Installation of ROSALIA in the Roman Research Nexus
 ------------------------------------------------------
 
-/home/rosalia-admin/.local/share/jupyter/kernels/rosalia/kernel.json, 
 
-{ "argv": [ "/home/rosalia-admin/envs/conda/rosalia/bin/python", 
-            "-Xfrozen_modules=off", "-m", "ipykernel_launcher", "-f", "{connection_file}" ],
-             "display_name": "rosalia", "language": "python", "metadata": { "debugger": true, "supported_encryption": "curve" }, 
-             "kernel_protocol_version": "5.5", 
-             "env": { "ROSALIACACHE": "/teams/rosalia/CACHE/rosalia_cache/" }} 
+.. code-block:: sh
+
+    /home/rosalia-admin/.local/share/jupyter/kernels/rosalia/kernel.json, 
+
+    { "argv": [ "/home/rosalia-admin/envs/conda/rosalia/bin/python", 
+                "-Xfrozen_modules=off", "-m", "ipykernel_launcher", "-f", "{connection_file}" ],
+                "display_name": "rosalia", "language": "python", "metadata": { "debugger": true, "supported_encryption": "curve" }, 
+                "kernel_protocol_version": "5.5", 
+                "env": { "ROSALIACACHE": "/teams/rosalia/CACHE/rosalia_cache/" }} 
 
 
 How to use ROSALIA in the Roman Research Nexus
