@@ -1,3 +1,5 @@
+import os
+import bottleneck as bn
 import numpy as np
 from astropy.io import fits
 import rosalia as rs

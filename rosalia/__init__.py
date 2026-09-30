@@ -4,7 +4,7 @@ ROSALIA: ROman Sky Analyst for Low surface brightness Imaging & Astronomy
 """
 
 __name__ = "ROSALIA"
-__version__ = "1.3.1"
+__version__ = "1.3.3"
 __author__ = "Alejandro S. Borlaff"
 __author_email__ = "a.s.borlaff@nasa.gov"
 __description__ = "A software to calibrate the sky background of Space Telescope images"
@@ -27,6 +27,7 @@ import rosalia.gnu
 import rosalia.inspector
 import rosalia.roman
 import rosalia.mast
+import rosalia.mosaics
 import rosalia.sky
 import rosalia.thermal
 import rosalia.sso
