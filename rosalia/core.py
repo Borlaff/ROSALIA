@@ -198,9 +198,9 @@ class exposure():
             self.MPC_OBSLOC = rs.horizons.get_mpc_observer_name(self.TELESCOP)
             self.JPL_OBSLOC = rs.horizons.get_jpl_observer_name(self.TELESCOP)
             # state_vectors = rs.horizons.get_heliocoords(self.EXPSTART, body=self.TELESCOP) # rs.horizons.interpolate_Roman_state_vectors(self.EXPSTART)
-            self.XYZ_HELIO_POS = [exposure_identity['spatial_x']*u.km.to("AU"), 
-                                  exposure_identity['spatial_y']*u.km.to("AU"), 
-                                  exposure_identity['spatial_z']*u.km.to("AU")]*u.AU # in AU.
+            self.XYZ_HELIO_POS = [exposure_identity['spatial_x'][0]*u.km.to("AU"), 
+                                  exposure_identity['spatial_y'][0]*u.km.to("AU"), 
+                                  exposure_identity['spatial_z'][0]*u.km.to("AU")]*u.AU # in AU.
             self.FPA_NEAR_RADIUS = 0.6 # Temporary fix until 'target.ra' 'target.dec' are fixed -> Switch to self.get_max_angular_size() when done (Borlaff - Sept 23, 2026)
 
 
