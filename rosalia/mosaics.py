@@ -73,7 +73,7 @@ def find_mosaic_wcs(input_data, resolution=None, auto_rotate=False):
         data_list = []
         astropywcs_list = []
         for flc_name in input_data[0]:
-            flc = fits.open(flc_name)
+            flc = fits.open(flc_name, memmap=True)
             for ext in input_data[1]:
                 astropywcs_list.append(astropy_wcs.WCS(flc[ext].header))
                 data_list.append(flc[ext].data.shape)
