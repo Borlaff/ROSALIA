@@ -73,14 +73,15 @@ def find_mosaic_wcs(input_data, resolution=None, auto_rotate=False):
         data_list = []
         astropywcs_list = []
         for flc_name in input_data[0]:
-            flc = fits.open(flc_name, memmap=True)
+            flc = fits.open(flc_name)
             for ext in input_data[1]:
                 astropywcs_list.append(astropy_wcs.WCS(flc[ext].header))
-                data_list.append(flc[ext].data)
+                data_list.append(flc[ext].data.shape)
             flc.close()
             
         input_data_for_reproject = list(zip(data_list, astropywcs_list))
-        optimal_wcs = find_optimal_celestial_wcs(input_data=input_data_for_reproject, resolution=resolution,
+        optimal_wcs = find_optimal_celestial_wcs(input_data=input_data_for_reproject, 
+                                                 resolution=resolution,
                                                  auto_rotate=auto_rotate)
         
         return(optimal_wcs)
