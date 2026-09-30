@@ -192,7 +192,7 @@ class exposure():
                 print("TEMP WARNING: PA is set to element 0 - This has to be fixed on MAST")
                 if isinstance(self.RA_TARG, (np.ndarray, list,)): self.RA_TARG = self.RA_TARG[0]
                 if isinstance(self.RA_TARG, (np.ndarray, list,)): self.DEC_TARG = self.DEC_TARG[0]
-                if isinstance(self.RA_TARG, (np.ndarray, list,)): self.PA = self.PA[0]
+                if isinstance(self.PA, (np.ndarray, list,)): self.PA = self.PA[0]
             # --------------------------------------------------------- #
             self.ROOTNAME = rs.inspector.longest_common_substring(self.FILENAME)
             self.MPC_OBSLOC = rs.horizons.get_mpc_observer_name(self.TELESCOP)
@@ -744,14 +744,15 @@ class exposure():
                     for SCIEXT_i, DATA_SHAPE_i, ASTROPYWCS_i in zip(self.SCIEXTS, self.DATA_SHAPE, self.ASTROPYWCS)
                 ]
 
-                # print(len(inputs))
-                #print(inputs)  
-                results = list(tqdm(executor.map(self._parallel_roman_estimate_straylight_SCA, inputs),total=len(inputs),))
+                parallel = True
+                if parallel:
+                    results = list(tqdm(executor.map(self._parallel_roman_estimate_straylight_SCA, inputs),total=len(inputs),))
+
+                if not parallel:
+                    results = []
+                    for i in range(len(inputs)):
+                        results.append(self._parallel_roman_estimate_straylight_SCA(inputs[i]))
                 
-                # results = []
-                #for i in range(len(inputs)):
-                #    results.append(self._parallel_roman_estimate_straylight_SCA(inputs[i]))
-                #
                 straylevel_all_SCAS.extend(results)
 
             print(datetime.now().isoformat() + " > Done : " + str(datetime.now() - t) + " elapsed.")

@@ -114,3 +114,48 @@ def astmkcatalog(input_name, ext, clean=True, verbose=False):
 
 
 #####################################################
+
+
+def correct_sky(input_name, ext, flat=False, overwrite=True, clean=True, verbose=False):
+    # So, lets write a program that does a flat sky background correction for us.
+    # Run noisechisel with the default parameters
+    stdout = rs.utils.execute_cmd("astnoisechisel --outliernumngb=5 -K -h" + str(ext) + " " + input_name)
+    detected_name = input_name.replace(".fits", "_detected.fits")
+
+    if not os.path.exists(detected_name):
+        return({"skylvl": np.nan, "input_name": input_name, "ext": ext})
+
+    # Open the detected fits file
+    input_fits = fits.open(input_name)
+    detected_fits = fits.open(detected_name)
+
+    if flat:
+        sky_sample = input_fits[ext].data[np.where(detected_fits["DETECTIONS"].data == 0)]
+        sky_level = bn.nanmedian(sky_sample)
+
+    else:
+        sky_level = detected_fits["SKY"].data 
+
+    if verbose:
+        print("Flat sky level:" + str(sky_level))
+        print("Subtracting from " + input_name + "[" + str(ext) + "]")
+        print("Storing in header KEYWORD SKYLVL1")
+
+
+    if overwrite:
+        try:
+            input_fits[ext].header["SKYLVL1"] = input_fits[ext].header["SKYLVL1"] + bn.nanmedian(sky_level)
+        except:
+            input_fits[ext].header["SKYLVL1"] = bn.nanmedian(sky_level)
+        input_fits[ext].data = input_fits[ext].data - sky_level
+        input_fits.verify("silentfix")
+        input_fits.writeto(input_name, overwrite=True)
+
+    input_fits.close()
+    detected_fits.close()
+
+    if clean:
+        rs.utils.execute_cmd("rm " + detected_name)
+
+    return({"skylvl": sky_level, "input_name": input_name, "ext": ext})
+
