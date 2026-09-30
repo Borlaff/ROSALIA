@@ -186,13 +186,13 @@ class exposure():
                 if len(list(set(self.EXPMID))) == 1: self.EXPMID = self.EXPMID[0] 
                 if len(list(set(self.EXPEND))) == 1: self.EXPEND = self.EXPEND[0] 
 
-
+                
                 print("TEMP WARNING: RA_TARG is set to element 0 - This has to be fixed on MAST")
                 print("TEMP WARNING: DEC_TARG is set to element 0 - This has to be fixed on MAST")
                 print("TEMP WARNING: PA is set to element 0 - This has to be fixed on MAST")
-                self.RA_TARG = self.RA_TARG[0]
-                self.DEC_TARG = self.DEC_TARG[0]
-                self.PA = self.PA[0]
+                if isinstance(self.RA_TARG, (np.ndarray, list,)): self.RA_TARG = self.RA_TARG[0]
+                if isinstance(self.RA_TARG, (np.ndarray, list,)): self.DEC_TARG = self.DEC_TARG[0]
+                if isinstance(self.RA_TARG, (np.ndarray, list,)): self.PA = self.PA[0]
             # --------------------------------------------------------- #
             self.ROOTNAME = rs.inspector.longest_common_substring(self.FILENAME)
             self.MPC_OBSLOC = rs.horizons.get_mpc_observer_name(self.TELESCOP)
@@ -550,7 +550,7 @@ class exposure():
         if data_list is None: data_list = self.DATA
         if wcs_list is None: wcs_list = self.ASTROPYWCS
         if keywords is None: keywords = self.fits_keywords
-
+        print("TODO: Add option to provide optimal_wcs - So multiple filters can share target grid")
         if isinstance(keywords["DETECTOR"], (list,)):
             keywords["DETECTOR"] = rs.inspector.longest_common_substring(self.DETECTOR)
             
@@ -1008,7 +1008,8 @@ class exposure():
         # Make the Roman Dummy image
         roman_dummy_name = self.FILENAME 
         if output_name is None:
-            output_name = self.FILENAME.replace(".fits", "_zody.fits").replace(".asdf", "_zody.fits")
+            # output_name = self.FILENAME.replace(".fits", "_zody.fits").replace(".asdf", "_zody.fits")
+            output_name = self.ROOTNAME + "_zody.fits" 
 
         zodiacal_background_list = []
         zodiacal_background_unit_list = []

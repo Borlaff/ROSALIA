@@ -54,6 +54,7 @@ def exposure_inspector(input_name, verbose=False, lite=False):
 
         else:
             exposure_identity = exposure_inspector_single(input_name, verbose=verbose, lite=lite)
+            exposure_identity = combine_dicts([exposure_identity])
             return(exposure_identity)
 
 
@@ -62,6 +63,7 @@ def exposure_inspector(input_name, verbose=False, lite=False):
         exposure_identity = exposure_inspector_single(input_name, verbose=verbose, lite=lite)
         # If the input is a stream, it needs a local basename. 
         exposure_identity["FILENAME"] = input_name["meta"]["filename"]
+        exposure_identity = combine_dicts([exposure_identity])
         return(exposure_identity)
 
 
@@ -127,8 +129,6 @@ def exposure_inspector(input_name, verbose=False, lite=False):
             exposure_identities.append(exposure_identity)
 
         exposure_identities = combine_dicts(exposure_identities)
-
-
         return(exposure_identities)
 
 
@@ -499,7 +499,6 @@ def combine_dicts(items: list[dict]) -> dict:
     # Iterate over the keys of the first dictionary and gather values from all dictionaries
     return {key: [d[key] for d in items] for key in items[0]}
 
-import numpy as np
 
 
 def values_are_equal(v1, v2) -> bool:
