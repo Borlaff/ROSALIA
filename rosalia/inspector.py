@@ -486,18 +486,20 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
 ######################################################
 ######################################################
 
-
 def combine_dicts(items: list[dict]) -> dict:
     """Combines a list of dictionaries sharing the same keys
 
-    into a single dictionary where each key maps to a list of values.
+    into a single dictionary where each key maps to a flattened list of values.
     """
     # Guard against an empty list input
     if not items:
         return {}
 
-    # Iterate over the keys of the first dictionary and gather values from all dictionaries
-    return {key: [d[key] for d in items] for key in items[0]}
+    # Iterate over each key, and flatten the lists across all dictionaries for that key
+    return {
+        key: [element for d in items for element in d[key]]
+        for key in items[0]
+    }
 
 
 
