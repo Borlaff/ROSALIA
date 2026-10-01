@@ -192,7 +192,7 @@ class exposure():
                 print("TEMP WARNING: DEC_TARG is set to element 0 - This has to be fixed on MAST")
                 print("TEMP WARNING: PA is set to element 0 - This has to be fixed on MAST")
                 if isinstance(self.RA_TARG, (np.ndarray, list,)): self.RA_TARG = self.RA_TARG[0]
-                if isinstance(self.RA_TARG, (np.ndarray, list,)): self.DEC_TARG = self.DEC_TARG[0]
+                if isinstance(self.DEC_TARG, (np.ndarray, list,)): self.DEC_TARG = self.DEC_TARG[0]
                 if isinstance(self.PA, (np.ndarray, list,)): self.PA = self.PA[0]
             # --------------------------------------------------------- #
             self.ROOTNAME = rs.inspector.longest_common_substring(self.FILENAME)
