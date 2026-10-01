@@ -169,6 +169,7 @@ class exposure():
 
             # If the number of SCIEXTS is larger than 1: 
             if isinstance(self.SCIEXTS, (list,)): 
+                print(self.TELESCOP)
                 # Simplify the attributes that are supposed to be constant across the exposure. 
                 if len(list(set(self.TELESCOP))) == 1: self.TELESCOP = self.TELESCOP[0]
                 if len(list(set(self.INSTRUME))) == 1: self.INSTRUME = self.INSTRUME[0]
