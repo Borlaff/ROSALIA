@@ -487,20 +487,32 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
 ######################################################
 
 def combine_dicts(items: list[dict]) -> dict:
-    """Combines a list of dictionaries sharing the same keys
+    """Combines a list of dictionaries sharing the same keys into a single
 
-    into a single dictionary where each key maps to a flattened list of values.
+    dictionary.
+
+    If a value is a list, its elements are concatenated; otherwise, the scalar
+    value itself is appended to the list for that key.
     """
     # Guard against an empty list input
     if not items:
         return {}
 
-    # Iterate over each key, and flatten the lists across all dictionaries for that key
-    return {
-        key: [element for d in items for element in d[key]]
-        for key in items[0]
-    }
+    # Initialize empty list containers for each key found in the first dictionary
+    combined: dict[str, list] = {key: [] for key in items[0]}
 
+    # Iterate through all dictionaries in the list
+    for d in items:
+        for key in combined:
+            val = d[key]
+            # If the value is already a list, unpack/extend its contents
+            if isinstance(val, list):
+                combined[key].extend(val)
+            # Otherwise, treat it as a scalar/atomic object and append it
+            else:
+                combined[key].append(val)
+
+    return combined
 
 
 def values_are_equal(v1, v2) -> bool:
