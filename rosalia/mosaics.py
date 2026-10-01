@@ -6,7 +6,7 @@ from tqdm import tqdm
 import astropy.units as u
 from reproject import reproject_interp
 from reproject.mosaicking import reproject_and_coadd, find_optimal_celestial_wcs
-
+import rosalia as rs
 
 def coadd_level2(data, astropywcs, optimal_wcs=None, resolution=None):
     input_data_for_reproject = list(zip(data, astropywcs))
