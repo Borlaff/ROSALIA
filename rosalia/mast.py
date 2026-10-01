@@ -289,4 +289,6 @@ class query():
                 bandpass = roman_exposure.FILTER
                 roman_exposure.save_flc(outname=bandpass+ "/" + outname)
                 downloaded_files.append(bandpass+ "/" + outname)
+            else:
+                print("File already exists: " + bandpass+ "/" + outname)
         return(downloaded_files)
