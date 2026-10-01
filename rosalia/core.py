@@ -766,7 +766,7 @@ class exposure():
             straylevel_list = [] 
             main_offender_list = [] 
             unique_main_offenders = []
-            for SCA in range(NSCAs):
+            for SCA in self.SCIEXTS:
                     # This is the canvas array where we will store all the straylight level.
                 straylight_SCA = np.zeros(self.DATA_SHAPE[0]).astype(np.float32)
                 # This is the canvas array where we will store the ID of the largest stray-light contributor
