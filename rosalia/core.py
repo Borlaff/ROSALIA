@@ -196,6 +196,7 @@ class exposure():
                 #if isinstance(self.RA_TARG, (np.ndarray, list,)): self.RA_TARG = self.RA_TARG[0]
                 #if isinstance(self.DEC_TARG, (np.ndarray, list,)): self.DEC_TARG = self.DEC_TARG[0]
                 #if isinstance(self.PA, (np.ndarray, list,)): self.PA = self.PA[0]
+                print("Quaternion: ", self.quaternion)
                 self.attitude = rs.attitude.quaternion_to_WFICEN(self.quaternion[0])
                 self.RA_TARG = self.attitude["ra_wficen"]
                 self.DEC_TARG = self.attitude["dec_wficen"]
