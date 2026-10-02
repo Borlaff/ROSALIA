@@ -151,6 +151,7 @@ class exposure():
             self.BUNIT = exposure_identity['BUNIT']
             self.conversion_megajanskys = exposure_identity['conversion_megajanskys']
             self.conversion_megajanskys_uncertainty = exposure_identity['conversion_megajanskys_uncertainty']
+            self.quaternion = exposure_identity['quaternion']
             self.helio_x = exposure_identity['spatial_x']
             self.spatial_x = exposure_identity['spatial_x']
             self.pixel_area = exposure_identity['pixel_area']

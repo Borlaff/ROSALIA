@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rosalia-wfi"
-version = "1.3.2"
+version = "1.3.3"
 description = "A software to calibrate the sky background of Space Telescope images"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -79,7 +79,7 @@ where = ["."]
 exclude = ["tests*"]
 
 [tool.setuptools.package-data]
-rosalia = ["*.mplstyle", "*.csv", "*.txt", "rosalia/style/*", "**/*.mplstyle", "images/*", "bin/*"]
+rosalia = ["*.mplstyle", "*.csv", "*.txt", "rosalia/CORE/detector/*xml", "rosalia/style/*", "**/*.mplstyle", "images/*", "bin/*"]
 
 [tool.pytest.ini_options]
 testpaths = ["rosalia"]
