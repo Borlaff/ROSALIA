@@ -214,7 +214,7 @@ def exposure_inspector_asdf(input_name, telescope="roman", verbose=False, lite=F
 
     exposure_identity["RA_TARG"]    = input_asdf["meta"]["pointing"]["target_ra"]
     exposure_identity["DEC_TARG"]   = input_asdf["meta"]["pointing"]["target_dec"]
-    exposure_identity["quaternion"] = input_asdf["meta"]["pointing"]["quaternion"]
+    exposure_identity["quaternion"] = [input_asdf["meta"]["pointing"]["quaternion"]]
     exposure_identity["photometry"] = input_asdf["meta"]["photometry"]# ["conversion_megajanskys"]
     # exposure_identity["photometry"] = input_asdf["meta"]["photometry"]["conversion_megajanskys_uncertainty"]
     # exposure_identity["pixel_area"] = input_asdf["meta"]["photometry"]["pixel_area"]
