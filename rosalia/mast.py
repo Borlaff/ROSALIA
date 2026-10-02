@@ -281,7 +281,7 @@ class query():
         downloaded_files = []
         for i in pbar:
             outname = exposures[i] + ".fits"
-            bandpass = "".join(products["filters"][products["exposure_id"] == exposures[i]])
+            bandpass = "".join(products["filters"][products["exposure_id"] == exposures[i]][0])
             pbar.set_description(f"Downloading {bandpass + "/" + outname}")
             if verbose: print(bandpass + "/" + outname)
             if not os.path.exists(bandpass + "/" + outname): 
