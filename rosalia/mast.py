@@ -281,12 +281,13 @@ class query():
         downloaded_files = []
         for i in pbar:
             outname = exposures[i] + ".fits"
-            pbar.set_description(f"Downloading {outname}")
-            if verbose: print(outname)
-            if not os.path.exists(bandpass+ "/" + outname): 
+            bandpass = "".join(products["filters"][products["exposure_id"] == exposures[i]])
+            pbar.set_description(f"Downloading {bandpass + "/" + outname}")
+            if verbose: print(bandpass + "/" + outname)
+            if not os.path.exists(bandpass + "/" + outname): 
                 exposure_products = products[products["exposure_id"] == exposures[i]]
                 roman_exposure = rs.core.exposure(exposure_products)
-                bandpass = roman_exposure.FILTER
+                # bandpass = roman_exposure.FILTER
                 roman_exposure.save_flc(outname=bandpass+ "/" + outname)
                 downloaded_files.append(bandpass+ "/" + outname)
             else:
