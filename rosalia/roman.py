@@ -762,3 +762,6 @@ def make_romanisim_dummy(name, ra, dec, pa, bandpass, date, catalog=None):
 
     current_run = glob.glob(name + "*.asdf")
     return(current_run)
+
+
+###################

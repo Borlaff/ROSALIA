@@ -5,6 +5,7 @@ Email: maxime.j.rizzo@nasa.gov
 Date: 2025-11-18
 """
 
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.spatial.transform import Rotation as R
@@ -14,6 +15,8 @@ from astropy import units as u
 import datetime
 import pandas as pd
 import pysiaf
+import rosalia as rs
+
 
 def get_radec(attitude_matrix):
     """
@@ -1393,7 +1396,16 @@ if __name__ == "__main__":
 
 
 
+#############
 
+def quaternion_to_WFICEN(quaternion):
+    siaf = pysiaf.Siaf('Roman', basepath=os.path.join(os.path.dirname(rs.core.__file__), "CORE", "detector/"),filename='roman_siaf_inflight_20260928.xml')
+    attitude = R.from_quat(quaternion).as_matrix()
+    
+    ra_wficen, dec_wficen = pysiaf.utils.rotations.pointing(attitude, siaf['WFI_CEN'].V2Ref, siaf['WFI_CEN'].V3Ref)
+    pa_wficen = pysiaf.utils.rotations.posangle(attitude, siaf['WFI_CEN'].V2Ref, siaf['WFI_CEN'].V3Ref)
+
+    return({"ra_wficen": ra_wficen, "dec_wficen": dec_wficen, "pa_wficen": pa_wficen})
 
 
 

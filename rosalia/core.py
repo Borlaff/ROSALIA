@@ -189,12 +189,17 @@ class exposure():
                 if len(list(set(self.EXPEND))) == 1: self.EXPEND = self.EXPEND[0] 
 
                 
-                print("TEMP WARNING: RA_TARG is set to element 0 - This has to be fixed on MAST")
-                print("TEMP WARNING: DEC_TARG is set to element 0 - This has to be fixed on MAST")
-                print("TEMP WARNING: PA is set to element 0 - This has to be fixed on MAST")
-                if isinstance(self.RA_TARG, (np.ndarray, list,)): self.RA_TARG = self.RA_TARG[0]
-                if isinstance(self.DEC_TARG, (np.ndarray, list,)): self.DEC_TARG = self.DEC_TARG[0]
-                if isinstance(self.PA, (np.ndarray, list,)): self.PA = self.PA[0]
+                print("Currently estimated through pysiaf and quaternion. This is a temporary fix until MAST fixes the RA_TARG, DEC_TARG, PA keywords in the Roman/WFI fits files.")
+
+                #print("TEMP WARNING: DEC_TARG is set to element 0 - This has to be fixed on MAST")
+                #print("TEMP WARNING: PA is set to element 0 - This has to be fixed on MAST")
+                #if isinstance(self.RA_TARG, (np.ndarray, list,)): self.RA_TARG = self.RA_TARG[0]
+                #if isinstance(self.DEC_TARG, (np.ndarray, list,)): self.DEC_TARG = self.DEC_TARG[0]
+                #if isinstance(self.PA, (np.ndarray, list,)): self.PA = self.PA[0]
+                self.attitude = rs.attitude.quaternion_to_WFICEN(self.quaternion[0])
+                self.RA_TARG = self.attitude["ra_wficen"]
+                self.DEC_TARG = self.attitude["dec_wficen"]
+                self.PA = self.attitude["pa_wficen"]
             # --------------------------------------------------------- #
             self.ROOTNAME = rs.inspector.longest_common_substring(self.FILENAME)
             self.MPC_OBSLOC = rs.horizons.get_mpc_observer_name(self.TELESCOP)
