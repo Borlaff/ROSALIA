@@ -196,7 +196,7 @@ class exposure():
                 #if isinstance(self.RA_TARG, (np.ndarray, list,)): self.RA_TARG = self.RA_TARG[0]
                 #if isinstance(self.DEC_TARG, (np.ndarray, list,)): self.DEC_TARG = self.DEC_TARG[0]
                 #if isinstance(self.PA, (np.ndarray, list,)): self.PA = self.PA[0]
-                print("Quaternion: ", self.quaternion)
+                #print("Quaternion: ", self.quaternion)
                 self.attitude = rs.attitude.quaternion_to_WFICEN(self.quaternion[0])
                 self.RA_TARG = self.attitude["ra_wficen"]
                 self.DEC_TARG = self.attitude["dec_wficen"]
@@ -773,7 +773,7 @@ class exposure():
             straylevel_list = [] 
             main_offender_list = [] 
             unique_main_offenders = []
-            for SCA in self.SCIEXTS:
+            for SCA in range(len(self.SCIEXTS)):
                     # This is the canvas array where we will store all the straylight level.
                 straylight_SCA = np.zeros(self.DATA_SHAPE[0]).astype(np.float32)
                 # This is the canvas array where we will store the ID of the largest stray-light contributor
