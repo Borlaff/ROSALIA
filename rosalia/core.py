@@ -752,7 +752,7 @@ class exposure():
                     for SCIEXT_i, DATA_SHAPE_i, ASTROPYWCS_i in zip(self.SCIEXTS, self.DATA_SHAPE, self.ASTROPYWCS)
                 ]
 
-                parallel = True
+                parallel = False
                 if parallel:
                     results = list(tqdm(executor.map(self._parallel_roman_estimate_straylight_SCA, inputs),total=len(inputs),))
 
