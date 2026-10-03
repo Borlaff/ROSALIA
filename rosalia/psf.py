@@ -139,10 +139,10 @@ class Star:
         
         Parameters
         ----------
-            wave : astropy.units.Quantity
+            wave : astropy.units.Quantity or array-like
                 Wavelength(s) at which to evaluate the SED. Any length unit
-                supported by Astropy is accepted; values are converted to
-                Angstroms internally.
+                supported by Astropy is accepted. Unitless inputs are assumed
+                to be in ``self.wave_units``.
         Returns
         -------
         numpy.ndarray or numpy scalar
@@ -156,7 +156,7 @@ class Star:
         # Check units using astropy
         if not isinstance(wave, u.Quantity):
             wave = wave * self.wave_units
-            raise warnings.warn(f"If the input wavelength is not an astropy Quantity, the units assumed are {self.wave_units}.")
+            warnings.warn(f"Input wavelength has no units; assuming {self.wave_units}.")
         
         wave = wave.to(self.wave_units).value
         return self._interpolator(wave)
@@ -232,39 +232,57 @@ class Star:
         return (wave.to(u.nm).value, mag_weights)
 
     def get_linear_weights(self, bandpass, instrument='WFI', zp=23.9, scale=0.11):
-        """Return each wavelength sample's contribution to the approximate magnitude.
-                
+        """Return filter wavelengths and spectral flux contributions in nJy/pixel.
+
         Parameters
         ----------
-            bandpass : str
-                Roman/WFI filter name, such as ``"F158"``.
-            instrument : str, optional
-                Name of the instrument containing the specified filterband. Default is 'WFI'.
-        
+        bandpass : str
+            Roman/WFI filter name, such as ``"F158"``.
+        instrument : str, optional
+            Instrument containing the filter. Defaults to ``"WFI"``.
+        zp : float, optional
+            AB zero point in the nJy convention. Defaults to 23.9, for which
+            ``f_nJy = 10**((zp - magnitude) / 2.5)``.
+        scale : float, optional
+            Pixel scale in arcsec/pixel. The returned flux contributions are
+            scaled by ``scale**2`` to give nJy/pixel from nJy/arcsec**2.
+
         Returns
-        ----------
-            numpy.ndarray
-                Values ``magnitude(wavelength) * transmission / sum(transmission)``
-                at the filter's sampled wavelengths. Their sum equals the value
-                returned by :meth:`get_magnitudes` (up to floating-point error).
+        -------
+        tuple[numpy.ndarray, numpy.ndarray]
+            ``(wavelength_nm, flux_contributions_nJy_per_pixel)``. The flux
+            contributions sum to the flux corresponding to
+            :meth:`get_magnitudes` multiplied by the pixel area.
 
         Notes
         -----
-        Despite the method name, these are magnitude contributions, not
-        dimensionless SED weights. They use the same approximate magnitude-
-        space averaging as :meth:`get_magnitudes`.
+        The target total is kept consistent with the class's approximate
+        magnitude-space filter average. The distribution across wavelength
+        follows the interpolated SED, filter transmission, and wavelength-bin
+        widths; it is intended for weighting monochromatic PSFs.
         """
         
         band = rs.telescopes.Roman.get_filter(instrument=instrument, filter_name=bandpass)
         wave = band['wavelength_bins']
         transmission = band['transmission_bins']
 
-        # Get the SED weights
+        # Preserve the same approximate band magnitude as get_magnitudes,
+        # while distributing its flux over the band using the sampled SED.
         mags = self.sed(wave)
-        fnu = 10**(0.4 * (zp - mags)) * scale**2
-        fnu_weights = fnu * transmission/np.sum(transmission)
+        wave_nm = wave.to(u.nm).value
+        throughput = np.asarray(transmission, dtype=float)
+        bin_width = np.gradient(wave_nm)
+        response = np.clip(throughput, 0, None) * np.abs(bin_width)
+        spectral_shape = 10**(-0.4 * (mags - np.nanmin(mags)))
+        relative_flux = spectral_shape * response
 
-        return (wave.to(u.nm).value, fnu_weights)
+        band_magnitude = self.get_magnitudes(bandpass, instrument=instrument)
+        target_flux = 10**(0.4 * (zp - band_magnitude)) * scale**2
+        if not np.isfinite(np.sum(relative_flux)) or np.sum(relative_flux) <= 0:
+            raise ValueError(f"Filter {bandpass!r} has no usable transmission samples.")
+        flux_weights = target_flux * relative_flux / np.sum(relative_flux)
+
+        return (wave_nm, flux_weights)
     
     def get_galsim_sed(self):
         """Build and store a GalSim SED from the catalog photometry.
@@ -1609,127 +1627,407 @@ def galsim_roman_psf(position, SCA, bandpass, shape=None, SED=None, **kwargs):
     
     return output
 
-def stpsf_roman_psf(position, SCA, bandpass, shape=None, SED=None, magnitude_weights=None, wave_weights=None, normalize=False, **kwargs):
-    '''
+def stpsf_roman_psf(position, SCA, bandpass, shape=None, SED=None,
+                    magnitude_weights=None, wave_weights=None, oversample_factor=1,
+                    flux_weights=None, zp=23.9,
+                    pixel_scale=0.11, **kwargs):
+    """Render a flux-calibrated, chromatic Roman/WFI PSF with STPSF.
+
+    Monochromatic STPSF PSFs are interpolated over the requested filter and
+    combined using the supplied spectrum. Each image pixel is in nJy/pixel;
+    the image sum is conserved to the requested integrated flux, including
+    when a rectangular output is cropped.
+
     Parameters
     ----------
-        position : sequence of float
-            Two-dimensional detector coordinates ``(x, y)`` in pixels.
-        SCA : int
-            Roman WFI SCA number, from 1 through 18.
-        bandpass : str
-            Roman WFI filter name, for example ``"F158"``.
-        shape : tuple of int, optional
-            The shape of the output PSF image in pixels, as ``(ny, nx)``. If
-            ``None``, the default size of 91x91 pixels is used.
-        SED : galsim.SED or methor or None, optional
-            The spectral energy distribution to use for the PSF. If ``None``, a plane SED is used.
-        magnitude_weights: array-like or None, optional
-            The weights to apply to each wavelength when constructing the chromatic PSF. If ``None``, equal weights are used.
-        wave_weights: array-like or None, optional
-            The wavelength of each corresponding weight in the ``weights`` array. If ``None``, equal spacing across the bandpass is assumed.
-            the units should be nanometers.
-            
+    position : sequence of float
+        Detector position ``(x, y)`` in pixels.
+    SCA : int
+        Roman WFI SCA number (1--18).
+    bandpass : str
+        Roman WFI filter name, for example ``"F158"``.
+    shape : tuple of int, optional
+        Output shape ``(ny, nx)``. Defaults to 91 by 91 pixels.
+    SED : galsim.SED, optional
+        Optional SED whose values are interpreted as spectral ``f_nu`` in
+        cgs units. If supplied without explicit weights, its band-averaged
+        flux is converted to nJy and distributed across the filter.
+    magnitude_weights : array-like, optional
+        AB magnitudes at each wavelength in ``wave_weights``. These are
+        converted to nJy/pixel using ``zp`` and ``pixel_scale``. Prefer
+        ``flux_weights`` when flux contributions are already available.
+    wave_weights : array-like or astropy.units.Quantity, optional
+        Wavelengths corresponding to ``magnitude_weights`` or
+        ``flux_weights``. Unitless values are interpreted as nanometers.
+    flux_weights : array-like, optional
+        Per-wavelength flux contributions in nJy/pixel. They are summed
+        directly and should pair with ``wave_weights``. This is the preferred
+        input for :meth:`Star.get_linear_weights` output.
+    zp : float, optional
+        AB zero point for converting magnitudes to nJy. Defaults to 23.9.
+    pixel_scale : float, optional
+        Pixel scale in arcsec/pixel, used to convert surface flux density to
+        nJy/pixel for magnitude and SED inputs. Defaults to 0.11.
+    **kwargs
+        Parameters passed to ``galsim.GSParams`` for PSF interpolation setup.
+
     Returns
     -------
-        astropy.io.fits.PrimaryHDU
-            The rendered chromatic PSF image in the primary HDU.
-    '''
-    import galsim
+    astropy.io.fits.PrimaryHDU
+        Chromatic PSF in nJy/pixel. Header includes ``BUNIT``, ``MAGZP``,
+        ``PIXSCALE``, and ``ABMAG`` (the integrated surface-brightness
+        magnitude corresponding to the pixel sum).
+
+    Notes
+    -----
+    STPSF expects monochromatic wavelengths in meters; filter curves and
+    ``wave_weights`` are handled in nanometers internally. 
+    """
+
     import stpsf
-    import numpy as np
     from scipy.interpolate import interp1d
-    from romanisim.bandpass import roman2galsim_bandpass
 
-    # Validate magnitude_weights and wave_weights arrays if provided
-    if magnitude_weights is not None and wave_weights is None:
-        raise ValueError("wave_weights must be provided if magnitude_weights are specified.")
-    elif magnitude_weights is None and wave_weights is not None:
-        raise ValueError("magnitude_weights must be provided if wave_weights are specified.")
-    else: 
-        magnitude_weights = np.array(magnitude_weights)
-        wave_weights = np.array(wave_weights)
-        if len(magnitude_weights) != len(wave_weights):
-            raise ValueError("magnitude_weights and wave_weights must have the same length.")
-
-    # 1. Determine FOV size based on shape
-    if shape is not None:
-        ny, nx = shape
-        fov = max(ny, nx)
-    else:
-        fov = 91
-        ny, nx = fov, fov
-
-    # 2. Get filter wavelength boundaries using GalSim (convert nm to meters)
-    bp = rs.telescopes.Roman.get_filter(instrument="WFI", filter_name="F158")
-    wave_min = np.min(bp['wavelength_bins'].to(u.nm).value)
-    wave_max = np.max(bp['wavelength_bins'].to(u.nm).value)
+    if magnitude_weights is not None and flux_weights is not None:
+        raise ValueError("Provide either magnitude_weights or flux_weights, not both.")
+    if (magnitude_weights is not None or flux_weights is not None) and wave_weights is None:
+        raise ValueError("wave_weights must be provided with magnitude_weights or flux_weights.")
+    if SED is not None and (magnitude_weights is not None or flux_weights is not None):
+        raise ValueError("SED cannot be combined with explicit magnitude/flux weights.")
     
-    # 3. Configure the Roman WFI model using STPSF
+    # Get the filter response for the specified bandpass
+    bp = rs.telescopes.Roman.get_filter(instrument="WFI", filter_name=bandpass)
+    filter_wave_nm = np.asarray(bp["wavelength_bins"].to(u.nm).value, dtype=float)
+    filter_throughput = np.asarray(bp["transmission_bins"], dtype=float)
+    order = np.argsort(filter_wave_nm)
+    filter_wave_nm = filter_wave_nm[order]
+    filter_throughput = filter_throughput[order]
+    valid_filter = np.isfinite(filter_wave_nm) & np.isfinite(filter_throughput)
+    filter_wave_nm = filter_wave_nm[valid_filter]
+    filter_throughput = np.clip(filter_throughput[valid_filter], 0.0, None)
+
+    # Ensure the filter has a valid wavelength grid
+    if len(filter_wave_nm) < 2 or np.any(np.diff(filter_wave_nm) <= 0):
+        raise ValueError(f"Filter {bandpass!r} has an invalid wavelength grid.")
+    
+    filter_response = filter_throughput * np.gradient(filter_wave_nm)
+    if not np.isfinite(filter_response.sum()) or filter_response.sum() <= 0:
+        raise ValueError(f"Filter {bandpass!r} has no positive transmission.")
+
+    # Measure the weights for the PSF based on the provided wave_weights, magnitude_weights, flux_weights, or SED
+    if wave_weights is not None:
+        if isinstance(wave_weights, u.Quantity):
+            sample_wave_nm = np.asarray(wave_weights.to(u.nm).value, dtype=float)
+        else:
+            sample_wave_nm = np.asarray(wave_weights, dtype=float)
+        
+        if sample_wave_nm.ndim != 1:
+            raise ValueError("wave_weights must be a one-dimensional wavelength array.")
+        
+        if magnitude_weights is not None:
+            sample_magnitudes = np.asarray(magnitude_weights, dtype=float)
+            
+            # Check that the magnitude array matches the wavelength array in shape
+            if sample_magnitudes.shape != sample_wave_nm.shape:
+                raise ValueError("magnitude_weights and wave_weights must have matching shapes.")
+            
+            throughput = np.interp(sample_wave_nm, filter_wave_nm, filter_throughput, left=0, right=0)
+            response = throughput * np.abs(np.gradient(sample_wave_nm))
+            sample_flux = 10**(0.4 * (zp - sample_magnitudes)) * pixel_scale**2
+            weights = sample_flux * response / response.sum()
+        else:
+            weights = np.asarray(flux_weights, dtype=float)
+            if weights.shape != sample_wave_nm.shape:
+                raise ValueError("flux_weights and wave_weights must have matching shapes.")
+    
+    elif SED is not None:
+        sample_wave_nm = filter_wave_nm
+        spectral_fnu = np.asarray(SED(sample_wave_nm), dtype=float)
+        
+        if spectral_fnu.shape != sample_wave_nm.shape:
+            raise ValueError("SED must return one f_nu value for each sampled wavelength.")
+        
+        # GalSim f_nu is in erg/s/cm^2/Hz; 1 nJy = 1e-32 in these units.
+        sample_flux = spectral_fnu / 1e-32
+        response = filter_response / filter_response.sum()
+        weights = sample_flux * response * pixel_scale**2
+    else:
+        # A flat 1 nJy spectrum is a useful unit-flux default.
+        sample_wave_nm = filter_wave_nm
+        weights = filter_response / filter_response.sum()
+
+    # Filter out invalid or non-positive samples
+    valid_samples = np.isfinite(sample_wave_nm) & np.isfinite(weights) & (weights >= 0)
+    sample_wave_nm = sample_wave_nm[valid_samples]
+    weights = weights[valid_samples]
+    if len(sample_wave_nm) == 0 or weights.sum() <= 0:
+        raise ValueError("The wavelength/flux weights contain no positive finite samples.")
+    if np.any(sample_wave_nm < filter_wave_nm[0]) or np.any(sample_wave_nm > filter_wave_nm[-1]):
+        raise ValueError(f"wave_weights must lie within the {bandpass} filter curve.")
+
+    # Determine the final PSF stamp shape, field of view, and position
+    if shape is None:
+        ny = nx = 91
+    else:
+        if len(shape) != 2 or min(shape) <= 0:
+            raise ValueError("shape must be a pair of positive dimensions (ny, nx).")
+        ny, nx = map(int, shape)
+    fov = max(ny, nx)
+
+    # Get the PSF from the STPSF Roman WFI model
     wfi = stpsf.roman.WFI()
     wfi.filter = bandpass
-    wfi.detector = f'SCA{SCA:02d}'
-    wfi.detector_position = position
+    wfi.detector = f"SCA{int(SCA):02d}"
+    wfi.detector_position = np.clip(position, 0, 4095) 
+
+    # Define the wavelength anchors for the chromatic PSF integration
+    wave_anchors_nm = np.linspace(filter_wave_nm[0], filter_wave_nm[-1], 10)
+    psf_cube = np.empty((len(wave_anchors_nm), fov, fov), dtype=float)
     
-    # 4. Build the fast interpolator (sample 10 points across the bandpass)
-    wave_anchors = np.linspace(wave_min, wave_max, 10)
-    psf_cube = np.zeros((len(wave_anchors), fov, fov))
+    for i, wave_nm in enumerate(wave_anchors_nm):
+        # STPSF's monochromatic parameter is in meters (not nanometers).
+        psf_hdul = wfi.calc_psf(fov_pixels=fov, monochromatic=wave_nm * 1e-9, oversample=1)
+        monochromatic_psf = np.asarray(psf_hdul[0].data, dtype=float)
+        psf_sum = np.nansum(monochromatic_psf)
+        
+        if not np.isfinite(psf_sum) or psf_sum <= 0:
+            raise RuntimeError(f"STPSF returned an invalid PSF at {wave_nm:.3f} nm.")
+        psf_cube[i] = np.nan_to_num(monochromatic_psf / psf_sum)
+
+    # Create an interpolator for the chromatic PSF based on the wavelength anchors
+    psf_interpolator = interp1d(wave_anchors_nm, psf_cube, axis=0, kind="linear",
+                                bounds_error=False, fill_value="extrapolate")
+
+    # Combbine the monochromatic PSFs weighted by the flux at each wavelength
+    chromatic_psf = np.zeros((fov, fov), dtype=float)
+    for wave_nm, flux in zip(sample_wave_nm, weights):
+        chromatic_psf += psf_interpolator(wave_nm) * flux
+
     
-    for i, w in enumerate(wave_anchors):
-        pst = wfi.calc_psf(fov_pixels=fov, monochromatic=w, oversample=1)
-        psf_cube[i] = pst[0].data
-        
-    psf_interpolator = interp1d(wave_anchors, psf_cube, axis=0, kind='linear', 
-                                bounds_error=False, fill_value='extrapolate')
+    # Normalize the chromatic PSF to match the requested total flux
+    requested_flux = float(np.sum(weights))
+    image_flux = float(np.sum(chromatic_psf))
+    if image_flux <= 0 or not np.isfinite(image_flux):
+        raise RuntimeError("Chromatic PSF integration produced no finite positive flux.")
+    chromatic_psf *= requested_flux / image_flux
 
-    # 5. Setup weights for integration
-    if magnitude_weights is None and SED is None:
-        wave_weights = np.linspace(wave_min, wave_max, 100)
-        weights = np.ones_like(wave_weights)
-    elif magnitude_weights is None and SED is not None:
-        wave_weights = np.linspace(wave_min, wave_max, 100)
-        bp_interp = interp1d(bp['wavelength_bins'].to(u.nm).value, bp['throughput'].value, kind='linear',
-                            bounds_error=False, fill_value="extrapolate")
-        magnitudes = -2.5 * np.log10(SED(wave_weights)/3631e-23)
-        magnitude_weights = bp_interp(wave_weights)*magnitudes
-        weights = 10**((23.9 - magnitude_weights + 5 * np.log10(0.11)) / 2.5)
-    else: 
-        weights = 10**((23.9 - magnitude_weights + 5 * np.log10(0.11)) / 2.5)
-        
-    # 6. Manually integrate across 100 fine steps
-    chromatic_psf = np.zeros((fov, fov))
-
-    for wave,weight in zip(wave_weights, weights):    
-        if weight <= 0 or np.isnan(weight):
-            continue
-        
-        # Extract and accumulate the weighted PSF slice
-        temp_psf = psf_interpolator(wave)
-        norm = weight / np.sum(temp_psf)
-        chromatic_psf += temp_psf * norm
-
-    # 7. Normalize the result
-    if normalize and np.sum(chromatic_psf) > 0:
-        chromatic_psf /= np.sum(chromatic_psf)
-    
-        
-
-    # Crop to requested rectangular shape if ny != nx
-    if shape is not None and ny != nx:
-        y_start = (fov - ny) // 2
-        x_start = (fov - nx) // 2
-        chromatic_psf = chromatic_psf[y_start:y_start+ny, x_start:x_start+nx]
-
-    # 8. Package into an Astropy FITS HDU
+    # Save header information and create the FITS HDU for the chromatic PSF to match ROSALIA
     hdu = fits.PrimaryHDU(data=chromatic_psf)
-    hdu.header['TELESCOP'] = 'ROMAN'
-    hdu.header['INSTRUME'] = 'WFI'
-    hdu.header['DETECTOR'] = wfi.detector
-    hdu.header['FILTER'] = bandpass
-    hdu.header['X_POS'] = position[0]
-    hdu.header['Y_POS'] = position[1]
-    
+    hdu.header["TELESCOP"] = "ROMAN"
+    hdu.header["INSTRUME"] = "WFI"
+    hdu.header["DETECTOR"] = wfi.detector
+    hdu.header["FILTER"] = bandpass
+    hdu.header["X_POS"] = position[0]
+    hdu.header["Y_POS"] = position[1]
+    hdu.header["BUNIT"] = "nJy/pixel"
+    hdu.header["MAGZP"] = (float(zp), "AB zero point for flux values in nJy")
+    hdu.header["PIXSCALE"] = (float(pixel_scale), "Pixel scale in arcsec/pixel")
+    hdu.header["TOTFLUX"] = (requested_flux, "Integrated PSF flux in nJy")
+    hdu.header["ABMAG"] = (float(zp - 2.5 * np.log10(requested_flux / pixel_scale**2)),
+                            "Integrated AB magnitude per square arcsec")
     return hdu
+
+
+
+def superback_roman_psf(position, SCA, bandpass, shape=None, SED=None,
+                    magnitude_weights=None, wave_weights=None, oversample_factor=1,
+                    flux_weights=None, zp=23.9,
+                    pixel_scale=0.11, **kwargs):
+    """Render a flux-calibrated, chromatic Roman/WFI PSF with SUPERBACK analytical model.
+
+    Monochromatic STPSF PSFs are interpolated over the requested filter and
+    combined using the supplied spectrum. Each image pixel is in nJy/pixel;
+    the image sum is conserved to the requested integrated flux, including
+    when a rectangular output is cropped.
+
+    Parameters
+    ----------
+    position : sequence of float
+        Detector position ``(x, y)`` in pixels.
+    SCA : int
+        Roman WFI SCA number (1--18).
+    bandpass : str
+        Roman WFI filter name, for example ``"F158"``.
+    shape : tuple of int, optional
+        Output shape ``(ny, nx)``. Defaults to 91 by 91 pixels.
+    SED : galsim.SED, optional
+        Optional SED whose values are interpreted as spectral ``f_nu`` in
+        cgs units. If supplied without explicit weights, its band-averaged
+        flux is converted to nJy and distributed across the filter.
+    magnitude_weights : array-like, optional
+        AB magnitudes at each wavelength in ``wave_weights``. These are
+        converted to nJy/pixel using ``zp`` and ``pixel_scale``. Prefer
+        ``flux_weights`` when flux contributions are already available.
+    wave_weights : array-like or astropy.units.Quantity, optional
+        Wavelengths corresponding to ``magnitude_weights`` or
+        ``flux_weights``. Unitless values are interpreted as nanometers.
+    flux_weights : array-like, optional
+        Per-wavelength flux contributions in nJy/pixel. They are summed
+        directly and should pair with ``wave_weights``. This is the preferred
+        input for :meth:`Star.get_linear_weights` output.
+    zp : float, optional
+        AB zero point for converting magnitudes to nJy. Defaults to 23.9.
+    pixel_scale : float, optional
+        Pixel scale in arcsec/pixel, used to convert surface flux density to
+        nJy/pixel for magnitude and SED inputs. Defaults to 0.11.
+    **kwargs
+        Parameters passed to ``galsim.GSParams`` for PSF interpolation setup.
+
+    Returns
+    -------
+    astropy.io.fits.PrimaryHDU
+        Chromatic PSF in nJy/pixel. Header includes ``BUNIT``, ``MAGZP``,
+        ``PIXSCALE``, and ``ABMAG`` (the integrated surface-brightness
+        magnitude corresponding to the pixel sum).
+
+    Notes
+    -----
+    STPSF expects monochromatic wavelengths in meters; filter curves and
+    ``wave_weights`` are handled in nanometers internally. 
+    """
+
+    import rosalia.superback as superback
+    from scipy.interpolate import interp1d
+
+    if magnitude_weights is not None and flux_weights is not None:
+        raise ValueError("Provide either magnitude_weights or flux_weights, not both.")
+    if (magnitude_weights is not None or flux_weights is not None) and wave_weights is None:
+        raise ValueError("wave_weights must be provided with magnitude_weights or flux_weights.")
+    if SED is not None and (magnitude_weights is not None or flux_weights is not None):
+        raise ValueError("SED cannot be combined with explicit magnitude/flux weights.")
+    
+    # Get the filter response for the specified bandpass
+    bp = rs.telescopes.Roman.get_filter(instrument="WFI", filter_name=bandpass)
+    filter_wave_nm = np.asarray(bp["wavelength_bins"].to(u.nm).value, dtype=float)
+    filter_throughput = np.asarray(bp["transmission_bins"], dtype=float)
+    order = np.argsort(filter_wave_nm)
+    filter_wave_nm = filter_wave_nm[order]
+    filter_throughput = filter_throughput[order]
+    valid_filter = np.isfinite(filter_wave_nm) & np.isfinite(filter_throughput)
+    filter_wave_nm = filter_wave_nm[valid_filter]
+    filter_throughput = np.clip(filter_throughput[valid_filter], 0.0, None)
+
+    # Ensure the filter has a valid wavelength grid
+    if len(filter_wave_nm) < 2 or np.any(np.diff(filter_wave_nm) <= 0):
+        raise ValueError(f"Filter {bandpass!r} has an invalid wavelength grid.")
+    
+    filter_response = filter_throughput * np.gradient(filter_wave_nm)
+    if not np.isfinite(filter_response.sum()) or filter_response.sum() <= 0:
+        raise ValueError(f"Filter {bandpass!r} has no positive transmission.")
+
+    # Measure the weights for the PSF based on the provided wave_weights, magnitude_weights, flux_weights, or SED
+    if wave_weights is not None:
+        if isinstance(wave_weights, u.Quantity):
+            sample_wave_nm = np.asarray(wave_weights.to(u.nm).value, dtype=float)
+        else:
+            sample_wave_nm = np.asarray(wave_weights, dtype=float)
+        
+        if sample_wave_nm.ndim != 1:
+            raise ValueError("wave_weights must be a one-dimensional wavelength array.")
+        
+        if magnitude_weights is not None:
+            sample_magnitudes = np.asarray(magnitude_weights, dtype=float)
+            
+            # Check that the magnitude array matches the wavelength array in shape
+            if sample_magnitudes.shape != sample_wave_nm.shape:
+                raise ValueError("magnitude_weights and wave_weights must have matching shapes.")
+            
+            throughput = np.interp(sample_wave_nm, filter_wave_nm, filter_throughput, left=0, right=0)
+            response = throughput * np.abs(np.gradient(sample_wave_nm))
+            sample_flux = 10**(0.4 * (zp - sample_magnitudes)) * pixel_scale**2
+            weights = sample_flux * response / response.sum()
+        else:
+            weights = np.asarray(flux_weights, dtype=float)
+            if weights.shape != sample_wave_nm.shape:
+                raise ValueError("flux_weights and wave_weights must have matching shapes.")
+    
+    elif SED is not None:
+        sample_wave_nm = filter_wave_nm
+        spectral_fnu = np.asarray(SED(sample_wave_nm), dtype=float)
+        
+        if spectral_fnu.shape != sample_wave_nm.shape:
+            raise ValueError("SED must return one f_nu value for each sampled wavelength.")
+        
+        # GalSim f_nu is in erg/s/cm^2/Hz; 1 nJy = 1e-32 in these units.
+        sample_flux = spectral_fnu / 1e-32
+        response = filter_response / filter_response.sum()
+        weights = sample_flux * response * pixel_scale**2
+    else:
+        # A flat 1 nJy spectrum is a useful unit-flux default.
+        sample_wave_nm = filter_wave_nm
+        weights = filter_response / filter_response.sum()
+
+    # Filter out invalid or non-positive samples
+    valid_samples = np.isfinite(sample_wave_nm) & np.isfinite(weights) & (weights >= 0)
+    sample_wave_nm = sample_wave_nm[valid_samples]
+    weights = weights[valid_samples]
+    if len(sample_wave_nm) == 0 or weights.sum() <= 0:
+        raise ValueError("The wavelength/flux weights contain no positive finite samples.")
+    if np.any(sample_wave_nm < filter_wave_nm[0]) or np.any(sample_wave_nm > filter_wave_nm[-1]):
+        raise ValueError(f"wave_weights must lie within the {bandpass} filter curve.")
+
+    # Determine the final PSF stamp shape and field of view
+    if shape is None:
+        ny = nx = 91
+    else:
+        if len(shape) != 2 or min(shape) <= 0:
+            raise ValueError("shape must be a pair of positive dimensions (ny, nx).")
+        ny, nx = map(int, shape)
+    fov = max(ny, nx)
+
+    # Get the thetax, thetay coordinates for the source position
+    thetax, thetay = get_detector_position_telescope_frame(SCA, idl_x=position[0], idl_y=position[1])
+    x_src, y_src = create_psf_grid(fov, scale_arcsec=0.108, oversample_factor=oversample_factor)
+
+    # Get the PSF from the STPSF Roman WFI model
+    bard = superback.getbardict(thetax, thetay)
+
+    # Define the wavelength anchors for the chromatic PSF integration
+    wave_anchors_nm = np.linspace(filter_wave_nm[0], filter_wave_nm[-1], 10)
+    psf_cube = np.empty((len(wave_anchors_nm), fov, fov), dtype=float)
+    
+    for i, wave_nm in enumerate(wave_anchors_nm):
+        # STPSF's monochromatic parameter is in meters (not nanometers).
+        psf_hdul = np.abs(superback.romanpsf(x_src, y_src, wave_nm * 1e-9, barparam=bard))**2
+        monochromatic_psf = np.asarray(psf_hdul, dtype=float)
+        psf_sum = np.nansum(monochromatic_psf)
+        
+        if not np.isfinite(psf_sum) or psf_sum <= 0:
+            raise RuntimeError(f"STPSF returned an invalid PSF at {wave_nm:.3f} nm.")
+        psf_cube[i] = np.nan_to_num(monochromatic_psf / psf_sum)
+
+    # Create an interpolator for the chromatic PSF based on the wavelength anchors
+    psf_interpolator = interp1d(wave_anchors_nm, psf_cube, axis=0, kind="linear",
+                                bounds_error=False, fill_value="extrapolate")
+
+    # Combbine the monochromatic PSFs weighted by the flux at each wavelength
+    chromatic_psf = np.zeros((fov, fov), dtype=float)
+    for wave_nm, flux in zip(sample_wave_nm, weights):
+        chromatic_psf += psf_interpolator(wave_nm) * flux
+
+    
+    # Normalize the chromatic PSF to match the requested total flux
+    requested_flux = float(np.sum(weights))
+    image_flux = float(np.sum(chromatic_psf))
+    if image_flux <= 0 or not np.isfinite(image_flux):
+        raise RuntimeError("Chromatic PSF integration produced no finite positive flux.")
+    chromatic_psf *= requested_flux / image_flux
+
+    # Save header information and create the FITS HDU for the chromatic PSF to match ROSALIA
+    hdu = fits.PrimaryHDU(data=chromatic_psf)
+    hdu.header["TELESCOP"] = "ROMAN"
+    hdu.header["INSTRUME"] = "WFI"
+    hdu.header["DETECTOR"] = f'WFI{SCA:02d}_FULL'
+    hdu.header["FILTER"] = bandpass
+    hdu.header["X_POS"] = position[0]
+    hdu.header["Y_POS"] = position[1]
+    hdu.header["BUNIT"] = "nJy/pixel"
+    hdu.header["MAGZP"] = (float(zp), "AB zero point for flux values in nJy")
+    hdu.header["PIXSCALE"] = (float(pixel_scale), "Pixel scale in arcsec/pixel")
+    hdu.header["TOTFLUX"] = (requested_flux, "Integrated PSF flux in nJy")
+    hdu.header["ABMAG"] = (float(zp - 2.5 * np.log10(requested_flux / pixel_scale**2)),
+                            "Integrated AB magnitude per square arcsec")
+    return hdu
+
 
 
 def moffat_2d(shape, mu0, alpha, beta):
@@ -1762,7 +2060,7 @@ def moffat_2d(shape, mu0, alpha, beta):
 def get_psf_extension_moffat(mag, depth=30, alpha=0.08, beta=1.52):
     """
     Analytically calculate the PSF extension based on a standard Moffat profile at a given depth.
-    
+        
     Parameters
     ----------
         mag: float or array-like
@@ -1795,3 +2093,247 @@ def get_psf_extension_moffat(mag, depth=30, alpha=0.08, beta=1.52):
     extension = alpha * np.sqrt(term)
     
     return extension.item() if extension.ndim == 0 else extension
+
+def build_psf_canvas(stars_catalog, shape_out, bandpass, depth=31, n_workers=None,
+                     method="superback"):
+    '''
+    Build a PSF canvas from a catalog of stars in parallel.
+
+    Parameters
+    ----------
+        stars_catalog: pandas.DataFrame
+            Catalog of stars containing at least columns:
+                `ra`, `dec`, `x`, `y`, `detector_id`, `x_det`, `y_det`
+        shape_out: tuple
+            Shape of the output PSF canvas (ny, nx).
+        bandpass: str
+            Bandpass of the observation in Roman WFI filter names (e.g., F062, F087, F106, F129, F158, F184, F213).
+        depth: float, optional
+            Depth at which to build the PSF in mag arcsecond^-2. Default is 31.
+        n_workers: int, optional
+            Maximum number of parallel workers. Defaults to at most two to limit
+            the memory used by concurrently generated PSF models.
+        method: str, optional
+            PSF model to use. Defaults to ``"superback"``.
+
+    Returns
+    -------
+        np.ndarray
+            PSF canvas of shape `shape_out`.
+
+    Notes
+    -----
+        The positions of each detector follow the SIAF convention in pixel coordinates.
+        
+    '''
+
+    if not isinstance(stars_catalog, pd.DataFrame):
+        raise TypeError("stars_catalog must be a pandas DataFrame.")
+    if len(shape_out) != 2 or any(int(size) <= 0 for size in shape_out):
+        raise ValueError("shape_out must contain two positive dimensions (ny, nx).")
+    shape_out = tuple(int(size) for size in shape_out)
+    if not np.isfinite(depth):
+        raise ValueError("depth must be finite.")
+    if not isinstance(bandpass, str) or not bandpass:
+        raise ValueError("bandpass must be a non-empty filter name.")
+
+    required_columns = {
+        "ra", "dec", "source_id", "detector_id", "x_det", "y_det", "x", "y",
+        "phot_bp_mean_mag_AB", "phot_g_mean_mag_AB", "phot_rp_mean_mag_AB",
+        "phot_w1_mean_mag_AB", "phot_w2_mean_mag_AB", "phot_w3_mean_mag_AB",
+        "phot_w4_mean_mag_AB", "phot_j_mean_mag_AB", "phot_h_mean_mag_AB",
+        "phot_ks_mean_mag_AB",
+    }
+    missing_columns = required_columns.difference(stars_catalog.columns)
+    if missing_columns:
+        raise ValueError(
+            "stars_catalog is missing required columns: "
+            + ", ".join(sorted(missing_columns))
+        )
+
+    canvas = np.zeros(shape_out, dtype=float)
+    if stars_catalog.empty:
+        return canvas
+
+    if n_workers is None:
+        n_workers = min(2, os.cpu_count() or 1)
+    if isinstance(n_workers, bool) or not isinstance(n_workers, (int, np.integer)) or n_workers < 1:
+        raise ValueError("n_workers must be a positive integer or None.")
+    n_workers = min(int(n_workers), len(stars_catalog))
+
+    from concurrent.futures import ThreadPoolExecutor
+    from threading import Lock
+
+    canvas_lock = Lock()
+    with tqdm(
+        total=len(stars_catalog),
+        desc="Injecting star PSFs",
+        unit="star",
+        position=0,
+        leave=True,
+    ) as progress:
+        worker_catalogs = [
+            stars_catalog.iloc[offset::n_workers]
+            for offset in range(n_workers)
+        ]
+        with ThreadPoolExecutor(max_workers=n_workers) as executor:
+            futures = [
+                executor.submit(
+                    _build_psf_for_worker,
+                    worker_catalog,
+                    depth,
+                    bandpass,
+                    canvas,
+                    canvas_lock,
+                    method,
+                    progress,
+                )
+                for worker_catalog in worker_catalogs
+            ]
+            for future in futures:
+                future.result()
+
+    return canvas
+
+
+def _build_psf_for_worker(stars_catalog, depth, bandpass, canvas, canvas_lock,
+                          method="superback", progress=None, pixel_scale=0.11):
+    '''
+    Generate and inject the PSFs assigned to a worker into the shared canvas.
+
+    Parameters
+    ----------
+        stars_catalog: pandas.DataFrame
+            Catalog of stars assigned to this worker.
+        depth: float
+            Depth at which to build the PSF in mag arcsecond^-2.
+        bandpass: str
+            Roman WFI bandpass used to compute the stellar spectrum.
+        canvas: np.ndarray
+            Shared output canvas. Updates are protected by ``canvas_lock``.
+        canvas_lock: threading.Lock
+            Lock protecting overlapping PSF additions to the canvas.
+        progress: tqdm.tqdm, optional
+            Shared progress bar advanced after each PSF is injected.
+    '''
+    for _, row in stars_catalog.iterrows():
+        x, y = float(row["x"]), float(row["y"])
+        x_det, y_det = float(row["x_det"]), float(row["y_det"])
+        detector_id = int(row["detector_id"])
+        if not np.all(np.isfinite([x, y, x_det, y_det])):
+            raise ValueError(f"Star {row['source_id']!r} has non-finite pixel coordinates.")
+        if detector_id < 1 or detector_id > 18 or detector_id != row["detector_id"]:
+            raise ValueError(f"Star {row['source_id']!r} has invalid detector_id {row['detector_id']!r}.")
+
+        star = Star(row)
+        magnitude = star.get_magnitudes(bandpass)
+        extension = get_psf_extension_moffat(magnitude, depth=depth)
+        if not np.isfinite(extension):
+            raise ValueError(f"Could not determine a finite PSF size for star {row['source_id']!r}.")
+
+        radius_pixels = max(1, int(np.ceil(extension / pixel_scale)))
+        stamp_size = 2 * radius_pixels + 1
+        wave_weights, flux_weights = star.get_linear_weights(bandpass)
+        psf_model = rs.telescopes.Roman.get_psf(
+            position=(x_det, y_det),
+            SCA=detector_id,
+            bandpass=bandpass,
+            shape=(stamp_size, stamp_size),
+            method=method,
+            wave_weights=wave_weights,
+            flux_weights=flux_weights,
+        )
+        psf_data = np.asarray(psf_model.data, dtype=float)
+
+        center_x, center_y = int(np.rint(x)), int(np.rint(y))
+        x_start = center_x - psf_data.shape[1] // 2
+        y_start = center_y - psf_data.shape[0] // 2
+        x_end = x_start + psf_data.shape[1]
+        y_end = y_start + psf_data.shape[0]
+        canvas_x_start, canvas_y_start = max(0, x_start), max(0, y_start)
+        canvas_x_end = min(canvas.shape[1], x_end)
+        canvas_y_end = min(canvas.shape[0], y_end)
+
+        if canvas_x_start < canvas_x_end and canvas_y_start < canvas_y_end:
+            psf_x_start = canvas_x_start - x_start
+            psf_y_start = canvas_y_start - y_start
+            psf_x_end = psf_x_start + canvas_x_end - canvas_x_start
+            psf_y_end = psf_y_start + canvas_y_end - canvas_y_start
+            with canvas_lock:
+                canvas[canvas_y_start:canvas_y_end, canvas_x_start:canvas_x_end] += (
+                    psf_data[psf_y_start:psf_y_end, psf_x_start:psf_x_end]
+                )
+
+        del psf_data, psf_model, wave_weights, flux_weights, star
+        if progress is not None:
+            progress.update(1)
+
+
+def get_detector_position_telescope_frame(detector_id, idl_x=0, idl_y=0):
+    """
+    Convert detector position to telescope frame coordinates.
+    
+    Parameters
+    ----------
+    detector_id : str
+        Detector identifier (e.g., 'WFI01')
+    idl_x : float
+        X position in detector ideal frame (pixels)
+    idl_y : float
+        Y position in detector ideal frame (pixels)
+        
+    Returns
+    -------
+    thetax : float
+        V2 position in telescope frame (radians)
+    thetay : float
+        V3 position in telescope frame (radians)
+    """
+    import stpsf
+
+    siaf = stpsf.stpsf_core.get_siaf_with_caching('roman')
+    aperture_name = f'WFI{detector_id:02d}_FULL'
+    
+    if aperture_name not in siaf.apertures:
+        raise ValueError(f"Aperture {aperture_name} not found in SIAF")
+    
+    aperture = siaf.apertures[aperture_name]
+    thetax_deg, thetay_deg = aperture.idl_to_tel(idl_x, idl_y)
+    
+    # Convert from degrees to radians
+    thetax_rad = thetax_deg * np.pi / 180 / 60 / 60
+    thetay_rad = thetay_deg * np.pi / 180 / 60 / 60
+    
+    return thetax_rad, thetay_rad
+
+
+def create_psf_grid(size_pixels, scale_arcsec, oversample_factor=1):
+    """
+    Create coordinate grids for PSF calculation.
+    
+    Parameters
+    ----------
+    size_pixels : int
+        PSF array size (will be size_pixels x size_pixels)
+    scale_arcsec : float
+        Pixel scale in arcsec/pixel
+    oversample_factor : float
+        Sub-pixel sampling factor
+        
+    Returns
+    -------
+    x : ndarray
+        X coordinate grid in arcsec
+    y : ndarray
+        Y coordinate grid in arcsec
+    """
+    # Create fine grid with oversampling
+    fine_size = size_pixels * oversample_factor
+    fine_scale = scale_arcsec / oversample_factor
+    
+    # Centered at (0, 0), extend ±half the field
+    half_field = (size_pixels * scale_arcsec) / 2
+    coords = np.linspace(-half_field + fine_scale/2, half_field - fine_scale/2, fine_size)
+    
+    x, y = np.meshgrid(coords, coords)
+    return x, y

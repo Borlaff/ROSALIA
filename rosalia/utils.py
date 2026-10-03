@@ -220,7 +220,7 @@ def exposure_inspector(input_name, verbose=False, lite=False):
             input_name = s3_paths
             # print(input_name)
         else:
-            input_name = glob.glob(input_name)
+            input_name = sorted(glob.glob(input_name))
 
 
     if isinstance(input_name, (list,)):
@@ -2115,3 +2115,39 @@ def get_astropywcs_info_from_sciexts(filename, sciexts):
             "DATA_SHAPE": data_shape,
             "ASTROPYWCS": astropywcs,
             "PIXSCALE": np.abs(astropywcs[0].proj_plane_pixel_scales()[0])})
+
+
+def distribute_indices_numpy(nums, N):
+    '''
+    Distribute indices of an array into N roughly equal parts in a balanced manner.
+
+    Parameters
+    ----------
+        nums: array-like
+            Array of numbers to distribute.
+        N: int
+            Number of parts to distribute into.
+
+    Returns
+    -------
+        list of lists
+            Each sublist contains the indices of `nums` assigned to that part.
+    '''
+
+    if not nums or N <= 0:
+        return [[] for _ in range(N)]
+        
+    # Convert to array and get sorted indices in descending order in C
+    nums_arr = np.array(nums, copy=False)
+    sorted_indices = np.argsort(-nums_arr) 
+    
+    distributed = []
+    for b in range(N):
+        # Slice and concatenate the numpy array
+        forward = sorted_indices[b :: 2*N]
+        backward = sorted_indices[2*N - 1 - b :: 2*N]
+        
+        # Convert back to standard python list
+        distributed.append(np.concatenate((forward, backward)).tolist())
+        
+    return distributed

@@ -749,7 +749,7 @@ class exposure():
     
 
 
-    def psf(self, g_mag_max=15, catalog=None, verbose=False):
+    def psf(self, g_mag_max=15, depth=31, catalog=None, method='superback', n_stars=None, n_workers=None, verbose=False):
         #######################################
         # rosalia_psf: Alejandro S. Borlaff. NASA/Ames STA. a.s.borlaff@nasa.gov
         # -------------------------------
@@ -801,6 +801,10 @@ class exposure():
         logger = logging.getLogger()
         logger.setLevel(logging.CRITICAL)
 
+        # Set the number of workers for parallel processing if not specified    
+        if n_workers is None:
+            n_workers = min(2, os.cpu_count() or 1)
+
         # Get the catalog of the stars around the FOV
         if not hasattr(self, 'source_catalog'):
             if catalog is None:
@@ -809,82 +813,50 @@ class exposure():
                 self.source_catalog = rs.utils.fix_custom_catalog(catalog)
 
         # Get the optimal wcs
-        self.optimal_wcs, self.shape_out = find_optimal_celestial_wcs([(self.DATA_SHAPE[i], self.ASTROPYWCS[i]) for i in range(len(self.SCIEXTS))])    
-
+        if not hasattr(self, 'optimal_wcs') or not hasattr(self, 'shape_out'):
+            self.optimal_wcs, self.shape_out = find_optimal_celestial_wcs([(self.DATA_SHAPE[i], self.ASTROPYWCS[i]) for i in range(len(self.SCIEXTS))],
+                                                                          auto_rotate=True)    
 
         # Find stars around the entire WFI footprint
         stars_in_footprint = self.is_inside_wfi(ra=self.source_catalog["ra"], dec=self.source_catalog["dec"])
         stars_catalog = self.source_catalog[stars_in_footprint]
-
+        if n_stars is not None:
+            stars_catalog = stars_catalog.head(n_stars)
+        
+        
         # Find the closest detector to each star
         stars_catalog["detector_id"] = self.find_closest_detector(ra=stars_catalog["ra"], dec=stars_catalog["dec"]) + 1
 
+        # Find x and y coordinates in each detector to generate the PSF 
+        for detector_id in stars_catalog["detector_id"].unique():
+            stars_in_detector = stars_catalog["detector_id"] == detector_id
+            stars_catalog.loc[stars_in_detector, "x_det"], stars_catalog.loc[stars_in_detector, "y_det"] = self.ASTROPYWCS[detector_id-1].world_to_pixel(
+                SkyCoord(
+                    ra=np.asarray(stars_catalog.loc[stars_in_detector, "ra"], dtype=float) * u.deg,
+                    dec=np.asarray(stars_catalog.loc[stars_in_detector, "dec"], dtype=float) * u.deg,
+                )
+            )
+
+        # Add x,y coordinates in the catalog
+        stars_catalog["x"], stars_catalog["y"] = self.optimal_wcs.world_to_pixel(
+            SkyCoord(
+                ra=np.asarray(stars_catalog["ra"], dtype=float) * u.deg,
+                dec=np.asarray(stars_catalog["dec"], dtype=float) * u.deg,
+            )
+        )
+
+        # Build the PSF canvas for the stars in the catalog
+        canvas = rs.psf.build_psf_canvas(
+            stars_catalog,
+            shape_out=self.shape_out,
+            bandpass=self.FILTER,
+            depth=depth,
+            n_workers=n_workers,
+            method=method,
+        )
         
         
-        # Generate the star stamps (PSFs)
-        print("TO DO: Make stamps with a more reasonable size. Dim stars can have smaller PSFs.")
-        print("To do this, make a profile of the Roman / PSF, and find out when would it be essentially 0.")
-        star_stamps = rs.psf.generate_star_stamps(hybrid_catalog=self.source_catalog,
-                                                # image_identity=image_identity),
-                                                 telescope=self.TELESCOP, 
-                                                 filename=self.FILENAME, 
-                                                 sciexts=self.SCIEXTS, 
-                                                 astropywcs=self.ASTROPYWCS,
-                                                 filter=self.FILTER_IDENTITY["wavelength"],
-                                                 pa=self.PA, verbose=verbose)
-        # def generate_star_stamps(hybrid_catalog, telescope, filename, sciexts, astropywcs, filter, pa, verbose=False):
-
-
-        # Now combine all the stamps in the mosaiced frame and blot back to the single SCAs.
-        # This is more efficient than reprojecting each star into all SCAs.
-        # Flattening the list of lists.
-        star_stamps_flat = []
-        for i in range(len(star_stamps)):
-            star_stamps_flat = star_stamps_flat + star_stamps[i]
-
-        # Making the combined frame.
-        os.system("swarp -dd > swarp.conf")
-        swarp_cmd_str = ""
-        for star_stamp in star_stamps_flat:
-            swarp_cmd_str = swarp_cmd_str + '"' + star_stamp +'" '
-
-        if verbose > 1: print("Combining star stamps into WCS frame...")
-        cmd = "swarp -c swarp.conf -SUBTRACT_BACK N -BLANK_BADPIXELS Y -COMBINE_TYPE SUM -VERBOSE_TYPE QUIET " + swarp_cmd_str
-        if verbose > 2: print(cmd)
-        rs.utils.execute_cmd(cmd)  # Run swarp on all the SCAs
-        star_swarp_name = self.FILENAME.replace(".fits", "_stars_drz.fits")
-        rs.utils.execute_cmd("mv coadd.fits " + star_swarp_name) # Make a compressed version, for easiest visualization.
-
-        # Now blot back to the dummy SCA per SCA frame
-        from reproject import reproject_interp
-        # Let's make a dummy copy to reproject the stars into
-        roman_dummy = fits.open(self.FILENAME, memmap=True)
-        star_model = fits.open(star_swarp_name, memmap=True)
-
-        if verbose: print("Storing stars in each SCA")
-        for SCIEXT_i in tqdm(self.SCIEXTS):
-            # Open the star fits
-            star_reprojected, footprint = reproject_interp(star_model[0],
-                                                           roman_dummy[SCIEXT_i].header, 
-                                                           parallel=True)
-            star_reprojected[np.isnan(star_reprojected)] = 0
-            roman_dummy[SCIEXT_i].data = roman_dummy[SCIEXT_i].data + star_reprojected
-
-        roman_dummy.verify("silentfix")
-        star_output_name = self.FILENAME.replace(".fits", "_stars.fits")
-        roman_dummy.writeto(star_output_name, overwrite=True)
-
-        # Now make again the drz, this time with the correct gaps.
-        drz_name, scaled_drz_name = rs.utils.run_swarp(pattern=star_output_name, 
-                                                       outname=star_output_name.replace(".fits","_drz.fits"), scale=0.11)
-
-
-        if verbose: 
-            print("In-field stray-light model completed. Level 2 multi-extension FITS: " + star_output_name)
-            print("Mosaic image: " + drz_name)
-            print("Scaled mosaic: " + scaled_drz_name)
-        return(star_output_name)
-
+        return canvas 
 
 
     def zodiacal(self, zody_mode="zodipy", verbose=False, output_name=None, output_units="e/s"):

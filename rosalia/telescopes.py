@@ -576,14 +576,11 @@ class Roman:
             raise ValueError(f"Invalid method '{method}'. Available methods are: {', '.join(available_methods)}")
         
         if method == 'stpsf':
-            # Implement STScI's stpsf Roman PSF model generation
             output = rs.psf.stpsf_roman_psf(position=position, SCA=SCA, bandpass=bandpass, shape=shape, SED=SED, **kwargs)
         elif method == 'galsim':
             output = rs.psf.galsim_roman_psf(position=position, SCA=SCA, bandpass=bandpass, shape=shape, SED=SED, **kwargs)
-
         elif method == 'superback':
-            # Implement SUPERBACK analytical model generation
-            pass
+            output = rs.psf.superback_roman_psf(position=position, SCA=SCA, bandpass=bandpass, shape=shape, SED=SED, **kwargs)
 
 
         return output
