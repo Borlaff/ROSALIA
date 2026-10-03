@@ -347,6 +347,221 @@ class Star:
 
 ############################
 
+def recover_detector_frames(canvas, optimal_wcs, detector_wcs, detector_shapes=None):
+    """
+    Reproject a mosaic canvas into the pixel grid of each detector.
+
+    The returned list follows the same ordering as ``detector_wcs`` and can be
+    used like an exposure's ``DATA`` list.
+    """
+    from reproject import reproject_interp
+
+    if np.ndim(canvas) != 2:
+        raise ValueError("canvas must be a two-dimensional image")
+
+    detector_wcs = list(detector_wcs)
+    if detector_shapes is not None:
+        detector_shapes = list(detector_shapes)
+        if len(detector_shapes) != len(detector_wcs):
+            raise ValueError("detector_shapes and detector_wcs must have the same length")
+
+    detector_frames = []
+    for i, wcs in enumerate(detector_wcs):
+        shape = detector_shapes[i] if detector_shapes is not None else wcs.array_shape
+        if shape is None:
+            raise ValueError(
+                "Detector image shape is required when its WCS has no array_shape"
+            )
+
+        frame, _ = reproject_interp(
+            (canvas, optimal_wcs),
+            output_projection=wcs,
+            shape_out=tuple(shape),
+        )
+        detector_frames.append(frame)
+
+    return detector_frames
+
+
+ROMAN_N_DETECTORS = 18
+ROMAN_DETECTOR_SIZE = 4088
+
+
+def _roman_apertures():
+    import pysiaf
+    siaf = pysiaf.Siaf("Roman")
+    detectors = [siaf["WFI%02d_FULL" % (i + 1)] for i in range(ROMAN_N_DETECTORS)]
+    return siaf["WFI_CEN"], detectors
+
+
+def _detector_to_canvas(center, detector, x, y, pixscale, origin):
+    # x, y: 0-based detector pixels. Returns 0-based canvas pixels.
+    v2, v3 = detector.sci_to_tel(np.asarray(x) + 1.0, np.asarray(y) + 1.0)
+    xidl, yidl = center.tel_to_idl(v2, v3)
+    return (xidl - origin[0]) / pixscale - 0.5, (yidl - origin[1]) / pixscale - 0.5
+
+
+def _canvas_to_detector(center, detector, cx, cy, pixscale, origin):
+    xidl = origin[0] + (np.asarray(cx) + 0.5) * pixscale
+    yidl = origin[1] + (np.asarray(cy) + 0.5) * pixscale
+    v2, v3 = center.idl_to_tel(xidl, yidl)
+    x, y = detector.tel_to_sci(v2, v3)
+    return x - 1.0, y - 1.0
+
+
+def get_roman_canvas_geometry(pixscale=0.11):
+    """
+    Geometry of the full Roman/WFI canvas, computed only from pysiaf.
+    The canvas lives in the ideal frame of WFI_CEN, with pixel size pixscale (arcsec).
+    Returns the (x, y) ideal-frame origin of the canvas edge and its (ny, nx) shape.
+    """
+    center, detectors = _roman_apertures()
+    edge = np.array([0.5, ROMAN_DETECTOR_SIZE + 0.5])
+    xs, ys = [], []
+    for detector in detectors:
+        corner_x, corner_y = np.meshgrid(edge, edge)
+        v2, v3 = detector.sci_to_tel(corner_x.ravel(), corner_y.ravel())
+        xidl, yidl = center.tel_to_idl(v2, v3)
+        xs.append(xidl)
+        ys.append(yidl)
+    xs, ys = np.concatenate(xs), np.concatenate(ys)
+    origin = (xs.min(), ys.min())
+    shape = (int(np.ceil((ys.max() - origin[1]) / pixscale)),
+             int(np.ceil((xs.max() - origin[0]) / pixscale)))
+    return origin, shape
+
+
+def _sample_image(image, x, y):
+    # Bilinear sampling at 0-based pixel positions. NaN outside the image.
+    from scipy.ndimage import map_coordinates
+    ny, nx = image.shape
+    inside = (x >= -0.5) & (x <= nx - 0.5) & (y >= -0.5) & (y <= ny - 0.5)
+    values = map_coordinates(image, [np.clip(y, 0, ny - 1), np.clip(x, 0, nx - 1)],
+                             order=1, mode="nearest")
+    return np.where(inside, values, np.nan)
+
+
+def _fit_tan_wcs(pix_x, pix_y, ra, dec, sip_degree=None, array_shape=None):
+    from astropy.wcs.utils import fit_wcs_from_points
+    world = SkyCoord(ra, dec, unit="deg", frame="icrs")
+    wcs = fit_wcs_from_points((pix_x, pix_y), world, proj_point="center",
+                              projection="TAN", sip_degree=sip_degree)
+    if array_shape is not None:
+        wcs.array_shape = tuple(array_shape)
+    return wcs
+
+
+def get_roman_canvas_wcs(wcs_list, pixscale=0.11):
+    """
+    WCS and shape of the full Roman/WFI canvas from the 18 detector WCS, using only pysiaf
+    for the layout (no reproject). Returns (canvas_wcs, shape) with shape = (ny, nx).
+    """
+    if len(wcs_list) != ROMAN_N_DETECTORS:
+        raise ValueError("Expected %d detector WCS" % ROMAN_N_DETECTORS)
+    center, detectors = _roman_apertures()
+    origin, shape = get_roman_canvas_geometry(pixscale)
+    grid = np.linspace(0, ROMAN_DETECTOR_SIZE - 1, 17)
+    gx, gy = np.meshgrid(grid, grid)
+    gx, gy = gx.ravel(), gy.ravel()
+    cxs, cys, ras, decs = [], [], [], []
+    for wcs, detector in zip(wcs_list, detectors):
+        pcx, pcy = _detector_to_canvas(center, detector, gx, gy, pixscale, origin)
+        ra, dec = wcs.all_pix2world(gx, gy, 0)
+        cxs.append(pcx); cys.append(pcy); ras.append(ra); decs.append(dec)
+    canvas_wcs = _fit_tan_wcs(np.concatenate(cxs), np.concatenate(cys),
+                              np.concatenate(ras), np.concatenate(decs), array_shape=shape)
+    return canvas_wcs, shape
+
+
+def make_roman_canvas_from_detectors(data_list, wcs_list, pixscale=0.11):
+    """
+    Function 1. Combine the 18 Roman/WFI detector arrays (4088x4088, ordered WFI01 to WFI18)
+    and their astropy WCS into a mosaic of the full field of view, using only pysiaf for the
+    detector layout (no reproject). Gaps between detectors are NaN.
+
+    Returns (canvas, canvas_wcs).
+    """
+    if len(data_list) != ROMAN_N_DETECTORS or len(wcs_list) != ROMAN_N_DETECTORS:
+        raise ValueError("Expected %d detector arrays and WCS" % ROMAN_N_DETECTORS)
+
+    center, detectors = _roman_apertures()
+    origin, shape = get_roman_canvas_geometry(pixscale)
+    canvas = np.full(shape, np.nan, dtype=np.float32)
+
+    for data, wcs, detector in zip(data_list, wcs_list, detectors):
+        data = np.asarray(data, dtype=np.float32)
+        if data.shape != (ROMAN_DETECTOR_SIZE, ROMAN_DETECTOR_SIZE):
+            raise ValueError("Each detector array must be %dx%d" % (ROMAN_DETECTOR_SIZE, ROMAN_DETECTOR_SIZE))
+
+        # Canvas pixels covered by this detector: its footprint bounding box.
+        cx_edge, cy_edge = _detector_to_canvas(center, detector, [0, ROMAN_DETECTOR_SIZE - 1] * 2,
+                                               [0, 0, ROMAN_DETECTOR_SIZE - 1, ROMAN_DETECTOR_SIZE - 1],
+                                               pixscale, origin)
+        x0 = max(int(np.floor(cx_edge.min())) - 1, 0)
+        x1 = min(int(np.ceil(cx_edge.max())) + 2, shape[1])
+        y0 = max(int(np.floor(cy_edge.min())) - 1, 0)
+        y1 = min(int(np.ceil(cy_edge.max())) + 2, shape[0])
+
+        cx, cy = np.meshgrid(np.arange(x0, x1), np.arange(y0, y1))
+        dx, dy = _canvas_to_detector(center, detector, cx, cy, pixscale, origin)
+        values = _sample_image(data, dx, dy)
+        region = canvas[y0:y1, x0:x1]
+        fill = np.isnan(region) & ~np.isnan(values)
+        region[fill] = values[fill]
+
+    canvas_wcs, _ = get_roman_canvas_wcs(wcs_list, pixscale)
+    return canvas, canvas_wcs
+
+
+def recover_roman_detectors_from_canvas(canvas, canvas_wcs, pixscale=0.11, sip_degree=3, detector_wcs=None):
+    """
+    Function 2. Inverse of make_roman_canvas_from_detectors. Extract the 18 Roman/WFI detector
+    arrays (4088x4088, WFI01 to WFI18) from a canvas built with the same pixscale, using pysiaf
+    for the detector layout and the canvas WCS for the sky positions.
+
+    Returns (data_list, wcs_list). Each detector WCS is a TAN fit with SIP distortion terms
+    (sip_degree) to the canvas WCS evaluated at the detector pixels.
+
+    If detector_wcs (18 astropy WCS) is given, the canvas can be on any grid (e.g. a swarp
+    mosaic): each detector pixel is mapped to the sky with its WCS and then to the canvas with
+    canvas_wcs. Those WCS are returned unchanged.
+    """
+    center, detectors = _roman_apertures()
+    canvas = np.asarray(canvas, dtype=np.float32)
+    if detector_wcs is not None:
+        pix = np.arange(ROMAN_DETECTOR_SIZE)
+        px, py = np.meshgrid(pix, pix)
+        data_list = []
+        for wcs in detector_wcs:
+            ra, dec = wcs.all_pix2world(px, py, 0)
+            cx, cy = canvas_wcs.all_world2pix(ra, dec, 0)
+            data_list.append(_sample_image(canvas, cx, cy).astype(np.float32))
+        return data_list, list(detector_wcs)
+
+    origin, shape = get_roman_canvas_geometry(pixscale)
+    if canvas.shape != shape:
+        raise ValueError("Canvas shape %s does not match the expected %s for pixscale=%s"
+                         % (canvas.shape, shape, pixscale))
+
+    pix = np.arange(ROMAN_DETECTOR_SIZE)
+    px, py = np.meshgrid(pix, pix)
+    grid = np.linspace(0, ROMAN_DETECTOR_SIZE - 1, 17)
+    gx, gy = np.meshgrid(grid, grid)
+    gx, gy = gx.ravel(), gy.ravel()
+
+    data_list, wcs_list = [], []
+    for detector in detectors:
+        cx, cy = _detector_to_canvas(center, detector, px, py, pixscale, origin)
+        data_list.append(_sample_image(canvas, cx, cy).astype(np.float32))
+
+        pcx, pcy = _detector_to_canvas(center, detector, gx, gy, pixscale, origin)
+        ra, dec = canvas_wcs.all_pix2world(pcx, pcy, 0)
+        wcs_list.append(_fit_tan_wcs(gx, gy, ra, dec, sip_degree=sip_degree,
+                                     array_shape=(ROMAN_DETECTOR_SIZE, ROMAN_DETECTOR_SIZE)))
+
+    return data_list, wcs_list
+
+
 def scale_and_subtract_stars(input_name, ext, exposure_identity, g_mag_max=False, clean=False, verbose=False):
     ## TODO: Compute the scale factor for the object at (x,y)=(53,69) for
     ## the PSF (psf.fits). Compute it in the ring 20-30 pixels.
