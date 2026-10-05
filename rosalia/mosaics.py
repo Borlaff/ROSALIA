@@ -7,6 +7,8 @@ import astropy.units as u
 from reproject import reproject_interp
 from reproject.mosaicking import reproject_and_coadd, find_optimal_celestial_wcs
 import rosalia as rs
+from astropy.wcs.wcsapi import BaseHighLevelWCS
+
 
 def coadd_level2(data, astropywcs, optimal_wcs=None, resolution=None):
     input_data_for_reproject = list(zip(data, astropywcs))
@@ -63,7 +65,7 @@ def find_mosaic_wcs(input_data, resolution=None, auto_rotate=False):
         resolution = resolution*u.arcsec
 
     print("input_data[0][0]: ", type(input_data[0][0]))
-    if isinstance(input_data[0][0], (np.ndarray, list,)) and isinstance(input_data[1][0], (astropy_wcs.wcs.WCS)):
+    if isinstance(input_data[0][0], (np.ndarray,)) and isinstance(input_data[1][0], (BaseHighLevelWCS,)):
         print("DATA / WCS mode")
         optimal_wcs = find_optimal_celestial_wcs(input_data=input_data, 
                                                  resolution=resolution, auto_rotate=auto_rotate)
