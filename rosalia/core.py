@@ -352,7 +352,7 @@ class exposure():
         search_radius = 1.5*self.get_max_angular_size()
 
         if os.path.exists(self.source_catalog_filename):
-            print("WARNING: Loading existing catalog! Remove " + self.source_catalog_filename + " if this is a mistake.")
+            print("INFO: Loading existing catalog! Remove " + self.source_catalog_filename + " if this is a mistake.")
             hybrid_catalog = pd.read_csv(self.source_catalog_filename)
 
         else:
