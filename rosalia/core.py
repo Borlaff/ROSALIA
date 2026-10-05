@@ -600,8 +600,8 @@ class exposure():
         resolution = self.PIXSCALE*u.arcsec
         input_data_for_reproject = list(zip(self.DATA, self.ASTROPYWCS))
 
-        optimal_wcs = find_optimal_celestial_wcs(input_data=input_data_for_reproject, 
-                                                resolution=resolution)
+        optimal_wcs = rs.mosaics.find_mosaic_wcs(input_data=input_data_for_reproject, 
+                                                 resolution=resolution)
 
         return(optimal_wcs[0], optimal_wcs[1])
 

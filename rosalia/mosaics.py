@@ -61,8 +61,9 @@ def find_mosaic_wcs(input_data, resolution=None, auto_rotate=False):
     
     if resolution is not None:
         resolution = resolution*u.arcsec
-        
-    if isinstance(input_data[0][0], (np.ndarray,)) and isinstance(input_data[1][0], (astropy_wcs.wcs.WCS)):
+
+    print("input_data[0][0]: ", type(input_data[0][0]))
+    if isinstance(input_data[0][0], (np.ndarray, list,)) and isinstance(input_data[1][0], (astropy_wcs.wcs.WCS)):
         print("DATA / WCS mode")
         optimal_wcs = find_optimal_celestial_wcs(input_data=input_data, 
                                                  resolution=resolution, auto_rotate=auto_rotate)
@@ -131,17 +132,17 @@ def generate_mosaic(data, astropywcs, resolution=None):
     if resolution is not None:
         resolution = resolution*u.arcsec
 
-    optimal_wcs = find_mosaic_wcs(input_data=input_data_for_reproject, 
-                                            resolution=resolution, auto_rotate=False)
+    optimal_wcs = rs.mosaics.find_mosaic_wcs(input_data=input_data_for_reproject, 
+                                             resolution=resolution, auto_rotate=False)
 
-    output = reproject_and_coadd(input_data=input_data_for_reproject, 
-                                output_projection=optimal_wcs[0], 
-                                shape_out=optimal_wcs[1], 
-                                combine_function="mean",
-                                reproject_function=reproject_interp,
-                                #progress_bar=True,
-                                parallel=True,
-                                intermediate_memmap=True)
+    output = rs.mosaics.reproject_and_coadd(input_data=input_data_for_reproject, 
+                                            output_projection=optimal_wcs[0], 
+                                            shape_out=optimal_wcs[1], 
+                                            combine_function="mean",
+                                            reproject_function=reproject_interp,
+                                            #progress_bar=True,
+                                            parallel=True,
+                                            intermediate_memmap=True)
 
     data = np.array(output[0].data)
     data[data==0] = np.nan
