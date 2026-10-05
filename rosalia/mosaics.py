@@ -14,7 +14,7 @@ def coadd_level2(data, astropywcs, optimal_wcs=None, resolution=None):
     input_data_for_reproject = list(zip(data, astropywcs))
 
     if resolution is not None:
-        if rs.utils.check_numeric_type(resolution) == "astropy.units.Quantity":
+        if rs.utils.check_numeric_type(resolution) == "number":
             print("Assuming user-input resolution is on arcsecs")
             resolution = resolution*u.arcsec
 
@@ -138,7 +138,7 @@ def reproject_roman_wfi_fits(data_list, wcs_list, mosaic_wcs):
 def generate_mosaic(data, astropywcs, resolution=None):
     input_data_for_reproject = list(zip(data, astropywcs))
 
-    if rs.utils.check_numeric_type(resolution) == "astropy.units.Quantity":
+    if rs.utils.check_numeric_type(resolution) == "number":
         print("Assuming user-input resolution is on arcsecs")
         resolution = resolution*u.arcsec
 
