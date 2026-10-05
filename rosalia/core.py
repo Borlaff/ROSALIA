@@ -352,7 +352,7 @@ class exposure():
         search_radius = 1.5*self.get_max_angular_size()
 
         if os.path.exists(self.source_catalog_filename):
-            print("INFO: Loading existing catalog! Remove " + self.source_catalog_filename + " if this is a mistake.")
+            print("find_mosaic_wcs: Loading existing catalog! Remove " + self.source_catalog_filename + " if this is a mistake.")
             hybrid_catalog = pd.read_csv(self.source_catalog_filename)
 
         else:
@@ -561,42 +561,32 @@ class exposure():
         print("TODO: Add option to provide optimal_wcs - So multiple filters can share target grid")
         if isinstance(keywords["DETECTOR"], (list,)):
             keywords["DETECTOR"] = rs.inspector.longest_common_substring(self.DETECTOR)
-            
-        headers_output = []
-        for i in range(len(wcs_list)):
-            ASTROPYWCS_i = wcs_list[i]
-            header = ASTROPYWCS_i.to_header()
 
-            header["EXTNAME"] = "DRZ"
-            header["RA_TARG"] = self.RA_TARG
-            header["DEC_TARG"] = self.DEC_TARG
-            header["EXPSTART"] = self.EXPSTART
-            header["EXPEND"] = self.EXPEND
-            header["PA"] = self.PA
-            header["TELESCOP"] = self.TELESCOP
-            header["INSTRUME"] = self.INSTRUME
-            header["BUNIT"] = "MJy sr-1"
+        lvl3_data, lvl3_header = rs.mosaics.generate_mosaic(data=data_list, astropywcs=wcs_list, resolution=resolution)
 
-            keywords["DETECTOR"] = rs.inspector.longest_common_substring(self.DETECTOR)
-            for key in keywords.keys():
-                header[key] = keywords[key]
+        lvl3_header["EXTNAME"] = "DRZ"
+        lvl3_header["RA_TARG"] = self.RA_TARG
+        lvl3_header["DEC_TARG"] = self.DEC_TARG
+        lvl3_header["EXPSTART"] = self.EXPSTART
+        lvl3_header["EXPEND"] = self.EXPEND
+        lvl3_header["PA"] = self.PA
+        lvl3_header["TELESCOP"] = self.TELESCOP
+        lvl3_header["INSTRUME"] = self.INSTRUME
+        lvl3_header["BUNIT"] = "MJy sr-1"
+        keywords["DETECTOR"] = rs.inspector.longest_common_substring(self.DETECTOR)
+        
+        for key in keywords.keys():
+            lvl3_header[key] = keywords[key]
 
-            headers_output.append(header)
-
-        drz_data, drz_wcs = rs.mosaics.generate_mosaic(data=data_list, astropywcs=headers_output, resolution=resolution)
-
-
-
-        rs.utils.save_fits(array=np.float32(drz_data), name=outname, header=drz_wcs,
+        rs.utils.save_fits(array=np.float32(lvl3_data), name=outname, header=lvl3_header,
                            extname=extname, 
                            overwrite=overwrite, 
                            output_verify='silentfix')
-        return(drz_data, drz_wcs, outname)
+        return(lvl3_data, lvl3_header, outname)
 
 
 
     def get_mosaic_wcs(self):
-        from reproject.mosaicking import find_optimal_celestial_wcs
         resolution = self.PIXSCALE*u.arcsec
         input_data_for_reproject = list(zip(self.DATA, self.ASTROPYWCS))
 
