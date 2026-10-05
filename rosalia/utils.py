@@ -1615,3 +1615,33 @@ def distance_to_galactic_plane(ra, dec):
     distance = abs(galactic_lat)
     
     return distance
+
+
+#############
+
+import numbers
+import numpy as np
+import astropy.units as u
+from astropy.units import Quantity
+
+def check_numeric_type(obj):
+    """
+    Checks if an object is an Astropy Quantity, a standard number, or neither.
+    
+    Parameters:
+        obj: The object to inspect.
+        
+    Returns:
+        str: Description of the object's numeric type.
+    """
+    # Astropy Quantity objects are subclasses of numpy.ndarray, 
+    # so check for Quantity first before general array/number checks.
+    if isinstance(obj, Quantity):
+        return "astropy.units.Quantity"
+    
+    # Check if the object is a standard Python or NumPy scalar number
+    elif isinstance(obj, (numbers.Number, np.number)):
+        return "number"
+    
+    else:
+        return "neither"

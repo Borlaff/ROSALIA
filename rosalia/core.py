@@ -170,7 +170,6 @@ class exposure():
 
             # If the number of SCIEXTS is larger than 1: 
             if isinstance(self.SCIEXTS, (list,)): 
-                print(self.TELESCOP)
                 # Simplify the attributes that are supposed to be constant across the exposure. 
                 if len(list(set(self.TELESCOP))) == 1: self.TELESCOP = self.TELESCOP[0]
                 if len(list(set(self.INSTRUME))) == 1: self.INSTRUME = self.INSTRUME[0]
@@ -181,7 +180,6 @@ class exposure():
                 # Check if all dictionaries in the list are identical copies
                 are_all_FILTERS_same = not self.FILTER_IDENTITY or rs.inspector.are_all_dicts_equal(self.FILTER_IDENTITY)
                 if are_all_FILTERS_same: self.FILTER_IDENTITY = self.FILTER_IDENTITY[0] 
-                #print(self.FILTER_IDENTITY[0])
                 if len(list(set(self.EXPSTART_ISOT))) == 1: self.EXPSTART_ISOT = self.EXPSTART_ISOT[0] 
                 if len(list(set(self.EXPSTART))) == 1: self.EXPSTART = self.EXPSTART[0] 
                 if len(list(set(self.EXPTIME))) == 1: self.EXPTIME = self.EXPTIME[0] 
@@ -190,7 +188,6 @@ class exposure():
 
                 
                 print("Currently estimated through pysiaf and quaternion. This is a temporary fix until MAST fixes the RA_TARG, DEC_TARG, PA keywords in the Roman/WFI fits files.")
-
                 #print("TEMP WARNING: DEC_TARG is set to element 0 - This has to be fixed on MAST")
                 #print("TEMP WARNING: PA is set to element 0 - This has to be fixed on MAST")
                 #if isinstance(self.RA_TARG, (np.ndarray, list,)): self.RA_TARG = self.RA_TARG[0]

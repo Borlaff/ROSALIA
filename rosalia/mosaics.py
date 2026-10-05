@@ -14,7 +14,9 @@ def coadd_level2(data, astropywcs, optimal_wcs=None, resolution=None):
     input_data_for_reproject = list(zip(data, astropywcs))
 
     if resolution is not None:
-        resolution = resolution*u.arcsec
+        if rs.utils.check_numeric_type(resolution) == "astropy.units.Quantity":
+            print("Assuming user-input resolution is on arcsecs")
+            resolution = resolution*u.arcsec
 
     if optimal_wcs is None:
         optimal_wcs =  find_mosaic_wcs(input_data=input_data_for_reproject, 
@@ -61,8 +63,8 @@ def find_mosaic_wcs(input_data, resolution=None, auto_rotate=False):
     #print(input_data[0][0])
     #print(input_data[1][0])
     
-    if resolution is not None:
-        resolution = resolution*u.arcsec
+    #if resolution is not None:
+    #    resolution = resolution*u.arcsec
 
     #print("input_data[0][0]: ", type(input_data[0][0]))
     #print("input_data[1][0]: ", type(input_data[1][0]))
@@ -136,7 +138,8 @@ def reproject_roman_wfi_fits(data_list, wcs_list, mosaic_wcs):
 def generate_mosaic(data, astropywcs, resolution=None):
     input_data_for_reproject = list(zip(data, astropywcs))
 
-    if resolution is not None:
+    if rs.utils.check_numeric_type(resolution) == "astropy.units.Quantity":
+        print("Assuming user-input resolution is on arcsecs")
         resolution = resolution*u.arcsec
 
     optimal_wcs = rs.mosaics.find_mosaic_wcs(input_data=input_data_for_reproject, 
