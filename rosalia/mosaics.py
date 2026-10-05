@@ -65,9 +65,11 @@ def find_mosaic_wcs(input_data, resolution=None, auto_rotate=False):
         resolution = resolution*u.arcsec
 
     print("input_data[0][0]: ", type(input_data[0][0]))
+    print("input_data[1][0]: ", type(input_data[1][0]))
+    print(input_data[1][0])
     print("isinstance(input_data[1][0], (BaseHighLevelWCS,): ", isinstance(input_data[1][0], (BaseHighLevelWCS,)))
 
-    
+
     if isinstance(input_data[0][0], (np.ndarray,)) and isinstance(input_data[1][0], (BaseHighLevelWCS,)):
         print("DATA / WCS mode")
         optimal_wcs = find_optimal_celestial_wcs(input_data=input_data, 
