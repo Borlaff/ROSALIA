@@ -64,19 +64,19 @@ def find_mosaic_wcs(input_data, resolution=None, auto_rotate=False):
     if resolution is not None:
         resolution = resolution*u.arcsec
 
-    print("input_data[0][0]: ", type(input_data[0][0]))
-    print("input_data[1][0]: ", type(input_data[1][0]))
-    print(input_data[1][0])
-    print("isinstance(input_data[1][0], (BaseHighLevelWCS,): ", isinstance(input_data[1][0], (BaseHighLevelWCS,)))
+    #print("input_data[0][0]: ", type(input_data[0][0]))
+    #print("input_data[1][0]: ", type(input_data[1][0]))
+    #print(input_data[1][0])
+    #print("isinstance(input_data[1][0], (BaseHighLevelWCS,): ", isinstance(input_data[1][0], (BaseHighLevelWCS,)))
 
 
-    if isinstance(input_data[0][0], (np.ndarray,)) and isinstance(input_data[1][0], (BaseHighLevelWCS,)):
+    if isinstance(input_data[0][0], (np.ndarray,)) and isinstance(input_data[0][1], (BaseHighLevelWCS,)):
         print("DATA / WCS mode")
         optimal_wcs = find_optimal_celestial_wcs(input_data=input_data, 
                                                  resolution=resolution, auto_rotate=auto_rotate)
         return(optimal_wcs)
 
-    if isinstance(input_data[0][0], (str,)) and isinstance(input_data[1][0], (np.int32, np.int16, np.int8, int)):
+    if isinstance(input_data[0][0], (str,)) and isinstance(input_data[0][1], (np.int32, np.int16, np.int8, int)):
         print("FITS / EXT mode") 
         # Gather the data and astropywcs
         data_list = []
