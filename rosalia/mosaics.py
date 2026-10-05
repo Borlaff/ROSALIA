@@ -15,8 +15,9 @@ def coadd_level2(data, astropywcs, optimal_wcs=None, resolution=None):
         resolution = resolution*u.arcsec
 
     if optimal_wcs is None:
-        optimal_wcs = find_optimal_celestial_wcs(input_data=input_data_for_reproject, 
-                                                 resolution=resolution)
+        optimal_wcs =  find_mosaic_wcs(input_data=input_data_for_reproject, 
+                                       resolution=resolution, auto_rotate=False) #find_optimal_celestial_wcs(input_data=input_data_for_reproject, 
+                      #                           resolution=resolution)
 
     output = reproject_and_coadd(input_data=input_data_for_reproject, 
                                 output_projection=optimal_wcs[0], 
@@ -86,3 +87,62 @@ def find_mosaic_wcs(input_data, resolution=None, auto_rotate=False):
         
         return(optimal_wcs)
 
+
+"""
+SET FOR DEPRECATION - SAVE METHOD FOR PARALLEL USING MEMMAPS
+
+def reproject_roman_wfi_fits(data_list, wcs_list, mosaic_wcs):
+    import os
+    from reproject import reproject_interp
+    import copy
+    reprojected_images = []
+
+    # reference_fits = fits.open(reference_name, memmap=True)
+    reference_header = mosaic_wcs.to_header() # reference_fits[reference_ext].header
+    reference_shape = reference_fits[reference_ext].data.shape
+    # Use all available CPU cores
+    num_cpus = os.cpu_count()
+
+    for data, wcs in tqdm(zip(data_list, wcs_list)):
+        data=np.float32(data)
+        array_out = np.memmap(filename='output.np', mode='w+',  
+                              shape=reference_shape, dtype='float32')
+        # print(wcs)
+        reproject_interp(
+            input_data=(data, wcs),
+            output_projection=reference_header,
+            parallel=num_cpus,  # Enables block-based multi-core processing
+            block_size='auto',   # Automatically determines chunk size 
+            return_footprint=False,
+            output_array=array_out
+            )
+
+        reprojected_image = copy.deepcopy(array_out)
+        reprojected_images.append(reprojected_image)
+        del array_out
+
+
+    return(reprojected_images, reference_header)
+"""
+
+def generate_mosaic(data, astropywcs, resolution=None):
+    input_data_for_reproject = list(zip(data, astropywcs))
+
+    if resolution is not None:
+        resolution = resolution*u.arcsec
+
+    optimal_wcs = find_mosaic_wcs(input_data=input_data_for_reproject, 
+                                            resolution=resolution, auto_rotate=False)
+
+    output = reproject_and_coadd(input_data=input_data_for_reproject, 
+                                output_projection=optimal_wcs[0], 
+                                shape_out=optimal_wcs[1], 
+                                combine_function="mean",
+                                reproject_function=reproject_interp,
+                                #progress_bar=True,
+                                parallel=True,
+                                intermediate_memmap=True)
+
+    data = np.array(output[0].data)
+    data[data==0] = np.nan
+    return(data, optimal_wcs[0].to_header())

@@ -583,7 +583,7 @@ class exposure():
 
             headers_output.append(header)
 
-        drz_data, drz_wcs = rs.utils.generate_mosaic(data=data_list, astropywcs=headers_output, resolution=resolution)
+        drz_data, drz_wcs = rs.mosaics.generate_mosaic(data=data_list, astropywcs=headers_output, resolution=resolution)
 
 
 
@@ -656,7 +656,7 @@ class exposure():
 
         if self.TELESCOP.lower() == "hst":
             straylight_images= self.HST_straylight()
-            mos_data, mos_wcs = rs.utils.generate_mosaic(data=straylight_images, astropywcs=self.ASTROPYWCS, resolution=None)
+            mos_data, mos_wcs = rs.mosaics.generate_mosaic(data=straylight_images, astropywcs=self.ASTROPYWCS, resolution=None)
             self.output_name = self.FILENAME.replace(".fits", "_stray.fits")
             rs.utils.save_fits(mos_data, self.output_name, mos_wcs)
             return(mos_data, mos_wcs)
@@ -752,13 +752,13 @@ class exposure():
                     for SCIEXT_i, DATA_SHAPE_i, ASTROPYWCS_i in zip(self.SCIEXTS, self.DATA_SHAPE, self.ASTROPYWCS)
                 ]
 
-                parallel = False
+                parallel = True
                 if parallel:
                     results = list(tqdm(executor.map(self._parallel_roman_estimate_straylight_SCA, inputs),total=len(inputs),))
 
                 if not parallel:
                     results = []
-                    for i in range(len(inputs)):
+                    for i in tqdm(range(len(inputs))):
                         results.append(self._parallel_roman_estimate_straylight_SCA(inputs[i]))
                 
                 straylevel_all_SCAS.extend(results)
