@@ -797,7 +797,7 @@ class exposure():
         from tqdm import tqdm
         from astropy.io import fits
         import logging
-        # from reproject.mosaicking import find_optimal_celestial_wcs
+        from reproject.mosaicking import find_optimal_celestial_wcs
         logger = logging.getLogger()
         logger.setLevel(logging.CRITICAL)
 
@@ -814,10 +814,10 @@ class exposure():
 
         # Get the optimal wcs
         if not hasattr(self, 'optimal_wcs') or not hasattr(self, 'shape_out'):
-            # self.optimal_wcs, self.shape_out = find_optimal_celestial_wcs([(self.DATA_SHAPE[i], self.ASTROPYWCS[i]) for i in range(len(self.SCIEXTS))],
-            #                                                               auto_rotate=True)    
+            self.optimal_wcs, self.shape_out = find_optimal_celestial_wcs([(self.DATA_SHAPE[i], self.ASTROPYWCS[i]) for i in range(len(self.SCIEXTS))],
+                                                                           auto_rotate=True)    
             # Canvas geometry from the pysiaf detector layout (no reproject).
-            self.optimal_wcs, self.shape_out = rs.psf.get_roman_canvas_wcs(self.ASTROPYWCS, pixscale=0.11)
+            #self.optimal_wcs, self.shape_out = rs.psf.get_roman_canvas_wcs(self.ASTROPYWCS, pixscale=0.11)
 
         # Find stars around the entire WFI footprint
         stars_in_footprint = self.is_inside_wfi(ra=self.source_catalog["ra"], dec=self.source_catalog["dec"])
@@ -856,9 +856,10 @@ class exposure():
             n_workers=n_workers,
             method=method,
         )
+
+        detectors, wcs_list = rs.psf.recover_roman_detectors_from_canvas(canvas, self.optimal_wcs, detector_wcs=self.ASTROPYWCS, pixscale=0.11)
         
-        
-        return canvas 
+        return detectors, wcs_list, canvas 
 
 
     def zodiacal(self, zody_mode="zodipy", verbose=False, output_name=None, output_units="e/s"):

@@ -81,7 +81,7 @@ include-package-data = true
 rosalia = ["*.mplstyle", "*.csv", "*.txt", "rosalia/style/*", "**/*.mplstyle", "images/*", "bin/*"]
 
 [tool.pytest.ini_options]
-testpaths = ["rosalia"]
+testpaths = ["tests", "rosalia"]
 python_files = ["test_*.py", "*_test.py"]
 addopts = "-v"
 

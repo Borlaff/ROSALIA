@@ -220,7 +220,10 @@ def exposure_inspector(input_name, verbose=False, lite=False):
             input_name = s3_paths
             # print(input_name)
         else:
-            input_name = sorted(glob.glob(input_name))
+            pattern = input_name
+            input_name = sorted(glob.glob(pattern))
+            if len(input_name) == 0:
+                raise FileNotFoundError("No files match the pattern: " + pattern)
 
 
     if isinstance(input_name, (list,)):
