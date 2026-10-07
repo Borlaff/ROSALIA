@@ -467,6 +467,7 @@ class Roman:
         return(np.array([vectors["x"].value, vectors["y"].value, vectors["z"].value])*u.AU)
 
     def stpsf_get_psf(detector_position, detector, filter_name, fov_pixels=1024, oversample=1):
+        import stpsf
         # This is just a wrapper for the stpsf wfi module to generate Roman's PSF.
         # import stpsf
         wfi = stpsf.roman.WFI()
@@ -530,39 +531,63 @@ class Roman:
         else:
             return(pav3)
 
-    def get_psf(detector_position, detector, filter_name):
-        SCA = detector
-        from romanisim.bandpass import roman2galsim_bandpass
-        import galsim
-        import galsim.roman as galsim_roman
+    def get_psf(position, SCA, bandpass, shape=None, SED=None, method='stpsf', **kwargs):
+        """Generate a Roman WFI point-spread function for one detector position.
 
-        # Get the filter identity
-        FILTER_IDENTITY = rs.telescopes.find_filter_in_svo(wavelength=filter_name,
-                                                           telescope="Roman",
-                                                           instrument="WFI",
-                                                           detector="WFI",
-                                                           verbose=False)
+        Parameters
+        ----------
+        position : sequence of float
+            Two-dimensional detector coordinates ``(x, y)`` in pixels. These
+            coordinates are passed to GalSim as the SCA position at which the
+            PSF should be evaluated.
+        SCA : int
+            Roman WFI SCA number, from 1 through 18.
+        bandpass : str
+            Roman WFI filter name, for example ``"F158"``. The filter must be
+            available in ``romanisim.bandpass.roman2galsim_bandpass`` and in
+            the SVO filter data used by :func:`find_filter_in_svo`.
+        shape : tuple of int, optional
+            The shape of the output PSF image in pixels, as ``(ny, nx)``. If
+            ``None``, the default size used by GalSim's ``drawImage`` is used.
+        SED : galsim.SED or None, optional
+            The spectral energy distribution to use for the PSF. If ``None``, a plane SED is used.
+        method : str, optional
+            The method to use for PSF generation. Default is ``'stpsf'``.
+            Currently supports:
+            - ``'stpsf'``: Using STScI's stpsf Roman PSF model.
+            - ``'galsim'``: Using GalSim's Roman PSF model directly.
+            - ``'superback'``: Using analytical model from SUPERBACK.
 
-        bandpass = roman2galsim_bandpass[filter_name]
-        gsparams = galsim.GSParams(maximum_fft_size=2**16, maxk_threshold=1.e-10, folding_threshold=1.e-6)
+        kwargs : dict, optional
+            Additional keyword arguments to pass to the galsim.GSParams.
 
-        class SCA_pos:
-            x = detector_position[0]
-            y = detector_position[1]
+        Returns
+        -------
+        astropy.io.fits.PrimaryHDU
+            The rendered PSF image in the primary HDU. The image is produced
+            with GalSim's Roman PSF model and has the default output image
+            size used by ``drawImage``.
 
-        psf = galsim_roman.getPSF(SCA, bandpass, SCA_pos=SCA_pos, pupil_bin=1, wcs=None,
-                                  n_waves=10, extra_aberrations=None,
-                                  wavelength=FILTER_IDENTITY["filter_lambda_ref"].to("nm").value,
-                                  gsparams=gsparams, logger=None,
-                                  high_accuracy=None, approximate_struts=None)
+        Notes
+        -----
+        A point source Delta function is used to convert the given 
+        SED to a profile suitable for convolution with the PSF.
+
+        """
+
+        available_methods = ['stpsf', 'galsim', 'superback']
+        if method not in available_methods:
+            raise ValueError(f"Invalid method '{method}'. Available methods are: {', '.join(available_methods)}")
+        
+        if method == 'stpsf':
+            output = rs.psf.stpsf_roman_psf(position=position, SCA=SCA, bandpass=bandpass, shape=shape, SED=SED, **kwargs)
+        elif method == 'galsim':
+            output = rs.psf.galsim_roman_psf(position=position, SCA=SCA, bandpass=bandpass, shape=shape, SED=SED, **kwargs)
+        elif method == 'superback':
+            output = rs.psf.superback_roman_psf(position=position, SCA=SCA, bandpass=bandpass, shape=shape, SED=SED, **kwargs)
 
 
-        img = psf.drawImage()
-        outname = 'temp_psf_' + filter_name + '_SCA' + str(SCA).zfill(2) + '.fits'
-        img.write(outname)
-        psf_wfi = fits.open(outname)
-        os.system("rm " + outname)
-        return(psf_wfi[0])
+        return output
 
     def find_wfi_center_for_offset_target(ra_target, dec_target, mjd, dX, dY, PA_wfi=None, verbose=False):
         # dX dY in degrees

@@ -61,6 +61,7 @@ dependencies = [
     "psutil",
     "pysiaf",
     "ephessos",
+    "asdf-astropy>=0.11.0"
 ]
 
 [project.urls]
@@ -72,6 +73,8 @@ Documentation = "https://rosalia.readthedocs.io/en/stable/"
 
 
 [tool.setuptools]
+packages = ["rosalia"]
+package-dir = {"" = "."}
 include-package-data = true
 
 [tool.setuptools.packages.find]
@@ -82,7 +85,7 @@ exclude = ["tests*"]
 rosalia = ["*.mplstyle", "*.csv", "*.txt", "rosalia/style/*", "**/*.mplstyle", "images/*", "bin/*"]
 
 [tool.pytest.ini_options]
-testpaths = ["rosalia"]
+testpaths = ["tests", "rosalia"]
 python_files = ["test_*.py", "*_test.py"]
 addopts = "-v"
 
