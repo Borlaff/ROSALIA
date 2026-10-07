@@ -1065,13 +1065,19 @@ class exposure():
         # Save the Zodiacal light DRZ file 
         self.save_drz(outname=self.drz_zody_name, data_list=zodiacal_background_list, wcs_list=self.ASTROPYWCS, resolution=resolution)
 
-        rs.plots.make_stray_plot(input_name=self.drz_zody_name, ext=0, mode="fe", 
-                                 color_label = "Flux (e/s/px)", cmap="RdYlBu_r", figsize=(10,7))
+        if output_units == "e/s":
+            rs.plots.make_stray_plot(input_name=self.drz_zody_name, ext=0, mode="fe",
+                                     color_label = "Flux (e/s/px)", cmap="RdYlBu_r", figsize=(10,7))
 
-        rs.plots.make_stray_plot(input_name=self.drz_zody_name, ext=0, mode="fe2mu", 
-                                 vmin=None, vmax=None, 
-                                 color_label = 'Surface brightness (mag arcsec$^{-2}$)',
-                                 cmap="RdYlBu", output_name=None, figsize=(10,7), mu_vmin=None, mu_vmax=None)
+            rs.plots.make_stray_plot(input_name=self.drz_zody_name, ext=0, mode="fe2mu",
+                                     vmin=None, vmax=None,
+                                     color_label = 'Surface brightness (mag arcsec$^{-2}$)',
+                                     cmap="RdYlBu", output_name=None, figsize=(10,7), mu_vmin=None, mu_vmax=None)
+        #otherwise rs.sky.get_zodiacal_background returns in units of MJy/Sr
+        # as is a standard unit to measure zodiacal light
+        else:
+            rs.plots.make_stray_plot(input_name=self.drz_zody_name, ext=0, mode="mjysr",
+                                     color_label = "Flux (MJy/Sr)", cmap="RdYlBu_r", figsize=(10,7))
 
         print("Output saved in: " + output_name)
 
