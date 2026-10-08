@@ -23,8 +23,9 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as matplotlib_colors
 import rosalia as rs
 from scipy import interpolate
-
+import healpy as hp
 import matplotlib.cm as cm
+import pickle
 
 
 # Suppress warnings. Comment this out if you wish to see the warning messages
@@ -249,7 +250,7 @@ def make_stray_plot(input_name, ext, mode="normal", catalog=None,
     return(output_name)
 
 
-def make_stars_around_plot(flt_name, catalog,  astropywcs_list, RA_TARG, DEC_TARG, radius = 0.6, output_name=None, figsize=(10,7), verbose=False):
+def make_stars_around_plot(flt_name, catalog,  astropywcs_list, RA_TARG, DEC_TARG, radius = 0.3, output_name=None, figsize=(10,7), verbose=False):
     if output_name is None:
         output_name = flt_name.replace(".fits", "_stars_close.png")
         
@@ -552,7 +553,6 @@ def make_straylight_plots(RA_TARG, DEC_TARG, PA, source_catalog, ASTROPYWCS, str
                                                  catalog=source_catalog, 
                                                  color_label = "Main offending source (ID)", 
                                                  figsize=figsize)
-
     
     if verbose > 0: print("Plot: Source environment map.")
     #try:
@@ -596,6 +596,96 @@ def make_straylight_plots(RA_TARG, DEC_TARG, PA, source_catalog, ASTROPYWCS, str
 
     return(pdf_report_name)
 
+
+#########################
+
+def get_combined_NDI_map(SCA, ra_point, dec_point, pa, radius=5, i=0):
+
+    # This is a test to plot all the NDI maps together, for checking biases. 
+
+    level_1_critical_distance_to_star = 1 # degree
+    level_2_critical_distance_to_star = 10 # degree
+
+    # Getting the constraints for the RA and DEC
+    ra_dec_constraints = rs.gaia.find_ra_dec_constraints(ra_point, dec_point, radius/2, verbose=False)
+
+    # Assimilating catalog.
+    ra_array = np.linspace(ra_dec_constraints['ra_min'], ra_dec_constraints['ra_max'], 1800)
+    dec_array = np.linspace(ra_dec_constraints['dec_min'], ra_dec_constraints['dec_max'], 1800)
+
+    ra_grid, dec_grid = np.meshgrid(ra_array, dec_array)
+    # Identify those at distances > 1 degrees (~100 times the size of the subarray).
+    # For stars at those distances, we will only estimate one NDI and assume the straylight is flat across
+    # the subarray (we will still have gradients!).
+
+    theta_phi_center_FPA = rs.utils.angular_distance(ra1=np.array([ra_point]), 
+                                                     dec1=np.array([dec_point]),
+                                                     ra2=ra_grid.flatten(), 
+                                                     dec2=dec_grid.flatten())
+    
+    ##############################################################################
+
+    # Here we split the stars into the different boundaries, depending on the distance to the center of the SCA.
+    bool_is_the_star_level_1 = np.array(theta_phi_center_FPA[0] < level_1_critical_distance_to_star)
+    bool_is_the_star_level_2 = np.array((theta_phi_center_FPA[0] >= level_1_critical_distance_to_star) & (theta_phi_center_FPA[0] < level_2_critical_distance_to_star))
+    bool_is_the_star_level_3 = np.array(theta_phi_center_FPA[0] >= level_2_critical_distance_to_star)
+
+    canvas_level = np.zeros(dec_grid.shape)
+    canvas_level[bool_is_the_star_level_3.reshape(dec_grid.shape)] = 3
+    canvas_level[bool_is_the_star_level_2.reshape(dec_grid.shape)] = 2
+    canvas_level[bool_is_the_star_level_1.reshape(dec_grid.shape)] = 1
+
+    # Load the NDIs and raster the map 
+    i = 0
+    NDI_canvas = np.zeros(dec_grid.shape)
+
+    # Level 1
+    ndi_name_1 = os.environ['ROSALIACACHE'] + "/CORE/NDI/RST/ndi_lvl1/lvl1_SCA_" + str(SCA) + ".pkl"
+    with open(ndi_name_1, "rb") as f:
+        ndi_lvl1 = pickle.load(f)
+
+    # Level 2
+    ndi_name_2 = os.environ['ROSALIACACHE'] + "/CORE/NDI/RST/ndi_lvl2/lvl2_SCA_" + str(SCA) + ".pkl"
+    with open(ndi_name_2, "rb") as f:
+        ndi_lvl2 = pickle.load(f)
+
+    # Level 3
+    subarray_locations_db = rs.roman.get_subarray_locations(SCA=SCA, verbose=False)
+    X_label = subarray_locations_db["xlabel"][i]
+    Y_label = subarray_locations_db["ylabel"][i]
+    ndi_name_3 = os.environ['ROSALIACACHE'] + "/CORE/NDI/RST/ndi_lvl3/" + "lvl3_SCA_" + str(SCA) + "_SUB_X" + str(X_label) + "_Y" + str(Y_label) + "_HP.fits"
+
+    NDI_lvl1 = rs.roman.roman_WFI_NDI_estimator_direct(ra_stars=ra_grid.flatten(), dec_stars=dec_grid.flatten(),
+                                                       ra_point=ra_point, dec_point=dec_point, pa_point=pa,
+                                                       level=1, ndi_wcs=ndi_lvl1["wcs"][i], 
+                                                       ndi_grid_interpolator=ndi_lvl1["ndi_interpolator"][i], verbose=False)
+
+    NDI_canvas[bool_is_the_star_level_1.reshape(dec_grid.shape)] = NDI_lvl1.reshape(dec_grid.shape)[bool_is_the_star_level_1.reshape(dec_grid.shape)]
+
+
+    NDI_lvl2 = rs.roman.roman_WFI_NDI_estimator_direct(ra_stars=ra_grid.flatten(), dec_stars=dec_grid.flatten(),
+                                                       ra_point=ra_point, dec_point=dec_point, pa_point=pa,
+                                                       level=2, ndi_wcs=ndi_lvl2["wcs"][i], 
+                                                       ndi_grid_interpolator=ndi_lvl2["ndi_interpolator"][i], verbose=False)
+
+    NDI_canvas[bool_is_the_star_level_2.reshape(dec_grid.shape)] = NDI_lvl2.reshape(dec_grid.shape)[bool_is_the_star_level_2.reshape(dec_grid.shape)]
+
+
+    # Prepare the healpix rotator for level 3 stars.
+    longitude = ra_point * u.deg
+    latitude = dec_point * u.deg
+    position_angle = -pa*u.deg
+    rot_custom = hp.Rotator(rot=[longitude.to_value(u.deg), latitude.to_value(u.deg), position_angle.to_value(u.deg)], inv=True)
+
+    NDI_lvl3 = rs.roman.roman_WFI_NDI_estimator_direct(ra_stars=ra_grid.flatten(), dec_stars=dec_grid.flatten(),
+                                                         ra_point=ra_point, dec_point=dec_point, pa_point=pa, 
+                                                         ndi_name=ndi_name_3, level=3, rot_custom=rot_custom, verbose=False)
+
+    NDI_canvas[bool_is_the_star_level_3.reshape(dec_grid.shape)] = NDI_lvl3.reshape(dec_grid.shape)[bool_is_the_star_level_3.reshape(dec_grid.shape)]
+
+    return(NDI_canvas, ra_dec_constraints)
+
+########################################
 
 
 

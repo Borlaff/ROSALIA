@@ -408,35 +408,21 @@ def query_healpix_ra_slices(healpix_lvl=7, verbose=False):
 ############################
 
 def find_ra_dec_constraints(ra, dec, radius, verbose=False):
-
+    from regions import CircleSkyRegion, make_example_dataset
     coord = SkyCoord(ra*u.deg, dec*u.deg, frame='icrs')
-    hp = astro_hp.HEALPix(nside=1024, order='nested', frame=ICRS())
+    hp = astro_hp.HEALPix(nside=128, order='nested', frame=ICRS())
     healpix_ids_bounding_circle = hp.cone_search_skycoord(coord, radius=radius*2*u.deg)
     #print(healpix_ids_bounding_circle)
 
     healpix_radec_bounding_circle = hp.healpix_to_skycoord(healpix_ids_bounding_circle)
     #print(healpix_radec_bounding_circle)
-    if verbose:
-        fig = plt.figure(figsize=(8,6))
-        ax = fig.add_subplot(111)
-        ax.scatter(healpix_radec_bounding_circle.ra.deg, healpix_radec_bounding_circle.dec.deg)
-        ax.set_xlim(0, 360)
-        ax.set_ylim(-90,90)
 
     ra_min = bn.nanmin(healpix_radec_bounding_circle.ra.deg)
     ra_max = bn.nanmax(healpix_radec_bounding_circle.ra.deg)
     dec_min = bn.nanmin(healpix_radec_bounding_circle.dec.deg)
     dec_max = bn.nanmax(healpix_radec_bounding_circle.dec.deg)
 
-    if verbose:
-        print(ra_min)
-        print(ra_max)
-        print(dec_min)
-        print(dec_max)
-
     # Is any of the poles contained in the bounding circle?
-    from regions import CircleSkyRegion, make_example_dataset
-
     sky_radius = Angle(radius*2*u.deg)
     sky_region = CircleSkyRegion(coord, sky_radius)
     north_pole_coord = SkyCoord(1*u.deg, 90*u.deg, frame='icrs')
@@ -487,5 +473,5 @@ def find_ra_dec_constraints(ra, dec, radius, verbose=False):
     sql_search_string = "WHERE " + ra_sql_search_string + " AND " + dec_sql_search_string + " "
 
     return({"sql_search_string": sql_search_string,
-            "ra_min": ra_min, "ra_max": ra_max,
-            "dec_min": dec_min, "dec_max": dec_max})
+            "ra_min": bounding_ra_min, "ra_max": bounding_ra_max,
+            "dec_min": bounding_dec_min, "dec_max": bounding_dec_max})

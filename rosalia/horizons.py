@@ -9,12 +9,11 @@ from rosalia.utils import divide_array_in_chunks
 import requests
 from astropy.time import Time
 from scipy.interpolate import interp1d
+from astroquery.jplhorizons import Horizons
 
 
 def get_heliocoords(mjd, body):
     
-    from astroquery.jplhorizons import Horizons
-    from astropy.time import Time
 
     jpl_code_body = get_jpl_observer_name(body)
 

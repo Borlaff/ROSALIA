@@ -142,10 +142,10 @@ def generate_mosaic(data, astropywcs, resolution=None):
         print("Assuming user-input resolution is on arcsecs")
         resolution = resolution*u.arcsec
 
-    optimal_wcs = rs.mosaics.find_mosaic_wcs(input_data=input_data_for_reproject, 
+    optimal_wcs = find_mosaic_wcs(input_data=input_data_for_reproject, 
                                              resolution=resolution, auto_rotate=False)
 
-    output = rs.mosaics.reproject_and_coadd(input_data=input_data_for_reproject, 
+    output = reproject_and_coadd(input_data=input_data_for_reproject, 
                                             output_projection=optimal_wcs[0], 
                                             shape_out=optimal_wcs[1], 
                                             combine_function="mean",

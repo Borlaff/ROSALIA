@@ -11,6 +11,11 @@ import matplotlib.pyplot as plt
 import astropy.units as u
 from astropy.time import Time
 from astropy.coordinates import SkyCoord
+from tqdm import tqdm
+import logging
+logger = logging.getLogger()
+logger.setLevel(logging.CRITICAL)
+import ephessos as ep
 
 class exposure():
     """
@@ -197,7 +202,7 @@ class exposure():
                 self.attitude = rs.attitude.quaternion_to_WFICEN(self.quaternion[0])
                 self.RA_TARG = self.attitude["ra_wficen"]
                 self.DEC_TARG = self.attitude["dec_wficen"]
-                self.PA = self.attitude["pa_wficen"]
+                self.PA = self.attitude["pa_wficen"] - 60
             # --------------------------------------------------------- #
             self.ROOTNAME = rs.inspector.longest_common_substring(self.FILENAME)
             self.MPC_OBSLOC = rs.horizons.get_mpc_observer_name(self.TELESCOP)
@@ -416,7 +421,6 @@ class exposure():
 
 
     def get_nearby_ssos(self, ra=None, dec=None, radius=None, mjd=None, verbose=False, time_step="1m"):
-        import ephessos as ep
         if ra==None: ra = self.RA_TARG
         if dec==None: dec = self.DEC_TARG
         if radius==None: radius = self.FPA_NEAR_RADIUS*60*60
@@ -466,9 +470,6 @@ class exposure():
         
         rs.utils.save_fits(data, self.FILENAME, headers)
         return(self.FILENAME)
-
-
-    # def make_mosaic(self, outname=None):
 
     
 
@@ -995,10 +996,7 @@ class exposure():
 
     def zodiacal(self, zody_mode="zodipy", verbose=False, output_name=None, output_units="e/s", resolution=1,
                  grid_method="random"):
-        from tqdm import tqdm
-        import logging
-        logger = logging.getLogger()
-        logger.setLevel(logging.CRITICAL)
+
 
         nSCIEXTS = len(self.SCIEXTS)
         # Make the Roman Dummy image

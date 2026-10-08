@@ -270,7 +270,7 @@ def exposure_inspector_asdf(input_name, telescope="roman", verbose=False, lite=F
     exposure_identity["RA_PNT"] =  input_asdf["meta"]['pointing']['ra_v1']
     exposure_identity["DEC_PNT"] =  input_asdf["meta"]['pointing']['dec_v1']
     # exposure_identity["PA"] =  # input_asdf["roman"]["meta"]['pointing']["pa_v3"] - 60  # input_asdf["roman"]["meta"]['pointing']["pa_aperture"] # input_asdf["roman"]["meta"]['pointing']['pa_v3']
-    exposure_identity["PA"] = input_asdf["meta"]['pointing']["pa_aperture"]
+    exposure_identity["PA"] = input_asdf["meta"]['pointing']["pa_aperture"] - 60
     exposure_identity["FILETYPE"] = "ASDF"
     exposure_identity["SCIEXTS"] = int(input_asdf["meta"]["instrument"]["detector"].replace("WFI",""))
     return(exposure_identity)

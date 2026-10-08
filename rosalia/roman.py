@@ -370,11 +370,7 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
 
     pixsize = rs.telescopes.Roman.get_physical_pixelsize(instrument="WFI") # Physical pixel size, in meters
 
-    # Find the coordinates of each pixel in the sky.
-    if verbose > 1: print(datetime.now().isoformat() + ": Finding coordinates of SCA pixels in the Sky...")
-    # SCA_pixel_radec = wcs.pixel_to_world(int(data_shape[0])/2,int(data_shape[1])/2)
-    if verbose > 1: print(datetime.now().isoformat() + ": Done")
-
+    # Assimilating catalog.
     radec_stars =  SkyCoord(ra_stars, dec_stars, frame="icrs", unit="deg")
     ra_stars     = radec_stars.ra.value.astype("float32")
     dec_stars    = radec_stars.dec.value.astype("float32")
