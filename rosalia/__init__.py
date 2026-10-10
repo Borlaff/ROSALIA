@@ -41,7 +41,6 @@ from . import (
     render as render,
     roman as roman,
     sky as sky,
-    skysurf as skysurf,
     skywalker as skywalker,
     sso as sso,
     telescopes as telescopes,
