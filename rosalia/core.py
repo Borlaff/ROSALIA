@@ -107,6 +107,7 @@ class exposure():
                 # self.EXPSTART_ISOT = 
                 self.MPC_OBSLOC = self.get_mpc_observer_location()
                 self.JPL_OBSLOC = self.get_jpl_observer_location()
+                self.FILTER = telescope["FILTER"]
                 self.FILTER_IDENTITY = rs.telescopes.find_filter_in_svo(wavelength=telescope["FILTER_PARAMS"]["NAME"],
                                                                         telescope=telescope["FILTER_PARAMS"]["TELESCOPE"],
                                                                         instrument=telescope["FILTER_PARAMS"]["INSTRUMENT"],
@@ -242,7 +243,7 @@ class exposure():
         self.MPC_OBSLOC = rs.horizons.get_mpc_observer_name(observer['TELESCOP'])
         self.JPL_OBSLOC = rs.horizons.get_jpl_observer_name(observer['TELESCOP'])
         self.SCA = rs.telescopes.Roman.WFI_SCAs
-
+        self.FILTER = observer["FILTER"]
         self.FILTER_IDENTITY = rs.telescopes.find_filter_in_svo(wavelength=observer["FILTER_PARAMS"]["NAME"],
                                                                 telescope=observer["FILTER_PARAMS"]["TELESCOPE"],
                                                                 instrument=observer["FILTER_PARAMS"]["INSTRUMENT"],
@@ -929,34 +930,38 @@ class exposure():
         Model the stars inside a Roman WFI image. This is useful for estimating the straylight from stars 
         inside the field of view, and for subtracting the stars from the image.
 
-        Args:
-            ra (float): 
-                Right ascension of the pointing, in degrees.
-            
-            dec (float): 
-                Declination of the pointing, in degrees.
-            
-            PA (float): 
-                Position angle of the observation, in degrees.
-            
+        Parameters
+        ----------
             g_mag_max (float):
                 Maximum g magnitude of the stars to consider in the model.
             
-            date (astropy.time.Time): 
-                Date of the observation in YYYY-MM-DDTHH:MM:SS format.
+            depth (float, optional):
+                Depth of the PSF model. Default is 31 mag arcsec^-2.
             
-            bandpass (str): 
-                Bandpass of the observation in Roman WFI filter names (e.g., F062, F087, F106, F129, F158, F184, F213).
+            catalog (pandas.DataFrame or dict, optional): 
+                User-provided catalog of stars. Must contain columns: `ra`, `dec`, `source_id`, `cat_id`, `mag_lambda`.
             
-            exptime (float): 
-                Exposure time of the observation, in seconds.
+            method (str, optional):
+                Method used for PSF modeling. Default is 'superback'.
 
-            input_catalog (pandas.DataFrame, optional): 
-                User-provided catalog of stars. Must contain columns: "ra", "dec", "source_id", "cat_id", "mag_lambda".
+            n_stars (int, optional):
+                Number of stars to include in the PSF model. Default is None (all stars).
+            
+            n_workers (int, optional):
+                Number of parallel workers to use for PSF modeling. Default is None (automatically determined).
             
             verbose (bool, optional): 
                 If True, print more information about progress. Default is False.
+        Returns
+        -------
+            (psf, wcs_list, canvas) : tuple
+                The 18 detectors as a list of `np.ndarray` containing the PSF models.
+                The list of WCS objects for each detector.
+                The footprint of the WFI.
 
+        Notes
+        -----
+            The methods supported currently include `superback` and `stpsf`.
         '''
         from tqdm import tqdm
         from astropy.io import fits

@@ -77,10 +77,6 @@ packages = ["rosalia"]
 package-dir = {"" = "."}
 include-package-data = true
 
-[tool.setuptools.packages.find]
-where = ["."]
-exclude = ["tests*"]
-
 [tool.setuptools.package-data]
 rosalia = ["*.mplstyle", "*.csv", "*.txt", "rosalia/style/*", "**/*.mplstyle", "images/*", "bin/*"]
 

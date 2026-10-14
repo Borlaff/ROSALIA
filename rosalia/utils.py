@@ -189,6 +189,19 @@ def execute_cmd(cmd, verbose=False):
 
 
 def fix_custom_catalog(catalog):
+    '''
+    Fix a custom catalog by adding a dummy entry if it contains only one row.
+    
+    PARAMETERS
+    ----------
+    catalog : dict or pandas.DataFrame
+        Custom catalog to be fixed.
+
+    RETURNS
+    -------
+    pandas.DataFrame
+        Fixed catalog with a dummy entry if it originally contained only one row.
+    '''
 
     if isinstance(catalog, dict):
         catalog = pd.DataFrame(catalog)

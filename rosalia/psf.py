@@ -132,7 +132,8 @@ class Star:
         The interpolator allows extrapolation outside the sampled wavelength
         range. It is stored as ``self._interpolator`` and used by :meth:`sed`.
         """
-        self._interpolator = interp1d(self.wave, self.mag, kind='linear', bounds_error=False, fill_value="extrapolate")
+        nan_index = np.isnan(self.mag)
+        self._interpolator = interp1d(self.wave[~nan_index], self.mag[~nan_index], kind='linear', bounds_error=False, fill_value="extrapolate")
 
     def sed(self, wave):
         """Evaluate the interpolated SED in AB magnitudes.
