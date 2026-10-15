@@ -27,6 +27,7 @@ ephem
 pysolar
 numexpr
 reproject
+romanisim @ git+https://github.com/spacetelescope/romanisim.git@main
 astroquery @ git+https://github.com/snbianco/astroquery.git@mast-beta-release 
 scipy>=1.18.0
 pyarrow
@@ -36,5 +37,4 @@ twine
 s3fs
 zodipy
 dotenv
-zodipy
 roman_datamodels @ git+https://github.com/spacetelescope/roman_datamodels

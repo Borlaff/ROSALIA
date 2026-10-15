@@ -14,6 +14,7 @@ notebooks/DEVEL/snap/snap*.png
 notebooks/CAR171/CAR171*.png
 notebooks/CAR171/BAK
 notebooks/CAR171/APT
+notebooks/tutorials/*/
 *apt
 *.part
 *aptbackup

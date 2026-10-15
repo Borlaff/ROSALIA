@@ -27,7 +27,8 @@
 # focal plane for a point-like source at given position in the field of view."
 # """
 ##########################################################
-
+import os 
+import pickle 
 import numpy as np
 from astropy import constants as const
 import astropy.units as u
@@ -94,6 +95,25 @@ def straylight_flux(mag, theta, phi, filter_name, instrument, telescope, exptime
     else:
         return(flux_per_pixel) # e/s/pixel
 
+
+
+
+def save_aligned_ndi_map(level, SCA, ra_point, dec_point, pa_point, output_name, subarray=0):
+    # Level 1
+    ndi_name = os.environ['ROSALIACACHE'] + "/CORE/NDI/RST/ndi_lvl" + str(level) + "/lvl" + str(level) + "_SCA_" + str(SCA) + ".pkl"
+    with open(ndi_name, "rb") as f:
+        ndi_identity = pickle.load(f)
+    
+    ndi_wcs=ndi_identity["wcs"][subarray]
+    ndi_grid_interpolator=ndi_identity["ndi_interpolator"][subarray]
+    ndi_grid = ndi_grid_interpolator.values.T
+
+
+    ndi_wcs.wcs.crota = -pa_point,-pa_point
+    ndi_wcs.wcs.crval = ra_point,dec_point
+
+    rs.utils.save_fits(ndi_grid, output_name, ndi_wcs.to_header())
+    return(ndi_identity)
 
 
 ############### LEGACY EUCLID CLASS FUNCTIONS ###################

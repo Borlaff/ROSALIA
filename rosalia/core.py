@@ -651,16 +651,17 @@ class exposure():
 
         elif self.TELESCOP.lower() == "roman" or self.TELESCOP.lower() == "rst":
             # Find out which stars belong to each detector. 
-            print(datetime.now().isoformat() + " > Fetching source catalog")
+            
 
             if not hasattr(self, 'source_catalog'):
                 if catalog is None:
+                    print(datetime.now().isoformat() + " > Fetching source catalog")
                     self.source_catalog = self.get_source_catalog(g_mag_max=g_mag_max, verbose=False)
+                    print(datetime.now().isoformat() + " > Done.")
                 else:
                     self.source_catalog = rs.utils.fix_custom_catalog(catalog)
 
             self.source_catalog = self.find_which_stars_are_inside_each_detector(verbose=False)
-            print(datetime.now().isoformat() + " > Done.")
 
             # If sun_block is True, then remove the Sun from the catalog.
             if sun_block:

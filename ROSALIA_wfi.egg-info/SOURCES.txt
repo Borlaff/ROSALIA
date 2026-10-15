@@ -24,6 +24,7 @@ rosalia/hst.py
 rosalia/inspector.py
 rosalia/irsa.py
 rosalia/mast.py
+rosalia/mosaics.py
 rosalia/ndi.py
 rosalia/plots.py
 rosalia/psf.py

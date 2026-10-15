@@ -10,6 +10,8 @@ from astropy import constants as const
 from datetime import datetime
 import healpy as hp
 import pickle
+from romanisim.ris_make_utils import set_metadata
+from romanisim.models import wcs as ris_wcs
 
 import logging
 
@@ -72,8 +74,6 @@ def create_roman_dummy(point, date, band, PA=None, exptime=500, output="default_
     #    WFI_PA = galsim.Angle(PA, coord.degrees)
     #else:
     #    WFI_PA = None
-    from romanisim.ris_make_utils import set_metadata
-    from romanisim.models import wcs as ris_wcs
 
     # import roman_datamodels
 
@@ -146,7 +146,7 @@ def create_roman_dummy(point, date, band, PA=None, exptime=500, output="default_
     rs.utils.save_fits(array=temp_array_list, name=output, header=temp_header_list)
 
     # We might need to add info on the first extension. Load the multifits, modify and save again.
-    final_fits = fits.open(output)
+    final_fits = fits.open(output, memmap=True)
     final_fits[0].header["RA_TARG"] = final_fits[1].header["RA_TARG"]
     final_fits[0].header["DEC_TARG"] = final_fits[1].header["DEC_TARG"]
     final_fits[0].header["TELESCOP"] = final_fits[1].header["TELESCOP"]
@@ -496,7 +496,7 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
     ###############################################
     # Precalculate constant factors for straylight estimation                                            
     ###############################################
-    NDI_conversion_factor = ((pixsize**2)*filter_identity["filter_transmission_ref"]*filter_identity["filter_lambda_ref"]/superpixel_mm2_area/const.c/const.h)
+    NDI_conversion_factor   = ((pixsize**2)*filter_identity["filter_transmission_ref"]*filter_identity["filter_lambda_ref"]/superpixel_mm2_area/const.c/const.h)
     NDI_conversion_factor_1 = (NDI_conversion_factor*irradiance_level_1_stars).decompose()
     NDI_conversion_factor_2 = (NDI_conversion_factor*irradiance_level_2_stars).decompose()
     NDI_conversion_factor_3 = (NDI_conversion_factor*irradiance_level_3_stars).decompose()
@@ -522,9 +522,9 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
             level=1
             transfer_level_1 = roman_WFI_NDI_estimator_direct(ra_stars=ra_level_1_stars, dec_stars=dec_level_1_stars,
                                                               ra_point=ra_point, dec_point=dec_point, pa_point=pa_point,
-                                                                ndi_wcs=ndi_lvl1["wcs"][i], 
-                                                                ndi_grid_interpolator=ndi_lvl1["ndi_interpolator"][i],
-                                                                level=level, verbose=True)
+                                                              ndi_wcs=ndi_lvl1["wcs"][i], 
+                                                              ndi_grid_interpolator=ndi_lvl1["ndi_interpolator"][i],
+                                                              level=level, verbose=True)
 
             straylight_level_1 = transfer_level_1*NDI_conversion_factor_1  # (NDI_level_1*(pixsize**2)*filter_identity["filter_transmission_ref"]*filter_identity["filter_lambda_ref"]*irradiance_level_1_stars/const.c/const.h).decompose()
             

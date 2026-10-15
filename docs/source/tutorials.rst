@@ -18,7 +18,7 @@ Due to the asymmetric design of the Nancy Grace Roman Space Telescope, there is 
 
     date = Time("2027-06-01T00:00:00") # Date of the observation, in Astropy Time YYYY-MM-DDTHH:MM:SS format.
  
-    nominal_PA = rs.telescopes.Roman.get_bestPA(ra=ra_star, dec=dec_star, mjd=date.mjd)
+    nominal_PA = rs.telescopes.Roman.get_bestPA(ra=ra, dec=dec, mjd=date.mjd)
 
 ``rs.telescopes.Roman.get_bestPA`` will return the optimal V3 position angle for the observation of a target at the given coordinates and date. The V3 position angle is defined as the angle between the equatorial North direction and the perpendicular vector to the spacecraft sun-shield, measured in degrees. The nominal (best) V3 position angle is the one that minimizes the stray-light from the Sun and maximizes the power in the solar panels. Notice that this angle is different from the position angle of the WFI focal plane, which is defined as the angle between the equatorial North direction and the Y-axis of the WFI focal plane. 
 

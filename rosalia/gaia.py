@@ -408,34 +408,73 @@ def query_healpix_ra_slices(healpix_lvl=7, verbose=False):
 ############################
 
 def find_ra_dec_constraints(ra, dec, radius, verbose=False):
-    from regions import CircleSkyRegion, make_example_dataset
-    coord = SkyCoord(ra*u.deg, dec*u.deg, frame='icrs')
-    hp = astro_hp.HEALPix(nside=128, order='nested', frame=ICRS())
-    healpix_ids_bounding_circle = hp.cone_search_skycoord(coord, radius=radius*2*u.deg)
-    #print(healpix_ids_bounding_circle)
+    """
+    Computes analytical RA/Dec bounding limits and SQL WHERE clauses for a cone search.
+    
+    Parameters
+    ----------
+    ra : float
+        Target Right Ascension in degrees [0, 360).
+    dec : float
+        Target Declination in degrees [-90, 90].
+    radius : float
+        Cone search radius in degrees.
+    verbose : bool, optional
+        Whether to print diagnostic messages (default is False).
+        
+    Returns
+    -------
+    dict
+        Dictionary containing 'sql_search_string', 'ra_min', 'ra_max', 'dec_min', 'dec_max',
+        and a boolean flag 'wraps_ra' indicating whether RA wraps across 0 deg.
+    """
+    # Convert angles to radians for trigonometric evaluation
+    ra_rad = np.radians(ra)
+    dec_rad = np.radians(dec)
+    r_rad = np.radians(radius)
 
-    healpix_radec_bounding_circle = hp.healpix_to_skycoord(healpix_ids_bounding_circle)
-    #print(healpix_radec_bounding_circle)
+    # 1. Exact Declination bounds
+    dec_min = max(-90.0, dec - radius)
+    dec_max = min(90.0, dec + radius)
 
-    ra_min = bn.nanmin(healpix_radec_bounding_circle.ra.deg)
-    ra_max = bn.nanmax(healpix_radec_bounding_circle.ra.deg)
-    dec_min = bn.nanmin(healpix_radec_bounding_circle.dec.deg)
-    dec_max = bn.nanmax(healpix_radec_bounding_circle.dec.deg)
+    bool_north_pole_in = (dec + radius) >= 90.0
+    bool_south_pole_in = (dec - radius) <= -90.0
 
-    # Is any of the poles contained in the bounding circle?
-    sky_radius = Angle(radius*2*u.deg)
-    sky_region = CircleSkyRegion(coord, sky_radius)
-    north_pole_coord = SkyCoord(1*u.deg, 90*u.deg, frame='icrs')
-    south_pole_coord = SkyCoord(1*u.deg, -90*u.deg, frame='icrs')
-
-    mock_dataset = make_example_dataset(data='simulated')
-    wcs = mock_dataset.wcs
-    bool_north_pole_in = sky_region.contains(north_pole_coord, wcs)
     if verbose:
-        print("Bool North pole in:" + str(bool_north_pole_in))
-    bool_south_pole_in = sky_region.contains(south_pole_coord, wcs)
-    if verbose:
-        print("Bool South pole in:" + str(bool_south_pole_in))
+        print(f"Bool North pole in: {bool_north_pole_in}")
+        print(f"Bool South pole in: {bool_south_pole_in}")
+
+    # 2. Exact Right Ascension bounds
+    if bool_north_pole_in or bool_south_pole_in:
+        ra_min = 0.0
+        ra_max = 360.0
+        wraps_ra = False
+        ra_sql_search_string = ""
+    else:
+        # Check if the cone spans all RA
+        cos_dec = np.cos(dec_rad)
+        sin_r = np.sin(r_rad)
+
+        if sin_r >= cos_dec:
+            ra_min = 0.0
+            ra_max = 360.0
+            wraps_ra = False
+            ra_sql_search_string = ""
+        else:
+            delta_ra = np.degrees(np.arcsin(sin_r / cos_dec))
+            ra_min_raw = ra - delta_ra
+            ra_max_raw = ra + delta_ra
+
+            ra_min = ra_min_raw % 360.0
+            ra_max = ra_max_raw % 360.0
+
+            if ra_min_raw < 0.0 or ra_max_raw >= 360.0:
+                wraps_ra = True
+                # Query wraps through RA = 0 / 360 deg
+                ra_sql_search_string = f"(ra >= {ra_min:.6f} OR ra <= {ra_max:.6f})"
+            else:
+                wraps_ra = False
+                ra_sql_search_string = f"(ra >= {ra_min:.6f} AND ra <= {ra_max:.6f})"
 
     # RA string
     if bool_north_pole_in or bool_south_pole_in:
@@ -474,4 +513,4 @@ def find_ra_dec_constraints(ra, dec, radius, verbose=False):
 
     return({"sql_search_string": sql_search_string,
             "ra_min": bounding_ra_min, "ra_max": bounding_ra_max,
-            "dec_min": bounding_dec_min, "dec_max": bounding_dec_max})
+            "dec_min": bounding_dec_min, "dec_max": bounding_dec_max, "wraps_ra": wraps_ra})

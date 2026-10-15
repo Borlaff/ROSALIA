@@ -26,7 +26,7 @@ from scipy import interpolate
 import healpy as hp
 import matplotlib.cm as cm
 import pickle
-
+import bottleneck as bn
 
 # Suppress warnings. Comment this out if you wish to see the warning messages
 import warnings
@@ -96,8 +96,6 @@ class Loader:
 
 
 def main_offender_find_fraction_of_map(mainoff_name, catalog):
-
-
     hdu = fits.open(mainoff_name)
     data = hdu[0].data
     try:
@@ -116,15 +114,17 @@ def main_offender_find_fraction_of_map(mainoff_name, catalog):
     print(unique_ids)
     fraction_by_offender = [] 
 
-    import bottleneck as bn
+
     source_name_list = []
     ra_list = []
     dec_list = []
     mag_lambda_list = []
     unique_id_valid = []
+
+
     for i in range(len(unique_ids)): 
         unique_id = unique_ids[i]
-        
+
         if np.where(catalog["cat_id"] == unique_id)[0].size == 0:
             print("Catalog does not have information for cat_id: " + str(unique_id) + ". Skipping")
             continue
@@ -250,16 +250,8 @@ def make_stray_plot(input_name, ext, mode="normal", catalog=None,
     return(output_name)
 
 
-def make_stars_around_plot(flt_name, catalog,  astropywcs_list, RA_TARG, DEC_TARG, radius = 0.3, output_name=None, figsize=(10,7), verbose=False):
-    if output_name is None:
-        output_name = flt_name.replace(".fits", "_stars_close.png")
-        
-    # if True:
+def make_stars_around_plot(catalog,  astropywcs_list, RA_TARG, DEC_TARG, radius = 0.6, output_name=None, figsize=(10,7), verbose=False):
 
-
-    # Open the original flt file
-    # image_identity = rs.utils.exposure_inspector(input_name=flt_name, verbose=False, lite=True)
-    
     # Get the detector corners: 
     detector_square_list = []
     for i in range(len(astropywcs_list)):
@@ -282,12 +274,13 @@ def make_stars_around_plot(flt_name, catalog,  astropywcs_list, RA_TARG, DEC_TAR
 
     print(radius)
 
+    # Plot Zone # 
     fig, ax = plt.subplots(figsize=figsize)
     
     plot_size, mag_lambda_range, plot_size_range = plot_stars_around(ax=ax, catalog=hybrid_catalog_close, 
                                            max_plot_size=50, min_plot_size=5, alpha=0.2)
 
-
+    ax.scatter(RA_TARG, DEC_TARG, marker="+", s=200, color="firebrick", label="WFI_CEN")
     plot_radec_limits = rs.gaia.find_ra_dec_constraints(ra=RA_TARG, dec=DEC_TARG, radius=radius)
     for detector_square in detector_square_list:
         plt.plot(detector_square[:,0], detector_square[:,1], alpha=0.5, color="red")
@@ -303,7 +296,6 @@ def make_stars_around_plot(flt_name, catalog,  astropywcs_list, RA_TARG, DEC_TAR
     ax.legend(loc="best", title="AB Mag", fancybox=True, edgecolor="white", bbox_to_anchor=(1.2, 0.5))
     fig.tight_layout()
     plt.savefig(output_name, dpi=300)
-
     plt.show()
     return(output_name)
 
@@ -429,10 +421,10 @@ def plot_stars_around(ax, catalog, max_plot_size=50, min_plot_size=5, alpha=0.2)
         try:
             planet_i = np.where(catalog["source_id"]==SSO_list_plain_i)[0][0]
             #plt.text(ra_stars[planet_i], dec_stars[planet_i], s=SSO_list_symbols[i])
-            plt.scatter(ra_stars[planet_i], dec_stars[planet_i], marker=SSO_list_symbols[i], s=1000)
-            flux_for_plot[planet_i] = np.nan
-            ra_stars[planet_i] = np.nan
-            dec_stars[planet_i] = np.nan
+            plt.scatter(ra_stars[planet_i], dec_stars[planet_i], marker=SSO_list_symbols[i], label= SSO_list_symbols[i] + " - " + SSO_list_plain[i], s=200)
+            #flux_for_plot[planet_i] = np.nan
+            #ra_stars[planet_i] = np.nan
+            #dec_stars[planet_i] = np.nan
 
         except:
             print("SSO body: " + SSO_list_plain_i + " not found. Skipping")
@@ -557,12 +549,11 @@ def make_straylight_plots(RA_TARG, DEC_TARG, PA, source_catalog, ASTROPYWCS, str
     if verbose > 0: print("Plot: Source environment map.")
     #try:
     if True:
-        stars_around_png = rs.plots.make_stars_around_plot(stray_flc_name,
-                                                           catalog=source_catalog, 
+        stars_around_png = rs.plots.make_stars_around_plot(catalog=source_catalog, 
                                                            astropywcs_list = ASTROPYWCS, 
                                                            RA_TARG=RA_TARG, 
                                                            DEC_TARG=DEC_TARG, 
-                                                           output_name=None, 
+                                                           output_name=stray_flc_name.replace(".fits", "_stars_close.png"), 
                                                            figsize=figsize)
         # def make_stars_around_plot(flt_name, catalog,  astropywcs_list, RA_TARG, DEC_TARG, radius = 0.6, output_name=None, figsize=(10,7)):
 
@@ -610,7 +601,7 @@ def get_combined_NDI_map(SCA, ra_point, dec_point, pa, radius=5, i=0):
     ra_dec_constraints = rs.gaia.find_ra_dec_constraints(ra_point, dec_point, radius/2, verbose=False)
 
     # Assimilating catalog.
-    ra_array = np.linspace(ra_dec_constraints['ra_min'], ra_dec_constraints['ra_max'], 1800)
+    ra_array  = np.linspace(ra_dec_constraints['ra_min'],  ra_dec_constraints['ra_max'],  1800)
     dec_array = np.linspace(ra_dec_constraints['dec_min'], ra_dec_constraints['dec_max'], 1800)
 
     ra_grid, dec_grid = np.meshgrid(ra_array, dec_array)

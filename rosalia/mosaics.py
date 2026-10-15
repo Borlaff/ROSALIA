@@ -9,6 +9,11 @@ from reproject.mosaicking import reproject_and_coadd, find_optimal_celestial_wcs
 import rosalia as rs
 from astropy.wcs.wcsapi import BaseHighLevelWCS
 
+import logging
+
+# Set the root logger to only display WARNING, ERROR, or CRITICAL logs
+logging.getLogger().setLevel(logging.ERROR)
+
 
 def coadd_level2(data, astropywcs, optimal_wcs=None, resolution=None):
     input_data_for_reproject = list(zip(data, astropywcs))

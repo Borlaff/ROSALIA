@@ -1,4 +1,5 @@
 import os
+import numpy as np
 from astropy.time import Time
 import pandas as pd
 from astroquery.jplhorizons import Horizons
@@ -100,7 +101,7 @@ def get_SSOs_ephemeris(observer, MJD):
 
     SSO_ephemeris_db["V_ab"] = SSO_ephemeris_db["V"] - 0.03 + 0.01
     SSO_ephemeris_db["source_id"] = SSO_list_plain
-    SSO_ephemeris_db["source_id_2"] = SSO_list
+    SSO_ephemeris_db["source_id_2"] = np.array(SSO_list, dtype="int")
 
     return(SSO_ephemeris_db)
 

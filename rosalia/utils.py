@@ -1612,9 +1612,9 @@ def distance_to_galactic_plane(ra, dec):
     galactic_coord = coord.galactic
     
     # Distance to galactic plane is the absolute value of galactic latitude
-    distance = abs(galactic_lat)
+    distance = abs(galactic_coord.b.degree)
     
-    return distance
+    return(distance)
 
 
 #############
