@@ -232,7 +232,7 @@ class Star:
 
         return (wave.to(u.nm).value, mag_weights)
 
-    def get_linear_weights(self, bandpass, instrument='WFI', zp=23.9, scale=0.11):
+    def get_linear_weights(self, bandpass, instrument='WFI', zp=23.9):
         """Return filter wavelengths and spectral flux contributions in nJy/pixel.
 
         Parameters
@@ -244,9 +244,7 @@ class Star:
         zp : float, optional
             AB zero point in the nJy convention. Defaults to 23.9, for which
             ``f_nJy = 10**((zp - magnitude) / 2.5)``.
-        scale : float, optional
-            Pixel scale in arcsec/pixel. The returned flux contributions are
-            scaled by ``scale**2`` to give nJy/pixel from nJy/arcsec**2.
+
 
         Returns
         -------
@@ -278,7 +276,7 @@ class Star:
         relative_flux = spectral_shape * response
 
         band_magnitude = self.get_magnitudes(bandpass, instrument=instrument)
-        target_flux = 10**(0.4 * (zp - band_magnitude)) * scale**2
+        target_flux = 10**(0.4 * (zp - band_magnitude))
         if not np.isfinite(np.sum(relative_flux)) or np.sum(relative_flux) <= 0:
             raise ValueError(f"Filter {bandpass!r} has no usable transmission samples.")
         flux_weights = target_flux * relative_flux / np.sum(relative_flux)
