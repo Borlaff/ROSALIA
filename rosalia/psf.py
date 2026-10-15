@@ -1948,7 +1948,7 @@ def stpsf_roman_psf(position, SCA, bandpass, shape=None, SED=None,
             
             throughput = np.interp(sample_wave_nm, filter_wave_nm, filter_throughput, left=0, right=0)
             response = throughput * np.abs(np.gradient(sample_wave_nm))
-            sample_flux = 10**(0.4 * (zp - sample_magnitudes)) * pixel_scale**2
+            sample_flux = 10**(0.4 * (zp - sample_magnitudes))
             weights = sample_flux * response / response.sum()
         else:
             weights = np.asarray(flux_weights, dtype=float)
@@ -1965,7 +1965,7 @@ def stpsf_roman_psf(position, SCA, bandpass, shape=None, SED=None,
         # GalSim f_nu is in erg/s/cm^2/Hz; 1 nJy = 1e-32 in these units.
         sample_flux = spectral_fnu / 1e-32
         response = filter_response / filter_response.sum()
-        weights = sample_flux * response * pixel_scale**2
+        weights = sample_flux * response 
     else:
         # A flat 1 nJy spectrum is a useful unit-flux default.
         sample_wave_nm = filter_wave_nm
@@ -2149,7 +2149,7 @@ def superback_roman_psf(position, SCA, bandpass, shape=None, SED=None,
             
             throughput = np.interp(sample_wave_nm, filter_wave_nm, filter_throughput, left=0, right=0)
             response = throughput * np.abs(np.gradient(sample_wave_nm))
-            sample_flux = 10**(0.4 * (zp - sample_magnitudes)) * pixel_scale**2
+            sample_flux = 10**(0.4 * (zp - sample_magnitudes))
             weights = sample_flux * response / response.sum()
         else:
             weights = np.asarray(flux_weights, dtype=float)
@@ -2166,7 +2166,7 @@ def superback_roman_psf(position, SCA, bandpass, shape=None, SED=None,
         # GalSim f_nu is in erg/s/cm^2/Hz; 1 nJy = 1e-32 in these units.
         sample_flux = spectral_fnu / 1e-32
         response = filter_response / filter_response.sum()
-        weights = sample_flux * response * pixel_scale**2
+        weights = sample_flux * response 
     else:
         # A flat 1 nJy spectrum is a useful unit-flux default.
         sample_wave_nm = filter_wave_nm
