@@ -2036,7 +2036,7 @@ def stpsf_roman_psf(position, SCA, bandpass, shape=None, SED=None,
     hdu.header["MAGZP"] = (float(zp), "AB zero point for flux values in nJy")
     hdu.header["PIXSCALE"] = (float(pixel_scale), "Pixel scale in arcsec/pixel")
     hdu.header["TOTFLUX"] = (requested_flux, "Integrated PSF flux in nJy")
-    hdu.header["ABMAG"] = (float(zp - 2.5 * np.log10(requested_flux / pixel_scale**2)),
+    hdu.header["ABMAG"] = (float(zp - 2.5 * np.log10(requested_flux)),
                             "Integrated AB magnitude per square arcsec")
     return hdu
 
@@ -2238,7 +2238,7 @@ def superback_roman_psf(position, SCA, bandpass, shape=None, SED=None,
     hdu.header["MAGZP"] = (float(zp), "AB zero point for flux values in nJy")
     hdu.header["PIXSCALE"] = (float(pixel_scale), "Pixel scale in arcsec/pixel")
     hdu.header["TOTFLUX"] = (requested_flux, "Integrated PSF flux in nJy")
-    hdu.header["ABMAG"] = (float(zp - 2.5 * np.log10(requested_flux / pixel_scale**2)),
+    hdu.header["ABMAG"] = (float(zp - 2.5 * np.log10(requested_flux)),
                             "Integrated AB magnitude per square arcsec")
     return hdu
 
