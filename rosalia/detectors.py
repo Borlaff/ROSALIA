@@ -21,6 +21,75 @@ from astropy import constants as const
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+
+def jy2fe(jy, instrument, filter_name, telescope, verbose=False):
+    '''
+    Convert flux density in Jy per pixel to photo-electrons per second per pixel for a given telescope and filter.
+
+    Parameters
+    ----------
+    jy : float or astropy.units.Quantity
+        Flux density in Jy per pixel.
+    instrument : str
+        Instrument name.
+    filter_name : str
+        Filter name.
+    telescope : str
+        Telescope name.
+    verbose : bool, optional
+        If True, print additional information. Default is False.
+
+    Returns
+    -------
+    astropy.units.Quantity
+        Photo-electrons per second per pixel.
+    '''
+    # Bare numbers are interpreted as Jy/pixel; Quantity inputs may use Jy/pixel.
+    if isinstance(jy, u.Quantity):
+        jy_per_pixel = jy.to_value(u.Jy / u.pixel)
+    else:
+        jy_per_pixel = np.asarray(jy)
+    if np.ndim(jy_per_pixel) == 0:
+        jy_per_pixel = np.array([jy_per_pixel])
+    fnu = jy_per_pixel * 10**(-0.4*(56.1 + 8.9)) * u.W.decompose()/u.meter**2/u.Hz
+
+
+    # For Hubble Space Telescope
+    if telescope == "Hubble" or telescope == "HST":
+        teles = rs.telescopes.Hubble
+
+    # For Hubble Space Telescope
+    if telescope.lower() == "roman" or telescope.lower() == "rst" or telescope.lower() == "roman/wfi":
+        teles = rs.telescopes.Roman
+
+    if telescope == "ARRAKIHS":
+        teles = rs.telescopes.ARRAKIHS
+
+    if telescope == "CSST":
+        teles = rs.telescopes.CSST
+
+    if telescope == "SPHEREx":
+        teles = rs.telescopes.SPHEREx
+
+    filter_db = teles.get_filter(instrument=instrument, filter_name=filter_name)
+    mirror_radius = teles.mirror_radius
+    A_telescope_factor = (np.pi * fnu*(mirror_radius**2)/const.h).decompose()
+
+    # We initialize the array that will contain the photoelectrons
+    Nephot_i = np.zeros(np.shape(jy_per_pixel))
+
+    # Now we integrate the photo-electron flux across the filter bandwidth
+    for i in range(len(filter_db["transmission_bins"])-1):
+        lambda_i0 = filter_db["wavelength_bins"][i]   # Wavelength in m
+        lambda_i1 = filter_db["wavelength_bins"][i+1] # Wavelength in m
+        lambda_i = (lambda_i0 + lambda_i1)/2. # Average lambda
+        T_i = (filter_db["transmission_bins"][i] + filter_db["transmission_bins"][i+1])/2. # Average quantum efficiency
+        dlambda_i = lambda_i1 - lambda_i0 # Delta lambda
+        Nephot_i = Nephot_i + (T_i * dlambda_i /lambda_i)
+
+    return((Nephot_i*A_telescope_factor).decompose())
+
+
 def mu2fe(mu, instrument, filter_name, telescope, verbose=False):
     ################################################
     # mu2electrons:
