@@ -19,6 +19,34 @@ def test_fe2mu_mu2fe():
     print("> test_fe2mu_mu2fe: PASS")
     return(True)
 
+def test_recover_detector_frames_from_canvas():
+    from astropy.wcs import WCS
+
+    canvas_wcs = WCS(naxis=2)
+    canvas_wcs.wcs.crpix = [1, 1]
+    canvas_wcs.wcs.cdelt = [-1 / 3600, 1 / 3600]
+    canvas_wcs.wcs.crval = [10, 20]
+    canvas_wcs.wcs.ctype = ["RA---TAN", "DEC--TAN"]
+
+    first_detector_wcs = canvas_wcs.deepcopy()
+    first_detector_wcs.array_shape = (6, 6)
+    second_detector_wcs = canvas_wcs.deepcopy()
+    second_detector_wcs.wcs.crpix = [-5, 1]
+    second_detector_wcs.array_shape = (6, 6)
+
+    canvas = np.arange(72, dtype=float).reshape((6, 12))
+    recovered = rs.psf.recover_detector_frames(
+        canvas=canvas,
+        optimal_wcs=canvas_wcs,
+        detector_wcs=[first_detector_wcs, second_detector_wcs],
+    )
+
+    assert len(recovered) == 2
+    assert_allclose(recovered[0], canvas[:, :6], atol=1e-6)
+    assert_allclose(recovered[1], canvas[:, 6:], atol=1e-6)
+    print("> test_recover_detector_frames_from_canvas: PASS")
+    return True
+
 def test_magnitude_conversion_gaia():
     from astroquery.gaia import Gaia
 

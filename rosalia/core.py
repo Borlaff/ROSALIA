@@ -112,6 +112,7 @@ class exposure():
                 # self.EXPSTART_ISOT = 
                 self.MPC_OBSLOC = self.get_mpc_observer_location()
                 self.JPL_OBSLOC = self.get_jpl_observer_location()
+                self.FILTER = telescope["FILTER"]
                 self.FILTER_IDENTITY = rs.telescopes.find_filter_in_svo(wavelength=telescope["FILTER_PARAMS"]["NAME"],
                                                                         telescope=telescope["FILTER_PARAMS"]["TELESCOPE"],
                                                                         instrument=telescope["FILTER_PARAMS"]["INSTRUMENT"],
@@ -256,7 +257,7 @@ class exposure():
         self.MPC_OBSLOC = rs.horizons.get_mpc_observer_name(observer['TELESCOP'])
         self.JPL_OBSLOC = rs.horizons.get_jpl_observer_name(observer['TELESCOP'])
         self.SCA = rs.telescopes.Roman.WFI_SCAs
-
+        self.FILTER = observer["FILTER"]
         self.FILTER_IDENTITY = rs.telescopes.find_filter_in_svo(wavelength=observer["FILTER_PARAMS"]["NAME"],
                                                                 telescope=observer["FILTER_PARAMS"]["TELESCOPE"],
                                                                 instrument=observer["FILTER_PARAMS"]["INSTRUMENT"],
@@ -380,6 +381,53 @@ class exposure():
             loader.stop()
         return(hybrid_catalog)
 
+    def find_closest_detector(self, ra, dec):
+        """
+        Finds the closest detector for target sources using vectorized math.
+        
+        Parameters:
+        -----------
+        ra : float or numpy.ndarray
+            RA coordinate(s) in degrees.
+        dec : float or numpy.ndarray
+            Dec coordinate(s) in degrees.
+            
+        Returns:
+        --------
+        closest_indices : numpy.ndarray or int
+            The index (or array of indices) of the closest WCS in `wcs_list`.
+            Returns a scalar integer if single floats were passed.
+        """
+        closest_indices = rs.utils.find_closest_detector(detector_wcs_list=self.ASTROPYWCS,
+                                                        ra=ra,
+                                                        dec=dec)     
+        return closest_indices
+
+
+    def is_inside_wfi(self, ra, dec, width=500):
+        """
+        Checks if given RA/Dec source(s) fall inside the WFI detector footprint.
+        
+        Parameters:
+        -----------
+        ra : float, list, or numpy.ndarray
+            Right Ascension of the source(s) in degrees.
+        dec : float, list, or numpy.ndarray
+            Declination of the source(s) in degrees.
+        width : int or float, optional
+            Pixel padding to extend (or shrink, if negative) the footprint border. Default is 500.
+            
+        Returns:
+        --------
+        inside : bool or numpy.ndarray of bool
+            A boolean (or array of booleans) indicating if each source falls within the boundary.
+        """
+        inside = rs.utils.check_sources_in_footprint(detector_wcs_list=self.ASTROPYWCS,
+                                                     detector_shapes=self.DATA_SHAPE,
+                                                     ra=ra,
+                                                     dec=dec,
+                                                     width=width)
+        return inside
 
 
     def find_which_stars_are_inside_each_detector(self, verbose=False):
@@ -868,7 +916,7 @@ class exposure():
 #####################################################################################
 
 
-    def psf(self, g_mag_max=15, catalog=None, verbose=False):
+    def psf(self, g_mag_max=15, depth=31, catalog=None, method='superback', n_stars=None, n_workers=None, verbose=False):
         #######################################
         # rosalia_psf: Alejandro S. Borlaff. NASA/Ames STA. a.s.borlaff@nasa.gov
         # -------------------------------
@@ -884,40 +932,49 @@ class exposure():
         Model the stars inside a Roman WFI image. This is useful for estimating the straylight from stars 
         inside the field of view, and for subtracting the stars from the image.
 
-        Args:
-            ra (float): 
-                Right ascension of the pointing, in degrees.
-            
-            dec (float): 
-                Declination of the pointing, in degrees.
-            
-            PA (float): 
-                Position angle of the observation, in degrees.
-            
+        Parameters
+        ----------
             g_mag_max (float):
                 Maximum g magnitude of the stars to consider in the model.
             
-            date (astropy.time.Time): 
-                Date of the observation in YYYY-MM-DDTHH:MM:SS format.
+            depth (float, optional):
+                Depth of the PSF model. Default is 31 mag arcsec^-2.
             
-            bandpass (str): 
-                Bandpass of the observation in Roman WFI filter names (e.g., F062, F087, F106, F129, F158, F184, F213).
+            catalog (pandas.DataFrame or dict, optional): 
+                User-provided catalog of stars. Must contain columns: `ra`, `dec`, `source_id`, `cat_id`, `mag_lambda`.
             
-            exptime (float): 
-                Exposure time of the observation, in seconds.
+            method (str, optional):
+                Method used for PSF modeling. Default is 'superback'.
 
-            input_catalog (pandas.DataFrame, optional): 
-                User-provided catalog of stars. Must contain columns: "ra", "dec", "source_id", "cat_id", "mag_lambda".
+            n_stars (int, optional):
+                Number of stars to include in the PSF model. Default is None (all stars).
+            
+            n_workers (int, optional):
+                Number of parallel workers to use for PSF modeling. Default is None (automatically determined).
             
             verbose (bool, optional): 
                 If True, print more information about progress. Default is False.
+        Returns
+        -------
+            (psf, wcs_list, canvas) : tuple
+                The 18 detectors as a list of `np.ndarray` containing the PSF models.
+                The list of WCS objects for each detector.
+                The footprint of the WFI.
 
+        Notes
+        -----
+            The methods supported currently include `superback` and `stpsf`.
         '''
         from tqdm import tqdm
         from astropy.io import fits
         import logging
+        from reproject.mosaicking import find_optimal_celestial_wcs
         logger = logging.getLogger()
         logger.setLevel(logging.CRITICAL)
+
+        # Set the number of workers for parallel processing if not specified    
+        if n_workers is None:
+            n_workers = min(2, os.cpu_count() or 1)
 
         # Get the catalog of the stars around the FOV
         if not hasattr(self, 'source_catalog'):
@@ -926,74 +983,54 @@ class exposure():
             else:
                 self.source_catalog = rs.utils.fix_custom_catalog(catalog)
 
+        # Get the optimal wcs
+        if not hasattr(self, 'optimal_wcs') or not hasattr(self, 'shape_out'):
+            self.optimal_wcs, self.shape_out = find_optimal_celestial_wcs([(self.DATA_SHAPE[i], self.ASTROPYWCS[i]) for i in range(len(self.SCIEXTS))],
+                                                                           auto_rotate=True)    
+            # Canvas geometry from the pysiaf detector layout (no reproject).
+            #self.optimal_wcs, self.shape_out = rs.psf.get_roman_canvas_wcs(self.ASTROPYWCS, pixscale=0.11)
 
-        # Generate the star stamps (PSFs)
-        print("TO DO: Make stamps with a more reasonable size. Dim stars can have smaller PSFs.")
-        print("To do this, make a profile of the Roman / PSF, and find out when would it be essentially 0.")
-        star_stamps = rs.psf.generate_star_stamps(hybrid_catalog=self.source_catalog,
-                                                # image_identity=image_identity),
-                                                 telescope=self.TELESCOP, 
-                                                 filename=self.FILENAME, 
-                                                 sciexts=self.SCIEXTS, 
-                                                 astropywcs=self.ASTROPYWCS,
-                                                 filter=self.FILTER_IDENTITY["wavelength"],
-                                                 pa=self.PA, verbose=verbose)
-        # def generate_star_stamps(hybrid_catalog, telescope, filename, sciexts, astropywcs, filter, pa, verbose=False):
+        # Find stars around the entire WFI footprint
+        stars_in_footprint = self.is_inside_wfi(ra=self.source_catalog["ra"], dec=self.source_catalog["dec"])
+        stars_catalog = self.source_catalog[stars_in_footprint]
+        if n_stars is not None:
+            stars_catalog = stars_catalog.head(n_stars)
+        
+        
+        # Find the closest detector to each star
+        stars_catalog["detector_id"] = self.find_closest_detector(ra=stars_catalog["ra"], dec=stars_catalog["dec"]) + 1
 
+        # Find x and y coordinates in each detector to generate the PSF 
+        for detector_id in stars_catalog["detector_id"].unique():
+            stars_in_detector = stars_catalog["detector_id"] == detector_id
+            stars_catalog.loc[stars_in_detector, "x_det"], stars_catalog.loc[stars_in_detector, "y_det"] = self.ASTROPYWCS[detector_id-1].world_to_pixel(
+                SkyCoord(
+                    ra=np.asarray(stars_catalog.loc[stars_in_detector, "ra"], dtype=float) * u.deg,
+                    dec=np.asarray(stars_catalog.loc[stars_in_detector, "dec"], dtype=float) * u.deg,
+                )
+            )
 
-        # Now combine all the stamps in the mosaiced frame and blot back to the single SCAs.
-        # This is more efficient than reprojecting each star into all SCAs.
-        # Flattening the list of lists.
-        star_stamps_flat = []
-        for i in range(len(star_stamps)):
-            star_stamps_flat = star_stamps_flat + star_stamps[i]
+        # Add x,y coordinates in the catalog
+        stars_catalog["x"], stars_catalog["y"] = self.optimal_wcs.world_to_pixel(
+            SkyCoord(
+                ra=np.asarray(stars_catalog["ra"], dtype=float) * u.deg,
+                dec=np.asarray(stars_catalog["dec"], dtype=float) * u.deg,
+            )
+        )
 
-        # Making the combined frame.
-        os.system("swarp -dd > swarp.conf")
-        swarp_cmd_str = ""
-        for star_stamp in star_stamps_flat:
-            swarp_cmd_str = swarp_cmd_str + '"' + star_stamp +'" '
+        # Build the PSF canvas for the stars in the catalog
+        canvas = rs.psf.build_psf_canvas(
+            stars_catalog,
+            shape_out=self.shape_out,
+            bandpass=self.FILTER,
+            depth=depth,
+            n_workers=n_workers,
+            method=method,
+        )
 
-        if verbose > 1: print("Combining star stamps into WCS frame...")
-        cmd = "swarp -c swarp.conf -SUBTRACT_BACK N -BLANK_BADPIXELS Y -COMBINE_TYPE SUM -VERBOSE_TYPE QUIET " + swarp_cmd_str
-        if verbose > 2: print(cmd)
-        rs.utils.execute_cmd(cmd)  # Run swarp on all the SCAs
-        star_swarp_name = self.FILENAME.replace(".fits", "_stars_drz.fits")
-        rs.utils.execute_cmd("mv coadd.fits " + star_swarp_name) # Make a compressed version, for easiest visualization.
-
-        # Now blot back to the dummy SCA per SCA frame
-        from reproject import reproject_interp
-        # Let's make a dummy copy to reproject the stars into
-        roman_dummy = fits.open(self.FILENAME, memmap=True)
-        star_model = fits.open(star_swarp_name, memmap=True)
-
-        if verbose: print("Storing stars in each SCA")
-        for SCIEXT_i in tqdm(self.SCIEXTS):
-            # Open the star fits
-            star_reprojected, footprint = reproject_interp(star_model[0],
-                                                           roman_dummy[SCIEXT_i].header, 
-                                                           parallel=True)
-            star_reprojected[np.isnan(star_reprojected)] = 0
-            roman_dummy[SCIEXT_i].data = roman_dummy[SCIEXT_i].data + star_reprojected
-
-        roman_dummy.verify("silentfix")
-        star_output_name = self.FILENAME.replace(".fits", "_stars.fits")
-        roman_dummy.writeto(star_output_name, overwrite=True)
-
-        # Now make again the drz, this time with the correct gaps.
-        drz_name, scaled_drz_name = rs.utils.run_swarp(pattern=star_output_name, 
-                                                       outname=star_output_name.replace(".fits","_drz.fits"), scale=0.11)
-
-
-        if verbose: 
-            print("In-field stray-light model completed. Level 2 multi-extension FITS: " + star_output_name)
-            print("Mosaic image: " + drz_name)
-            print("Scaled mosaic: " + scaled_drz_name)
-        return(star_output_name)
-
-#####################################################################################
-### Zodiacal ########################################################################
-#####################################################################################
+        detectors, wcs_list = rs.psf.recover_roman_detectors_from_canvas(canvas, self.optimal_wcs, detector_wcs=self.ASTROPYWCS, pixscale=0.11)
+        
+        return detectors, wcs_list, canvas 
 
     def zodiacal(self, zody_mode="zodipy", verbose=False, output_name=None, output_units="e/s", resolution=1,
                  grid_method="random"):
@@ -1033,13 +1070,19 @@ class exposure():
         # Save the Zodiacal light DRZ file 
         self.save_drz(outname=self.drz_zody_name, data_list=zodiacal_background_list, wcs_list=self.ASTROPYWCS, resolution=resolution)
 
-        rs.plots.make_stray_plot(input_name=self.drz_zody_name, ext=0, mode="fe", 
-                                 color_label = "Flux (e/s/px)", cmap="RdYlBu_r", figsize=(10,7))
+        if output_units == "e/s":
+            rs.plots.make_stray_plot(input_name=self.drz_zody_name, ext=0, mode="fe",
+                                     color_label = "Flux (e/s/px)", cmap="RdYlBu_r", figsize=(10,7))
 
-        rs.plots.make_stray_plot(input_name=self.drz_zody_name, ext=0, mode="fe2mu", 
-                                 vmin=None, vmax=None, 
-                                 color_label = 'Surface brightness (mag arcsec$^{-2}$)',
-                                 cmap="RdYlBu", output_name=None, figsize=(10,7), mu_vmin=None, mu_vmax=None)
+            rs.plots.make_stray_plot(input_name=self.drz_zody_name, ext=0, mode="fe2mu",
+                                     vmin=None, vmax=None,
+                                     color_label = 'Surface brightness (mag arcsec$^{-2}$)',
+                                     cmap="RdYlBu", output_name=None, figsize=(10,7), mu_vmin=None, mu_vmax=None)
+        #otherwise rs.sky.get_zodiacal_background returns in units of MJy/Sr
+        # as is a standard unit to measure zodiacal light
+        else:
+            rs.plots.make_stray_plot(input_name=self.drz_zody_name, ext=0, mode="mjysr",
+                                     color_label = "Flux (MJy/Sr)", cmap="RdYlBu_r", figsize=(10,7))
 
         print("Output saved in: " + output_name)
 

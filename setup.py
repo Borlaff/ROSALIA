@@ -1,5 +1,5 @@
 from pathlib import Path
-from setuptools import setup, Extension
+from setuptools import setup, Extension, find_packages
 from Cython.Build import cythonize
 from Cython.Compiler import Options
 
@@ -9,5 +9,9 @@ Options.annotate = False
 scripts = [str(s) for s in Path('bin/').iterdir()
            if s.is_file() and s.name != '__pycache__']
 
-setup(scripts=scripts,
-      package_data={'rosalia': ['rosalia/style/*.mplstyle']})
+setup(
+    packages=find_packages(),          # Explicitly finds your "rosalia" folder
+    package_dir={"": "."},             # Explicitly anchors it to the root directory
+    scripts=scripts,
+    package_data={'rosalia': ['style/*.mplstyle']}, # Fixed: removed the duplicate 'rosalia/' prefix
+)
