@@ -13,7 +13,7 @@ import re
 try:
     __version__ = version("rosalia-wfi")
 except PackageNotFoundError:
-   __version__ = "1.2.4.dev0"
+   __version__ = "1.3.9.dev0"
 
 
 __author__ = "Alejandro S. Borlaff"

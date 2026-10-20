@@ -157,9 +157,9 @@ class exposure():
             self.BUNIT = exposure_identity['BUNIT']
             self.conversion_megajanskys = exposure_identity['conversion_megajanskys']
             self.conversion_megajanskys_uncertainty = exposure_identity['conversion_megajanskys_uncertainty']
-            self.quaternion = exposure_identity['quaternion']
-            self.helio_x = exposure_identity['spatial_x']
-            self.spatial_x = exposure_identity['spatial_x']
+            
+            #self.helio_x = exposure_identity['spatial_x']
+            #self.spatial_x = exposure_identity['spatial_x']
             self.pixel_area = exposure_identity['pixel_area']
             self.EXPSTART_ISOT = exposure_identity['EXPSTART_ISOT']
             self.PA = exposure_identity['PA']
@@ -192,27 +192,35 @@ class exposure():
                 if len(list(set(self.EXPMID))) == 1: self.EXPMID = self.EXPMID[0] 
                 if len(list(set(self.EXPEND))) == 1: self.EXPEND = self.EXPEND[0] 
 
-                
-                print("Currently estimated through pysiaf and quaternion. This is a temporary fix until MAST fixes the RA_TARG, DEC_TARG, PA keywords in the Roman/WFI fits files.")
-                #print("TEMP WARNING: DEC_TARG is set to element 0 - This has to be fixed on MAST")
-                #print("TEMP WARNING: PA is set to element 0 - This has to be fixed on MAST")
-                #if isinstance(self.RA_TARG, (np.ndarray, list,)): self.RA_TARG = self.RA_TARG[0]
-                #if isinstance(self.DEC_TARG, (np.ndarray, list,)): self.DEC_TARG = self.DEC_TARG[0]
-                #if isinstance(self.PA, (np.ndarray, list,)): self.PA = self.PA[0]
-                #print("Quaternion: ", self.quaternion)
-                self.attitude = rs.attitude.quaternion_to_WFICEN(self.quaternion[0])
-                self.RA_TARG = self.attitude["ra_wficen"]
-                self.DEC_TARG = self.attitude["dec_wficen"]
-                self.PA = self.attitude["pa_wficen"] - 60
+
+                if self.TELESCOP.lower() == "roman":
+                    print("Currently estimated through pysiaf and quaternion. This is a temporary fix until MAST fixes the RA_TARG, DEC_TARG, PA keywords in the Roman/WFI fits files.")
+                    self.quaternion = exposure_identity['quaternion']
+                    self.attitude = rs.attitude.quaternion_to_WFICEN(self.quaternion[0])
+                    self.RA_TARG = self.attitude["ra_wficen"]
+                    self.DEC_TARG = self.attitude["dec_wficen"]
+                    self.PA = self.attitude["pa_wficen"] - 60
+                    self.XYZ_HELIO_POS = [exposure_identity['spatial_x'][0]*u.km.to("AU"), 
+                                         exposure_identity['spatial_y'][0]*u.km.to("AU"), 
+                                         exposure_identity['spatial_z'][0]*u.km.to("AU")]*u.AU # in AU.
+                    self.FPA_NEAR_RADIUS = 0.6 # Temporary fix until 'target.ra' 'target.dec' are fixed -> Switch to self.get_max_angular_size() when done (Borlaff - Sept 23, 2026)
+
+                if self.TELESCOP.lower() == "hst":
+                    self.RA_TARG = exposure_identity["RA_TARG"]
+                    self.DEC_TARG = exposure_identity["DEC_TARG"]
+                    self.PA = exposure_identity["PA"]
+                    state_vectors = rs.horizons.get_heliocoords(self.EXPSTART, body=self.TELESCOP) # rs.horizons.interpolate_Roman_state_vectors(self.EXPSTART)
+                    self.XYZ_HELIO_POS = [state_vectors["x"][0]*u.AU, 
+                                          state_vectors["y"][0]*u.AU, 
+                                          state_vectors["z"][0]*u.AU] # in AU.
+                    self.FPA_NEAR_RADIUS = self.get_max_angular_size() # 
+
             # --------------------------------------------------------- #
             self.ROOTNAME = rs.inspector.longest_common_substring(self.FILENAME)
             self.MPC_OBSLOC = rs.horizons.get_mpc_observer_name(self.TELESCOP)
             self.JPL_OBSLOC = rs.horizons.get_jpl_observer_name(self.TELESCOP)
             # state_vectors = rs.horizons.get_heliocoords(self.EXPSTART, body=self.TELESCOP) # rs.horizons.interpolate_Roman_state_vectors(self.EXPSTART)
-            self.XYZ_HELIO_POS = [exposure_identity['spatial_x'][0]*u.km.to("AU"), 
-                                  exposure_identity['spatial_y'][0]*u.km.to("AU"), 
-                                  exposure_identity['spatial_z'][0]*u.km.to("AU")]*u.AU # in AU.
-            self.FPA_NEAR_RADIUS = 0.6 # Temporary fix until 'target.ra' 'target.dec' are fixed -> Switch to self.get_max_angular_size() when done (Borlaff - Sept 23, 2026)
+
 
 
         self.fits_keywords = {"TELESCOP": self.TELESCOP, "INSTRUME": self.INSTRUME, "DETECTOR": self.DETECTOR, 

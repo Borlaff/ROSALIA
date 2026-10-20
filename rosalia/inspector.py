@@ -9,7 +9,7 @@ from astropy.io import fits
 import roman_datamodels.datamodels._datamodels
 import astropy.table.table
 import os
-
+import astropy.units as u
 ############################
 def exposure_inspector(input_name, verbose=False, lite=False):
     """
@@ -321,6 +321,8 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
             print("Warning: HST image - PA_APER not found.")
 
 
+
+
     if exposure_identity["TELESCOP"] == "Roman" or exposure_identity["TELESCOP"] == "ROMAN" or exposure_identity["TELESCOP"]=="RST" or exposure_identity["TELESCOP"]=="NGRST":
         telescope_class = rs.telescopes.Roman
         exposure_identity["PA"] = input_fits[0].header["PA"]
@@ -348,7 +350,6 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
         bunit = exposure_identity["BUNIT"]
         if (exposure_identity["DRIZCORR"] == "PERFORM") & (exposure_identity["BUNIT"] == "ELECTRONS"):
             exposure_identity["HST_TYPE"] = "FLT"
-            HST_ACS_counts_to_jy(flux_ACS, photflam, photplam)
 
         if (exposure_identity["DRIZCORR"] == "COMPLETE") & (exposure_identity["BUNIT"] == "ELECTRONS/S"):
             exposure_identity["HST_TYPE"] = "DRZ"
@@ -394,7 +395,6 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
     # exposure_identity["PIXSCALE"] = telescope_class.get_pixscale(instrument=exposure_identity["INSTRUME"])
 
     # Find which extensions are SCI
-    exposure_identity["SCIEXTS"] = rs.utils.detect_sci_extensions(input_name)
 
     # Emancipate this as a separate program.
     # Find the central coordinates of the Multiextension fits.
@@ -404,7 +404,8 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
     astropywcs = []
     science_extension_hdulist = []
     header_list = []
-
+    exposure_identity["SCIEXTS"] = rs.utils.detect_sci_extensions(input_name)
+    
     # If LITE, fill this anyways.
     for sci_ext_i in exposure_identity["SCIEXTS"]:
         data_shape.append(input_fits[sci_ext_i].data.shape)
@@ -420,6 +421,17 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
     exposure_identity["DATA_SHAPE"] = data_shape
     exposure_identity["ASTROPYWCS"] = astropywcs
     exposure_identity["PIXSCALE"] = np.abs(astropywcs[0].proj_plane_pixel_scales()[0])
+
+    if exposure_identity["HST_TYPE"] == "FLT":
+        photflam = exposure_identity["PHOTFLAM"]*u.erg*u.cm**-2/u.AA
+        photplam = exposure_identity["PHOTPLAM"]*u.AA
+        pixscale = exposure_identity["PIXSCALE"]
+        exposure_identity["pixel_area"] = (pixscale.to("arcsec").value)**2
+
+        exposure_identity["conversion_megajanskys"] = rs.hst.hst_conversion_mjysr(photflam, photplam, pixscale)
+        exposure_identity["conversion_megajanskys_uncertainty"] = 0 
+        
+        exposure_identity["SCA"] = np.linspace(1, len(exposure_identity["SCIEXTS"]), len(exposure_identity["SCIEXTS"]), dtype="int32").tolist()
 
     # If not lite, do one more loop with the data to make a swarp coadd.
     if not "RA_TARG" in exposure_identity:

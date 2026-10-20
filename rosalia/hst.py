@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from astropy import constants as const
 import astropy.units as u
-
+from astropy.units import Quantity
 
 def f_hst_attenuation(theta):
     return(10**f_hst_attenuation_interpolator(np.log10(theta)))
@@ -146,4 +146,57 @@ def hst_estimate_straylight_SCA(
         straylight_lvl[i] = np.nansum((NDI_transfer_function[i,:]*NDI_conversion_factor*irradiance_stars).decompose()).value
 
     return(ra_detector, dec_detector, straylight_lvl)
+
+
  
+
+def hst_conversion_mjysr(photflam, photplam, pixscale):
+    '''Estimates the conversion factor between counts/s and MJy/sr for HST/ACS level 2 images.
+    
+    Based on: https://www.stsci.edu/hst/instrumentation/acs/data-analysis/zeropoints
+    
+    Parameters
+    ----------
+    photflam : astropy.units.quantity.Quantity
+        Inverse sensitivity in units of erg cm^-2 Å^-1 electron^-1.
+        This represents the scaling factor to transform instrumental flux 
+        (electrons/s) to physical flux density.
+        
+    photplam : astropy.units.quantity.Quantity
+        Pivot wavelength in Angstroms (Å).
+        
+    pixscale : astropy.units.quantity.Quantity
+        Angular size of the detector pixel in arcseconds.
+    
+    Returns
+    -------
+    conversion_mjysr : astropy.units.quantity.Quantity
+        Multiplicative conversion factor in units of MJy s / sr.
+        Multiply your count rate (counts/s) by this factor to get MJy/sr.
+        
+    Examples
+    --------
+    >>> import astropy.units as u
+    >>> photflam = 7.87e-20 * u.erg / u.cm**2 / u.AA
+    >>> photplam = 5907.38 * u.AA
+    >>> pixscale = 0.05 * u.arcsec
+    >>> factor = hst_conversion_mjysr(photflam, photplam, pixscale)
+    '''
+
+    # Validate inputs are Quantity objects
+
+    if not all(isinstance(x, Quantity) for x in [photflam, photplam, pixscale]):
+        raise TypeError("All inputs must be astropy Quantity objects with units")
+    
+    # Validate units are compatible
+    try:
+        photflam.to(u.erg / u.cm**2 / u.AA)
+        photplam.to(u.AA)
+        pixscale.to(u.arcsec)
+    except u.UnitConversionError as e:
+        raise ValueError(f"Input units are incompatible: {e}")
+
+    conversion_mjysr = (((photplam**2/const.c * (photflam)))/(pixscale**2)).decompose().to("MJy s / sr")
+    return(conversion_mjysr)
+
+
