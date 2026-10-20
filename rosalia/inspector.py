@@ -348,6 +348,7 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
         bunit = exposure_identity["BUNIT"]
         if (exposure_identity["DRIZCORR"] == "PERFORM") & (exposure_identity["BUNIT"] == "ELECTRONS"):
             exposure_identity["HST_TYPE"] = "FLT"
+            HST_ACS_counts_to_jy(flux_ACS, photflam, photplam)
 
         if (exposure_identity["DRIZCORR"] == "COMPLETE") & (exposure_identity["BUNIT"] == "ELECTRONS/S"):
             exposure_identity["HST_TYPE"] = "DRZ"
@@ -442,29 +443,9 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
         #exposure_identity["DATA_SHAPE"] = data_shape
         #exposure_identity["ASTROPYWCS"] = astropywcs
 
-        try:
-            from reproject.mosaicking import find_optimal_celestial_wcs
-            wcs_out, shape_out = find_optimal_celestial_wcs(input_data=input_fits, hdu_in=exposure_identity["SCIEXTS"])
-            reference_header = wcs_out.to_header()
-
-        except:
-            #print("WARNING: The input WCS has distortion. find_optimal_celestial_wcs does not currently support this mode.")
-            #print("ROSALIA will apply a temporary solution with SWARP // Jul 29 2024.")
-
-            os.system("swarp -dd > swarp.conf")
-            swarp_cmd_str = ""
-
-            for sci_ext_i in exposure_identity["SCIEXTS"]:
-                swarp_cmd_str = swarp_cmd_str + '"' + input_name+"["+str(sci_ext_i)  + ']" '
-
-            outname, outname_scaled = run_swarp(pattern=swarp_cmd_str, 
-                                                outname=input_name.replace(".fits", "_drz.fits"),
-                                                scale=0.11,
-                                                coveredfrac=1)
-
-
-            swarp_coadd = fits.open(outname)
-            reference_header = swarp_coadd[0].header
+        data, reference_header = rs.mosaics.generate_mosaic(exposure_identity["DATA"], 
+                                                            exposure_identity["ASTROPYWCS"], 
+                                                            resolution=None)
 
 
         exposure_identity["RA_PNT"]  = reference_header["CRVAL1"]
@@ -473,6 +454,7 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
         exposure_identity["DEC_TARG"] = reference_header["CRVAL2"]
         exposure_identity["X_PNT"]  = reference_header["CRPIX1"]
         exposure_identity["Y_PNT"]  = reference_header["CRPIX2"]
+
 
     
     ################

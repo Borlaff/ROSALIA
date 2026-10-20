@@ -210,7 +210,7 @@ class query():
 
         # Login to search and retrieve Roman data
         token = os.getenv("MAST_API_TOKEN")    
-        missions.login(token=token, store_token=False)
+        missions.login(token=token)
                     
         print(f'Mission: {missions.mission}')
         print(f'Service: {missions.service}')
