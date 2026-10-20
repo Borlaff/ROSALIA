@@ -144,7 +144,7 @@ def generate_mosaic(data, astropywcs, resolution=None):
     input_data_for_reproject = list(zip(data, astropywcs))
 
     if rs.utils.check_numeric_type(resolution) == "number":
-        print("Assuming user-input resolution is on arcsecs")
+        # print("Assuming user-input resolution is in arcsecs")
         resolution = resolution*u.arcsec
 
     optimal_wcs = find_mosaic_wcs(input_data=input_data_for_reproject, 

@@ -274,7 +274,7 @@ def get_zodiacal_background(astropywcs, wavelength=None,
 
     else:
         if verbose: print("Output units: MJy/Sr")
-    print('tmptmp&&&&&&&&&&&&&',zody_interp)
+    # print('tmptmp&&&&&&&&&&&&&',zody_interp)
 
     return(zody_interp.T)
 

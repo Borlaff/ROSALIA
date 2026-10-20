@@ -206,7 +206,8 @@ def get_filter(telescope, instrument, detector, filter_name, verbose=False):
         if verbose: print("SVO reported the transmission in m2. Correcting by area of the telescope (" + str(telescope_area) + " )")
         transmission_bins = np.array(transmission_bins)/telescope_area.value
 
-    return({"instrument": instrument, "filter_name": filter_name,
+    return({"instrument": instrument, "filter_name": filter_name, "wavelength": svo_filter_identity["wavelength"],
+            "filter_transmission_curve": svo_filter_identity["filter_transmission_curve"],
             "wavelength_bins": wavelength_bins, "transmission_bins": transmission_bins, "average_wave_filter": average_wave_filter,
             "lambda_min": lambda_min, "lambda_max": lambda_max, "lambda_ref": lambda_ref, "transmission_ref": transmission_ref})
 #################################################################

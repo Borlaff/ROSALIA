@@ -237,7 +237,7 @@ def exposure_inspector_asdf(input_name, telescope="roman", verbose=False, lite=F
 
     ############## Get the filter identity #######################
     try: 
-        exposure_identity["FILTER_IDENTITY"] = rs.telescopes.find_filter_in_svo(wavelength=exposure_identity["FILTER"],
+        exposure_identity["FILTER_IDENTITY"] = rs.telescopes.get_filter(filter_name=exposure_identity["FILTER"],
                                                                                 telescope=exposure_identity["TELESCOP"],
                                                                                 instrument=exposure_identity["INSTRUME"],
                                                                                 detector=detector_svo,
@@ -378,7 +378,7 @@ def exposure_inspector_fits(input_name, verbose=False, lite=False):
 
     ############## Get the filter identity #######################
     try: 
-        exposure_identity["FILTER_IDENTITY"] = rs.telescopes.find_filter_in_svo(wavelength=exposure_identity["FILTER"],
+        exposure_identity["FILTER_IDENTITY"] = rs.telescopes.get_filter(filter_name=exposure_identity["FILTER"],
                                                                             telescope=exposure_identity["TELESCOP"],
                                                                             instrument=exposure_identity["INSTRUME"],
                                                                             detector=exposure_identity["DETECTOR"],

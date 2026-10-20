@@ -113,7 +113,7 @@ class exposure():
                 self.MPC_OBSLOC = self.get_mpc_observer_location()
                 self.JPL_OBSLOC = self.get_jpl_observer_location()
                 self.FILTER = telescope["FILTER"]
-                self.FILTER_IDENTITY = rs.telescopes.find_filter_in_svo(wavelength=telescope["FILTER_PARAMS"]["NAME"],
+                self.FILTER_IDENTITY = rs.telescopes.get_filter(filter_name=telescope["FILTER_PARAMS"]["NAME"],
                                                                         telescope=telescope["FILTER_PARAMS"]["TELESCOPE"],
                                                                         instrument=telescope["FILTER_PARAMS"]["INSTRUMENT"],
                                                                         detector=telescope["FILTER_PARAMS"]["DETECTOR"], verbose=verbose)
@@ -229,9 +229,9 @@ class exposure():
             "PA": self.PA, "EXPTIME": self.EXPTIME, 
             "EXPSTART": self.EXPSTART, 
             "EXPSTART_ISOT": self.EXPSTART_ISOT, 
-            "WAVEREF": self.FILTER_IDENTITY["filter_lambda_ref"].to("nm").value, 
-            "WAVEMIN": self.FILTER_IDENTITY["filter_lambda_min"].to("Angstrom").value, 
-            "WAVEMAX": self.FILTER_IDENTITY["filter_lambda_max"].to("nm").value}
+            "WAVEREF": self.FILTER_IDENTITY["lambda_ref"].to("nm").value, 
+            "WAVEMIN": self.FILTER_IDENTITY["lambda_min"].to("Angstrom").value, 
+            "WAVEMAX": self.FILTER_IDENTITY["lambda_max"].to("nm").value}
 
     def roman_wfi_exposure(self, observer, prefix="", verbose=False):
         print("> Synthetic Roman_wfi_exposure")
@@ -266,7 +266,7 @@ class exposure():
         self.JPL_OBSLOC = rs.horizons.get_jpl_observer_name(observer['TELESCOP'])
         self.SCA = rs.telescopes.Roman.WFI_SCAs
         self.FILTER = observer["FILTER"]
-        self.FILTER_IDENTITY = rs.telescopes.find_filter_in_svo(wavelength=observer["FILTER_PARAMS"]["NAME"],
+        self.FILTER_IDENTITY = rs.telescopes.get_filter(filter_name=observer["FILTER_PARAMS"]["NAME"],
                                                                 telescope=observer["FILTER_PARAMS"]["TELESCOPE"],
                                                                 instrument=observer["FILTER_PARAMS"]["INSTRUMENT"],
                                                                 detector=observer["FILTER_PARAMS"]["DETECTOR"], verbose=verbose)
@@ -347,7 +347,7 @@ class exposure():
     def get_nearby_sources(self, g_mag_max=15, verbose=False):
         hybrid_catalog = rs.psf.get_hybrid_catalog(ra=self.RA_TARG, dec=self.DEC_TARG,
                                                    radius=1,
-                                                   lambda_ref=self.FILTER_IDENTITY["filter_lambda_ref"],
+                                                   lambda_ref=self.FILTER_IDENTITY["lambda_ref"],
                                                    MJD=self.EXPSTART,
                                                    observer=self.TELESCOP,
                                                    g_mag_max = g_mag_max,
@@ -380,7 +380,7 @@ class exposure():
 
             hybrid_catalog = rs.psf.get_hybrid_catalog(ra=self.RA_TARG, dec=self.DEC_TARG,
                                                     radius=search_radius,
-                                                    lambda_ref=self.FILTER_IDENTITY["filter_lambda_ref"],
+                                                    lambda_ref=self.FILTER_IDENTITY["lambda_ref"],
                                                     MJD=self.EXPMID,
                                                     observer=self.TELESCOP,
                                                     g_mag_max = g_mag_max,
@@ -737,9 +737,9 @@ class exposure():
             synthetic_mag_outside = np.array(self.source_catalog["mag_lambda"][~self.source_catalog["is_inside_FPA"]])
             # stars_world_location = coordinates.SkyCoord(ra_stars_outside, dec_stars_outside, frame='icrs', unit="deg")
 
-            lambda_max = self.FILTER_IDENTITY["filter_lambda_max"]
-            lambda_min = self.FILTER_IDENTITY["filter_lambda_min"]
-            lambda_ref = self.FILTER_IDENTITY["filter_lambda_ref"]
+            lambda_max = self.FILTER_IDENTITY["lambda_max"]
+            lambda_min = self.FILTER_IDENTITY["lambda_min"]
+            lambda_ref = self.FILTER_IDENTITY["lambda_ref"]
             irradiance_stars = const.c*(lambda_max-lambda_min)/(lambda_ref**2)*((10**(-0.4*(synthetic_mag_outside+56.1)))*u.W/u.meter**2/u.Hz)
 
             ##########################################
@@ -937,6 +937,7 @@ class exposure():
 
         '''
         rosalia_psf: Alejandro S. Borlaff. NASA Ames Research Center.
+                     Pablo M. Sanchez Alarcon. NASA Ames Research Center
         Model the stars inside a Roman WFI image. This is useful for estimating the straylight from stars 
         inside the field of view, and for subtracting the stars from the image.
 
@@ -973,8 +974,6 @@ class exposure():
         -----
             The methods supported currently include `superback` and `stpsf`.
         '''
-        from tqdm import tqdm
-        from astropy.io import fits
         import logging
         from reproject.mosaicking import find_optimal_celestial_wcs
         logger = logging.getLogger()

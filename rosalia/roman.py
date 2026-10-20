@@ -496,7 +496,7 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
     ###############################################
     # Precalculate constant factors for straylight estimation                                            
     ###############################################
-    NDI_conversion_factor   = ((pixsize**2)*filter_identity["filter_transmission_ref"]*filter_identity["filter_lambda_ref"]/superpixel_mm2_area/const.c/const.h)
+    NDI_conversion_factor   = ((pixsize**2)*filter_identity["transmission_ref"]*filter_identity["lambda_ref"]/superpixel_mm2_area/const.c/const.h)
     NDI_conversion_factor_1 = (NDI_conversion_factor*irradiance_level_1_stars).decompose()
     NDI_conversion_factor_2 = (NDI_conversion_factor*irradiance_level_2_stars).decompose()
     NDI_conversion_factor_3 = (NDI_conversion_factor*irradiance_level_3_stars).decompose()
