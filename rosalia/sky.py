@@ -67,7 +67,7 @@ def rebin(a, newshape):
 
 
 
-def rebin_transmission_curve(filter_transmission_curve, nbins, verbose=False):
+def rebin_transmission_curve(wavelength_bins,transmission_bins, nbins, verbose=False):
     from scipy import interpolate
 
     # This program takes as input a table with two columns
@@ -93,8 +93,8 @@ def rebin_transmission_curve(filter_transmission_curve, nbins, verbose=False):
     #transmission_curve = ascii.read(filter_curve_name)
 
     # We assume the first column contains lambda, and the second the transmission
-    wavelength = filter_transmission_curve["Wavelength"]
-    transmission = filter_transmission_curve["Transmission"]
+    wavelength = wavelength_bins
+    transmission = transmission_bins
 
     # We generate an interpolator function with the datapoints from the table
     good = np.where(np.isfinite(wavelength) & np.isfinite(transmission))
@@ -166,7 +166,7 @@ def get_zodiacal_background(astropywcs, wavelength=None,
     # Check that ra and dec arguments are in array
     if isinstance(wavelength, (dict)):
 
-        rebinned_filter_curve = rebin_transmission_curve(filter_transmission_curve=wavelength["filter_transmission_curve"],
+        rebinned_filter_curve = rebin_transmission_curve(wavelength["wavelength_bins"],wavelength["transmission_bins"],
                                                          nbins=nbins_wavelength, verbose=verbose)
         rebinned_transmission = rebinned_filter_curve["rebinned_transmission"]
 
@@ -205,10 +205,10 @@ def get_zodiacal_background(astropywcs, wavelength=None,
 
     # For each wavelength bin, we do this query
     if zody_mode.lower() == "irsa":
-        zody_MJysr = irsa_zody(ra=detector_grid["grid_world"][0], 
-                               dec=detector_grid["grid_world"][1], 
-                               wavelength=rebinned_wavelength, 
-                               weights=rebinned_transmission, 
+        zody_MJysr = irsa_zody(ra=detector_grid["grid_world"][0],
+                               dec=detector_grid["grid_world"][1],
+                               wavelength=rebinned_wavelength,
+                               weights=rebinned_transmission,
                                expstart=expstart, obslocin=obslocin)
 
 
@@ -228,7 +228,7 @@ def get_zodiacal_background(astropywcs, wavelength=None,
                                  wavelength=rebinned_wavelength.to("um").value,
                                  weights=rebinned_transmission,
                                  expstart=expstart,verbose=verbose)
-        
+
     x = detector_grid["grid_xy"][:,0]
     y = detector_grid["grid_xy"][:,1]
     xsize = int(np.max(x))
@@ -243,7 +243,7 @@ def get_zodiacal_background(astropywcs, wavelength=None,
     else:
         zody_interp = zody_MJysr
 
-    zody_interp = zody_interp*(u.MJy * u.steradian**-1) 
+    zody_interp = zody_interp*(u.MJy * u.steradian**-1)
 
     if output_units == "e/s":
         if verbose: print("Output units:" + output_units)
@@ -260,21 +260,20 @@ def get_zodiacal_background(astropywcs, wavelength=None,
         #es_to_MJysr = ris_bandpass.etomjysr(bandpass=wavelength["wavelength"], sca=sca)*u.MJy * u.steradian**-1 * u.s # The factor F such that MJy / sr = F * DN/s
         #zody_interp = zody_interp/es_to_MJysr
 
-        
+
         zody_interp = rs.constants.MJysr_to_Jyarcsec2*zody_interp # Jy/arcsec2
         mu = -2.5*np.log10(zody_interp.value)+8.9
-        zody_interp = rs.detectors.mu2fe(mu=mu, 
+        zody_interp = rs.detectors.mu2fe(mu=mu,
                                          instrument="WFI",
-                                         filter_name=wavelength["wavelength"], 
-                                         telescope="Roman", 
+                                         filter_name=wavelength["wavelength"],
+                                         telescope="Roman",
                                          verbose=verbose)
-        
+
 
         if verbose: print("Output units: e/s")
 
     else:
         if verbose: print("Output units: MJy/Sr")
-    # print('tmptmp&&&&&&&&&&&&&',zody_interp)
 
     return(zody_interp.T)
 
@@ -554,6 +553,7 @@ def stsci_zody(ra, dec, wavelength, weights, expstart,verbose=False):
             cachei=np.where(cache_check==np.array(cache_record))
             emission.append(emission_record[cachei[0][0]])
 
+    print('tmptmp*************',emission,ra,dec,expstart,wavelength,weights)
     return emission
 
 #########################################
