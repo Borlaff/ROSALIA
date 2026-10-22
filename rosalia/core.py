@@ -1036,7 +1036,10 @@ class exposure():
 
         # Set the number of workers for parallel processing if not specified    
         if n_workers is None:
-            n_workers = min(2, os.cpu_count() or 1)
+            if backend and str(backend).lower() == "pytorch":
+                n_workers = None  # PyTorch dynamically uses all available CPU threads / GPU
+            else:
+                n_workers = min(2, os.cpu_count() or 1)
 
         # Get the catalog of the stars around the FOV
         if not hasattr(self, 'source_catalog'):

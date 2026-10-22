@@ -631,7 +631,7 @@ def superback_roman_psf_pytorch(position, SCA, bandpass, shape=None, SED=None,
     return hdu
 
 
-def partition_stars_by_size(star_items, n_workers=None, budget_scale=1.0, chunk_threshold=2048):
+def partition_stars_by_size(star_items, n_workers=None, budget_scale=1.0, chunk_threshold=2048, is_cpu=False):
     """
     Partition stars into batches of identical stamp sizes.
 
@@ -663,7 +663,7 @@ def partition_stars_by_size(star_items, n_workers=None, budget_scale=1.0, chunk_
         else:
             max_b = 1  # Gigantic stars spatially chunked individually
 
-        if n_workers is not None and n_workers > 0 and current_size <= 1025:
+        if is_cpu and n_workers is not None and n_workers > 0 and current_size <= 1025:
             max_b = min(max_b, int(n_workers * 4))
 
         # Collect stars for this batch
@@ -938,6 +938,13 @@ def build_psf_canvas_pytorch(stars_catalog, shape_out, bandpass, depth=31,
     device, dtype = resolve_device_and_dtype(device, dtype)
     dtype = dtype or torch.float64
 
+    # Configure CPU parallelism if executing on CPU
+    cpu_threads = None
+    if device.type == "cpu":
+        if n_workers is not None and n_workers > 0:
+            torch.set_num_threads(int(n_workers))
+        cpu_threads = torch.get_num_threads()
+
     mem_info = get_device_memory_info(device=device, memory_fraction=memory_fraction)
     eff_chunk_size = chunk_size if chunk_size is not None else mem_info["chunk_size"]
     eff_chunk_threshold = mem_info["chunk_threshold"]
@@ -996,7 +1003,8 @@ def build_psf_canvas_pytorch(stars_catalog, shape_out, bandpass, depth=31,
 
     # 3. Partition into batches of matching stamp sizes (always >= required)
     batches = partition_stars_by_size(
-        star_items, n_workers=n_workers, budget_scale=budget_scale, chunk_threshold=eff_chunk_threshold
+        star_items, n_workers=n_workers, budget_scale=budget_scale,
+        chunk_threshold=eff_chunk_threshold, is_cpu=(device.type == "cpu")
     )
     num_batches = len(batches)
     total_stars = len(star_items)
@@ -1022,7 +1030,12 @@ def build_psf_canvas_pytorch(stars_catalog, shape_out, bandpass, depth=31,
         min_size = min_stars_biggest_batch[0]
         min_note = " (spatially-chunked)" if min_size > eff_chunk_threshold else ""
 
-        print(f"\n[PyTorch SUPERBACK] Hardware device: {device.type.upper()} ({dtype}) | Canvas: {shape_out[0]}x{shape_out[1]}", flush=True)
+        if device.type == "cpu":
+            dev_str = f"CPU ({cpu_threads} OpenMP threads)"
+        else:
+            dev_str = f"{device.type.upper()}"
+
+        print(f"\n[PyTorch SUPERBACK] Hardware device: {dev_str} ({dtype}) | Canvas: {shape_out[0]}x{shape_out[1]}", flush=True)
         print(f"[PyTorch SUPERBACK] Memory: {free_gb:.1f} GB free of {total_gb:.1f} GB | Adaptive budget ({pct}%): {budget_gb:.1f} GB (tile size: {eff_chunk_size}x{eff_chunk_size})", flush=True)
         print(f"[PyTorch SUPERBACK] Star catalog: {total_stars} stars | Batches: {num_batches} | Avg stars/batch: {avg_stars:.1f}", flush=True)
         if num_batches == 1:
