@@ -529,7 +529,8 @@ def partition_stars_by_size(star_items, n_workers=None):
 
 @torch.inference_mode()
 def render_batch_into_canvas(batch_size, stars, wave_anchors_nm, canvas,
-                             device=None, dtype=torch.float64, pixel_scale=0.11):
+                             device=None, dtype=torch.float64, pixel_scale=0.11,
+                             verbose=False, pbar=None, batch_info=None):
     """
     Render a batch of stars sharing the exact same stamp size and inject in-place into canvas.
     """
@@ -553,13 +554,20 @@ def render_batch_into_canvas(batch_size, stars, wave_anchors_nm, canvas,
 
     if S > 2048:
         # Extremely large stamp (e.g. m=0 bright star): stream anchor-by-anchor
-        for star in stars:
+        for s_idx, star in enumerate(stars, 1):
             beta = star["beta"].to(device=device, dtype=calc_dtype)
             bars = normalize_barparam(star["bard"])
 
             chromatic_psf = torch.zeros((S, S), dtype=calc_dtype, device=device)
 
             for a_idx in range(num_anchors):
+                if verbose:
+                    slice_str = f"star {star['source_id']} ({S}x{S}) slice {a_idx+1}/{num_anchors}"
+                    if pbar is not None:
+                        pbar.set_postfix_str(slice_str)
+                    else:
+                        print(f"      ... streaming anchor slice {a_idx+1}/{num_anchors} for stamp {S}x{S}...", flush=True)
+
                 k_a = k[a_idx:a_idx + 1]
                 z_out = k_a * DEFAULT_AOUTER * theta
                 z_in = k_a * DEFAULT_AINNER * theta
@@ -788,16 +796,24 @@ def build_psf_canvas_pytorch(stars_catalog, shape_out, bandpass, depth=31,
 
     # 3. Partition into batches of matching stamp sizes (always >= required)
     batches = partition_stars_by_size(star_items, n_workers=n_workers)
-
-    # 4. Dispatch batches across device
+    num_batches = len(batches)
     total_stars = len(star_items)
+
+    # 4. Dispatch batches across device with progress tracking
+    if verbose:
+        print(f"\n[PyTorch SUPERBACK] Hardware device: {device.type.upper()} ({dtype}) | Canvas: {shape_out[0]}x{shape_out[1]}", flush=True)
+        print(f"[PyTorch SUPERBACK] Partitioned {total_stars} stars into {num_batches} equal-stamp-size batches:", flush=True)
+        for b_idx, (b_stamp, b_stars) in enumerate(batches, 1):
+            streaming_note = " (anchor-streamed)" if b_stamp > 2048 else ""
+            print(f"  • Batch {b_idx}/{num_batches}: {len(b_stars)} star(s) | stamp size {b_stamp}x{b_stamp}{streaming_note}", flush=True)
+
     pbar = None
     if verbose:
         try:
             from tqdm import tqdm
             pbar = tqdm(
                 total=total_stars,
-                desc=f"Injecting star PSFs (PyTorch {device.type.upper()})",
+                desc=f"Injecting star PSFs ({device.type.upper()})",
                 unit="star",
                 leave=True,
             )
@@ -805,16 +821,25 @@ def build_psf_canvas_pytorch(stars_catalog, shape_out, bandpass, depth=31,
             pbar = None
 
     try:
-        for batch_size, stars in batches:
+        for b_idx, (batch_size, stars) in enumerate(batches, 1):
+            if pbar is not None:
+                pbar.set_postfix_str(f"batch {b_idx}/{num_batches} ({batch_size}x{batch_size})")
+            elif verbose:
+                print(f"  --> Processing batch {b_idx}/{num_batches} ({len(stars)} star(s), stamp {batch_size}x{batch_size})...", flush=True)
+
             render_batch_into_canvas(
                 batch_size, stars, wave_anchors_nm, canvas,
-                device=device, dtype=dtype, pixel_scale=pixel_scale
+                device=device, dtype=dtype, pixel_scale=pixel_scale,
+                verbose=verbose, pbar=pbar, batch_info=(b_idx, num_batches)
             )
             if pbar is not None:
                 pbar.update(len(stars))
     finally:
         if pbar is not None:
             pbar.close()
+
+    if verbose:
+        print(f"[PyTorch SUPERBACK] Completed injection of {total_stars} stars into canvas.\n", flush=True)
 
     gc.collect()
     return canvas

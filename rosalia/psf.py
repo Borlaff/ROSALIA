@@ -512,7 +512,7 @@ def make_roman_canvas_from_detectors(data_list, wcs_list, pixscale=0.11):
     return canvas, canvas_wcs
 
 
-def recover_roman_detectors_from_canvas(canvas, canvas_wcs, pixscale=0.11, sip_degree=3, detector_wcs=None):
+def recover_roman_detectors_from_canvas(canvas, canvas_wcs, pixscale=0.11, sip_degree=3, detector_wcs=None, verbose=False):
     """
     Function 2. Inverse of make_roman_canvas_from_detectors. Extract the 18 Roman/WFI detector
     arrays (4088x4088, WFI01 to WFI18) from a canvas built with the same pixscale, using pysiaf
@@ -531,7 +531,14 @@ def recover_roman_detectors_from_canvas(canvas, canvas_wcs, pixscale=0.11, sip_d
         pix = np.arange(ROMAN_DETECTOR_SIZE)
         px, py = np.meshgrid(pix, pix)
         data_list = []
-        for wcs in detector_wcs:
+        iterator = detector_wcs
+        if verbose:
+            try:
+                from tqdm import tqdm
+                iterator = tqdm(detector_wcs, desc="Extracting 18 detector frames", unit="detector")
+            except Exception:
+                iterator = detector_wcs
+        for wcs in iterator:
             ra, dec = wcs.all_pix2world(px, py, 0)
             cx, cy = canvas_wcs.all_world2pix(ra, dec, 0)
             data_list.append(_sample_image(canvas, cx, cy).astype(np.float32))

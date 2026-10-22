@@ -1074,6 +1074,9 @@ class exposure():
             )
         )
 
+        if verbose:
+            print(f"[exposure.psf] Selected {len(stars_catalog)} in-field stars inside WFI footprint (depth={depth}).", flush=True)
+
         # Build the PSF canvas for the stars in the catalog
         canvas = rs.psf.build_psf_canvas(
             stars_catalog,
@@ -1089,7 +1092,9 @@ class exposure():
             **kwargs,
         )
 
-        detectors, wcs_list = rs.psf.recover_roman_detectors_from_canvas(canvas, self.optimal_wcs, detector_wcs=self.ASTROPYWCS, pixscale=0.11)
+        detectors, wcs_list = rs.psf.recover_roman_detectors_from_canvas(
+            canvas, self.optimal_wcs, detector_wcs=self.ASTROPYWCS, pixscale=0.11, verbose=verbose
+        )
         
         return detectors, wcs_list, canvas 
 
