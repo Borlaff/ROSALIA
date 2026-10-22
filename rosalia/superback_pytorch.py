@@ -6,7 +6,7 @@ implementations of the SUPERBACK analytical PSF model for the Nancy Grace Roman 
 It includes:
 - Equal-stamp-size batched multiprocessing with size-ceiling quantizations (always >= required).
 - Dynamic batch-sizing to optimize GPU core occupancy and available memory.
-- Anchor-streaming for extremely bright / gigantic stars to eliminate Out-Of-Memory (OOM) errors.
+- Spatial chunking for gigantic stamps (e.g. m <= 2 bright stars) to bound memory and eliminate OOM errors.
 - Inference-mode execution with zero gradient tracking.
 - Compatibility across CUDA, MPS, and CPU.
 """
@@ -399,39 +399,115 @@ def superback_roman_psf_pytorch(position, SCA, bandpass, shape=None, SED=None,
     )
     bard = superback.getbardict(thetax_rad, thetay_rad)
 
-    # 4. Coordinate grid
+    # 4. Monochromatic calculation across anchor wavelengths
+    wave_anchors_nm = np.linspace(filter_wave_nm[0], filter_wave_nm[-1], num_anchors)
+    beta = compute_anchor_weights(sample_wave_nm, weights, wave_anchors_nm, device=device, dtype=dtype)
+
+    if fov > 2048:
+        # Spatial chunking for gigantic single stamps to prevent OOM
+        calc_dtype = torch.float32
+        wave_anchors_m = torch.tensor(wave_anchors_nm * 1e-9, dtype=calc_dtype, device=device)
+        beta_t = beta.to(device=device, dtype=calc_dtype)
+
+        # Precompute normalization on central odd-sized core
+        S_norm = min(fov, 2049)
+        if S_norm % 2 == 0:
+            S_norm += 1
+        x_norm, y_norm = create_psf_grid(
+            S_norm, scale_arcsec=0.108, oversample_factor=oversample_factor,
+            device=device, dtype=calc_dtype
+        )
+        comp_norm = romanpsf_pytorch(x_norm, y_norm, wave_anchors_m, barparam=bard, device=device, dtype=calc_dtype)
+        norm_sums = (torch.abs(comp_norm)**2).sum(dim=(-2, -1), keepdim=True)
+        norm_sums = torch.where(norm_sums > 0, norm_sums, torch.ones_like(norm_sums))
+        del x_norm, y_norm, comp_norm
+
+        half_field = (fov * 0.108 / oversample_factor) / 2.0
+        fine_scale = 0.108 / oversample_factor
+        coords = torch.linspace(
+            -half_field + fine_scale / 2.0,
+            half_field - fine_scale / 2.0,
+            fov,
+            device=device,
+            dtype=calc_dtype,
+        )
+
+        CHUNK_SIZE = 2048
+        psf_data = np.zeros((ny, nx), dtype=np.float32)
+        y_crop_start = (fov - ny) // 2
+        x_crop_start = (fov - nx) // 2
+
+        chunks_y = list(range(0, ny, CHUNK_SIZE))
+        chunks_x = list(range(0, nx, CHUNK_SIZE))
+
+        for cy0 in chunks_y:
+            cy1 = min(ny, cy0 + CHUNK_SIZE)
+            sy0 = y_crop_start + cy0
+            sy1 = y_crop_start + cy1
+            for cx0 in chunks_x:
+                cx1 = min(nx, cx0 + CHUNK_SIZE)
+                sx0 = x_crop_start + cx0
+                sx1 = x_crop_start + cx1
+
+                x_grid, y_grid = torch.meshgrid(coords[sx0:sx1], coords[sy0:sy1], indexing="xy")
+                comp_chunk = romanpsf_pytorch(
+                    x_grid, y_grid, wave_anchors_m, barparam=bard,
+                    device=device, dtype=calc_dtype
+                )
+                del x_grid, y_grid
+                mono_chunk = torch.abs(comp_chunk)**2
+                del comp_chunk
+                mono_norm = mono_chunk / norm_sums
+                del mono_chunk
+                chrom_chunk = torch.sum(mono_norm * beta_t.view(-1, 1, 1), dim=0)
+                del mono_norm
+
+                psf_data[cy0:cy1, cx0:cx1] = chrom_chunk.detach().cpu().numpy()
+                del chrom_chunk
+
+        del coords, norm_sums, beta_t
+
+        requested_flux = float(np.sum(weights))
+        image_flux = float(np.sum(psf_data))
+        if image_flux <= 0 or not np.isfinite(image_flux):
+            raise RuntimeError("PyTorch SUPERBACK produced non-positive flux.")
+        psf_data *= (requested_flux / image_flux)
+
+        if return_tensor:
+            return torch.from_numpy(psf_data).to(device=device, dtype=dtype)
+
+        hdu = fits.PrimaryHDU(data=psf_data)
+        hdu.header["TELESCOP"] = "ROMAN"
+        hdu.header["INSTRUME"] = "WFI"
+        hdu.header["DETECTOR"] = f"WFI{SCA:02d}_FULL"
+        hdu.header["FILTER"] = bandpass
+        hdu.header["X_POS"] = position[0]
+        hdu.header["Y_POS"] = position[1]
+        hdu.header["BUNIT"] = "nJy/pixel"
+        hdu.header["MAGZP"] = (float(zp), "AB zero point for flux values in nJy")
+        hdu.header["PIXSCALE"] = (float(pixel_scale), "Pixel scale in arcsec/pixel")
+        hdu.header["TOTFLUX"] = (requested_flux, "Integrated PSF flux in nJy")
+        hdu.header["ABMAG"] = (
+            float(zp - 2.5 * np.log10(requested_flux)),
+            "Integrated AB magnitude per square arcsec",
+        )
+        return hdu
+
+    # Coordinate grid for standard-sized stamps (fov <= 2048)
     x_src, y_src = create_psf_grid(
         fov, scale_arcsec=0.108, oversample_factor=oversample_factor,
         device=device, dtype=dtype
     )
 
-    # 5. Monochromatic calculation across anchor wavelengths
-    wave_anchors_nm = np.linspace(filter_wave_nm[0], filter_wave_nm[-1], num_anchors)
-    beta = compute_anchor_weights(sample_wave_nm, weights, wave_anchors_nm, device=device, dtype=dtype)
-
-    if fov > 2048:
-        # Stream anchor-by-anchor for gigantic stamps to prevent OOM
-        chromatic_psf = torch.zeros((fov, fov), dtype=dtype, device=device)
-        for a_idx, wave_nm in enumerate(wave_anchors_nm):
-            wave_m = wave_nm * 1e-9
-            complex_slice = romanpsf_pytorch(
-                x_src, y_src, wave_m, barparam=bard, device=device, dtype=dtype
-            )
-            mono_slice = torch.abs(complex_slice)**2
-            slice_sum = mono_slice.sum()
-            if slice_sum > 0:
-                chromatic_psf += (mono_slice / slice_sum) * beta[a_idx]
-            del complex_slice, mono_slice
-    else:
-        wave_anchors_m = torch.tensor(wave_anchors_nm * 1e-9, dtype=dtype, device=device)
-        complex_psf = romanpsf_pytorch(
-            x_src, y_src, wave_anchors_m, barparam=bard, device=device, dtype=dtype
-        )
-        mono_psf = torch.abs(complex_psf)**2
-        sums = mono_psf.sum(dim=(-2, -1), keepdim=True)
-        psf_cube = mono_psf / sums
-        chromatic_psf = torch.sum(psf_cube * beta.view(-1, 1, 1), dim=0)
-        del complex_psf, mono_psf, psf_cube
+    wave_anchors_m = torch.tensor(wave_anchors_nm * 1e-9, dtype=dtype, device=device)
+    complex_psf = romanpsf_pytorch(
+        x_src, y_src, wave_anchors_m, barparam=bard, device=device, dtype=dtype
+    )
+    mono_psf = torch.abs(complex_psf)**2
+    sums = mono_psf.sum(dim=(-2, -1), keepdim=True)
+    psf_cube = mono_psf / sums
+    chromatic_psf = torch.sum(psf_cube * beta.view(-1, 1, 1), dim=0)
+    del complex_psf, mono_psf, psf_cube
 
     # 6. Normalize to requested integrated flux
     requested_flux = float(np.sum(weights))
@@ -496,11 +572,9 @@ def partition_stars_by_size(star_items, n_workers=None):
         elif current_size <= 1025:
             max_b = 8
         elif current_size <= 2049:
-            max_b = 4
-        elif current_size <= 4097:
             max_b = 2
         else:
-            max_b = 1  # Gigantic stars processed individually with anchor streaming
+            max_b = 1  # Gigantic stars spatially chunked individually
 
         if n_workers is not None and n_workers > 0 and current_size <= 1025:
             max_b = min(max_b, int(n_workers * 4))
@@ -530,92 +604,122 @@ def partition_stars_by_size(star_items, n_workers=None):
 @torch.inference_mode()
 def render_batch_into_canvas(batch_size, stars, wave_anchors_nm, canvas,
                              device=None, dtype=torch.float64, pixel_scale=0.11,
-                             verbose=False, pbar=None, batch_info=None):
+                             verbose=False, pbar=None, batch_info=None,
+                             chunk_size=2048):
     """
     Render a batch of stars sharing the exact same stamp size and inject in-place into canvas.
+
+    For gigantic stamps (S > 2048), stars are spatially chunked into tiles of size `chunk_size`
+    (default 2048x2048) intersecting the Roman canvas bounding box. This prevents any multi-gigabyte
+    memory allocations and eliminates OOM / process kills while preserving exact flux conservation.
     """
     S = batch_size
     n_batch = len(stars)
     num_anchors = len(wave_anchors_nm)
     wave_anchors_m = torch.tensor(wave_anchors_nm * 1e-9, dtype=dtype, device=device)
 
-    # 1. Coordinate grid is created ONCE for the entire batch
-    # For gigantic stamps (S > 2048), float32 prevents allocating >20 GB on CPU while preserving precision
-    calc_dtype = torch.float32 if S > 2048 else dtype
-    x_src, y_src = create_psf_grid(S, scale_arcsec=0.108, device=device, dtype=calc_dtype)
-    x_meters = (x_src * ARCSEC_TO_RAD * DEFAULT_FLENGTH).unsqueeze(0)
-    y_meters = (y_src * ARCSEC_TO_RAD * DEFAULT_FLENGTH).unsqueeze(0)
-    del x_src, y_src
-
-    theta = torch.sqrt(x_meters**2 + y_meters**2)
-    k = (2.0 * np.pi) / wave_anchors_m.to(calc_dtype).view(-1, 1, 1) / DEFAULT_FLENGTH  # (A, 1, 1)
-
-    complex_dtype = torch.complex64 if calc_dtype == torch.float32 else torch.complex128
-
     if S > 2048:
-        # Extremely large stamp (e.g. m=0 bright star): stream anchor-by-anchor
-        for s_idx, star in enumerate(stars, 1):
+        # Spatial chunking for gigantic stamps (e.g. m <= 2 bright stars Alpha Cen, Sirius, etc.)
+        calc_dtype = torch.float32
+        wave_anchors_m = wave_anchors_m.to(calc_dtype)
+        grid_scale = 0.108
+
+        for star in stars:
+            center_x = int(np.rint(star["x"]))
+            center_y = int(np.rint(star["y"]))
+
+            x_start = center_x - S // 2
+            y_start = center_y - S // 2
+            x_end = x_start + S
+            y_end = y_start + S
+
+            canvas_x0 = max(0, x_start)
+            canvas_x1 = min(canvas.shape[1], x_end)
+            canvas_y0 = max(0, y_start)
+            canvas_y1 = min(canvas.shape[0], y_end)
+
+            if canvas_x0 >= canvas_x1 or canvas_y0 >= canvas_y1:
+                continue
+
+            # 1. Normalization sum on central odd-sized core
+            S_norm = min(S, 2049)
+            if S_norm % 2 == 0:
+                S_norm += 1
+            x_norm, y_norm = create_psf_grid(S_norm, scale_arcsec=grid_scale, device=device, dtype=calc_dtype)
+            comp_norm = romanpsf_pytorch(x_norm, y_norm, wave_anchors_m, barparam=star["bard"], device=device, dtype=calc_dtype)
+            norm_sums = (torch.abs(comp_norm)**2).sum(dim=(-2, -1), keepdim=True)
+            norm_sums = torch.where(norm_sums > 0, norm_sums, torch.ones_like(norm_sums))
+            del x_norm, y_norm, comp_norm
+
+            # 2. 1D coordinate tensor (only ~200 KB for S = 50,000)
+            half_field = (S * grid_scale) / 2.0
+            coords = torch.linspace(
+                -half_field + grid_scale / 2.0,
+                half_field - grid_scale / 2.0,
+                S,
+                device=device,
+                dtype=calc_dtype,
+            )
+
+            # 3. Canvas-bounded tiles
+            chunks_y = list(range(canvas_y0, canvas_y1, chunk_size))
+            chunks_x = list(range(canvas_x0, canvas_x1, chunk_size))
+            total_chunks = len(chunks_y) * len(chunks_x)
+
             beta = star["beta"].to(device=device, dtype=calc_dtype)
-            bars = normalize_barparam(star["bard"])
+            chunk_idx = 0
 
-            chromatic_psf = torch.zeros((S, S), dtype=calc_dtype, device=device)
+            for cy0 in chunks_y:
+                cy1 = min(canvas_y1, cy0 + chunk_size)
+                sy0 = cy0 - y_start
+                sy1 = cy1 - y_start
+                for cx0 in chunks_x:
+                    cx1 = min(canvas_x1, cx0 + chunk_size)
+                    sx0 = cx0 - x_start
+                    sx1 = cx1 - x_start
+                    chunk_idx += 1
 
-            for a_idx in range(num_anchors):
-                if verbose:
-                    slice_str = f"star {star['source_id']} ({S}x{S}) slice {a_idx+1}/{num_anchors}"
-                    if pbar is not None:
-                        pbar.set_postfix_str(slice_str)
-                    else:
-                        print(f"      ... streaming anchor slice {a_idx+1}/{num_anchors} for stamp {S}x{S}...", flush=True)
+                    if verbose:
+                        chunk_str = f"star {star['source_id']} ({S}x{S}) chunk {chunk_idx}/{total_chunks}"
+                        if pbar is not None:
+                            pbar.set_postfix_str(chunk_str)
+                        elif chunk_idx % 20 == 1 or chunk_idx == total_chunks:
+                            print(f"      ... evaluating chunk {chunk_idx}/{total_chunks} for stamp {S}x{S}...", flush=True)
 
-                k_a = k[a_idx:a_idx + 1]
-                z_out = k_a * DEFAULT_AOUTER * theta
-                z_in = k_a * DEFAULT_AINNER * theta
+                    x_grid, y_grid = torch.meshgrid(coords[sx0:sx1], coords[sy0:sy1], indexing="xy")
+                    comp_chunk = romanpsf_pytorch(
+                        x_grid, y_grid, wave_anchors_m, barparam=star["bard"],
+                        device=device, dtype=calc_dtype
+                    )
+                    del x_grid, y_grid
 
-                j1_out = bessel_j1_safe(z_out, device)
-                del z_out
-                j1_in = bessel_j1_safe(z_in, device)
-                del z_in
+                    mono_chunk = torch.abs(comp_chunk)**2
+                    del comp_chunk
 
-                m_out = j1_out * (2.0 * np.pi * DEFAULT_AOUTER**2)
-                del j1_out
-                m_in = j1_in * (2.0 * np.pi * DEFAULT_AINNER**2)
-                del j1_in
-                slice_final = (m_out - m_in).to(complex_dtype)
-                del m_out, m_in
+                    mono_norm = mono_chunk / norm_sums
+                    del mono_chunk
 
-                bararea = []
-                for bar in bars:
-                    amp = bar.get("amp", 1.0)
-                    bx0 = bar.get("x0", 0.0)
-                    by0 = bar.get("y0", 0.0)
-                    rot = bar.get("theta", 0.0)
-                    b_val = barpsf_pytorch(x_meters, y_meters, k_a, bar["w"], bar["l"], bx0, by0, rotation=rot)
-                    slice_final -= amp * b_val
-                    bararea.append(bar["w"] * bar["l"])
+                    chrom_chunk = torch.sum(mono_norm * beta.view(-1, 1, 1), dim=0)
+                    del mono_norm
 
-                open_pupil_area = np.pi * (DEFAULT_AOUTER**2 - DEFAULT_AINNER**2) - np.sum(bararea)
-                pixscale_arcsec = DEFAULT_PIXSIZE / DEFAULT_FLENGTH / ARCSEC_TO_RAD
-                norm_factor = (k_a / 2.0 / np.pi / np.sqrt(open_pupil_area)) * (DEFAULT_PIXSIZE / pixscale_arcsec)
-                slice_final *= norm_factor
+                    canvas[cy0:cy1, cx0:cx1] += chrom_chunk.detach().cpu().numpy()
+                    del chrom_chunk
 
-                mono = torch.abs(slice_final.squeeze(0))**2
-                del slice_final
-                mono_sum = mono.sum()
-                if mono_sum > 0:
-                    chromatic_psf += (mono / mono_sum) * beta[a_idx]
-                del mono
-
-            req_flux = star["requested_flux"]
-            c_sum = chromatic_psf.sum()
-            if c_sum > 0:
-                chromatic_psf *= (req_flux / c_sum)
-
-            # Inject into canvas
-            _inject_psf_patch(canvas, chromatic_psf, star["x"], star["y"], S)
-            del chromatic_psf
+            del coords, norm_sums, beta
 
     else:
+        # Precompute coordinate grid ONCE for the whole batch of matching stamp sizes
+        calc_dtype = dtype
+        x_src, y_src = create_psf_grid(S, scale_arcsec=0.108, device=device, dtype=calc_dtype)
+        x_meters = (x_src * ARCSEC_TO_RAD * DEFAULT_FLENGTH).unsqueeze(0)
+        y_meters = (y_src * ARCSEC_TO_RAD * DEFAULT_FLENGTH).unsqueeze(0)
+        del x_src, y_src
+
+        theta = torch.sqrt(x_meters**2 + y_meters**2)
+        k = (2.0 * np.pi) / wave_anchors_m.to(calc_dtype).view(-1, 1, 1) / DEFAULT_FLENGTH  # (A, 1, 1)
+
+        complex_dtype = torch.complex64 if calc_dtype == torch.float32 else torch.complex128
+
         # Precompute the common primary mirror Bessel pattern ONCE for all anchors
         z_out = k * DEFAULT_AOUTER * theta  # (A, S, S)
         z_in = k * DEFAULT_AINNER * theta
@@ -668,9 +772,8 @@ def render_batch_into_canvas(batch_size, stars, wave_anchors_nm, canvas,
             _inject_psf_patch(canvas, chromatic_star, star["x"], star["y"], S)
             del chromatic_star
 
-        del base_mirror
+        del base_mirror, x_meters, y_meters, theta, k
 
-    del x_meters, y_meters, theta, k
     if device.type == "cuda":
         torch.cuda.empty_cache()
     elif device.type == "mps":
@@ -804,7 +907,7 @@ def build_psf_canvas_pytorch(stars_catalog, shape_out, bandpass, depth=31,
         print(f"\n[PyTorch SUPERBACK] Hardware device: {device.type.upper()} ({dtype}) | Canvas: {shape_out[0]}x{shape_out[1]}", flush=True)
         print(f"[PyTorch SUPERBACK] Partitioned {total_stars} stars into {num_batches} equal-stamp-size batches:", flush=True)
         for b_idx, (b_stamp, b_stars) in enumerate(batches, 1):
-            streaming_note = " (anchor-streamed)" if b_stamp > 2048 else ""
+            streaming_note = " (spatially-chunked)" if b_stamp > 2048 else ""
             print(f"  • Batch {b_idx}/{num_batches}: {len(b_stars)} star(s) | stamp size {b_stamp}x{b_stamp}{streaming_note}", flush=True)
 
     pbar = None

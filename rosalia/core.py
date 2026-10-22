@@ -980,7 +980,7 @@ class exposure():
             dtype (torch.dtype, optional):
                 Floating-point tensor precision for PyTorch calculations.
                 Defaults to ``torch.float32`` on Apple MPS and ``torch.float64`` on CUDA and CPU.
-                Stamps larger than 2,048 pixels automatically stream anchors to prevent OOM errors.
+                Stamps larger than 2,048 pixels are automatically spatially chunked into canvas-intersecting tiles to prevent OOM errors.
 
             backend (str, optional):
                 Execution backend when ``method='superback'``. Options:
