@@ -2043,12 +2043,12 @@ def stpsf_roman_psf(position, SCA, bandpass, shape=None, SED=None,
 
 
 def superback_roman_psf(position, SCA, bandpass, shape=None, SED=None,
-                    magnitude_weights=None, wave_weights=None, oversample_factor=1,
-                    flux_weights=None, zp=23.9,
-                    pixel_scale=0.11, **kwargs):
+                        magnitude_weights=None, wave_weights=None, oversample_factor=1,
+                        flux_weights=None, zp=23.9,
+                        pixel_scale=0.11, backend="pytorch", device=None, dtype=None, **kwargs):
     """Render a flux-calibrated, chromatic Roman/WFI PSF with SUPERBACK analytical model.
 
-    Monochromatic STPSF PSFs are interpolated over the requested filter and
+    Monochromatic SUPERBACK PSFs are interpolated over the requested filter and
     combined using the supplied spectrum. Each image pixel is in nJy/pixel;
     the image sum is conserved to the requested integrated flux, including
     when a rectangular output is cropped.
@@ -2074,6 +2074,8 @@ def superback_roman_psf(position, SCA, bandpass, shape=None, SED=None,
     wave_weights : array-like or astropy.units.Quantity, optional
         Wavelengths corresponding to ``magnitude_weights`` or
         ``flux_weights``. Unitless values are interpreted as nanometers.
+    oversample_factor : int or float, default 1
+        Spatial oversampling factor.
     flux_weights : array-like, optional
         Per-wavelength flux contributions in nJy/pixel. They are summed
         directly and should pair with ``wave_weights``. This is the preferred
@@ -2083,8 +2085,14 @@ def superback_roman_psf(position, SCA, bandpass, shape=None, SED=None,
     pixel_scale : float, optional
         Pixel scale in arcsec/pixel, used to convert surface flux density to
         nJy/pixel for magnitude and SED inputs. Defaults to 0.11.
+    backend : str, optional
+        Execution backend: ``"pytorch"`` (default) or ``"numpy"``.
+    device : str or torch.device, optional
+        PyTorch computation device (``'cuda'``, ``'mps'``, ``'cpu'``, or ``'auto'``).
+    dtype : torch.dtype, optional
+        Tensor precision. Defaults to float32 on Apple MPS and float64 on CUDA/CPU.
     **kwargs
-        Parameters passed to ``galsim.GSParams`` for PSF interpolation setup.
+        Additional parameters passed to the PSF renderer.
 
     Returns
     -------
@@ -2095,11 +2103,10 @@ def superback_roman_psf(position, SCA, bandpass, shape=None, SED=None,
 
     Notes
     -----
-    STPSF expects monochromatic wavelengths in meters; filter curves and
-    ``wave_weights`` are handled in nanometers internally. 
+    When ``backend="pytorch"`` (default), the analytical PSF evaluation is accelerated
+    using PyTorch tensor operations with automatic GPU/MPS/CPU selection.
     """
 
-    backend = kwargs.pop("backend", "pytorch")
     if backend and str(backend).lower() == "pytorch":
         try:
             import rosalia.superback_pytorch as sbp
@@ -2107,7 +2114,7 @@ def superback_roman_psf(position, SCA, bandpass, shape=None, SED=None,
                 position=position, SCA=SCA, bandpass=bandpass, shape=shape, SED=SED,
                 magnitude_weights=magnitude_weights, wave_weights=wave_weights,
                 oversample_factor=oversample_factor, flux_weights=flux_weights,
-                zp=zp, pixel_scale=pixel_scale, **kwargs
+                zp=zp, pixel_scale=pixel_scale, device=device, dtype=dtype, **kwargs
             )
         except ImportError:
             pass
@@ -2322,7 +2329,7 @@ def get_psf_extension_moffat(mag, depth=30, alpha=0.08, beta=1.52):
     return extension.item() if extension.ndim == 0 else extension
 
 def build_psf_canvas(stars_catalog, shape_out, bandpass, depth=31, n_workers=None,
-                     method="superback", **kwargs):
+                     method="superback", backend="pytorch", device=None, dtype=None, **kwargs):
     '''
     Build a PSF canvas from a catalog of stars in parallel.
 
@@ -2341,7 +2348,18 @@ def build_psf_canvas(stars_catalog, shape_out, bandpass, depth=31, n_workers=Non
             Maximum number of parallel workers. Defaults to at most two to limit
             the memory used by concurrently generated PSF models.
         method: str, optional
-            PSF model to use. Defaults to ``"superback"``.
+            PSF model to use ('superback', 'stpsf', 'galsim'). Defaults to ``"superback"``.
+        backend: str, optional
+            Execution backend for ``method="superback"`` ('pytorch' or 'numpy').
+            Defaults to ``"pytorch"`` for GPU/batch acceleration.
+        device: str or torch.device, optional
+            Computation device for PyTorch ('cuda', 'mps', 'cpu', or 'auto').
+            Default is 'auto' (prioritizes CUDA -> MPS -> CPU).
+        dtype: torch.dtype, optional
+            Floating-point precision for PyTorch tensors. Defaults to float32 on Apple MPS
+            and float64 on CUDA/CPU.
+        **kwargs:
+            Additional parameters passed to the canvas builder.
 
     Returns
     -------
@@ -2351,7 +2369,9 @@ def build_psf_canvas(stars_catalog, shape_out, bandpass, depth=31, n_workers=Non
     Notes
     -----
         The positions of each detector follow the SIAF convention in pixel coordinates.
-        
+        When ``method="superback"`` and ``backend="pytorch"``, stars are grouped into
+        batches with identical stamp sizes (size-ceiling bucketing) and evaluated with
+        gradient tracking deactivated (`torch.inference_mode()`).
     '''
 
     if not isinstance(stars_catalog, pd.DataFrame):
@@ -2382,7 +2402,6 @@ def build_psf_canvas(stars_catalog, shape_out, bandpass, depth=31, n_workers=Non
     if stars_catalog.empty:
         return canvas
 
-    backend = kwargs.pop("backend", "pytorch")
     if method == "superback" and backend and str(backend).lower() == "pytorch":
         try:
             import rosalia.superback_pytorch as sbp
@@ -2392,6 +2411,8 @@ def build_psf_canvas(stars_catalog, shape_out, bandpass, depth=31, n_workers=Non
                 bandpass=bandpass,
                 depth=depth,
                 n_workers=n_workers,
+                device=device,
+                dtype=dtype,
                 **kwargs,
             )
         except ImportError:

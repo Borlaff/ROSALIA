@@ -263,6 +263,17 @@ rosalia_psf = rs.correct.rosalia_psf(ra=ra, dec=dec, PA=PA, date=date,
                                      g_mag_max=15, verbose=1)
 ```
 
+Alternatively, you can generate the PSF model directly from an `exposure` object with PyTorch GPU/CPU acceleration:
+
+```python
+# Using PyTorch acceleration with SUPERBACK analytical model
+detectors, wcs_list, canvas = exposure.psf(
+    method="superback",     # Analytical Roman model (default)
+    device="auto",          # Auto-selects CUDA GPU -> Apple Silicon MPS -> Multi-core CPU
+    depth=27,               # Surface brightness depth in mag arcsec^-2
+    verbose=True
+)
+```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

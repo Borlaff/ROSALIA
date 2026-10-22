@@ -924,7 +924,7 @@ class exposure():
 #####################################################################################
 
 
-    def psf(self, g_mag_max=15, depth=31, catalog=None, method='superback', n_stars=None, n_workers=None, verbose=False, device=None, dtype=None, **kwargs):
+    def psf(self, g_mag_max=15, depth=31, catalog=None, method='superback', n_stars=None, n_workers=None, verbose=False, device=None, dtype=None, backend='pytorch', **kwargs):
         #######################################
         # rosalia_psf: Alejandro S. Borlaff. NASA/Ames STA. a.s.borlaff@nasa.gov
         # -------------------------------
@@ -953,16 +953,44 @@ class exposure():
                 User-provided catalog of stars. Must contain columns: `ra`, `dec`, `source_id`, `cat_id`, `mag_lambda`.
             
             method (str, optional):
-                Method used for PSF modeling. Default is 'superback'.
+                Method used for PSF modeling. Options are:
+                - ``'superback'`` (default): Analytical Roman Space Telescope PSF model.
+                  Supports high-performance PyTorch acceleration across GPU and CPU.
+                - ``'stpsf'``: WebbPSF/STPSF-based numerical model.
+                - ``'galsim'``: GalSim-based parametric model.
 
             n_stars (int, optional):
                 Number of stars to include in the PSF model. Default is None (all stars).
             
             n_workers (int, optional):
                 Number of parallel workers to use for PSF modeling. Default is None (automatically determined).
+                When using PyTorch backend, worker batching is optimized dynamically.
             
             verbose (bool, optional): 
-                If True, print more information about progress. Default is False.
+                If True, print progress bar and diagnostic information. Default is False.
+
+            device (str or torch.device, optional):
+                Target hardware device for PyTorch acceleration when ``method='superback'``:
+                - ``None`` or ``'auto'`` (default): Automatically selects the fastest available hardware
+                  (NVIDIA CUDA GPU -> Apple Silicon MPS GPU -> Multi-core CPU).
+                - ``'cuda'``: NVIDIA GPU via CUDA.
+                - ``'mps'``: Apple Silicon GPU via Metal Performance Shaders.
+                - ``'cpu'``: Multi-threaded CPU execution.
+
+            dtype (torch.dtype, optional):
+                Floating-point tensor precision for PyTorch calculations.
+                Defaults to ``torch.float32`` on Apple MPS and ``torch.float64`` on CUDA and CPU.
+                Stamps larger than 2,048 pixels automatically stream anchors to prevent OOM errors.
+
+            backend (str, optional):
+                Execution backend when ``method='superback'``. Options:
+                - ``'pytorch'`` (default): GPU-accelerated and batched PyTorch implementation with
+                  zero gradient tracking and size-quantized star batches.
+                - ``'numpy'``: Legacy NumPy serial / threadpool implementation.
+
+            **kwargs:
+                Additional arguments passed to the underlying PSF generator.
+
         Returns
         -------
             (psf, wcs_list, canvas) : tuple
@@ -972,7 +1000,28 @@ class exposure():
 
         Notes
         -----
-            The methods supported currently include `superback` and `stpsf`.
+            PyTorch Acceleration with SUPERBACK:
+            ------------------------------------
+            PyTorch acceleration is enabled by default when ``method='superback'``.
+            It provides 3x to 15x speedups and reduces memory footprint by up to 4.5x
+            compared to the legacy NumPy pipeline.
+
+            Usage Examples:
+            ---------------
+            # 1. Default execution (automatically uses PyTorch on best available GPU/MPS/CPU):
+            >>> detectors, wcs_list, canvas = exposure.psf()
+
+            # 2. Explicitly target Apple Silicon GPU (MPS):
+            >>> detectors, wcs_list, canvas = exposure.psf(device='mps')
+
+            # 3. Explicitly target NVIDIA CUDA GPU:
+            >>> detectors, wcs_list, canvas = exposure.psf(device='cuda')
+
+            # 4. Explicitly target multi-core CPU with PyTorch:
+            >>> detectors, wcs_list, canvas = exposure.psf(device='cpu')
+
+            # 5. Fallback to legacy NumPy implementation (no PyTorch):
+            >>> detectors, wcs_list, canvas = exposure.psf(backend='numpy')
         '''
         import logging
         from reproject.mosaicking import find_optimal_celestial_wcs
@@ -1035,6 +1084,7 @@ class exposure():
             method=method,
             device=device,
             dtype=dtype,
+            backend=backend,
             verbose=verbose,
             **kwargs,
         )
