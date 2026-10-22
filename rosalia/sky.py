@@ -446,7 +446,8 @@ def zodipy_zody(ra, dec, wavelength, weights, expstart, obspos="earth"):
     #print("Zodipy wave:")
     #print(wavelength)
     # Initialize a zodiacal light model at a wavelength/frequency or over a bandpass
-    model = zodipy.Model(wavelength*u.micron, weights=weights, extrapolate=True)
+    #Force dirbe model because other options do not have accurate coverage at Roman's low wavelengths
+    model = zodipy.Model(wavelength*u.micron, weights=weights, extrapolate=True, name='dirbe')
 
     # Evaluate the zodiacal light model
     # Here the solution depends from obspos.
@@ -520,7 +521,7 @@ def stsci_zody(ra, dec, wavelength, weights, expstart,verbose=False):
         if cache_check not in cache_record:
 
             #Call the background class lifted from StSci's rbt.py module
-            bkg = background(r, d, verbose=verbose)
+            bkg = background(r, d)
 
             #return the wavelength array and matching zodiacal light array if
             # day is in the available calendary days, otherwise return nans
@@ -553,7 +554,6 @@ def stsci_zody(ra, dec, wavelength, weights, expstart,verbose=False):
             cachei=np.where(cache_check==np.array(cache_record))
             emission.append(emission_record[cachei[0][0]])
 
-    print('tmptmp*************',emission,ra,dec,expstart,wavelength,weights)
     return emission
 
 #########################################
@@ -571,6 +571,8 @@ def get_healpix(nside, ra, dec):
 
 #########################################
 
+#sln deleted thresh and wavlenegth from class because only needed for deleted bathtub routine, which we don't use
+#sln hard-coded in paths to cache files for now and healpix properties
 class background:
     """
     Main background class. Loads background data for a specific (RA, DEC)
@@ -584,28 +586,40 @@ class background:
         Declination in decimal degrees
     wavelength : float
         Wavelength (micron)
+    thresh : float, optional
+        Background threshold (default 1.1)
     """
 
-    def __init__(self, ra, dec,verbose=False):
+    def __init__(self, ra, dec):
         # Remote source (no local caching)
-        self.remote_dir = "https://archive.stsci.edu/missions/roman/simulations/straylight/sl_cache/"
-        self.cache_version = "2025.5"
-
+        # self.remote_dir = _CACHE["cache_dir"] #sln
+        # self.cache_version = str(_CACHE["cache_version"])
+        self.remote_dir = "https://archive.stsci.edu/missions/roman/simulations/straylight/sl_cache/" #sln
 
         # Static refdata (still read from local repo files)
+        # self.local_path = Path(__file__).parent / "refdata" #sln
+        # # self.wave_file = get_remote_data("wave_file") #sln
+        # # self.thermal_file = get_remote_data("thermal_file")
+        # self.wave_file = "std_spectrum_wavelengths.txt"
+        # self.thermal_file = "thermal_curve_roman_rryan_v1.0.csv"
 
-        #sln
-        # self.local_path = Path(__file__).parent / "refdata"
         self.local_path = 'https://raw.githubusercontent.com/spacetelescope/roman_notebooks/main/notebooks/background_visualization_tool/refdata' #sln
-
         self.wave_file = "std_spectrum_wavelengths.txt"
         self.thermal_file = "thermal_curve_roman_rryan_v1.0.csv"
 
+
         # Healpix details used by cache partitioning
-        self.nside = 128
+        # self.nside = int(_HEALPIX["nside"]) #sln
+        # ordering = str(_HEALPIX["ordering"]).upper()
+        self.nside = 128 #sln
+        ordering = "RING"
+
+        if ordering not in {"RING", "NESTED"}:
+            raise ValueError("HEALPix ordering must be RING or NESTED.")
+        self.nest = ordering == "NESTED"
 
         # Load static spectral grids / thermal background
-        self.abs_wave_array, self.thermal_wave_array, self.thermal_bg = self.read_static_data(verbose=verbose)
+        self.abs_wave_array, self.thermal_wave_array, self.thermal_bg = self.read_static_data()
         self.sl_abs_nwave = self.abs_wave_array.size
         self.sl_thermal_nwave = self.thermal_wave_array.size
 
@@ -617,23 +631,19 @@ class background:
         self.cache_file = self.myfile_from_healpix(ra, dec)
 
         # Load and prepare all per-position data
-        self.bkg_data = self.read_bkg_data_from_url(self.cache_file,verbose=verbose)
+        self.bkg_data = self.read_bkg_data_from_url(self.cache_file)
 
     # ---------- File / data loading ----------
 
     def myfile_from_healpix(self, ra, dec):
         """Map (RA, DEC) to the cache file path via healpix indexing."""
-        healpix_idx = hp.pixelfunc.ang2pix(self.nside, ra, dec, nest=False, lonlat=True)
+        healpix_idx = hp.pixelfunc.ang2pix(self.nside, ra, dec, nest=self.nest, lonlat=True) #lsn healpy to hp
         healpix_str_pad = str(healpix_idx).zfill(6)
         return f"{healpix_str_pad[0:4]}/sl_pix_{healpix_str_pad}.bin"
 
-    def read_static_data(self,verbose=False):
+    def read_static_data(self):
         """Load static wavelength grid and thermal curve from refdata."""
-        if verbose: #sln
-            print(f"Loading static wavelength grid from {self.local_path + '/' + self.wave_file}.") #sln
         abs_wave_array = np.loadtxt(self.local_path + '/' + self.wave_file)
-        if verbose: #sln
-            print(f"Loading thermal wavelength grid from {self.local_path + '/' + self.thermal_file}.")
         thermal = np.transpose(np.genfromtxt(self.local_path + '/' + self.thermal_file, delimiter=","))
 
         thermal_wave_array = thermal[0]
@@ -641,6 +651,12 @@ class background:
 
         return abs_wave_array, thermal_wave_array, thermal_flux
 
+        #sln new way temporary comment out and pasted old way above
+        # return validate_reference_data(
+        #     self.local_path / self.wave_file,
+        #     self.local_path / self.thermal_file,
+        # )
+        #
     # ---------- Remote cache reading ----------
 
     def read_bkg_data_from_url(self, cache_file, verbose=False):
@@ -648,10 +664,8 @@ class background:
         Read one Roman background file (.bin) directly from the STScI-hosted URL,
         parse it into arrays, and return the structured dict.
         """
-
         url = self.remote_dir.rstrip("/") + "/" + cache_file
-        if verbose: #sln
-            print(f"Loading background file from {url}")
+        # print(f"Loading background file from {url}") #sln commented out
         with urllib.request.urlopen(url) as response:
             file_data = response.read()
 
@@ -686,22 +700,10 @@ class background:
         date_map = nonzodi_bg["iday_index"][0]  # 366 entries: -1 for invalid, >=0 for valid mapping
 
         # Initial "calendar" are the day-of-year indices with data
+        # (sun-angle constraints are already encoded in the cache date_map)
         calendar = np.where(date_map >= 0)[0]
-
         if verbose:
             print("Valid days in file:", calendar.size, "of", len(date_map))
-
-        # Apply Roman sun-angle constraint using tgt_vis (visibility mask)
-        target = SkyCoord(self.ra * u.degree, self.dec * u.degree, frame="icrs")
-        c = compute_visibility(
-            target, report=True, fileout="vis_debug.txt",
-            interval_sampling_days=1, interval_start_time=None, interval_duration_days=366,
-        )
-        c.get_good_angles()
-        good_indices = np.where(c.df_results["good_angles"].values)[0]  # day-of-year indices (0..365)
-
-        # Keep only days that are both in the file and visible
-        calendar = calendar[np.isin(calendar, good_indices)]
 
         # Map from calendar (day-of-year) to the sequential index space in zodi_sl_bgs
         # The file packs only valid days sequentially; the mapping is via date_map
@@ -725,37 +727,30 @@ class background:
             self.abs_wave_array, nonzodi_bg_flux, self.thermal_wave_array, fill=0.0
         )
 
-        # Base total = static (nonzodi + thermal) + zodi(day)
+        # Smooth the hard 0.5 μm cutoff on the cache-derived components
+        # (NIRCam ratio corrections are already in the R2025.9+ cache).
+        for dd in range(Ndays):
+            _, zodi_bgs_int[dd] = self.modify_background(zodi_bgs_int[dd])
+        _, nonzodi_bg_int = self.modify_background(nonzodi_bg_int)
+        # _, thermal_bg_smoothed = self.modify_background(self.thermal_bg)  # scaling the thermal component. Not done now.
+
+        # Total = smoothed non-zodi + thermal + smoothed zodi
+        # total_bg = np.tile(nonzodi_bg_int + thermal_bg_smoothed, (Ndays, 1)) + zodi_bgs_int
         total_bg = np.tile(nonzodi_bg_int + self.thermal_bg, (Ndays, 1)) + zodi_bgs_int
 
-        # Apply NIRCam-informed modification to total and components
-        for dd in range(Ndays):
-            if dd == 0:
-                mod_wave_array, mod_total_bg_first = self.modify_background(total_bg[dd])
-                mod_total_bg = np.zeros((Ndays, len(mod_total_bg_first)))
-                mod_total_bg[dd] = mod_total_bg_first
-            else:
-                _, mod_total_bg[dd] = self.modify_background(total_bg[dd])
-
-        mod_zodi_bgs_int = np.zeros((Ndays, self.sl_thermal_nwave))
-        for dd in range(Ndays):
-            _, mod_zodi_bgs_int[dd] = self.modify_background(zodi_bgs_int[dd])
-        _, mod_nonzodi_flux = self.modify_background(nonzodi_bg_int)
-
         return {
-            "calendar": np.array(calendar),      # day-of-year indices that survived visibility gating
+            "calendar": np.array(calendar),
             "ra": ra,
             "dec": dec,
             "pos": pos,
             "wave_array": self.thermal_wave_array,
-            "nonzodi_bg": mod_nonzodi_flux,
+            "nonzodi_bg": nonzodi_bg_int,
             "thermal_bg": self.thermal_bg,
-            "zodi_bg": mod_zodi_bgs_int,
-            "total_bg": mod_total_bg,
+            "zodi_bg": zodi_bgs_int,
+            "total_bg": total_bg,
         }
 
     # ---------- Spectral modification / interpolation ----------
-
     def modify_background(self, bg_flux):
         """
         E. Han's modification to incorporate NIRCam measurements.
@@ -773,136 +768,9 @@ class background:
                 [bg_flux_to_mod[first_pass[0]], bg_flux_to_mod[first_pass[-1]]],
             )
 
-        # NIRCam pivot wavelengths and ratios (technical report)
-        pivot_wvl = [0.705, 0.902, 1.154, 1.501]
-        measured_bg_ratio = [0.656, 0.680, 0.819, 0.982]
-
-        bg_model = np.interp(pivot_wvl, bg_wvl_to_mod, bg_flux_to_mod)
-        measured_bg_nircam = np.array(measured_bg_ratio) * bg_model
-
-        # Quadratic fit of ratio for extrapolation 0.41–0.624 μm
-        fit = np.polyfit(pivot_wvl, measured_bg_ratio, 2)
-        wvl_fix_indices = np.where((bg_wvl_to_mod >= 0.41) & (bg_wvl_to_mod <= 0.624))[0]
-        bg_wvl_to_fix = bg_wvl_to_mod[wvl_fix_indices]
-        solution = fit[0] * bg_wvl_to_fix**2 + fit[1] * bg_wvl_to_fix + fit[2]
-        bg_flux_polyfit = solution * bg_flux_to_mod[wvl_fix_indices]
-
-        original_blue = np.where(bg_wvl_to_mod <= 0.41)[0]
-        original_red = np.where(bg_wvl_to_mod >= 1.668)[0]
-
-        bg_wvl_mod = np.concatenate((
-            bg_wvl_to_mod[original_blue],
-            bg_wvl_to_fix,
-            np.array(pivot_wvl),
-            bg_wvl_to_mod[original_red]
-        ))
-        bg_flux_mod = np.concatenate((
-            bg_flux_to_mod[original_blue],
-            bg_flux_polyfit,
-            measured_bg_nircam,
-            bg_flux_to_mod[original_red]
-        ))
-
-        # Interpolate back to the thermal grid
-        bg_flux_mod_interp = self.interpolate_spec(
-            bg_wvl_mod, bg_flux_mod, self.thermal_wave_array, fill=0.0
-        )
-        return bg_wvl_mod, bg_flux_mod_interp
+        return bg_wvl_to_mod, bg_flux_to_mod
 
     def interpolate_spec(self, wave, specin, new_wave, fill=np.nan):
         """Interpolate spectral data to a new wavelength grid."""
         f = interp1d(wave, specin, bounds_error=False, fill_value=fill)
         return f(new_wave)
-
-#########################################
-
-class compute_visibility():
-
-    def __init__(self,targets_coordinates,fileout=None,report=False,interval_sampling_days=None,interval_start_time=None,interval_duration_days=None):
-
-        if isinstance(targets_coordinates, list):
-            self.targets_coordinates = targets_coordinates
-        else:
-            self.targets_coordinates = [targets_coordinates]
-
-        self.fileout = fileout
-        self.report = report
-        self.interval = {'sampling_days':interval_sampling_days,
-                         'start_time':interval_start_time,
-                         'duration_days':interval_duration_days}
-        self.sampled_times = self.set_sampled_times(self.interval)
-        self.sun_coord = get_body('Sun',self.sampled_times)   # get coordinate object for the Sun for each day of the year
-        self.min_sun_angle = (90. - 36.) * u.deg
-        self.max_sun_angle = (90. + 36.) * u.deg
-        self.df_results = self.initialize_dataframe()
-
-
-    def initialize_dataframe(self):
-        radec_string = ['({}, {})'.format(coords.ra.to_string(u.hour), coords.dec.to_string(u.degree, alwayssign=True)) for coords in self.targets_coordinates]
-        time_string  = [self.format_time(time) for time in self.sampled_times]
-        index_levels = [radec_string,time_string]
-        index_names  = ['(RA, Dec)', 'DOY']
-        multi_index  = pd.MultiIndex.from_product(index_levels, names=index_names)
-        column_names = ['Sun_RA','Sun_Dec','separation','good_angles','nominal_roll','pa_obs_y','pa_fpa_local_x','pa_fpa_local_y','sunang_x','sunang_y','sunang_z']
-
-        # The reindexing of dataframe below is necessary due to this pandas bug:
-        # https://stackoverflow.com/questions/71837659/trying-to-sort-multiindex-index-using-categorical-index/73766126#73766126
-
-        return (pd.DataFrame(index=multi_index,columns=column_names)).reindex(radec_string,level=0)
-
-    def format_time(self,time_object):
-        """Converts a datetime object's time to DOY.ddddd """
-        datetime = time_object.datetime
-        decimal_hours = datetime.hour + datetime.minute/ 60. + datetime.second/3600
-        return datetime.strftime("%Y")+'-'+datetime.strftime("%j")+'.'+'{:7.5f}'.format(decimal_hours/24)[2:]
-
-
-    def set_sampled_times(self,interval):
-
-        '''
-        define the array of Time object at which the visitbility will be sampled.
-        If a date is in the future, this will generate a 'dubious date' warning message
-        the reason is that it is unknown how many leap seconds will be needed in the future.
-        the results will still be valid
-        '''
-
-        if interval['start_time'] is None:
-            t_start_str = ['2024-01-01T00:00:00.0']
-            t_start = Time(t_start_str,format='isot', scale='utc')
-        elif isinstance(interval['start_time'], Time) == False:
-            if isinstance(interval['start_time'], str):
-                t_start = Time(interval['start_time'],format='isot', scale='utc')
-            else:
-                print('Start time needs to be a astropy.Time object or a string')
-                assert False
-        else:
-            t_start = interval['start_time']
-
-        if interval['duration_days'] is None:
-            t_end = 365.
-        else:
-            t_end = interval['duration_days']
-
-        if interval['sampling_days'] is None:
-            t_step = 1.
-        else:
-            t_step = interval['sampling_days']
-
-        if t_step > t_end:
-            print('sampling interval cannot exceeed total duration')
-            assert False
-
-        return t_start+np.arange(0.,t_end,t_step)*u.d
-
-
-    def get_good_angles(self):
-        for i,target_coordinates in enumerate(self.targets_coordinates):
-
-            with warnings.catch_warnings():
-                warnings.simplefilter('ignore', AstropyWarning)
-                sun_angle = self.sun_coord.separation(target_coordinates)
-                good_angles = (sun_angle >= self.min_sun_angle) & (sun_angle <= self.max_sun_angle)
-            self.df_results.loc[pd.IndexSlice[self.df_results.index.levels[0][i],:],'good_angles'] = good_angles
-            self.df_results.loc[pd.IndexSlice[self.df_results.index.levels[0][i],:],'separation'] = sun_angle
-            self.df_results.loc[pd.IndexSlice[self.df_results.index.levels[0][i],:],'Sun_RA'] = self.sun_coord.ra
-            self.df_results.loc[pd.IndexSlice[self.df_results.index.levels[0][i],:],'Sun_Dec'] = self.sun_coord.dec
