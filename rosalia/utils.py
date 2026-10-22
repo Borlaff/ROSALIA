@@ -679,10 +679,10 @@ def create_angle_mask(xsize, ysize, q, theta, center=None, radius=None, pitch=90
 #####################################
 
 
-def make_profile(image, radial_mask=None, ext=None, ra_cen=None, dec_cen=None, xcen=None, ycen=None, rbins=None, pixscale = 1, nbins=100, nsimul=100, q=1, theta=0):
+def make_profile(image, radial_mask=None, ext=None, ra_cen=None, dec_cen=None, xcen=None, ycen=None, rbins=None, pixscale = 1, nbins=100, nsimul=100, q=1, theta=0, verbose=False):
 
     if isinstance(image, str):
-        print("Input image:" + image)
+        if verbose: print("Input image:" + image)
         image_fits = fits.open(image)
         image_name = image
         image = image_fits[ext].data
@@ -692,17 +692,17 @@ def make_profile(image, radial_mask=None, ext=None, ra_cen=None, dec_cen=None, x
             w = astropy_wcs.WCS(header)
             pixscale = astropy_wcs.utils.proj_plane_pixel_scales(w)[0]
             xcen, ycen = radec_to_xy(ra=ra_cen, dec=dec_cen, fits_name=image_name, ext=ext)
-            print("RA" + str(ra_cen) + " - DEC: " + str(dec_cen))
+            if verbose: print("RA" + str(ra_cen) + " - DEC: " + str(dec_cen))
         except:
-            print("No valid WCS found. Pixscale set to 1")
-            print("Using xcen and ycen supplied by user")
+            if verbose: print("No valid WCS found. Pixscale set to 1")
+            if verbose: print("Using xcen and ycen supplied by user")
             pixscale = 1
 
 
         # Find the coordinates of the target in the image
         if ext is None:
-            print("WARNING: No ext was specified")
-        print("X" + str(xcen) + " - Y: " + str(ycen))
+            if verbose: print("WARNING: No ext was specified")
+        if verbose: print("X" + str(xcen) + " - Y: " + str(ycen))
 
 
     shape_image = image.shape
@@ -719,10 +719,10 @@ def make_profile(image, radial_mask=None, ext=None, ra_cen=None, dec_cen=None, x
                                          q=q, theta=theta, center=[xcen, ycen], radius=None)
 
     if rbins is None:
-        print("No rbins provided.")
+        if verbose: print("No rbins provided.")
         min_rbins = np.min(radial_mask)
         max_rbins = np.max(radial_mask)
-        print("Assuming " + str(min_rbins) + " - " + str(max_rbins))
+        if verbose: print("Assuming " + str(min_rbins) + " - " + str(max_rbins))
         rbins = np.linspace(min_rbins, max_rbins, nbins)
 
     profile = np.zeros((len(rbins)-1,5))
@@ -858,7 +858,7 @@ def create_dummy_image_with_wcs(ra_cen, dec_cen, ra_size, dec_size, pixscale, ou
     #
     # Input:
     # ra_cen, dec_cen: float (degrees): Central coordinates of the image.
-    # ra_range, dec_range: tuple, 2 float (degrees): Min and max values of ra, dec. They need to be in order.
+    # ra_size, dec_size: tuple, 2 float (degrees): Min and max values of ra, dec. They need to be in order.
     # pixscale: float (degrees/px): Pixel scale in degree per pixel.
     # outname: string: Name of the output image.
 
@@ -1814,3 +1814,48 @@ def distribute_indices_numpy(nums, N):
         distributed.append(np.concatenate((forward, backward)).tolist())
         
     return distributed
+
+
+
+def get_ra_dec_arrays(fits_file, ext):
+    """
+    Analyze a FITS file with WCS and return RA and Dec arrays for each pixel.
+    
+    Parameters:
+    -----------
+    fits_file : str
+        Path to the FITS file
+    
+    Returns:
+    --------
+    ra_array : numpy.ndarray
+        2D array containing Right Ascension (in degrees) for each pixel
+    dec_array : numpy.ndarray
+        2D array containing Declination (in degrees) for each pixel
+    """
+    
+    # Open the FITS file and read the header
+    with fits.open(fits_file) as hdul:
+        # Get the primary HDU (or specify extension if needed)
+        header = hdul[ext].header
+        
+        # Create WCS object from the header
+        wcs = astropy_wcs.WCS(header)
+        
+        # Get the image dimensions
+        naxis1 = header['NAXIS1']  # Width (x-axis)
+        naxis2 = header['NAXIS2']  # Height (y-axis)
+    
+    # Create pixel coordinate grids
+    # Note: FITS uses 1-based indexing, but we'll use 0-based and let WCS handle it
+    x_pixels = np.arange(naxis1)
+    y_pixels = np.arange(naxis2)
+    
+    # Create 2D meshgrid of pixel coordinates
+    x_grid, y_grid = np.meshgrid(x_pixels, y_pixels)
+    
+    # Convert pixel coordinates to world coordinates (RA, Dec)
+    # wcs.all_pix2world expects (x, y) coordinates
+    ra_array, dec_array = wcs.all_pix2world(x_grid, y_grid, 0)
+    
+    return ra_array, dec_array

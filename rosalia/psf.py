@@ -1205,8 +1205,8 @@ def get_hybrid_catalog(ra, dec, radius, lambda_ref, MJD, observer, g_mag_max=Fal
     gaia_coords = SkyCoord(ra_stars, dec_stars, frame='icrs')
     sep = c.separation(gaia_coords)
 
-    n_bright_stars = len(gaia_naked_eye_stars["ra"])
-    n_highres_stars = len(high_resolution_catalog)
+    #n_bright_stars = len(gaia_naked_eye_stars["ra"])
+    #n_highres_stars = len(high_resolution_catalog)
 
     print("\n[DEMO WARNING:] Naked eye stars do not have photometry besides g band")
     #append_empty_rows(high_resolution_catalog, n_bright_stars)

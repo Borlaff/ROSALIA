@@ -118,6 +118,7 @@ def main_offender_find_fraction_of_map(mainoff_name, catalog):
     source_name_list = []
     ra_list = []
     dec_list = []
+    dist_list = []
     mag_lambda_list = []
     unique_id_valid = []
 
@@ -142,6 +143,7 @@ def main_offender_find_fraction_of_map(mainoff_name, catalog):
         ra = np.float32(catalog.iloc[catalog["cat_id"] == unique_id]["ra"])[0]
         dec = np.float32(catalog.iloc[catalog["cat_id"] == unique_id]["dec"])[0]
         mag_lambda = np.float32(catalog.iloc[catalog["cat_id"] == unique_id]["mag_lambda"])[0]
+        dist = np.float32(catalog.iloc[catalog["cat_id"] == unique_id]["dist"])[0]
 
 
         # Try to find the name of the main_offender
@@ -161,9 +163,10 @@ def main_offender_find_fraction_of_map(mainoff_name, catalog):
         dec_list.append(dec)
         mag_lambda_list.append(mag_lambda)
         source_name_list.append(source_name)
+        dist_list.append(dist)
     
     main_offender_db = pd.DataFrame({"source_id":unique_id_valid, "ra": ra_list, "dec": dec_list, "mag_lambda": mag_lambda_list,
-                                     "source_name":source_name_list,
+                                     "source_name":source_name_list, "dist": dist_list,
                                     "fraction_by_offender":fraction_by_offender})
     main_offender_db = main_offender_db.sort_values(by=["fraction_by_offender"], ascending=False)
 
@@ -301,68 +304,65 @@ def make_stars_around_plot(catalog,  astropywcs_list, RA_TARG, DEC_TARG, radius 
 
 ###############
 
-
-
-def plot_ndi_main_offenders(RA_TARG, DEC_TARG, PA, scaled_main_off, catalog, ndi_level, figsize=(10,7)):
-
+def plot_ndi_main_offenders(RA_TARG, DEC_TARG, PA, scaled_main_off, catalog, radius=5, pixscale=30/60/60, figsize=(10,7)):
 
     main_offender_db, multiline_text = rs.plots.main_offender_find_fraction_of_map(scaled_main_off, catalog)
-    
-    # Plot level NDI 
-    ndi_name = os.environ["ROSALIACACHE"] + "CORE/NDI/RST/ndi_lvl" + str(ndi_level) + "_mean.fits"
-    pa_point = PA
-    ra_point = RA_TARG
-    dec_point = DEC_TARG
 
-    if ndi_level==1:
+    radius = 1.2*bn.nanmax(main_offender_db["dist"])
+    pixscale = 30/60/60/5*radius # Empirical formula to be visually appealing. 
+
+    # Plot level NDI 
+    #ndi_name = os.environ["ROSALIACACHE"] + "CORE/NDI/RST/ndi_lvl" + str(ndi_level) + "_mean.fits"
+    #pa_point = PA
+    #ra_point = RA_TARG
+    #dec_point = DEC_TARG
+
+    if radius<1:
         ndi_linthresh = 0.05
-    if ndi_level==2:
+    elif radius>=1 and radius<=10:
         ndi_linthresh = 0.001
     else:
-        ndi_linthresh = 0.01
+        ndi_linthresh = 0.0001
    
     # Make the modified header based on the exposure properties.
-    ndi_fits = fits.open(ndi_name)
-    w = astropy_wcs.WCS(header=ndi_fits[0].header, fobj=ndi_fits, naxis=2)
-    w.wcs.crota = -pa_point, -pa_point
-    w.wcs.crval = ra_point, dec_point
-    w.wcs.cdelt = -ndi_fits[0].header["CDELT1"], ndi_fits[0].header["CDELT2"]
-    print(w)
-    ndi_fits[0].header = w.to_header()
+    #ndi_fits = fits.open(ndi_name)
+    #w = astropy_wcs.WCS(header=ndi_fits[0].header, fobj=ndi_fits, naxis=2)
+    #w.wcs.crota = -pa_point, -pa_point
+    #w.wcs.crval = ra_point, dec_point
+    #w.wcs.cdelt = -ndi_fits[0].header["CDELT1"], ndi_fits[0].header["CDELT2"]
+    #print(w)
+    #ndi_fits[0].header = w.to_header()
     
-    fig, ax = plt.subplots(1, 1, figsize=figsize, subplot_kw=dict(projection=w))
-
-
-    # ndi_header = fits.open(ndi_headerlet)[0].header
-    
+    ndi_map, ndi_wcs, _ = get_combined_NDI_map(SCA=1, ra_point=RA_TARG, dec_point=DEC_TARG, pa=PA, radius=radius, pixscale=pixscale, dummy_name="dummy_ndi_plot.fits")
+    # ndi_header = ndi_wcs.to_header()
+    fig, ax = plt.subplots(1, 1, figsize=figsize, subplot_kw=dict(projection=ndi_wcs))
     # The transfer NDI maps units of 1/(superpixel size in mm2). 
     # We need to correct by that factor. 
     superpixel_mm2_area = (rs.telescopes.Roman.get_physical_pixelsize("WFI").to("mm").value * 512)**2
-    im = ax.imshow(ndi_fits[0].data/superpixel_mm2_area, origin='lower', cmap="RdYlBu_r",
+    im = ax.imshow(ndi_map/superpixel_mm2_area, origin='lower', cmap="RdYlBu_r",
                            norm=matplotlib_colors.SymLogNorm(linthresh=ndi_linthresh, linscale=1,
                                             base=10))
     cbar = plt.colorbar(im, ax=ax, location='top', fraction=0.046, pad=0.04)
     cbar.set_label(label='Normalized Detector Irradiance (unitless)',size=15)
-
-    ndi_w = astropy_wcs.WCS(header=ndi_fits[0].header, fobj=ndi_fits, naxis=2)
-    # star_catalog = star_catalog_list[i]
-    
     # CAR locations 
     alpha = 1
 
     for i in range(np.min([len(main_offender_db["ra"]), 3])):
         # CAR 1 A
-        x_stars, y_stars = ndi_w.wcs_world2pix(main_offender_db["ra"].iloc[i], main_offender_db["dec"].iloc[i], 0)
+        x_stars, y_stars = ndi_wcs.wcs_world2pix(main_offender_db["ra"].iloc[i], main_offender_db["dec"].iloc[i], 0)
         #ax.scatter(main_offender_db["ra"].iloc[i], main_offender_db["dec"].iloc[i], marker="h", edgecolor="black", color=cm.hot(i/3), alpha=alpha, s=150/(i+1), label=main_offender_db["source_name"].iloc[i])
         ax.scatter(x_stars, y_stars, marker="h", edgecolor="black", color=cm.hot(i/3), alpha=alpha, s=150/(i+1), label=main_offender_db["source_name"].iloc[i])
-    max_extent_ndi = np.abs(ndi_fits[0].header["CDELT2"]) * ndi_fits[0].data.shape[0]/2# This is the radial extent of the NDI map
+
+
+    # max_extent_ndi = np.abs(ndi_header["CDELT2"]) * ndi_map.shape[0]/2# This is the radial extent of the NDI map
     # print(max_extent_ndi)
-    angle_ticks = np.round(np.linspace(-max_extent_ndi, max_extent_ndi, 5),1)
+    # angle_ticks = np.round(np.linspace(-max_extent_ndi, max_extent_ndi, 5),1)
     # print(angle_ticks)
-    pixel_ticks = angle_ticks/np.abs(ndi_fits[0].header["CDELT2"])  + ndi_fits[0].data.shape[0]/2
+    # pixel_ticks = angle_ticks/np.abs(ndi_header["CDELT2"])  + ndi_map.shape[0]/2
     # print(pixel_ticks)
     #ax.set_xticks(pixel_ticks, angle_ticks, size=12)
     #ax.set_yticks(pixel_ticks, angle_ticks, size=12)
+
     ax.set_xlabel("RA (degrees)", size=15)
     ax.set_ylabel("Dec (degrees)", size=15)
 
@@ -547,34 +547,22 @@ def make_straylight_plots(RA_TARG, DEC_TARG, PA, source_catalog, ASTROPYWCS, str
                                                  figsize=figsize)
     
     if verbose > 0: print("Plot: Source environment map.")
-    #try:
-    if True:
-        stars_around_png = rs.plots.make_stars_around_plot(catalog=source_catalog, 
+    stars_around_png = rs.plots.make_stars_around_plot(catalog=source_catalog, 
                                                            astropywcs_list = ASTROPYWCS, 
                                                            RA_TARG=RA_TARG, 
                                                            DEC_TARG=DEC_TARG, 
                                                            output_name=stray_flc_name.replace(".fits", "_stars_close.png"), 
                                                            figsize=figsize)
-        # def make_stars_around_plot(flt_name, catalog,  astropywcs_list, RA_TARG, DEC_TARG, radius = 0.6, output_name=None, figsize=(10,7)):
-
-    #except:
-    #    print(rs.plots.style.YELLOW + "WARNING: Could not make stars around plot. Check if the catalog has the right columns." + rs.plots.style.RESET)
-    #    stars_around_png = ""
 
 
     if verbose > 0: print("Plot: Location of Main offenders on NDI map.")
-    #try:
-    if True:
-        ndi_mainoff_name = rs.plots.plot_ndi_main_offenders(RA_TARG=RA_TARG, 
-                                                            DEC_TARG=DEC_TARG, 
-                                                            PA=PA,
-                                                            scaled_main_off=scaled_main_off_name, 
-                                                            catalog=source_catalog, 
-                                                            ndi_level=2, 
-                                                            figsize=figsize)
-    # except:
-    #    print(rs.plots.style.YELLOW + "WARNING: Could not make stars Main offender plot. Check if the catalog has the right columns." + rs.plots.style.RESET)
-    #    ndi_mainoff_name = ""
+    ndi_mainoff_name = rs.plots.plot_ndi_main_offenders(RA_TARG=RA_TARG, 
+                                                        DEC_TARG=DEC_TARG, 
+                                                        PA=PA,
+                                                        scaled_main_off=scaled_main_off_name, 
+                                                        catalog=source_catalog, 
+                                                        figsize=figsize)
+
  
     pdf_report_name = stray_flc_name.replace(".fits", ".pdf")
     rs.utils.execute_cmd("magick -adjoin " +\
@@ -589,95 +577,6 @@ def make_straylight_plots(RA_TARG, DEC_TARG, PA, source_catalog, ASTROPYWCS, str
 
 
 #########################
-
-def get_combined_NDI_map(SCA, ra_point, dec_point, pa, radius=5, i=0):
-
-    # This is a test to plot all the NDI maps together, for checking biases. 
-
-    level_1_critical_distance_to_star = 1 # degree
-    level_2_critical_distance_to_star = 10 # degree
-
-    # Getting the constraints for the RA and DEC
-    ra_dec_constraints = rs.gaia.find_ra_dec_constraints(ra_point, dec_point, radius/2, verbose=False)
-
-    # Assimilating catalog.
-    ra_array  = np.linspace(ra_dec_constraints['ra_min'],  ra_dec_constraints['ra_max'],  1800)
-    dec_array = np.linspace(ra_dec_constraints['dec_min'], ra_dec_constraints['dec_max'], 1800)
-
-    ra_grid, dec_grid = np.meshgrid(ra_array, dec_array)
-    # Identify those at distances > 1 degrees (~100 times the size of the subarray).
-    # For stars at those distances, we will only estimate one NDI and assume the straylight is flat across
-    # the subarray (we will still have gradients!).
-
-    theta_phi_center_FPA = rs.utils.angular_distance(ra1=np.array([ra_point]), 
-                                                     dec1=np.array([dec_point]),
-                                                     ra2=ra_grid.flatten(), 
-                                                     dec2=dec_grid.flatten())
-    
-    ##############################################################################
-
-    # Here we split the stars into the different boundaries, depending on the distance to the center of the SCA.
-    bool_is_the_star_level_1 = np.array(theta_phi_center_FPA[0] < level_1_critical_distance_to_star)
-    bool_is_the_star_level_2 = np.array((theta_phi_center_FPA[0] >= level_1_critical_distance_to_star) & (theta_phi_center_FPA[0] < level_2_critical_distance_to_star))
-    bool_is_the_star_level_3 = np.array(theta_phi_center_FPA[0] >= level_2_critical_distance_to_star)
-
-    canvas_level = np.zeros(dec_grid.shape)
-    canvas_level[bool_is_the_star_level_3.reshape(dec_grid.shape)] = 3
-    canvas_level[bool_is_the_star_level_2.reshape(dec_grid.shape)] = 2
-    canvas_level[bool_is_the_star_level_1.reshape(dec_grid.shape)] = 1
-
-    # Load the NDIs and raster the map 
-    i = 0
-    NDI_canvas = np.zeros(dec_grid.shape)
-
-    # Level 1
-    ndi_name_1 = os.environ['ROSALIACACHE'] + "/CORE/NDI/RST/ndi_lvl1/lvl1_SCA_" + str(SCA) + ".pkl"
-    with open(ndi_name_1, "rb") as f:
-        ndi_lvl1 = pickle.load(f)
-
-    # Level 2
-    ndi_name_2 = os.environ['ROSALIACACHE'] + "/CORE/NDI/RST/ndi_lvl2/lvl2_SCA_" + str(SCA) + ".pkl"
-    with open(ndi_name_2, "rb") as f:
-        ndi_lvl2 = pickle.load(f)
-
-    # Level 3
-    subarray_locations_db = rs.roman.get_subarray_locations(SCA=SCA, verbose=False)
-    X_label = subarray_locations_db["xlabel"][i]
-    Y_label = subarray_locations_db["ylabel"][i]
-    ndi_name_3 = os.environ['ROSALIACACHE'] + "/CORE/NDI/RST/ndi_lvl3/" + "lvl3_SCA_" + str(SCA) + "_SUB_X" + str(X_label) + "_Y" + str(Y_label) + "_HP.fits"
-
-    NDI_lvl1 = rs.roman.roman_WFI_NDI_estimator_direct(ra_stars=ra_grid.flatten(), dec_stars=dec_grid.flatten(),
-                                                       ra_point=ra_point, dec_point=dec_point, pa_point=pa,
-                                                       level=1, ndi_wcs=ndi_lvl1["wcs"][i], 
-                                                       ndi_grid_interpolator=ndi_lvl1["ndi_interpolator"][i], verbose=False)
-
-    NDI_canvas[bool_is_the_star_level_1.reshape(dec_grid.shape)] = NDI_lvl1.reshape(dec_grid.shape)[bool_is_the_star_level_1.reshape(dec_grid.shape)]
-
-
-    NDI_lvl2 = rs.roman.roman_WFI_NDI_estimator_direct(ra_stars=ra_grid.flatten(), dec_stars=dec_grid.flatten(),
-                                                       ra_point=ra_point, dec_point=dec_point, pa_point=pa,
-                                                       level=2, ndi_wcs=ndi_lvl2["wcs"][i], 
-                                                       ndi_grid_interpolator=ndi_lvl2["ndi_interpolator"][i], verbose=False)
-
-    NDI_canvas[bool_is_the_star_level_2.reshape(dec_grid.shape)] = NDI_lvl2.reshape(dec_grid.shape)[bool_is_the_star_level_2.reshape(dec_grid.shape)]
-
-
-    # Prepare the healpix rotator for level 3 stars.
-    longitude = ra_point * u.deg
-    latitude = dec_point * u.deg
-    position_angle = -pa*u.deg
-    rot_custom = hp.Rotator(rot=[longitude.to_value(u.deg), latitude.to_value(u.deg), position_angle.to_value(u.deg)], inv=True)
-
-    NDI_lvl3 = rs.roman.roman_WFI_NDI_estimator_direct(ra_stars=ra_grid.flatten(), dec_stars=dec_grid.flatten(),
-                                                         ra_point=ra_point, dec_point=dec_point, pa_point=pa, 
-                                                         ndi_name=ndi_name_3, level=3, rot_custom=rot_custom, verbose=False)
-
-    NDI_canvas[bool_is_the_star_level_3.reshape(dec_grid.shape)] = NDI_lvl3.reshape(dec_grid.shape)[bool_is_the_star_level_3.reshape(dec_grid.shape)]
-
-    return(NDI_canvas, ra_dec_constraints)
-
-########################################
-
 
 
 
@@ -806,3 +705,102 @@ def plot_rosalia_logo():
 style.RED + "NASA" + style.RESET + " Ames Research Center - " + style.RESET + " Roman Wide Field Science\n"+\
 style.RESET + "Contact: Alex S. Borlaff (NASA Ames/STA) -  "+style.BLUE+"a.s.borlaff@nasa.gov \n\n\n"+style.RESET))
     print(''.join(list(ascii)), flush=True)
+
+
+
+
+
+def get_combined_NDI_map(SCA, ra_point, dec_point, pa, radius=5, pixscale=30/60/60, ndi_label_i=0, dummy_name="dummy_ndi_plot.fits"):
+
+    # This is a test to plot all the NDI maps together, for checking biases. 
+
+    level_1_critical_distance_to_star = 0.5 # degree
+    level_2_critical_distance_to_star = 10 # degree
+
+    # Getting the constraints for the RA and DEC
+    ra_dec_constraints = rs.gaia.find_ra_dec_constraints(ra_point, dec_point, radius/2, verbose=False)
+
+    # Assimilating catalog.
+    #ra_array  = np.linspace(ra_dec_constraints['ra_min'],  ra_dec_constraints['ra_max'],  1800)
+    #dec_array = np.linspace(ra_dec_constraints['dec_min'], ra_dec_constraints['dec_max'], 1800)
+    rs.utils.create_dummy_image_with_wcs(ra_cen=ra_point, dec_cen=dec_point, ra_size=radius, dec_size=radius, pixscale=pixscale, outname=dummy_name)
+    ra_grid, dec_grid = rs.utils.get_ra_dec_arrays(fits_file=dummy_name, ext=0)
+
+    #ra_grid, dec_grid = np.meshgrid(ra_array, dec_array)
+    # Identify those at distances > 1 degrees (~100 times the size of the subarray).
+    # For stars at those distances, we will only estimate one NDI and assume the straylight is flat across
+    # the subarray (we will still have gradients!).
+
+    theta_phi_center_FPA = rs.utils.angular_distance(ra1=np.array([ra_point]), 
+                                                     dec1=np.array([dec_point]),
+                                                     ra2=ra_grid.flatten(), 
+                                                     dec2=dec_grid.flatten())
+    
+    ##############################################################################
+
+    # Here we split the stars into the different boundaries, depending on the distance to the center of the SCA.
+    bool_is_the_star_level_1 = np.array(theta_phi_center_FPA[0] < level_1_critical_distance_to_star)
+    bool_is_the_star_level_2 = np.array((theta_phi_center_FPA[0] >= level_1_critical_distance_to_star) & (theta_phi_center_FPA[0] < level_2_critical_distance_to_star))
+    bool_is_the_star_level_3 = np.array(theta_phi_center_FPA[0] >= level_2_critical_distance_to_star)
+
+    canvas_level = np.zeros(dec_grid.shape)
+    canvas_level[bool_is_the_star_level_3.reshape(dec_grid.shape)] = 3
+    canvas_level[bool_is_the_star_level_2.reshape(dec_grid.shape)] = 2
+    canvas_level[bool_is_the_star_level_1.reshape(dec_grid.shape)] = 1
+
+    # Load the NDIs and raster the map 
+    i = 0
+    NDI_canvas = np.zeros(dec_grid.shape)
+
+    # Level 1
+    ndi_name_1 = os.environ['ROSALIACACHE'] + "/CORE/NDI/RST/ndi_lvl1/lvl1_SCA_" + str(SCA) + ".pkl"
+    with open(ndi_name_1, "rb") as f:
+        ndi_lvl1 = pickle.load(f)
+
+    # Level 2
+    ndi_name_2 = os.environ['ROSALIACACHE'] + "/CORE/NDI/RST/ndi_lvl2/lvl2_SCA_" + str(SCA) + ".pkl"
+    with open(ndi_name_2, "rb") as f:
+        ndi_lvl2 = pickle.load(f)
+
+    # Level 3
+    subarray_locations_db = rs.roman.get_subarray_locations(SCA=SCA, verbose=False)
+    X_label = subarray_locations_db["xlabel"][ndi_label_i]
+    Y_label = subarray_locations_db["ylabel"][ndi_label_i]
+    ndi_name_3 = os.environ['ROSALIACACHE'] + "/CORE/NDI/RST/ndi_lvl3/" + "lvl3_SCA_" + str(SCA) + "_SUB_X" + str(X_label) + "_Y" + str(Y_label) + "_HP.fits"
+
+    NDI_lvl1 = rs.roman.roman_WFI_NDI_estimator_direct(ra_stars=ra_grid.flatten(), dec_stars=dec_grid.flatten(),
+                                                       ra_point=ra_point, dec_point=dec_point, pa_point=pa,
+                                                       level=1, ndi_wcs=ndi_lvl1["wcs"][ndi_label_i], 
+                                                       ndi_grid_interpolator=ndi_lvl1["ndi_interpolator"][ndi_label_i], verbose=False)
+
+    NDI_canvas[bool_is_the_star_level_1.reshape(dec_grid.shape)] = NDI_lvl1.reshape(dec_grid.shape)[bool_is_the_star_level_1.reshape(dec_grid.shape)]
+
+
+    NDI_lvl2 = rs.roman.roman_WFI_NDI_estimator_direct(ra_stars=ra_grid.flatten(), dec_stars=dec_grid.flatten(),
+                                                       ra_point=ra_point, dec_point=dec_point, pa_point=pa,
+                                                       level=2, ndi_wcs=ndi_lvl2["wcs"][ndi_label_i], 
+                                                       ndi_grid_interpolator=ndi_lvl2["ndi_interpolator"][ndi_label_i], verbose=False)
+
+    NDI_canvas[bool_is_the_star_level_2.reshape(dec_grid.shape)] = NDI_lvl2.reshape(dec_grid.shape)[bool_is_the_star_level_2.reshape(dec_grid.shape)]
+
+
+    # Prepare the healpix rotator for level 3 stars.
+    longitude = ra_point * u.deg
+    latitude = dec_point * u.deg
+    position_angle = -pa*u.deg
+    rot_custom = hp.Rotator(rot=[longitude.to_value(u.deg), latitude.to_value(u.deg), position_angle.to_value(u.deg)], inv=True)
+
+    NDI_lvl3 = rs.roman.roman_WFI_NDI_estimator_direct(ra_stars=ra_grid.flatten(), dec_stars=dec_grid.flatten(),
+                                                         ra_point=ra_point, dec_point=dec_point, pa_point=pa, 
+                                                         ndi_name=ndi_name_3, level=3, rot_custom=rot_custom, verbose=False)
+
+    NDI_canvas[bool_is_the_star_level_3.reshape(dec_grid.shape)] = NDI_lvl3.reshape(dec_grid.shape)[bool_is_the_star_level_3.reshape(dec_grid.shape)]
+
+    ndi_canvas_fits = fits.open(dummy_name)
+    ndi_canvas_fits[0].data = NDI_canvas
+    ndi_canvas_fits.verify("silentfix")
+    ndi_canvas_fits.writeto(dummy_name, overwrite=True)
+    
+    return(NDI_canvas, astropy_wcs.WCS(ndi_canvas_fits[0].header), ra_dec_constraints)
+
+########################################

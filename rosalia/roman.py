@@ -365,7 +365,7 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
     # Level 2 stars have a distance between 1 degree and 10 degrees to the center of the SCA.
     # Level 3 stars have a distance of 10 degrees or more to the SCA.
 
-    level_1_critical_distance_to_star = 1 # degree
+    level_1_critical_distance_to_star = 0.5 # degree
     level_2_critical_distance_to_star = 10 # degree
 
     pixsize = rs.telescopes.Roman.get_physical_pixelsize(instrument="WFI") # Physical pixel size, in meters

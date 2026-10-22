@@ -612,7 +612,7 @@ class exposure():
         if data_list is None: data_list = self.DATA
         if wcs_list is None: wcs_list = self.ASTROPYWCS
         if keywords is None: keywords = self.fits_keywords
-        print("TODO: Add option to provide optimal_wcs - So multiple filters can share target grid")
+
         if isinstance(keywords["DETECTOR"], (list,)):
             keywords["DETECTOR"] = rs.inspector.longest_common_substring(self.DETECTOR)
 
