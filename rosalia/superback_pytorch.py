@@ -904,11 +904,28 @@ def build_psf_canvas_pytorch(stars_catalog, shape_out, bandpass, depth=31,
 
     # 4. Dispatch batches across device with progress tracking
     if verbose:
+        avg_stars = total_stars / num_batches if num_batches > 0 else 0.0
+        # Batch with most stars (if tied, pick the one with highest stamp size)
+        max_stars_batch = max(batches, key=lambda b: (len(b[1]), b[0]))
+        max_count = len(max_stars_batch[1])
+        max_size = max_stars_batch[0]
+
+        # Batch with fewest stars and largest stamp size
+        min_star_count = min(len(b[1]) for b in batches)
+        min_stars_batches = [b for b in batches if len(b[1]) == min_star_count]
+        min_stars_biggest_batch = max(min_stars_batches, key=lambda b: b[0])
+        min_count = len(min_stars_biggest_batch[1])
+        min_size = min_stars_biggest_batch[0]
+        min_note = " (spatially-chunked)" if min_size > 2048 else ""
+
         print(f"\n[PyTorch SUPERBACK] Hardware device: {device.type.upper()} ({dtype}) | Canvas: {shape_out[0]}x{shape_out[1]}", flush=True)
-        print(f"[PyTorch SUPERBACK] Partitioned {total_stars} stars into {num_batches} equal-stamp-size batches:", flush=True)
-        for b_idx, (b_stamp, b_stars) in enumerate(batches, 1):
-            streaming_note = " (spatially-chunked)" if b_stamp > 2048 else ""
-            print(f"  • Batch {b_idx}/{num_batches}: {len(b_stars)} star(s) | stamp size {b_stamp}x{b_stamp}{streaming_note}", flush=True)
+        print(f"[PyTorch SUPERBACK] Star catalog: {total_stars} stars | Batches: {num_batches} | Avg stars/batch: {avg_stars:.1f}", flush=True)
+        if num_batches == 1:
+            note = " (spatially-chunked)" if max_size > 2048 else ""
+            print(f"  • Single batch: {max_count} star(s) | stamp size {max_size}x{max_size}{note}", flush=True)
+        else:
+            print(f"  • Batch with most stars: {max_count} star(s) | stamp size {max_size}x{max_size}", flush=True)
+            print(f"  • Batch with fewest stars (largest stamp): {min_count} star(s) | stamp size {min_size}x{min_size}{min_note}", flush=True)
 
     pbar = None
     if verbose:
