@@ -2099,6 +2099,19 @@ def superback_roman_psf(position, SCA, bandpass, shape=None, SED=None,
     ``wave_weights`` are handled in nanometers internally. 
     """
 
+    backend = kwargs.pop("backend", "pytorch")
+    if backend and str(backend).lower() == "pytorch":
+        try:
+            import rosalia.superback_pytorch as sbp
+            return sbp.superback_roman_psf_pytorch(
+                position=position, SCA=SCA, bandpass=bandpass, shape=shape, SED=SED,
+                magnitude_weights=magnitude_weights, wave_weights=wave_weights,
+                oversample_factor=oversample_factor, flux_weights=flux_weights,
+                zp=zp, pixel_scale=pixel_scale, **kwargs
+            )
+        except ImportError:
+            pass
+
     import rosalia.superback as superback
     from scipy.interpolate import interp1d
 
@@ -2309,7 +2322,7 @@ def get_psf_extension_moffat(mag, depth=30, alpha=0.08, beta=1.52):
     return extension.item() if extension.ndim == 0 else extension
 
 def build_psf_canvas(stars_catalog, shape_out, bandpass, depth=31, n_workers=None,
-                     method="superback"):
+                     method="superback", **kwargs):
     '''
     Build a PSF canvas from a catalog of stars in parallel.
 
@@ -2368,6 +2381,21 @@ def build_psf_canvas(stars_catalog, shape_out, bandpass, depth=31, n_workers=Non
     canvas = np.zeros(shape_out, dtype=float)
     if stars_catalog.empty:
         return canvas
+
+    backend = kwargs.pop("backend", "pytorch")
+    if method == "superback" and backend and str(backend).lower() == "pytorch":
+        try:
+            import rosalia.superback_pytorch as sbp
+            return sbp.build_psf_canvas_pytorch(
+                stars_catalog=stars_catalog,
+                shape_out=shape_out,
+                bandpass=bandpass,
+                depth=depth,
+                n_workers=n_workers,
+                **kwargs,
+            )
+        except ImportError:
+            pass
 
     if n_workers is None:
         n_workers = min(2, os.cpu_count() or 1)

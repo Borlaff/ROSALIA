@@ -6,6 +6,12 @@ NASA Ames Research Center, Moffett Field, 94035, California, USA.
 a.s.borlaff@nasa.gov
 """
 
+# Early-import PyTorch to prevent OpenMP library conflicts across C-extensions on macOS
+try:
+    import torch
+except ImportError:
+    pass
+
 from importlib.metadata import version, PackageNotFoundError
 from pathlib import Path
 import re
@@ -46,6 +52,8 @@ from . import (
     sky as sky,
     skywalker as skywalker,
     sso as sso,
+    superback as superback,
+    superback_pytorch as superback_pytorch,
     telescopes as telescopes,
     tests as tests,
     utils as utils,
@@ -63,6 +71,8 @@ __all__ = [
     "irsa",
     "ndi",
     "psf",
+    "superback",
+    "superback_pytorch",
     "gaia",
     "gnu",
     "roman",

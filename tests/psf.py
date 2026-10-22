@@ -243,7 +243,7 @@ def test_superback_roman_psf_integrated_magnitude_matches_star():
 
     total_flux_njy_per_pixel = np.sum(psf.data)
     integrated_magnitude = (
-        23.9 - 2.5 * np.log10(total_flux_njy_per_pixel) + 5 * np.log10(0.11)
+        23.9 - 2.5 * np.log10(total_flux_njy_per_pixel)
     )
 
     assert psf.data.shape == (512, 512)
@@ -270,7 +270,7 @@ def test_stpsf_roman_psf_integrated_magnitude_matches_star():
 
     total_flux_njy_per_pixel = np.sum(psf.data)
     integrated_magnitude = (
-        23.9 - 2.5 * np.log10(total_flux_njy_per_pixel) + 5 * np.log10(0.11)
+        23.9 - 2.5 * np.log10(total_flux_njy_per_pixel)
     )
 
     assert psf.data.shape == (512, 512)

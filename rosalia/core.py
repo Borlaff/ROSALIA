@@ -924,7 +924,7 @@ class exposure():
 #####################################################################################
 
 
-    def psf(self, g_mag_max=15, depth=31, catalog=None, method='superback', n_stars=None, n_workers=None, verbose=False):
+    def psf(self, g_mag_max=15, depth=31, catalog=None, method='superback', n_stars=None, n_workers=None, verbose=False, device=None, dtype=None, **kwargs):
         #######################################
         # rosalia_psf: Alejandro S. Borlaff. NASA/Ames STA. a.s.borlaff@nasa.gov
         # -------------------------------
@@ -1033,6 +1033,10 @@ class exposure():
             depth=depth,
             n_workers=n_workers,
             method=method,
+            device=device,
+            dtype=dtype,
+            verbose=verbose,
+            **kwargs,
         )
 
         detectors, wcs_list = rs.psf.recover_roman_detectors_from_canvas(canvas, self.optimal_wcs, detector_wcs=self.ASTROPYWCS, pixscale=0.11)
