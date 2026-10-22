@@ -1022,6 +1022,11 @@ def build_psf_canvas_pytorch(stars_catalog, shape_out, bandpass, depth=31,
         max_count = len(max_stars_batch[1])
         max_size = max_stars_batch[0]
 
+        # Batch with smallest stamp size (if tied, pick the one with most stars)
+        min_stamp_batch = min(batches, key=lambda b: (b[0], -len(b[1])))
+        min_stamp_count = len(min_stamp_batch[1])
+        min_stamp_size = min_stamp_batch[0]
+
         # Batch with fewest stars and largest stamp size
         min_star_count = min(len(b[1]) for b in batches)
         min_stars_batches = [b for b in batches if len(b[1]) == min_star_count]
@@ -1043,6 +1048,7 @@ def build_psf_canvas_pytorch(stars_catalog, shape_out, bandpass, depth=31,
             print(f"  • Single batch: {max_count} star(s) | stamp size {max_size}x{max_size}{note}", flush=True)
         else:
             print(f"  • Batch with most stars: {max_count} star(s) | stamp size {max_size}x{max_size}", flush=True)
+            print(f"  • Batch with smallest stamp: {min_stamp_count} star(s) | stamp size {min_stamp_size}x{min_stamp_size}", flush=True)
             print(f"  • Batch with fewest stars (largest stamp): {min_count} star(s) | stamp size {min_size}x{min_size}{min_note}", flush=True)
 
     pbar = None
