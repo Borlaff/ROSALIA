@@ -2336,7 +2336,8 @@ def get_psf_extension_moffat(mag, depth=30, alpha=0.08, beta=1.52):
     return extension.item() if extension.ndim == 0 else extension
 
 def build_psf_canvas(stars_catalog, shape_out, bandpass, depth=31, n_workers=None,
-                     method="superback", backend="pytorch", device=None, dtype=None, **kwargs):
+                     method="superback", backend="pytorch", device=None, dtype=None,
+                     memory_fraction=0.70, **kwargs):
     '''
     Build a PSF canvas from a catalog of stars in parallel.
 
@@ -2420,6 +2421,7 @@ def build_psf_canvas(stars_catalog, shape_out, bandpass, depth=31, n_workers=Non
                 n_workers=n_workers,
                 device=device,
                 dtype=dtype,
+                memory_fraction=memory_fraction,
                 **kwargs,
             )
         except ImportError:

@@ -924,7 +924,7 @@ class exposure():
 #####################################################################################
 
 
-    def psf(self, g_mag_max=15, depth=31, catalog=None, method='superback', n_stars=None, n_workers=None, verbose=False, device=None, dtype=None, backend='pytorch', **kwargs):
+    def psf(self, g_mag_max=15, depth=31, catalog=None, method='superback', n_stars=None, n_workers=None, verbose=False, device=None, dtype=None, backend='pytorch', memory_fraction=0.70, **kwargs):
         #######################################
         # rosalia_psf: Alejandro S. Borlaff. NASA/Ames STA. a.s.borlaff@nasa.gov
         # -------------------------------
@@ -987,6 +987,12 @@ class exposure():
                 - ``'pytorch'`` (default): GPU-accelerated and batched PyTorch implementation with
                   zero gradient tracking and size-quantized star batches.
                 - ``'numpy'``: Legacy NumPy serial / threadpool implementation.
+
+            memory_fraction (float, optional):
+                Fraction of available hardware RAM/VRAM to allocate as the dynamic operational budget
+                when ``method='superback'`` (typically 0.60 to 0.80, default 0.70).
+                Adaptive batch sizing and spatial chunking dynamically scale to this budget to maximize
+                hardware utilization without exceeding system capacity.
 
             **kwargs:
                 Additional arguments passed to the underlying PSF generator.
@@ -1089,6 +1095,7 @@ class exposure():
             dtype=dtype,
             backend=backend,
             verbose=verbose,
+            memory_fraction=memory_fraction,
             **kwargs,
         )
 

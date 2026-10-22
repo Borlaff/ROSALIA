@@ -76,6 +76,88 @@ def resolve_device_and_dtype(device=None, dtype=None):
     return device, dtype
 
 
+def get_device_memory_info(device=None, memory_fraction=0.70):
+    """
+    Query available free memory for the target hardware and calculate adaptive budgets.
+
+    Parameters
+    ----------
+    device : str or torch.device, optional
+        Target hardware device ('cuda', 'mps', 'cpu', or None).
+    memory_fraction : float, default 0.70
+        Fraction of available memory to allocate for the operational budget (typically 0.60 to 0.80).
+
+    Returns
+    -------
+    dict
+        Adaptive memory parameters:
+        - 'free_bytes': int, raw available free memory in bytes
+        - 'total_bytes': int, total device/system memory in bytes
+        - 'budget_bytes': int, operational memory budget in bytes
+        - 'memory_fraction': float, clamped fraction used (0.10 to 0.90)
+        - 'chunk_size': int, adaptive spatial tile size for large stamps (e.g. 1024, 2048, 4096)
+        - 'chunk_threshold': int, stamp size boundary above which stars are chunked
+        - 'budget_scale': float, relative scaling factor for star batch sizes
+    """
+    device, _ = resolve_device_and_dtype(device, None)
+    fraction = max(0.10, min(0.90, float(memory_fraction)))
+
+    free_bytes = None
+    total_bytes = None
+
+    # 1. Query CUDA VRAM
+    if device.type == "cuda" and torch.cuda.is_available():
+        try:
+            dev_idx = device.index if device.index is not None else torch.cuda.current_device()
+            free_bytes, total_bytes = torch.cuda.mem_get_info(dev_idx)
+        except Exception:
+            pass
+
+    # 2. Query Apple Silicon unified memory / CPU system RAM
+    if free_bytes is None:
+        try:
+            import psutil
+            vm = psutil.virtual_memory()
+            free_bytes = vm.available
+            total_bytes = vm.total
+            if device.type == "mps" and hasattr(torch, "mps") and hasattr(torch.mps, "recommended_max_memory"):
+                rec_max = torch.mps.recommended_max_memory()
+                free_bytes = min(free_bytes, rec_max)
+        except Exception:
+            free_bytes = 4 * 1024**3
+            total_bytes = 8 * 1024**3
+
+    budget_bytes = int(free_bytes * fraction)
+
+    # Determine adaptive chunk size and chunk threshold based on budget
+    # 1 tile of size C requires ~ 250 * C^2 bytes peak transient memory
+    if budget_bytes >= 8 * 1024**3:
+        chunk_size = 4096
+        chunk_threshold = 2048
+    elif budget_bytes >= 2 * 1024**3:
+        chunk_size = 2048
+        chunk_threshold = 2048
+    elif budget_bytes >= 600 * 1024**2:
+        chunk_size = 1024
+        chunk_threshold = 1024
+    else:
+        chunk_size = 512
+        chunk_threshold = 512
+
+    # Relative scaling for batch sizing compared to 2 GB baseline
+    budget_scale = max(0.5, min(4.0, budget_bytes / (2.0 * 1024**3)))
+
+    return {
+        "free_bytes": free_bytes,
+        "total_bytes": total_bytes,
+        "budget_bytes": budget_bytes,
+        "memory_fraction": fraction,
+        "chunk_size": chunk_size,
+        "chunk_threshold": chunk_threshold,
+        "budget_scale": budget_scale,
+    }
+
+
 def create_psf_grid(size_pixels, scale_arcsec=0.108, oversample_factor=1,
                     device=None, dtype=torch.float64):
     """
@@ -330,7 +412,8 @@ def superback_roman_psf_pytorch(position, SCA, bandpass, shape=None, SED=None,
                                 magnitude_weights=None, wave_weights=None,
                                 oversample_factor=1, flux_weights=None, zp=23.9,
                                 pixel_scale=0.11, device=None, dtype=torch.float64,
-                                num_anchors=10, return_tensor=False, **kwargs):
+                                num_anchors=10, return_tensor=False,
+                                memory_fraction=0.70, chunk_size=None, **kwargs):
     """
     Render a flux-calibrated, chromatic Roman/WFI PSF with the SUPERBACK model in PyTorch.
 
@@ -403,7 +486,11 @@ def superback_roman_psf_pytorch(position, SCA, bandpass, shape=None, SED=None,
     wave_anchors_nm = np.linspace(filter_wave_nm[0], filter_wave_nm[-1], num_anchors)
     beta = compute_anchor_weights(sample_wave_nm, weights, wave_anchors_nm, device=device, dtype=dtype)
 
-    if fov > 2048:
+    mem_info = get_device_memory_info(device=device, memory_fraction=memory_fraction)
+    eff_chunk_size = chunk_size if chunk_size is not None else mem_info["chunk_size"]
+    eff_chunk_threshold = mem_info["chunk_threshold"]
+
+    if fov > eff_chunk_threshold:
         # Spatial chunking for gigantic single stamps to prevent OOM
         calc_dtype = torch.float32
         wave_anchors_m = torch.tensor(wave_anchors_nm * 1e-9, dtype=calc_dtype, device=device)
@@ -432,7 +519,7 @@ def superback_roman_psf_pytorch(position, SCA, bandpass, shape=None, SED=None,
             dtype=calc_dtype,
         )
 
-        CHUNK_SIZE = 2048
+        CHUNK_SIZE = eff_chunk_size
         psf_data = np.zeros((ny, nx), dtype=np.float32)
         y_crop_start = (fov - ny) // 2
         x_crop_start = (fov - nx) // 2
@@ -493,7 +580,7 @@ def superback_roman_psf_pytorch(position, SCA, bandpass, shape=None, SED=None,
         )
         return hdu
 
-    # Coordinate grid for standard-sized stamps (fov <= 2048)
+    # Coordinate grid for standard-sized stamps (fov <= eff_chunk_threshold)
     x_src, y_src = create_psf_grid(
         fov, scale_arcsec=0.108, oversample_factor=oversample_factor,
         device=device, dtype=dtype
@@ -544,7 +631,7 @@ def superback_roman_psf_pytorch(position, SCA, bandpass, shape=None, SED=None,
     return hdu
 
 
-def partition_stars_by_size(star_items, n_workers=None):
+def partition_stars_by_size(star_items, n_workers=None, budget_scale=1.0, chunk_threshold=2048):
     """
     Partition stars into batches of identical stamp sizes.
 
@@ -562,17 +649,17 @@ def partition_stars_by_size(star_items, n_workers=None):
     while i < n_stars:
         current_size = star_items[i]["raw_stamp_size"]
 
-        # Dynamic batch sizing to optimize GPU cores and memory
+        # Dynamic batch sizing adapted to hardware memory budget
         if current_size <= 129:
-            max_b = 64
+            max_b = min(256, max(16, int(64 * budget_scale)))
         elif current_size <= 257:
-            max_b = 32
+            max_b = min(128, max(8, int(32 * budget_scale)))
         elif current_size <= 513:
-            max_b = 16
+            max_b = min(64, max(4, int(16 * budget_scale)))
         elif current_size <= 1025:
-            max_b = 8
-        elif current_size <= 2049:
-            max_b = 2
+            max_b = min(32, max(2, int(8 * budget_scale)))
+        elif current_size <= chunk_threshold:
+            max_b = min(8, max(1, int(2 * budget_scale)))
         else:
             max_b = 1  # Gigantic stars spatially chunked individually
 
@@ -605,20 +692,20 @@ def partition_stars_by_size(star_items, n_workers=None):
 def render_batch_into_canvas(batch_size, stars, wave_anchors_nm, canvas,
                              device=None, dtype=torch.float64, pixel_scale=0.11,
                              verbose=False, pbar=None, batch_info=None,
-                             chunk_size=2048):
+                             chunk_size=2048, chunk_threshold=2048):
     """
     Render a batch of stars sharing the exact same stamp size and inject in-place into canvas.
 
-    For gigantic stamps (S > 2048), stars are spatially chunked into tiles of size `chunk_size`
-    (default 2048x2048) intersecting the Roman canvas bounding box. This prevents any multi-gigabyte
-    memory allocations and eliminates OOM / process kills while preserving exact flux conservation.
+    For gigantic stamps (S > chunk_threshold), stars are spatially chunked into tiles of size `chunk_size`
+    intersecting the Roman canvas bounding box. This prevents any multi-gigabyte memory allocations
+    and eliminates OOM / process kills while preserving exact flux conservation.
     """
     S = batch_size
     n_batch = len(stars)
     num_anchors = len(wave_anchors_nm)
     wave_anchors_m = torch.tensor(wave_anchors_nm * 1e-9, dtype=dtype, device=device)
 
-    if S > 2048:
+    if S > chunk_threshold:
         # Spatial chunking for gigantic stamps (e.g. m <= 2 bright stars Alpha Cen, Sirius, etc.)
         calc_dtype = torch.float32
         wave_anchors_m = wave_anchors_m.to(calc_dtype)
@@ -811,7 +898,8 @@ def _inject_psf_patch(canvas, psf_tensor, star_x, star_y, S):
 @torch.inference_mode()
 def build_psf_canvas_pytorch(stars_catalog, shape_out, bandpass, depth=31,
                              n_workers=None, device=None, dtype=torch.float64,
-                             pixel_scale=0.11, num_anchors=10, verbose=True):
+                             pixel_scale=0.11, num_anchors=10, verbose=True,
+                             memory_fraction=0.70, chunk_size=None):
     """
     Build a full Roman WFI PSF canvas in PyTorch using size-bucketed multiprocessing.
 
@@ -837,6 +925,10 @@ def build_psf_canvas_pytorch(stars_catalog, shape_out, bandpass, depth=31,
         Anchor wavelengths for chromatic integration.
     verbose : bool, default True
         Whether to display progress.
+    memory_fraction : float, default 0.70
+        Fraction of available RAM/VRAM to allocate as the dynamic operational budget (typically 0.60 to 0.80).
+    chunk_size : int, optional
+        Override spatial chunk size (if None, adaptively computed based on available memory).
 
     Returns
     -------
@@ -845,6 +937,11 @@ def build_psf_canvas_pytorch(stars_catalog, shape_out, bandpass, depth=31,
     """
     device, dtype = resolve_device_and_dtype(device, dtype)
     dtype = dtype or torch.float64
+
+    mem_info = get_device_memory_info(device=device, memory_fraction=memory_fraction)
+    eff_chunk_size = chunk_size if chunk_size is not None else mem_info["chunk_size"]
+    eff_chunk_threshold = mem_info["chunk_threshold"]
+    budget_scale = mem_info["budget_scale"]
 
     canvas = np.zeros(shape_out, dtype=float)
     if stars_catalog.empty:
@@ -898,13 +995,20 @@ def build_psf_canvas_pytorch(stars_catalog, shape_out, bandpass, depth=31,
         })
 
     # 3. Partition into batches of matching stamp sizes (always >= required)
-    batches = partition_stars_by_size(star_items, n_workers=n_workers)
+    batches = partition_stars_by_size(
+        star_items, n_workers=n_workers, budget_scale=budget_scale, chunk_threshold=eff_chunk_threshold
+    )
     num_batches = len(batches)
     total_stars = len(star_items)
 
     # 4. Dispatch batches across device with progress tracking
     if verbose:
+        free_gb = mem_info["free_bytes"] / 1024**3
+        total_gb = mem_info["total_bytes"] / 1024**3
+        budget_gb = mem_info["budget_bytes"] / 1024**3
+        pct = int(mem_info["memory_fraction"] * 100)
         avg_stars = total_stars / num_batches if num_batches > 0 else 0.0
+
         # Batch with most stars (if tied, pick the one with highest stamp size)
         max_stars_batch = max(batches, key=lambda b: (len(b[1]), b[0]))
         max_count = len(max_stars_batch[1])
@@ -916,12 +1020,13 @@ def build_psf_canvas_pytorch(stars_catalog, shape_out, bandpass, depth=31,
         min_stars_biggest_batch = max(min_stars_batches, key=lambda b: b[0])
         min_count = len(min_stars_biggest_batch[1])
         min_size = min_stars_biggest_batch[0]
-        min_note = " (spatially-chunked)" if min_size > 2048 else ""
+        min_note = " (spatially-chunked)" if min_size > eff_chunk_threshold else ""
 
         print(f"\n[PyTorch SUPERBACK] Hardware device: {device.type.upper()} ({dtype}) | Canvas: {shape_out[0]}x{shape_out[1]}", flush=True)
+        print(f"[PyTorch SUPERBACK] Memory: {free_gb:.1f} GB free of {total_gb:.1f} GB | Adaptive budget ({pct}%): {budget_gb:.1f} GB (tile size: {eff_chunk_size}x{eff_chunk_size})", flush=True)
         print(f"[PyTorch SUPERBACK] Star catalog: {total_stars} stars | Batches: {num_batches} | Avg stars/batch: {avg_stars:.1f}", flush=True)
         if num_batches == 1:
-            note = " (spatially-chunked)" if max_size > 2048 else ""
+            note = " (spatially-chunked)" if max_size > eff_chunk_threshold else ""
             print(f"  • Single batch: {max_count} star(s) | stamp size {max_size}x{max_size}{note}", flush=True)
         else:
             print(f"  • Batch with most stars: {max_count} star(s) | stamp size {max_size}x{max_size}", flush=True)
@@ -950,7 +1055,8 @@ def build_psf_canvas_pytorch(stars_catalog, shape_out, bandpass, depth=31,
             render_batch_into_canvas(
                 batch_size, stars, wave_anchors_nm, canvas,
                 device=device, dtype=dtype, pixel_scale=pixel_scale,
-                verbose=verbose, pbar=pbar, batch_info=(b_idx, num_batches)
+                verbose=verbose, pbar=pbar, batch_info=(b_idx, num_batches),
+                chunk_size=eff_chunk_size, chunk_threshold=eff_chunk_threshold
             )
             if pbar is not None:
                 pbar.update(len(stars))
