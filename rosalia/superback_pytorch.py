@@ -25,6 +25,12 @@ from astropy.io import fits
 if "PYTORCH_ENABLE_MPS_FALLBACK" not in os.environ:
     os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
 
+# Ensure SUPERBACK_PATH points to ROSALIACACHE/CORE/superback if available
+if "SUPERBACK_PATH" not in os.environ and "ROSALIACACHE" in os.environ:
+    cache_sb = os.path.join(os.environ["ROSALIACACHE"], "CORE", "superback")
+    if os.path.isdir(cache_sb):
+        os.environ["SUPERBACK_PATH"] = cache_sb
+
 import rosalia as rs
 import rosalia.superback as superback
 

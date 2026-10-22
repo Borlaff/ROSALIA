@@ -2,6 +2,12 @@ import numpy as np
 import os
 from scipy.special import j1
 import copy
+
+# Ensure SUPERBACK_PATH points to ROSALIACACHE/CORE/superback if available
+if "SUPERBACK_PATH" not in os.environ and "ROSALIACACHE" in os.environ:
+    cache_sb = os.path.join(os.environ["ROSALIACACHE"], "CORE", "superback")
+    if os.path.isdir(cache_sb):
+        os.environ["SUPERBACK_PATH"] = cache_sb
 '''
 This module calculates the surface brightness of the Roman WFI PSF at a given angular offset from 
 a given source. This code is optimized for large angular offsets from the source, and takes a different
