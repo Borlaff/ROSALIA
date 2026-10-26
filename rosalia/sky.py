@@ -64,7 +64,8 @@ def rebin(a, newshape):
     return a[tuple(indices)]
 
 
-def rebin_transmission_curve(filter_transmission_curve, nbins, verbose=False):
+def rebin_transmission_curve(wavelength_bins,transmission_bins, nbins, verbose=False):
+    from scipy import interpolate
 
     # This program takes as input a table with two columns
     # 1) lambda_AA: Wavelength in Angstroms
@@ -89,8 +90,8 @@ def rebin_transmission_curve(filter_transmission_curve, nbins, verbose=False):
     #transmission_curve = ascii.read(filter_curve_name)
 
     # We assume the first column contains lambda, and the second the transmission
-    wavelength = filter_transmission_curve["Wavelength"]
-    transmission = filter_transmission_curve["Transmission"]
+    wavelength = wavelength_bins
+    transmission = transmission_bins
 
     # We generate an interpolator function with the datapoints from the table
     good = np.where(np.isfinite(wavelength) & np.isfinite(transmission))
@@ -159,7 +160,7 @@ def get_zodiacal_background(astropywcs, wavelength=None,
     # Check that ra and dec arguments are in array
     if isinstance(wavelength, (dict)):
 
-        rebinned_filter_curve = rebin_transmission_curve(filter_transmission_curve=wavelength["filter_transmission_curve"],
+        rebinned_filter_curve = rebin_transmission_curve(wavelength["wavelength_bins"],wavelength["transmission_bins"],
                                                          nbins=nbins_wavelength, verbose=verbose)
         rebinned_transmission = rebinned_filter_curve["rebinned_transmission"]
 
@@ -198,10 +199,10 @@ def get_zodiacal_background(astropywcs, wavelength=None,
 
     # For each wavelength bin, we do this query
     if zody_mode.lower() == "irsa":
-        zody_MJysr = irsa_zody(ra=detector_grid["grid_world"][0], 
-                               dec=detector_grid["grid_world"][1], 
-                               wavelength=rebinned_wavelength, 
-                               weights=rebinned_transmission, 
+        zody_MJysr = irsa_zody(ra=detector_grid["grid_world"][0],
+                               dec=detector_grid["grid_world"][1],
+                               wavelength=rebinned_wavelength,
+                               weights=rebinned_transmission,
                                expstart=expstart, obslocin=obslocin)
 
 
@@ -221,7 +222,7 @@ def get_zodiacal_background(astropywcs, wavelength=None,
                                  wavelength=rebinned_wavelength.to("um").value,
                                  weights=rebinned_transmission,
                                  expstart=expstart,verbose=verbose)
-        
+
     x = detector_grid["grid_xy"][:,0]
     y = detector_grid["grid_xy"][:,1]
     xsize = int(np.max(x))
@@ -236,7 +237,7 @@ def get_zodiacal_background(astropywcs, wavelength=None,
     else:
         zody_interp = zody_MJysr
 
-    zody_interp = zody_interp*(u.MJy * u.steradian**-1) 
+    zody_interp = zody_interp*(u.MJy * u.steradian**-1)
 
     if output_units == "e/s":
         if verbose: print("Output units:" + output_units)
@@ -253,21 +254,20 @@ def get_zodiacal_background(astropywcs, wavelength=None,
         #es_to_MJysr = ris_bandpass.etomjysr(bandpass=wavelength["wavelength"], sca=sca)*u.MJy * u.steradian**-1 * u.s # The factor F such that MJy / sr = F * DN/s
         #zody_interp = zody_interp/es_to_MJysr
 
-        
+
         zody_interp = rs.constants.MJysr_to_Jyarcsec2*zody_interp # Jy/arcsec2
         mu = -2.5*np.log10(zody_interp.value)+8.9
-        zody_interp = rs.detectors.mu2fe(mu=mu, 
+        zody_interp = rs.detectors.mu2fe(mu=mu,
                                          instrument="WFI",
-                                         filter_name=wavelength["wavelength"], 
-                                         telescope="Roman", 
+                                         filter_name=wavelength["wavelength"],
+                                         telescope="Roman",
                                          verbose=verbose)
-        
+
 
         if verbose: print("Output units: e/s")
 
     else:
         if verbose: print("Output units: MJy/Sr")
-    # print('tmptmp&&&&&&&&&&&&&',zody_interp)
 
     return(zody_interp.T)
 
@@ -406,7 +406,8 @@ def zodipy_zody(ra, dec, wavelength, weights, expstart, obspos="earth"):
     #print("Zodipy wave:")
     #print(wavelength)
     # Initialize a zodiacal light model at a wavelength/frequency or over a bandpass
-    model = zodipy.Model(wavelength*u.micron, weights=weights, extrapolate=True)
+    #Force dirbe model because other options do not have accurate coverage at Roman's low wavelengths
+    model = zodipy.Model(wavelength*u.micron, weights=weights, extrapolate=True, name='dirbe')
 
     # Evaluate the zodiacal light model
     # Here the solution depends from obspos.
@@ -480,7 +481,7 @@ def stsci_zody(ra, dec, wavelength, weights, expstart,verbose=False):
         if cache_check not in cache_record:
 
             #Call the background class lifted from StSci's rbt.py module
-            bkg = background(r, d, verbose=verbose)
+            bkg = background(r, d)
 
             #return the wavelength array and matching zodiacal light array if
             # day is in the available calendary days, otherwise return nans
@@ -530,6 +531,8 @@ def get_healpix(nside, ra, dec):
 
 #########################################
 
+#sln deleted thresh and wavlenegth from class because only needed for deleted bathtub routine, which we don't use
+#sln hard-coded in paths to cache files for now and healpix properties
 class background:
     """
     Main background class. Loads background data for a specific (RA, DEC)
@@ -543,31 +546,43 @@ class background:
         Declination in decimal degrees
     wavelength : float
         Wavelength (micron)
+    thresh : float, optional
+        Background threshold (default 1.1)
     """
 
     import copy
 
 
-    def __init__(self, ra, dec,verbose=False):
+    def __init__(self, ra, dec):
         # Remote source (no local caching)
-        self.remote_dir = "https://archive.stsci.edu/missions/roman/simulations/straylight/sl_cache/"
-        self.cache_version = "2025.5"
-
+        # self.remote_dir = _CACHE["cache_dir"] #sln
+        # self.cache_version = str(_CACHE["cache_version"])
+        self.remote_dir = "https://archive.stsci.edu/missions/roman/simulations/straylight/sl_cache/" #sln
 
         # Static refdata (still read from local repo files)
+        # self.local_path = Path(__file__).parent / "refdata" #sln
+        # # self.wave_file = get_remote_data("wave_file") #sln
+        # # self.thermal_file = get_remote_data("thermal_file")
+        # self.wave_file = "std_spectrum_wavelengths.txt"
+        # self.thermal_file = "thermal_curve_roman_rryan_v1.0.csv"
 
-        #sln
-        # self.local_path = Path(__file__).parent / "refdata"
         self.local_path = 'https://raw.githubusercontent.com/spacetelescope/roman_notebooks/main/notebooks/background_visualization_tool/refdata' #sln
-
         self.wave_file = "std_spectrum_wavelengths.txt"
         self.thermal_file = "thermal_curve_roman_rryan_v1.0.csv"
 
+
         # Healpix details used by cache partitioning
-        self.nside = 128
+        # self.nside = int(_HEALPIX["nside"]) #sln
+        # ordering = str(_HEALPIX["ordering"]).upper()
+        self.nside = 128 #sln
+        ordering = "RING"
+
+        if ordering not in {"RING", "NESTED"}:
+            raise ValueError("HEALPix ordering must be RING or NESTED.")
+        self.nest = ordering == "NESTED"
 
         # Load static spectral grids / thermal background
-        self.abs_wave_array, self.thermal_wave_array, self.thermal_bg = self.read_static_data(verbose=verbose)
+        self.abs_wave_array, self.thermal_wave_array, self.thermal_bg = self.read_static_data()
         self.sl_abs_nwave = self.abs_wave_array.size
         self.sl_thermal_nwave = self.thermal_wave_array.size
 
@@ -579,23 +594,19 @@ class background:
         self.cache_file = self.myfile_from_healpix(ra, dec)
 
         # Load and prepare all per-position data
-        self.bkg_data = self.read_bkg_data_from_url(self.cache_file,verbose=verbose)
+        self.bkg_data = self.read_bkg_data_from_url(self.cache_file)
 
     # ---------- File / data loading ----------
 
     def myfile_from_healpix(self, ra, dec):
         """Map (RA, DEC) to the cache file path via healpix indexing."""
-        healpix_idx = hp.pixelfunc.ang2pix(self.nside, ra, dec, nest=False, lonlat=True)
+        healpix_idx = hp.pixelfunc.ang2pix(self.nside, ra, dec, nest=self.nest, lonlat=True) #lsn healpy to hp
         healpix_str_pad = str(healpix_idx).zfill(6)
         return f"{healpix_str_pad[0:4]}/sl_pix_{healpix_str_pad}.bin"
 
-    def read_static_data(self,verbose=False):
+    def read_static_data(self):
         """Load static wavelength grid and thermal curve from refdata."""
-        if verbose: #sln
-            print(f"Loading static wavelength grid from {self.local_path + '/' + self.wave_file}.") #sln
         abs_wave_array = np.loadtxt(self.local_path + '/' + self.wave_file)
-        if verbose: #sln
-            print(f"Loading thermal wavelength grid from {self.local_path + '/' + self.thermal_file}.")
         thermal = np.transpose(np.genfromtxt(self.local_path + '/' + self.thermal_file, delimiter=","))
 
         thermal_wave_array = thermal[0]
@@ -603,6 +614,12 @@ class background:
 
         return abs_wave_array, thermal_wave_array, thermal_flux
 
+        #sln new way temporary comment out and pasted old way above
+        # return validate_reference_data(
+        #     self.local_path / self.wave_file,
+        #     self.local_path / self.thermal_file,
+        # )
+        #
     # ---------- Remote cache reading ----------
 
     def read_bkg_data_from_url(self, cache_file, verbose=False):
@@ -610,11 +627,11 @@ class background:
         Read one Roman background file (.bin) directly from the STScI-hosted URL,
         parse it into arrays, and return the structured dict.
         """
-        import urllib.request as url_request
+
         url = self.remote_dir.rstrip("/") + "/" + cache_file
         if verbose: #sln
             print(f"Loading background file from {url}")
-        with url_request.urlopen(url) as response:
+        with urllib.request.urlopen(url) as response:
             file_data = response.read()
 
         buf = io.BytesIO(file_data)
@@ -648,22 +665,10 @@ class background:
         date_map = nonzodi_bg["iday_index"][0]  # 366 entries: -1 for invalid, >=0 for valid mapping
 
         # Initial "calendar" are the day-of-year indices with data
+        # (sun-angle constraints are already encoded in the cache date_map)
         calendar = np.where(date_map >= 0)[0]
-
         if verbose:
             print("Valid days in file:", calendar.size, "of", len(date_map))
-
-        # Apply Roman sun-angle constraint using tgt_vis (visibility mask)
-        target = SkyCoord(self.ra * u.degree, self.dec * u.degree, frame="icrs")
-        c = compute_visibility(
-            target, report=True, fileout="vis_debug.txt",
-            interval_sampling_days=1, interval_start_time=None, interval_duration_days=366,
-        )
-        c.get_good_angles()
-        good_indices = np.where(c.df_results["good_angles"].values)[0]  # day-of-year indices (0..365)
-
-        # Keep only days that are both in the file and visible
-        calendar = calendar[np.isin(calendar, good_indices)]
 
         # Map from calendar (day-of-year) to the sequential index space in zodi_sl_bgs
         # The file packs only valid days sequentially; the mapping is via date_map
@@ -687,37 +692,30 @@ class background:
             self.abs_wave_array, nonzodi_bg_flux, self.thermal_wave_array, fill=0.0
         )
 
-        # Base total = static (nonzodi + thermal) + zodi(day)
+        # Smooth the hard 0.5 μm cutoff on the cache-derived components
+        # (NIRCam ratio corrections are already in the R2025.9+ cache).
+        for dd in range(Ndays):
+            _, zodi_bgs_int[dd] = self.modify_background(zodi_bgs_int[dd])
+        _, nonzodi_bg_int = self.modify_background(nonzodi_bg_int)
+        # _, thermal_bg_smoothed = self.modify_background(self.thermal_bg)  # scaling the thermal component. Not done now.
+
+        # Total = smoothed non-zodi + thermal + smoothed zodi
+        # total_bg = np.tile(nonzodi_bg_int + thermal_bg_smoothed, (Ndays, 1)) + zodi_bgs_int
         total_bg = np.tile(nonzodi_bg_int + self.thermal_bg, (Ndays, 1)) + zodi_bgs_int
 
-        # Apply NIRCam-informed modification to total and components
-        for dd in range(Ndays):
-            if dd == 0:
-                mod_wave_array, mod_total_bg_first = self.modify_background(total_bg[dd])
-                mod_total_bg = np.zeros((Ndays, len(mod_total_bg_first)))
-                mod_total_bg[dd] = mod_total_bg_first
-            else:
-                _, mod_total_bg[dd] = self.modify_background(total_bg[dd])
-
-        mod_zodi_bgs_int = np.zeros((Ndays, self.sl_thermal_nwave))
-        for dd in range(Ndays):
-            _, mod_zodi_bgs_int[dd] = self.modify_background(zodi_bgs_int[dd])
-        _, mod_nonzodi_flux = self.modify_background(nonzodi_bg_int)
-
         return {
-            "calendar": np.array(calendar),      # day-of-year indices that survived visibility gating
+            "calendar": np.array(calendar),
             "ra": ra,
             "dec": dec,
             "pos": pos,
             "wave_array": self.thermal_wave_array,
-            "nonzodi_bg": mod_nonzodi_flux,
+            "nonzodi_bg": nonzodi_bg_int,
             "thermal_bg": self.thermal_bg,
-            "zodi_bg": mod_zodi_bgs_int,
-            "total_bg": mod_total_bg,
+            "zodi_bg": zodi_bgs_int,
+            "total_bg": total_bg,
         }
 
     # ---------- Spectral modification / interpolation ----------
-
     def modify_background(self, bg_flux):
         """
         E. Han's modification to incorporate NIRCam measurements.
@@ -735,41 +733,7 @@ class background:
                 [bg_flux_to_mod[first_pass[0]], bg_flux_to_mod[first_pass[-1]]],
             )
 
-        # NIRCam pivot wavelengths and ratios (technical report)
-        pivot_wvl = [0.705, 0.902, 1.154, 1.501]
-        measured_bg_ratio = [0.656, 0.680, 0.819, 0.982]
-
-        bg_model = np.interp(pivot_wvl, bg_wvl_to_mod, bg_flux_to_mod)
-        measured_bg_nircam = np.array(measured_bg_ratio) * bg_model
-
-        # Quadratic fit of ratio for extrapolation 0.41–0.624 μm
-        fit = np.polyfit(pivot_wvl, measured_bg_ratio, 2)
-        wvl_fix_indices = np.where((bg_wvl_to_mod >= 0.41) & (bg_wvl_to_mod <= 0.624))[0]
-        bg_wvl_to_fix = bg_wvl_to_mod[wvl_fix_indices]
-        solution = fit[0] * bg_wvl_to_fix**2 + fit[1] * bg_wvl_to_fix + fit[2]
-        bg_flux_polyfit = solution * bg_flux_to_mod[wvl_fix_indices]
-
-        original_blue = np.where(bg_wvl_to_mod <= 0.41)[0]
-        original_red = np.where(bg_wvl_to_mod >= 1.668)[0]
-
-        bg_wvl_mod = np.concatenate((
-            bg_wvl_to_mod[original_blue],
-            bg_wvl_to_fix,
-            np.array(pivot_wvl),
-            bg_wvl_to_mod[original_red]
-        ))
-        bg_flux_mod = np.concatenate((
-            bg_flux_to_mod[original_blue],
-            bg_flux_polyfit,
-            measured_bg_nircam,
-            bg_flux_to_mod[original_red]
-        ))
-
-        # Interpolate back to the thermal grid
-        bg_flux_mod_interp = self.interpolate_spec(
-            bg_wvl_mod, bg_flux_mod, self.thermal_wave_array, fill=0.0
-        )
-        return bg_wvl_mod, bg_flux_mod_interp
+        return bg_wvl_to_mod, bg_flux_to_mod
 
     def interpolate_spec(self, wave, specin, new_wave, fill=np.nan):
         """Interpolate spectral data to a new wavelength grid."""
@@ -779,7 +743,6 @@ class background:
 #########################################
 
 class compute_visibility():
-    from astropy.coordinates import get_body
 
     def __init__(self,targets_coordinates,fileout=None,report=False,interval_sampling_days=None,interval_start_time=None,interval_duration_days=None):
 
