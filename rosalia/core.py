@@ -243,7 +243,7 @@ class exposure():
         observer['DATA_SHAPE'] = [4088, 4088]
         observer['DATA'] = 18*[np.zeros(observer['DATA_SHAPE'])]
         observer['PIXSCALE'] = rs.telescopes.Roman.get_pixscale(instrument=observer['INSTRUME']).to("degree").value
-        observer['FILTER_PARAMS'] = {"NAME": observer["FILTER"], "TELESCOPE": "RST", "INSTRUMENT": "WFI", "DETECTOR": "WFI"}
+        observer['FILTER_PARAMS'] = {"NAME": observer["FILTER"], "TELESCOPE": "Roman", "INSTRUMENT": "WFI", "DETECTOR": "WFI"}
         
         # Generic derived definitions. 
         self.TELESCOP = observer['TELESCOP']
@@ -924,7 +924,7 @@ class exposure():
 #####################################################################################
 
 
-    def psf(self, g_mag_max=15, depth=31, catalog=None, method='superback', n_stars=None, n_workers=None, verbose=False, device=None, dtype=None, backend='pytorch', memory_fraction=0.70, **kwargs):
+    def psf(self, g_mag_max=15, depth=31, catalog=None, method='superback', n_stars=None, n_workers=None, verbose=False, device=None, dtype=None, backend='pytorch', memory_fraction=0.70, return_segmentation=False, mag_segment_offset=2, dilation_radius=2, **kwargs):
         #######################################
         # rosalia_psf: Alejandro S. Borlaff. NASA/Ames STA. a.s.borlaff@nasa.gov
         # -------------------------------
@@ -994,12 +994,28 @@ class exposure():
                 Adaptive batch sizing and spatial chunking dynamically scale to this budget to maximize
                 hardware utilization without exceeding system capacity.
 
+            return_segmentation (bool, optional):
+                If True, simultaneously generate and return an integer star segmentation map where
+                each label corresponds to a star (smaller stars placed on top of bigger stars). Default is False.
+
+            mag_segment_offset (float, optional):
+                Magnitude offset relative to ``depth`` defining the surface brightness threshold for the
+                segmentation footprint (``depth - mag_segment_offset``). Default is 2.
+
+            dilation_radius (int, optional):
+                Radius in pixels for morphological dilation on each star footprint in PyTorch
+                (fills empty holes between diffraction rings and spikes). Default is 2.
+
             **kwargs:
                 Additional arguments passed to the underlying PSF generator.
 
         Returns
         -------
-            (psf, wcs_list, canvas) : tuple
+            tuple:
+                If ``return_segmentation=False`` (default):
+                    (detectors, wcs_list, canvas)
+                If ``return_segmentation=True``:
+                    (detectors, wcs_list, canvas, seg_detectors, seg_canvas)
                 The 18 detectors as a list of `np.ndarray` containing the PSF models.
                 The list of WCS objects for each detector.
                 The footprint of the WFI.
@@ -1057,11 +1073,13 @@ class exposure():
 
         # Find stars around the entire WFI footprint
         stars_in_footprint = self.is_inside_wfi(ra=self.source_catalog["ra"], dec=self.source_catalog["dec"])
-        stars_catalog = self.source_catalog[stars_in_footprint]
+        stars_catalog = self.source_catalog[stars_in_footprint].copy()
         if n_stars is not None:
-            stars_catalog = stars_catalog.head(n_stars)
-        
-        
+            stars_catalog = stars_catalog.head(n_stars).copy()
+
+        if "seg_id" not in stars_catalog.columns:
+            stars_catalog["seg_id"] = np.arange(1, len(stars_catalog) + 1, dtype=np.int32)
+
         # Find the closest detector to each star
         stars_catalog["detector_id"] = self.find_closest_detector(ra=stars_catalog["ra"], dec=stars_catalog["dec"]) + 1
 
@@ -1086,8 +1104,8 @@ class exposure():
         if verbose:
             print(f"[exposure.psf] Selected {len(stars_catalog)} in-field stars inside WFI footprint (depth={depth}).", flush=True)
 
-        # Build the PSF canvas for the stars in the catalog
-        canvas = rs.psf.build_psf_canvas(
+        # Build the PSF canvas (and optional segmentation map) for the stars in the catalog
+        canvas_result = rs.psf.build_psf_canvas(
             stars_catalog,
             shape_out=self.shape_out,
             bandpass=self.FILTER,
@@ -1099,13 +1117,34 @@ class exposure():
             backend=backend,
             verbose=verbose,
             memory_fraction=memory_fraction,
+            return_segmentation=return_segmentation,
+            mag_segment_offset=mag_segment_offset,
+            dilation_radius=dilation_radius,
             **kwargs,
         )
+
+        if return_segmentation:
+            canvas, seg_canvas = canvas_result
+        else:
+            canvas = canvas_result
+            seg_canvas = None
 
         detectors, wcs_list = rs.psf.recover_roman_detectors_from_canvas(
             canvas, self.optimal_wcs, detector_wcs=self.ASTROPYWCS, pixscale=0.11, verbose=verbose
         )
-        
+
+        if return_segmentation:
+            seg_detectors, _ = rs.psf.recover_roman_detectors_from_canvas(
+                seg_canvas, self.optimal_wcs, detector_wcs=self.ASTROPYWCS, pixscale=0.11, verbose=verbose, order=0
+            )
+            self.psf_canvas = canvas
+            self.psf_seg_canvas = seg_canvas
+            self.psf_detectors = detectors
+            self.psf_seg_detectors = seg_detectors
+            return detectors, wcs_list, canvas, seg_detectors, seg_canvas
+
+        self.psf_canvas = canvas
+        self.psf_detectors = detectors
         return detectors, wcs_list, canvas 
 
     def zodiacal(self, zody_mode="zodipy", verbose=False, output_name=None, output_units="e/s", resolution=1,

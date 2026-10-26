@@ -329,3 +329,113 @@ def test_exposure_psf_creation():
     assert psf_out[2] is not None  # Canvas geometry
     assert isinstance(psf_out[2], np.ndarray)  # Canvas geometry
     assert np.sum(psf_out[2]) > 0  # Canvas is not empty
+
+
+def test_exposure_psf_segmentation():
+    from astropy.time import Time
+    from astropy.coordinates import SkyCoord
+    from astropy.wcs import WCS
+
+    target = 'alpha Centauri'
+    ra = 219.92041
+    dec = -60.835148
+    pa = 30
+    date = Time("2027-01-01T00:00:00")
+    bandpass = "F129"
+    exptime = 600
+
+    observer = {
+        "TELESCOP": "Roman/WFI",
+        "pointing": [ra, dec],
+        "FILTER": bandpass,
+        "PA_Y": pa,
+        "EXPSTART": date.mjd,
+        "EXPTIME": exptime,
+    }
+
+    exposure = rs.core.exposure(observer=observer, prefix="test_seg")
+
+    out = exposure.psf(
+        catalog=_STAR_CATALOG,
+        n_stars=3,
+        depth=27,
+        return_segmentation=True,
+        mag_segment_offset=2,
+        verbose=False,
+    )
+
+    assert out is not None
+    assert isinstance(out, tuple)
+    assert len(out) == 5
+    detectors, wcs_list, canvas, seg_detectors, seg_canvas = out
+
+    # Check flux canvas & segmentation canvas
+    assert canvas.shape == seg_canvas.shape
+    assert seg_canvas.dtype == np.int32
+    assert np.any(seg_canvas > 0)
+
+    # Check detector segmentation cutouts
+    assert len(seg_detectors) == 18
+    for i in range(18):
+        assert seg_detectors[i].shape == (4088, 4088)
+        assert np.issubdtype(seg_detectors[i].dtype, np.integer)
+
+    # Check exposure attributes
+    assert exposure.psf_canvas is canvas
+    assert exposure.psf_seg_canvas is seg_canvas
+    assert exposure.psf_detectors is detectors
+    assert exposure.psf_seg_detectors is seg_detectors
+
+
+def test_psf_segmentation_dilation():
+    import torch
+    import pandas as pd
+    from rosalia.superback_pytorch import dilate_mask_pytorch, create_dilation_disk, build_psf_canvas_pytorch
+
+    # 1. Test morphological dilation on a synthetic mask with an empty hole
+    # Create an annular mask with a hole at the center (5, 5)
+    mask = torch.zeros((11, 11), dtype=torch.bool)
+    mask[3, 5] = True
+    mask[7, 5] = True
+    mask[5, 3] = True
+    mask[5, 7] = True
+    assert not mask[5, 5]  # Center is empty hole
+
+    # Dilate by 2 pixels using PyTorch circular disk
+    dilated = dilate_mask_pytorch(mask, radius=2)
+    assert dilated[5, 5]  # Hole is filled by 2-pixel dilation
+
+    # 2. Test kernel creation
+    disk = create_dilation_disk(radius=2)
+    assert disk.shape == (1, 1, 5, 5)
+    assert disk[0, 0, 2, 2] == 1.0  # Center
+    assert disk[0, 0, 0, 0] == 0.0  # Corner beyond radius 2 (0^2 + 0^2 > 4 from center)
+
+    # 3. Test build_psf_canvas_pytorch with dilation_radius=0 vs dilation_radius=2
+    cat_df = pd.DataFrame(_STAR_CATALOG)
+    cat_df["x"] = [100.0, 300.0, 500.0, 700.0, 900.0][:len(cat_df)]
+    cat_df["y"] = [100.0, 300.0, 500.0, 700.0, 900.0][:len(cat_df)]
+    cat_df["x_det"] = 2048.0
+    cat_df["y_det"] = 2048.0
+    cat_df["detector_id"] = 1
+
+    sub_cat = cat_df.iloc[:2].copy()
+    shape_out = (500, 500)
+
+    canvas_raw, seg_raw = build_psf_canvas_pytorch(
+        sub_cat, shape_out=shape_out, bandpass="F129", depth=22,
+        return_segmentation=True, mag_segment_offset=2, dilation_radius=0, verbose=False
+    )
+
+    canvas_dil, seg_dil = build_psf_canvas_pytorch(
+        sub_cat, shape_out=shape_out, bandpass="F129", depth=22,
+        return_segmentation=True, mag_segment_offset=2, dilation_radius=2, verbose=False
+    )
+
+    # Dilation should expand footprint and close gaps
+    assert np.sum(seg_dil > 0) > np.sum(seg_raw > 0)
+    # Both star labels must be present
+    assert len(np.unique(seg_dil)) == 3  # 0 (background) + 2 star labels
+    assert seg_dil.dtype == np.int32
+
+

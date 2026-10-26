@@ -91,9 +91,31 @@ def telescope_class_finder(telescope):
 
 def find_filter_in_svo(wavelength, telescope, instrument, detector, verbose=False):
 
-    # Check if the filter is in cache. 
-    filter_cache_filename = os.environ['ROSALIACACHE'] + "/CORE/filters/" + telescope + "_" + instrument + "_" + detector + "_" + wavelength + ".pkl"
-    if os.path.exists(filter_cache_filename):
+    # Handle exceptions with naming upfront
+    # ----------------------------------- #
+    if telescope.lower() in ("hubble", "hst"):
+        telescope = "HST"
+    elif telescope.lower() in ("rst", "roman", "roman/wfi"):
+        telescope = "Roman"
+    if instrument.lower() in ("acs/wfc", "acs", "acs/hrc", "acs/sbc"):
+        instrument = "ACS"
+
+    # Check if the filter is in cache (checking aliases as well).
+    cache_base = os.environ.get('ROSALIACACHE', '')
+    candidates = [telescope]
+    if telescope == "Roman":
+        candidates.extend(["RST", "ROMAN"])
+    elif telescope == "RST":
+        candidates.extend(["Roman", "ROMAN"])
+
+    filter_cache_filename = None
+    for cand in candidates:
+        fn = os.path.join(cache_base, "CORE", "filters", f"{cand}_{instrument}_{detector}_{wavelength}.pkl")
+        if os.path.exists(fn):
+            filter_cache_filename = fn
+            break
+
+    if filter_cache_filename is not None and os.path.exists(filter_cache_filename):
         if verbose: print("Filter " + wavelength + " found in cache. Loading from " + filter_cache_filename)
         filter_db = rs.utils.load_dict(filter_cache_filename)
         return(filter_db)
@@ -106,21 +128,12 @@ def find_filter_in_svo(wavelength, telescope, instrument, detector, verbose=Fals
             print("Input filter name " + wavelength + "")
             print("Looking for " + wavelength + " in SVO library")
 
-        # Handle exceptions with naming
-        # ----------------------------------- #
-        if telescope.lower() == "hubble" or telescope.lower() == "hst":
-            telescope = "HST"
-        if instrument.lower() == "acs/wfc" or instrument.lower() == "acs" or instrument.lower() == "acs/hrc" or instrument.lower() == "acs/sbc":
-            instrument = "ACS"
-        if telescope.lower() == "rst" or telescope.lower() == "roman" or telescope.lower() == "roman/wfi":
-            telescope = "Roman"
-
-        #if True:
+        filter_list = None
         try:
             filter_list = SvoFps.get_filter_list(facility=telescope, instrument=instrument).to_pandas()
 
-        except:
-            print("Filter " + wavelength +  " not found.")
+        except Exception as exc:
+            print("Filter " + wavelength +  " not found or SVO query failed: " + str(exc))
             print("Please use a wavelength between 0.5 - 2000 microns")
             print("Or a STRAYCOR compatible filter name")
             print("No filter found. Check input data")
@@ -128,6 +141,9 @@ def find_filter_in_svo(wavelength, telescope, instrument, detector, verbose=Fals
             print("Telescope: " + telescope)
             print("Instrument: " + instrument)
             print("Detector: " + detector)
+
+        if filter_list is None:
+            raise RuntimeError(f"Could not load filter {wavelength} for {telescope}/{instrument} from SVO or cache.")
 
         #return(matched_filter)
 

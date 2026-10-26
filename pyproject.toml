@@ -50,6 +50,7 @@ dependencies = [
     "astroquery",
     "scipy",
     "matplotlib",
+    "astropy",
     "astropy_healpix",
     "pytest",
     "celluloid",
@@ -62,7 +63,14 @@ dependencies = [
     "pysiaf",
     "stpsf",
     "ephessos",
-    "asdf-astropy>=0.11.0"
+    "asdf-astropy>=0.11.0",
+    "torch>=2.0.0",
+    "zodipy",
+    "crds",
+    "dill",
+    "s3fs",
+    "pyarrow",
+    "roman_datamodels"
 ]
 
 [project.urls]

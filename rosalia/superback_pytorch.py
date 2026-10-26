@@ -694,11 +694,53 @@ def partition_stars_by_size(star_items, n_workers=None, budget_scale=1.0, chunk_
     return batches
 
 
+def create_dilation_disk(radius=2, device="cpu", dtype=torch.float32):
+    """
+    Create a 4D circular disk convolution kernel (1, 1, 2r+1, 2r+1) for PyTorch morphological dilation.
+    """
+    if radius <= 0:
+        return None
+    k_size = 2 * radius + 1
+    y, x = torch.meshgrid(
+        torch.arange(k_size, device=device) - radius,
+        torch.arange(k_size, device=device) - radius,
+        indexing="ij",
+    )
+    disk = ((x**2 + y**2) <= radius**2).to(dtype=dtype, device=device).unsqueeze(0).unsqueeze(0)
+    return disk
+
+
+def dilate_mask_pytorch(mask, radius=2, kernel=None):
+    """
+    Morphologically dilate a 2D binary mask in PyTorch using a circular disk kernel.
+    Fills empty holes and gaps between PSF diffraction rings and spikes.
+    """
+    if radius <= 0:
+        return mask if mask.dtype == torch.bool else (mask > 0)
+
+    if kernel is None:
+        kernel = create_dilation_disk(radius=radius, device=mask.device, dtype=torch.float32)
+    elif kernel.device != mask.device:
+        kernel = kernel.to(mask.device)
+
+    orig_shape = mask.shape
+    inp = mask.to(dtype=torch.float32)
+    if inp.dim() == 2:
+        inp = inp.unsqueeze(0).unsqueeze(0)
+    elif inp.dim() == 3:
+        inp = inp.unsqueeze(1)
+
+    dilated = torch.nn.functional.conv2d(inp, kernel, padding=radius) > 0
+    return dilated.view(orig_shape)
+
+
 @torch.inference_mode()
 def render_batch_into_canvas(batch_size, stars, wave_anchors_nm, canvas,
                              device=None, dtype=torch.float64, pixel_scale=0.11,
                              verbose=False, pbar=None, batch_info=None,
-                             chunk_size=2048, chunk_threshold=2048):
+                             chunk_size=2048, chunk_threshold=2048,
+                             seg_canvas=None, flux_thresh=0.0,
+                             dilation_radius=2, dilation_kernel=None):
     """
     Render a batch of stars sharing the exact same stamp size and inject in-place into canvas.
 
@@ -795,8 +837,20 @@ def render_batch_into_canvas(batch_size, stars, wave_anchors_nm, canvas,
                     chrom_chunk = torch.sum(mono_norm * beta.view(-1, 1, 1), dim=0)
                     del mono_norm
 
-                    canvas[cy0:cy1, cx0:cx1] += chrom_chunk.detach().cpu().numpy()
-                    del chrom_chunk
+                    chunk_np = chrom_chunk.detach().cpu().numpy()
+                    canvas[cy0:cy1, cx0:cx1] += chunk_np
+
+                    if seg_canvas is not None and star.get("seg_id", 0) > 0:
+                        target_seg = seg_canvas[cy0:cy1, cx0:cx1]
+                        chunk_mask = (chrom_chunk >= flux_thresh)
+                        if dilation_radius > 0:
+                            chunk_mask = dilate_mask_pytorch(
+                                chunk_mask, radius=dilation_radius, kernel=dilation_kernel
+                            )
+                        mask = chunk_mask.detach().cpu().numpy() & (target_seg == 0)
+                        target_seg[mask] = star["seg_id"]
+
+                    del chrom_chunk, chunk_np
 
             del coords, norm_sums, beta
 
@@ -862,7 +916,12 @@ def render_batch_into_canvas(batch_size, stars, wave_anchors_nm, canvas,
             if c_sum > 0:
                 chromatic_star *= (req_flux / c_sum)
 
-            _inject_psf_patch(canvas, chromatic_star, star["x"], star["y"], S)
+            _inject_psf_patch(
+                canvas, chromatic_star, star["x"], star["y"], S,
+                seg_canvas=seg_canvas, star_label=star.get("seg_id", 0),
+                flux_thresh=flux_thresh,
+                dilation_radius=dilation_radius, dilation_kernel=dilation_kernel,
+            )
             del chromatic_star
 
         del base_mirror, x_meters, y_meters, theta, k
@@ -873,9 +932,12 @@ def render_batch_into_canvas(batch_size, stars, wave_anchors_nm, canvas,
         torch.mps.empty_cache()
 
 
-def _inject_psf_patch(canvas, psf_tensor, star_x, star_y, S):
+def _inject_psf_patch(canvas, psf_tensor, star_x, star_y, S,
+                      seg_canvas=None, star_label=0, flux_thresh=0.0,
+                      dilation_radius=2, dilation_kernel=None):
     """
-    In-place injection of PSF patch into the NumPy canvas.
+    In-place injection of PSF patch into the NumPy canvas, and optional star segmentation labeling.
+    Morphological dilation with PyTorch closes empty holes between diffraction rings and spikes.
     """
     center_x = int(np.rint(star_x))
     center_y = int(np.rint(star_y))
@@ -896,8 +958,36 @@ def _inject_psf_patch(canvas, psf_tensor, star_x, star_y, S):
         psf_x_end = psf_x_start + (canvas_x_end - canvas_x_start)
         psf_y_end = psf_y_start + (canvas_y_end - canvas_y_start)
 
-        patch = psf_tensor[psf_y_start:psf_y_end, psf_x_start:psf_x_end].detach().cpu().numpy()
+        crop_torch = psf_tensor[psf_y_start:psf_y_end, psf_x_start:psf_x_end]
+        if isinstance(crop_torch, torch.Tensor):
+            patch = crop_torch.detach().cpu().numpy()
+        else:
+            patch = crop_torch
+            crop_torch = torch.from_numpy(patch)
+
         canvas[canvas_y_start:canvas_y_end, canvas_x_start:canvas_x_end] += patch
+
+        if seg_canvas is not None and star_label > 0:
+            target_seg = seg_canvas[canvas_y_start:canvas_y_end, canvas_x_start:canvas_x_end]
+            # Compute initial flux-threshold mask in PyTorch
+            star_mask_torch = (crop_torch >= flux_thresh)
+            # Morphological dilation in PyTorch to close empty holes between rings/spikes
+            if dilation_radius > 0:
+                star_mask_torch = dilate_mask_pytorch(
+                    star_mask_torch, radius=dilation_radius, kernel=dilation_kernel
+                )
+            mask_np = star_mask_torch.detach().cpu().numpy()
+
+            # Smaller stars are injected first; larger stars injected later cannot overwrite
+            mask = mask_np & (target_seg == 0)
+            if not np.any(mask) and patch.size > 0:
+                # Guarantee at least the peak pixel is tracked if unclaimed
+                py, px = np.unravel_index(np.argmax(patch), patch.shape)
+                if target_seg[py, px] == 0:
+                    target_seg[py, px] = star_label
+            else:
+                target_seg[mask] = star_label
+
         del patch
 
 
@@ -905,7 +995,9 @@ def _inject_psf_patch(canvas, psf_tensor, star_x, star_y, S):
 def build_psf_canvas_pytorch(stars_catalog, shape_out, bandpass, depth=31,
                              n_workers=None, device=None, dtype=torch.float64,
                              pixel_scale=0.11, num_anchors=10, verbose=True,
-                             memory_fraction=0.70, chunk_size=None):
+                             memory_fraction=0.70, chunk_size=None,
+                             return_segmentation=False, mag_segment_offset=2,
+                             seg_dtype=np.int32, zp=23.9, dilation_radius=2):
     """
     Build a full Roman WFI PSF canvas in PyTorch using size-bucketed multiprocessing.
 
@@ -935,11 +1027,21 @@ def build_psf_canvas_pytorch(stars_catalog, shape_out, bandpass, depth=31,
         Fraction of available RAM/VRAM to allocate as the dynamic operational budget (typically 0.60 to 0.80).
     chunk_size : int, optional
         Override spatial chunk size (if None, adaptively computed based on available memory).
+    return_segmentation : bool, default False
+        Whether to create and return a simultaneous integer star segmentation map.
+    mag_segment_offset : float, default 2
+        Magnitude offset from depth for the segmentation footprint threshold (depth - mag_segment_offset).
+    seg_dtype : numpy.dtype, default np.int32
+        Integer data type for the star segmentation map (keeps memory footprint small).
+    zp : float, default 23.9
+        AB zero point in nJy convention for flux threshold calculation.
+    dilation_radius : int, default 2
+        Radius in pixels for morphological dilation on each star footprint in PyTorch (fills holes between rings/spikes).
 
     Returns
     -------
-    np.ndarray
-        Accumulated PSF canvas of shape `shape_out`.
+    np.ndarray or tuple of (np.ndarray, np.ndarray)
+        Accumulated PSF canvas of shape `shape_out`, or (psf_canvas, seg_canvas) if return_segmentation=True.
     """
     device, dtype = resolve_device_and_dtype(device, dtype)
     dtype = dtype or torch.float64
@@ -958,7 +1060,14 @@ def build_psf_canvas_pytorch(stars_catalog, shape_out, bandpass, depth=31,
 
     canvas = np.zeros(shape_out, dtype=float)
     if stars_catalog.empty:
+        if return_segmentation:
+            return canvas, np.zeros(shape_out, dtype=seg_dtype)
         return canvas
+
+    seg_canvas = np.zeros(shape_out, dtype=seg_dtype) if return_segmentation else None
+    mu_limit = float(depth - mag_segment_offset)
+    flux_thresh = float((pixel_scale**2) * 10.0**(0.4 * (zp - mu_limit)))
+    dilation_kernel = create_dilation_disk(dilation_radius, device=device) if (return_segmentation and dilation_radius > 0) else None
 
     # 1. Filter curves
     bp = rs.telescopes.Roman.get_filter(instrument="WFI", filter_name=bandpass)
@@ -982,8 +1091,8 @@ def build_psf_canvas_pytorch(stars_catalog, shape_out, bandpass, depth=31,
 
         star = rs.psf.Star(row)
         magnitude = star.get_magnitudes(bandpass)
-        extension = rs.psf.get_psf_extension_moffat(magnitude, depth=depth)
-        radius_pixels = max(1, int(np.ceil(extension / pixel_scale)))
+        extension = rs.psf.get_psf_extension_spikes(magnitude, depth=depth)
+        radius_pixels = max(30, int(np.ceil(extension / pixel_scale)))
         raw_stamp_size = 2 * radius_pixels + 1
 
         wave_weights, flux_weights = star.get_linear_weights(bandpass)
@@ -998,6 +1107,7 @@ def build_psf_canvas_pytorch(stars_catalog, shape_out, bandpass, depth=31,
 
         star_items.append({
             "source_id": row.get("source_id", idx),
+            "seg_id": int(row.get("seg_id", idx + 1 if isinstance(idx, (int, np.integer)) else len(star_items) + 1)),
             "x": x,
             "y": y,
             "detector_id": detector_id,
@@ -1081,7 +1191,9 @@ def build_psf_canvas_pytorch(stars_catalog, shape_out, bandpass, depth=31,
                 batch_size, stars, wave_anchors_nm, canvas,
                 device=device, dtype=dtype, pixel_scale=pixel_scale,
                 verbose=verbose, pbar=pbar, batch_info=(b_idx, num_batches),
-                chunk_size=eff_chunk_size, chunk_threshold=eff_chunk_threshold
+                chunk_size=eff_chunk_size, chunk_threshold=eff_chunk_threshold,
+                seg_canvas=seg_canvas, flux_thresh=flux_thresh,
+                dilation_radius=dilation_radius, dilation_kernel=dilation_kernel,
             )
             if pbar is not None:
                 pbar.update(len(stars))
@@ -1093,4 +1205,6 @@ def build_psf_canvas_pytorch(stars_catalog, shape_out, bandpass, depth=31,
         print(f"[PyTorch SUPERBACK] Completed injection of {total_stars} stars into canvas.\n", flush=True)
 
     gc.collect()
+    if return_segmentation:
+        return canvas, seg_canvas
     return canvas

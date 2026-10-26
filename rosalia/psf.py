@@ -430,14 +430,17 @@ def get_roman_canvas_geometry(pixscale=0.11):
     return origin, shape
 
 
-def _sample_image(image, x, y):
-    # Bilinear sampling at 0-based pixel positions. NaN outside the image.
+def _sample_image(image, x, y, order=1):
+    # Bilinear or nearest sampling at 0-based pixel positions. NaN (or 0 for integer/mask) outside the image.
     from scipy.ndimage import map_coordinates
     ny, nx = image.shape
     inside = (x >= -0.5) & (x <= nx - 0.5) & (y >= -0.5) & (y <= ny - 0.5)
+    is_int = np.issubdtype(image.dtype, np.integer)
+    fill_val = 0 if is_int else np.nan
+    actual_order = 0 if is_int else order
     values = map_coordinates(image, [np.clip(y, 0, ny - 1), np.clip(x, 0, nx - 1)],
-                             order=1, mode="nearest")
-    return np.where(inside, values, np.nan)
+                             order=actual_order, mode="nearest")
+    return np.where(inside, values, fill_val)
 
 
 def _fit_tan_wcs(pix_x, pix_y, ra, dec, sip_degree=None, array_shape=None):
@@ -512,7 +515,7 @@ def make_roman_canvas_from_detectors(data_list, wcs_list, pixscale=0.11):
     return canvas, canvas_wcs
 
 
-def recover_roman_detectors_from_canvas(canvas, canvas_wcs, pixscale=0.11, sip_degree=3, detector_wcs=None, verbose=False):
+def recover_roman_detectors_from_canvas(canvas, canvas_wcs, pixscale=0.11, sip_degree=3, detector_wcs=None, verbose=False, order=None):
     """
     Function 2. Inverse of make_roman_canvas_from_detectors. Extract the 18 Roman/WFI detector
     arrays (4088x4088, WFI01 to WFI18) from a canvas built with the same pixscale, using pysiaf
@@ -526,7 +529,11 @@ def recover_roman_detectors_from_canvas(canvas, canvas_wcs, pixscale=0.11, sip_d
     canvas_wcs. Those WCS are returned unchanged.
     """
     center, detectors = _roman_apertures()
-    canvas = np.asarray(canvas, dtype=np.float32)
+    canvas = np.asarray(canvas)
+    is_int = np.issubdtype(canvas.dtype, np.integer)
+    sample_order = 0 if is_int else (1 if order is None else order)
+    out_dtype = canvas.dtype if is_int else np.float32
+
     if detector_wcs is not None:
         pix = np.arange(ROMAN_DETECTOR_SIZE)
         px, py = np.meshgrid(pix, pix)
@@ -541,7 +548,7 @@ def recover_roman_detectors_from_canvas(canvas, canvas_wcs, pixscale=0.11, sip_d
         for wcs in iterator:
             ra, dec = wcs.all_pix2world(px, py, 0)
             cx, cy = canvas_wcs.all_world2pix(ra, dec, 0)
-            data_list.append(_sample_image(canvas, cx, cy).astype(np.float32))
+            data_list.append(_sample_image(canvas, cx, cy, order=sample_order).astype(out_dtype))
         return data_list, list(detector_wcs)
 
     origin, shape = get_roman_canvas_geometry(pixscale)
@@ -558,7 +565,7 @@ def recover_roman_detectors_from_canvas(canvas, canvas_wcs, pixscale=0.11, sip_d
     data_list, wcs_list = [], []
     for detector in detectors:
         cx, cy = _detector_to_canvas(center, detector, px, py, pixscale, origin)
-        data_list.append(_sample_image(canvas, cx, cy).astype(np.float32))
+        data_list.append(_sample_image(canvas, cx, cy, order=sample_order).astype(out_dtype))
 
         pcx, pcy = _detector_to_canvas(center, detector, gx, gy, pixscale, origin)
         ra, dec = canvas_wcs.all_pix2world(pcx, pcy, 0)
@@ -2298,6 +2305,54 @@ def moffat_2d(shape, mu0, alpha, beta):
     r = np.sqrt((x - x_cen)**2 + (y - y_cen)**2)
     return mu0 + 2.5 * beta * np.log10(1 + (r/alpha)**2)
 
+def get_psf_extension_spikes(m_star, mu_target, l=0.91, w=0.0758, n_struts=6, ainner=.783/2, aouter=2.553/2):
+    """
+    Angular extent of a Roman WFI diffraction spike down to a given surface brightness.
+
+    Returns the radius (arcsec) from the star at which the peak envelope of a
+    single strut spike falls to `mu_target`.
+
+    Parameters
+    ----------
+    m_star : float
+        Magnitude of the star, in the same band as `mu_target`.
+    mu_target : float
+        Target surface brightness in mag/arcsec^2, in the same band as `m_star`.
+    l : float, default 0.91
+        Strut length in meters (the fitted `l` of the bars from romanspikes).
+    w : float, default 0.0758
+        Strut width in meters (the fitted `w`). Only enters through the open area.
+    n_struts : int, default 6
+        Number of struts, used to subtract n_struts*l*w from the pupil area.
+    ainner : float, default 0.3915
+        Radius of the central obscuration (secondary) in meters.
+    aouter : float, default 1.2765
+        Radius of the primary aperture in meters.
+
+    Returns
+    -------
+    float
+        Spike radius in arcsec.
+
+    Model assumptions
+    -----------------
+    - Surface brightness is the fraction of the star's flux per arcsec^2, |romanpsf|^2.
+    - A spike lies along the direction perpendicular to the strut, where the
+      along-strut sinc (length l) equals 1. The cross-spike width is ~ lambda/l.
+    - Along the spike, the cross-strut sinc (width w) gives amplitude ~ 1/theta,
+      so intensity ~ theta^-2.
+    - The result is the peak envelope S(theta) = l^2 / (pi^2 * A * theta^2), with
+      A = pi*(aouter^2 - ainner^2) - n_struts*l*w. Fringes average to half of this.
+    - Independent of wavelength; w enters only through the open area A.
+    - A single strut is assumed; overlapping struts and LOLO-diffuser bars add
+      coherently (see spike_extent_numeric).
+    - The Airy halo (theta^-3) is ignored.
+    - Factor 0.11*0.67 is empirically calculated to match observed spike extents.
+    """
+    A = np.pi*(aouter**2 - ainner**2) - n_struts*l*w
+    S = 10**(-0.4*(mu_target - m_star))
+    return (l/(np.pi*np.sqrt(A*S)))*0.11*0.67
+
 def get_psf_extension_moffat(mag, depth=30, alpha=0.08, beta=1.52):
     """
     Analytically calculate the PSF extension based on a standard Moffat profile at a given depth.
@@ -2337,7 +2392,9 @@ def get_psf_extension_moffat(mag, depth=30, alpha=0.08, beta=1.52):
 
 def build_psf_canvas(stars_catalog, shape_out, bandpass, depth=31, n_workers=None,
                      method="superback", backend="pytorch", device=None, dtype=None,
-                     memory_fraction=0.70, **kwargs):
+                     memory_fraction=0.70, return_segmentation=False,
+                     mag_segment_offset=2, seg_dtype=np.int32, zp=23.9,
+                     dilation_radius=2, **kwargs):
     '''
     Build a PSF canvas from a catalog of stars in parallel.
 
@@ -2366,13 +2423,25 @@ def build_psf_canvas(stars_catalog, shape_out, bandpass, depth=31, n_workers=Non
         dtype: torch.dtype, optional
             Floating-point precision for PyTorch tensors. Defaults to float32 on Apple MPS
             and float64 on CUDA/CPU.
+        memory_fraction: float, optional
+            Fraction of available RAM/VRAM to allocate as the dynamic operational budget.
+        return_segmentation: bool, optional
+            Whether to create and return a simultaneous integer star segmentation map.
+        mag_segment_offset: float, optional
+            Magnitude offset from depth for segmentation footprint threshold (depth - mag_segment_offset).
+        seg_dtype: numpy.dtype, optional
+            Integer data type for star segmentation map (default np.int32).
+        zp: float, optional
+            AB zero point in nJy convention (default 23.9).
+        dilation_radius: int, optional
+            Radius in pixels for morphological dilation on each star footprint (fills holes between rings/spikes, default 2).
         **kwargs:
             Additional parameters passed to the canvas builder.
 
     Returns
     -------
-        np.ndarray
-            PSF canvas of shape `shape_out`.
+        np.ndarray or tuple of (np.ndarray, np.ndarray)
+            PSF canvas of shape `shape_out`, or (psf_canvas, seg_canvas) if return_segmentation=True.
 
     Notes
     -----
@@ -2408,7 +2477,13 @@ def build_psf_canvas(stars_catalog, shape_out, bandpass, depth=31, n_workers=Non
 
     canvas = np.zeros(shape_out, dtype=float)
     if stars_catalog.empty:
+        if return_segmentation:
+            return canvas, np.zeros(shape_out, dtype=seg_dtype)
         return canvas
+
+    if "seg_id" not in stars_catalog.columns:
+        stars_catalog = stars_catalog.copy()
+        stars_catalog["seg_id"] = np.arange(1, len(stars_catalog) + 1, dtype=np.int32)
 
     if method == "superback" and backend and str(backend).lower() == "pytorch":
         try:
@@ -2422,6 +2497,11 @@ def build_psf_canvas(stars_catalog, shape_out, bandpass, depth=31, n_workers=Non
                 device=device,
                 dtype=dtype,
                 memory_fraction=memory_fraction,
+                return_segmentation=return_segmentation,
+                mag_segment_offset=mag_segment_offset,
+                seg_dtype=seg_dtype,
+                zp=zp,
+                dilation_radius=dilation_radius,
                 **kwargs,
             )
         except ImportError:
@@ -2435,6 +2515,10 @@ def build_psf_canvas(stars_catalog, shape_out, bandpass, depth=31, n_workers=Non
 
     from concurrent.futures import ThreadPoolExecutor
     from threading import Lock
+
+    seg_canvas = np.zeros(shape_out, dtype=seg_dtype) if return_segmentation else None
+    mu_limit = float(depth - mag_segment_offset)
+    flux_thresh = float((0.11**2) * 10.0**(0.4 * (zp - mu_limit)))
 
     canvas_lock = Lock()
     with tqdm(
@@ -2459,17 +2543,24 @@ def build_psf_canvas(stars_catalog, shape_out, bandpass, depth=31, n_workers=Non
                     canvas_lock,
                     method,
                     progress,
+                    0.11,
+                    seg_canvas,
+                    flux_thresh,
+                    dilation_radius,
                 )
                 for worker_catalog in worker_catalogs
             ]
             for future in futures:
                 future.result()
 
+    if return_segmentation:
+        return canvas, seg_canvas
     return canvas
 
 
 def _build_psf_for_worker(stars_catalog, depth, bandpass, canvas, canvas_lock,
-                          method="superback", progress=None, pixel_scale=0.11):
+                          method="superback", progress=None, pixel_scale=0.11,
+                          seg_canvas=None, flux_thresh=0.0, dilation_radius=2):
     '''
     Generate and inject the PSFs assigned to a worker into the shared canvas.
 
@@ -2532,9 +2623,25 @@ def _build_psf_for_worker(stars_catalog, depth, bandpass, canvas, canvas_lock,
             psf_x_end = psf_x_start + canvas_x_end - canvas_x_start
             psf_y_end = psf_y_start + canvas_y_end - canvas_y_start
             with canvas_lock:
-                canvas[canvas_y_start:canvas_y_end, canvas_x_start:canvas_x_end] += (
-                    psf_data[psf_y_start:psf_y_end, psf_x_start:psf_x_end]
-                )
+                patch = psf_data[psf_y_start:psf_y_end, psf_x_start:psf_x_end]
+                canvas[canvas_y_start:canvas_y_end, canvas_x_start:canvas_x_end] += patch
+                if seg_canvas is not None:
+                    star_label = int(row.get("seg_id", 0))
+                    if star_label > 0:
+                        target_seg = seg_canvas[canvas_y_start:canvas_y_end, canvas_x_start:canvas_x_end]
+                        star_mask = (patch >= flux_thresh)
+                        if dilation_radius > 0:
+                            from scipy.ndimage import binary_dilation
+                            y_k, x_k = np.ogrid[-dilation_radius:dilation_radius+1, -dilation_radius:dilation_radius+1]
+                            disk_struct = (x_k**2 + y_k**2) <= dilation_radius**2
+                            star_mask = binary_dilation(star_mask, structure=disk_struct)
+                        mask = star_mask & (target_seg == 0)
+                        if not np.any(mask) and patch.size > 0:
+                            py, px = np.unravel_index(np.argmax(patch), patch.shape)
+                            if target_seg[py, px] == 0:
+                                target_seg[py, px] = star_label
+                        else:
+                            target_seg[mask] = star_label
 
         del psf_data, psf_model, wave_weights, flux_weights, star
         if progress is not None:
