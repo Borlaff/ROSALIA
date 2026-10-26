@@ -17,9 +17,12 @@ notebooks/CAR171/*/
 notebooks/CAR171/BAK
 notebooks/CAR171/APT
 notebooks/tutorials/*/
+notebooks/SUN/*/
 *apt
 *.part
 *aptbackup
+
+variables.env
 
 PAPER_I/
 notebooks/MOCK/*/

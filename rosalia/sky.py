@@ -10,28 +10,26 @@
 # v.1.0 - 20 Enero 2023. First loading of programs inherited from former monolithic straycor.py
 # v.1.1 August 2026 integration with StSci zodiacal light calculator by SLN
 ##########################################################
-import os
 import io
-import urllib
+
 import healpy as hp
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
-import bottleneck as bn
+import rosalia as rs
+
+import zodipy
+
+
 import astropy.units as u
 from astropy.io import fits
 from astropy.time import Time
 from astropy.coordinates import SkyCoord
 import matplotlib.pyplot as plt
 # import gunagala.sky as skies # Gunagala is not maintained. It requires to detach from astropy_helpers. https://github.com/astropy/astropy-helpers
-import copy
-from scipy.interpolate import interp1d
-from astropy.coordinates import get_body
+from scipy.interpolate import interp1d, griddata
+
 import warnings
 from astropy.utils.exceptions import AstropyWarning
-import urllib.request
-
-import rosalia as rs
 
 def remove_zodiacal_light_acs(input_name, verbose=False):
     zody_interp_sci1 = get_zodiacal_background(input_name=input_name, ext=1, verbose=verbose)
@@ -57,18 +55,16 @@ def remove_zodiacal_light_acs(input_name, verbose=False):
 #####################################################
 
 def rebin(a, newshape):
-        '''Rebin an array to a new shape.
-        '''
-        # assert len(a.shape) == len(newshape)
-        slices = [ slice(0,old, float(old)/new) for old,new in zip(a.shape,newshape) ]
-        coordinates = np.mgrid[slices]
-        indices = coordinates.astype('i')   #choose the biggest smaller integer index
-        return a[tuple(indices)]
-
+    '''Rebin an array to a new shape.
+    '''
+    # assert len(a.shape) == len(newshape)
+    slices = [ slice(0,old, float(old)/new) for old,new in zip(a.shape,newshape) ]
+    coordinates = np.mgrid[slices]
+    indices = coordinates.astype('i')   #choose the biggest smaller integer index
+    return a[tuple(indices)]
 
 
 def rebin_transmission_curve(filter_transmission_curve, nbins, verbose=False):
-    from scipy import interpolate
 
     # This program takes as input a table with two columns
     # 1) lambda_AA: Wavelength in Angstroms
@@ -105,7 +101,7 @@ def rebin_transmission_curve(filter_transmission_curve, nbins, verbose=False):
         print("transmission[good]")
         print(transmission[good])
 
-    filter_interpolator = interpolate.interp1d(wavelength[good], transmission[good])
+    filter_interpolator = interp1d(wavelength[good], transmission[good])
 
     # We rebin to a new grid, defined by nbins
     rebinned_wavelength = rebin(wavelength, (nbins,))
@@ -143,10 +139,7 @@ def get_zodiacal_background(astropywcs, wavelength=None,
                             expstart=None, step=1000, zody_mode="stsci",
                             obspos = None,
                             nbins_wavelength=20, obslocin=3, grid_method="random",
-                            output_units=None, verbose=False, dointerpolate=True):
-
-    from scipy import interpolate
-    import astropy.wcs as astropy_wcs
+                            output_units=None, verbose=False, dointerpolate=True):    
 
     # Keywords for IRSA background query:
     # Check: https://irsa.ipac.caltech.edu/applications/BackgroundModel/docs/dustProgramInterface.html
@@ -239,7 +232,7 @@ def get_zodiacal_background(astropywcs, wavelength=None,
     points = [(x[i], y[i]) for i in range(len(x))]
 
     if dointerpolate:
-        zody_interp =  interpolate.griddata(points, zody_MJysr, (xv, yv), method="cubic")
+        zody_interp =  griddata(points, zody_MJysr, (xv, yv), method="cubic")
     else:
         zody_interp = zody_MJysr
 
@@ -278,30 +271,6 @@ def get_zodiacal_background(astropywcs, wavelength=None,
 
     return(zody_interp.T)
 
-########################################################
-"""
-def find_filter_curve_file(wavelength):
-    straycor_path = os.path.dirname(os.environ["ROSALIACACHE"])
-    filters_path = straycor_path + "/FILTERS/"
-    filters_list = glob.glob(filters_path + "*")
-
-    filter_match = []
-    for filter_name in filters_list:
-        if wavelength in filter_name:
-            filter_match.append(filter_name)
-
-    if len(filter_match) > 1:
-        print("More than one filter was found with " + wavelength + " name")
-        print(filter_match)
-        print("Check http://svo2.cab.inta-csic.es/theory/fps/index.php?mode=browse&gname=HST")
-        raise Exception("ERROR: Undefined filter name. Please use a more specific name")
-
-    else:
-        filter_match = filter_match[0]
-        print("Filter found: " + filter_match)
-
-    return(filter_match)
-"""
 
 #########################################
 
@@ -364,13 +333,7 @@ def gunagala_zody(ra, dec, wavelength, year, day):
     d['year'] = year
     d['day'] = day
     d['zody'] = zodi_intensity_pointing
-
-
     return(d)
-
-
-
-
 
 ##########################################
 
@@ -418,11 +381,7 @@ def zodipy_zody(ra, dec, wavelength, weights, expstart, obspos="earth"):
     mu_zody = surface brightness in Jy arcsec-2
     """
 
-    from astropy.coordinates import SkyCoord
-    import pandas as pd
-    import zodipy
-    import astropy.units as u
-    from astropy.time import Time
+
 
     if not isinstance(ra, (list, pd.core.series.Series, np.ndarray)):
         ra = np.array([ra])
@@ -586,6 +545,9 @@ class background:
         Wavelength (micron)
     """
 
+    import copy
+
+
     def __init__(self, ra, dec,verbose=False):
         # Remote source (no local caching)
         self.remote_dir = "https://archive.stsci.edu/missions/roman/simulations/straylight/sl_cache/"
@@ -648,11 +610,11 @@ class background:
         Read one Roman background file (.bin) directly from the STScI-hosted URL,
         parse it into arrays, and return the structured dict.
         """
-
+        import urllib.request as url_request
         url = self.remote_dir.rstrip("/") + "/" + cache_file
         if verbose: #sln
             print(f"Loading background file from {url}")
-        with urllib.request.urlopen(url) as response:
+        with url_request.urlopen(url) as response:
             file_data = response.read()
 
         buf = io.BytesIO(file_data)
@@ -817,6 +779,7 @@ class background:
 #########################################
 
 class compute_visibility():
+    from astropy.coordinates import get_body
 
     def __init__(self,targets_coordinates,fileout=None,report=False,interval_sampling_days=None,interval_start_time=None,interval_duration_days=None):
 

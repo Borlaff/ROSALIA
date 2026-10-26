@@ -6,16 +6,22 @@ import os
 import numpy as np
 import pandas as pd
 import rosalia as rs
+import ephessos as ep
+
 from datetime import datetime
 import matplotlib.pyplot as plt
+
 import astropy.units as u
 from astropy.time import Time
 from astropy.coordinates import SkyCoord
+from astropy import constants as const
+
 from tqdm import tqdm
+
+
 import logging
 logger = logging.getLogger()
 logger.setLevel(logging.CRITICAL)
-import ephessos as ep
 
 class exposure():
     """
@@ -86,6 +92,7 @@ class exposure():
         
     """
 
+    from astropy.io import fits
 
     def __init__(self, filename=None, prefix="", observer=None, telescope=None):
         import os 
@@ -234,9 +241,11 @@ class exposure():
             "WAVEMAX": self.FILTER_IDENTITY["lambda_max"].to("nm").value}
 
     def roman_wfi_exposure(self, observer, prefix="", verbose=False):
-        print("> Synthetic Roman_wfi_exposure")
-        # Here we expect observer={"TELESCOP": "Roman/WFI", "pointing": [RA_TARG, DEC_TARG], "FILTER":FILTER, "PA_Y": PA_Y, "EXPSTART": EXPSTART, "EXPTIME": EXPTIME}
+        print("> Synthetic Roman WFI exposure")
+        # Here we expect observer={"TELESCOP": "Roman/WFI", "pointing": [RA_TARG, DEC_TARG], 
+        #                          "FILTER":FILTER, "PA_Y": PA_Y, "EXPSTART": EXPSTART, "EXPTIME": EXPTIME}
         # Fixed parameters for Roman/WFI 
+
         observer['TELESCOP'] = "Roman"
         observer['INSTRUME'] = "WFI"
         observer['DETECTOR'] = "WFI"
@@ -319,27 +328,26 @@ class exposure():
     
 
     def plot_footprint(self, figsize=(10,10), verbose=True, ax=None, color='red', label=None):
-        # print("Hey! plot_footprint")
-        if verbose: print("Finding ra dec constraints")
-        # ra_dec_constraints = rs.gaia.find_ra_dec_constraints(self.RA_TARG, self.DEC_TARG, radius=self.FPA_NEAR_RADIUS, verbose=verbose)
         if verbose: print("Getting detector corners")
+
         exp_corners = self.get_detector_corners()
+
         if verbose: print("Plotting...")
+
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
+
         for i in range(len(self.SCIEXTS)):
             x = np.array(exp_corners[i]["corners_world"][:,0].tolist() + [exp_corners[i]["corners_world"][0,0]])
             y = np.array(exp_corners[i]["corners_world"][:,1].tolist() + [exp_corners[i]["corners_world"][0,1]])
             ax.plot(x, y, color=color, label=label)
-            # ax.set_xlim(ra_dec_constraints["ra_max"], ra_dec_constraints["ra_min"])
-            # ax.set_ylim(ra_dec_constraints["dec_min"], ra_dec_constraints["dec_max"])
             ax.set_xlabel("Right Ascension (degree)")
             ax.set_ylabel("Declination (degree)")
+
         return(ax)
     
 
     def find_nearby_ssos(self):
-        import ephessos as ep 
         sso_cone_search = ep.core.cone_search(ra=self.RA_TARG, dec=self.DEC_TARG, mjd=self.EXPSTART, search_radius=self.FPA_NEAR_RADIUS, verbose=False)
         return(sso_cone_search)
 
@@ -388,6 +396,7 @@ class exposure():
                                                     query_filename=self.source_catalog_filename)
             loader.stop()
         return(hybrid_catalog)
+
 
     def find_closest_detector(self, ra, dec):
         """
@@ -440,8 +449,6 @@ class exposure():
 
     def find_which_stars_are_inside_each_detector(self, verbose=False):
         # Find where each star lands (detector ID or outside FOV)
-
-        from tqdm import tqdm
         names_of_bool_columns_if_star_is_inside = []
         detector_square_list = []
 
@@ -466,13 +473,13 @@ class exposure():
             names_of_bool_columns_if_star_is_inside.append(name_column_is_star_inside_this_detector)
 
             self.source_catalog[name_column_is_star_inside_this_detector] = infield_stars["bool_isIn"]
-            # detector_corners = fpa_detector_corners[SCIEXT_i-1]
-            # If verbose, make a plot of the stars with the footprint.
-            # rs.detectors.get_detector_corners(wcs=self.ASTROPYWCS[SCIEXT_i-1])
             detector_square_list.append(np.concatenate([detector_corners["corners_world"], detector_corners["corners_world"]]))
+
         # Once you are done checking if the stars are inside each detector,
         # find out which stars are outside ALL detectors.
+
         self.source_catalog["is_inside_FPA"] = self.source_catalog[names_of_bool_columns_if_star_is_inside].any(axis=1)
+
         return(self.source_catalog)
 
 
@@ -532,10 +539,9 @@ class exposure():
     def HST_straylight(self):
 
         source_catalog = self.get_source_catalog()
-
         target_name = self.FILENAME
-
         straylight_images = []
+
         for i in range(len(self.SCIEXTS)):
             ra_detector, dec_detector, straylight_lvl  = rs.hst.hst_estimate_straylight_SCA(
                                                                 wcs=self.ASTROPYWCS[i],
@@ -649,11 +655,7 @@ class exposure():
 
         return(optimal_wcs[0], optimal_wcs[1])
 
-
-
     from concurrent.futures import ProcessPoolExecutor
-    from tqdm import tqdm
-
     @staticmethod
     def _parallel_roman_estimate_straylight_SCA(args):
         data_shape, wcs, SCIEXT_i, filter_identity, ra_stars_outside, dec_stars_outside, cat_id_outside, source_id_outside, irradiance_stars, ra_point, dec_point, pa_point, verbose = args
@@ -675,10 +677,6 @@ class exposure():
 
 
     def straylight(self, catalog=None, g_mag_max=15, sun_block=False, resolution=1, verbose=False):
-        from astropy import constants as const
-        from tqdm import tqdm 
-        from astropy.io import fits
-        
         #######################################
         # straylight: AKA. main_offender: Alejandro S. Borlaff. NASA/Ames STA. a.s.borlaff@nasa.gov
         # -------------------------------
@@ -697,6 +695,7 @@ class exposure():
         # v5 - 4 June 2026 - Adapted into a method of the exposure class. Now it can be used for any exposure, but the straylight estimation is currently only available for Roman/WFI exposures.
         #######################################
 
+        from astropy.io import fits 
 
         if self.TELESCOP.lower() == "hst":
             straylight_images= self.HST_straylight()

@@ -246,7 +246,7 @@ class query():
         
         # Re-order the column names 
         # results = results[col_list]
-        products = missions.get_unique_product_list(results)
+        products = missions.get_product_list(results)
 
         if file_suffix is not None:
             products = missions.filter_products(products, file_suffix='_cal')

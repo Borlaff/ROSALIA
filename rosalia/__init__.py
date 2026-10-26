@@ -69,8 +69,8 @@ __all__ = [
     "mosaics",
     "mast",
     "sky",
-    "skysurf",
     "sso",
+    "superback",
     "skywalker",
     "telescopes",
     "tests",
@@ -79,5 +79,4 @@ __all__ = [
     "albedo",
     "render",
     "attitude",
-    "roman_estimate_straylight_SCA"
 ]

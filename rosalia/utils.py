@@ -853,7 +853,7 @@ def create_custom_wcs(crpix, crval, cdelt, crota=[0,0], projection="TAN"):
     header = w.to_header()
     return(header)
 
-def create_dummy_image_with_wcs(ra_cen, dec_cen, ra_size, dec_size, pixscale, outname="default_dummy.fits"):
+def create_dummy_image_with_wcs(ra_cen, dec_cen, pa, ra_size, dec_size, pixscale, outname="default_dummy.fits"):
     # create_dummy_image_with_wcs.
     #
     # Input:
@@ -870,7 +870,7 @@ def create_dummy_image_with_wcs(ra_cen, dec_cen, ra_size, dec_size, pixscale, ou
     # Make the dummy image
     dummy_array = np.zeros((x_size, y_size))
 
-    header = create_custom_wcs(crpix=[x_size/2, y_size/2], crval=[ra_cen, dec_cen], cdelt=[pixscale, pixscale])
+    header = create_custom_wcs(crpix=[x_size/2, y_size/2], crval=[ra_cen, dec_cen], cdelt=[pixscale, pixscale], crota=[-pa, -pa])
 
     rs.utils.save_fits(array=dummy_array, name=outname, header=header)
 

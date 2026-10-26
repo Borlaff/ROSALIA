@@ -62,21 +62,6 @@ def create_roman_dummy(point, date, band, PA=None, exptime=500, output="default_
     #
     # --------------------------------------------- #
 
-    #import galsim
-    #import galsim.roman as roman
-
-    # Setting up the parameters in GalSim format
-    #ra_targ = coord.Angle(point.ra.degree*coord.degrees)
-    #dec_targ = coord.Angle(point.dec.degree*coord.degrees)
-    #targ_pos = galsim.CelestialCoord(ra=ra_targ, dec=dec_targ)
-
-    #if PA is not None:
-    #    WFI_PA = galsim.Angle(PA, coord.degrees)
-    #else:
-    #    WFI_PA = None
-
-    # import roman_datamodels
-
     # Starting the loop for the 18 SCAs
     temp_out_sca_filename_list = []
     temp_array_list = []
@@ -99,7 +84,7 @@ def create_roman_dummy(point, date, band, PA=None, exptime=500, output="default_
                             truncate=None,
                             scale_factor=1)
 
-        # Add this to include the distortion: 
+        # Add this to include the distortion: <- It does not work! 
         #distortion_file = parameters.reference_data["distortion"]
         #dist_model = roman_datamodels.datamodels.DistortionRefModel(distortion_file)
         #if distortion_file is not None:
@@ -364,7 +349,6 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
     # Level 1 stars are the closest. R to the center of the SCA of 1 degree.
     # Level 2 stars have a distance between 1 degree and 10 degrees to the center of the SCA.
     # Level 3 stars have a distance of 10 degrees or more to the SCA.
-
     level_1_critical_distance_to_star = 0.5 # degree
     level_2_critical_distance_to_star = 10 # degree
 
@@ -547,8 +531,6 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
         # -------------------------------------------------------------------------- #
         stray_main_offender_level_1 = straylight_level_1[where_max_stray]
         total_straylight_level_1 = bn.nansum(straylight_level_1)
-        # straylight_SCA[ymin:ymax, xmin:xmax] = straylight_SCA[ymin:ymax, xmin:xmax] + total_straylight_level_1
-        # straylight_minimal_storage_array[i] = straylight_minimal_storage_array[i] + total_straylight_level_1
 
         # -------------------------------------------------------------------------- #
         # 2 - Estimate the stray-light at the SCA level for mid-distance stars     #
@@ -579,8 +561,6 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
 
         stray_main_offender_level_2 = straylight_level_2[where_max_stray] # bn.nanmax(straylight_level_2)
         total_straylight_level_2 = bn.nansum(straylight_level_2)
-        #straylight_SCA[ymin:ymax, xmin:xmax] = straylight_SCA[ymin:ymax, xmin:xmax] + total_straylight_level_2
-        # straylight_minimal_storage_array[i] = straylight_minimal_storage_array[i] + total_straylight_level_2
 
         # -------------------------------------------------------------------------- #
         # 3 - Estimate the stray-light at the SCA level for long-distance stars      #
@@ -594,35 +574,25 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
                                                                 ra_point=ra_point, dec_point=dec_point, pa_point=pa_point, 
                                                                 ndi_name=ndi_name_3, level=level, rot_custom=rot_custom, verbose=True)
             
-            #NDI_level_3 = transfer_level_3/superpixel_mm2_area
-            #straylight_level_3 =     (NDI_level_3*(pixsize**2)*filter_identity["filter_transmission_ref"]*filter_identity["filter_lambda_ref"]*irradiance_level_3_stars/const.c/const.h).decompose()
             straylight_level_3 = transfer_level_3*NDI_conversion_factor_3
             where_max_stray = np.where(straylight_level_3.value == bn.nanmax(straylight_level_3))[0][0]
             id_main_offender_level_3 = id_level_3_stars[where_max_stray]
             source_id_main_offender_level_3 = source_id_level_3[where_max_stray]
-            # stray_main_offender_level_3 = straylight_level_3[where_max_stray]
-            # max_NDI_level_3 = NDI_level_3[where_max_stray]
 
         else:
             straylight_level_3 = np.array([0])/u.s
             id_main_offender_level_3 = 0
             stray_main_offender_level_3 = 0
             where_max_stray = 0
-            # max_NDI_level_3 = 0
             source_id_main_offender_level_3 = None
 
 
 
         stray_main_offender_level_3 = straylight_level_3[where_max_stray]
         total_straylight_level_3 = bn.nansum(straylight_level_3)
-        #straylight_SCA[ymin:ymax, xmin:xmax] = straylight_SCA[ymin:ymax, xmin:xmax] + total_straylight_level_3
-        # straylight_minimal_storage_array[i] = straylight_minimal_storage_array[i] + total_straylight_level_3
 
 
         # Combine the three levels of straylight and identify the main offender across all levels.
-        #print(stray_main_offender_level_1)
-        #print(stray_main_offender_level_2)
-        #print(stray_main_offender_level_3)
         main_offender_level_123 = np.array([stray_main_offender_level_1.value,
                                             stray_main_offender_level_2.value,
                                             stray_main_offender_level_3.value])
@@ -645,13 +615,10 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
             # print("NDI " + str([max_NDI_level_1, max_NDI_level_2, max_NDI_level_3]))
 
 
-        #straylight_SCA[ymin:ymax, xmin:xmax] = straylight_SCA[ymin:ymax, xmin:xmax] + total_straylight_level_1 + total_straylight_level_2 + total_straylight_level_3
-        #main_offender_SCA[ymin:ymax, xmin:xmax] = id_main_offender_level_123[main_offender_level_123 == bn.nanmax(main_offender_level_123)][0]
         straylight_total[i] = total_straylight_level_1 + total_straylight_level_2 + total_straylight_level_3 # straylight_SCA[ymid, xmid]
         mainoffender_total[i] = id_main_offender_level_123[main_offender_level_123 == bn.nanmax(main_offender_level_123)][0] #main_offender_SCA[ymid, xmid]
 
         # Plot the Roman/WFI loading bar
-        # os.system('clear')
         if loadingbar: clear_output(wait=True)
         if loadingbar: print(rs.plots.style.CYAN + "ROSALIA Stray-light Mapper: Scanning ... " + rs.plots.style.RESET)
         if loadingbar: rs.plots.print_ascii_focal_plane(x=X_label, y=Y_label, SCA=SCA)
@@ -660,12 +627,6 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
         #######################################################################
 
 
-        #main_offender_db = pd.DataFrame({"xmid": xmid, "ymid": ymid,
-        #                                 "ramid": ramid, "decmid": decmid,
-        #                                 "xmin": xmin, "ymin": ymin,
-        #                                 "xmax": xmax, "ymid": ymax,
-        #                                 "RA_mid": RA_mid_subarrays, "DEC_mid": DEC_mid_subarrays,
-        #                                 "stray": col_stray, "main_off_id": col_main_off_id})
         # -------------------------------------------------------------------------- #
         # 4 - TO-DO - Interpolate the values across the SCA to smooth it out         #
         # -------------------------------------------------------------------------- #
@@ -688,11 +649,7 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
     #######################################################################
 
     if verbose > 1: print(datetime.now().isoformat() + ": Done")
-    #return({"straylight_SCA": straylight_SCA, 
-    #        "main_offender_SCA": main_offender_SCA, 
-    #        "main_offender_db": main_offender_db, 
-    #        #"straylight_minimal_storage_array": straylight_minimal_storage_array,
-    #        })
+
     return(main_offender_db)
 #################################################
 

@@ -1348,10 +1348,6 @@ def get_hybrid_catalog(ra, dec, radius, lambda_ref, MJD, observer, g_mag_max=Fal
 ############################
 
 def psf_harvester_single_exposure(input_name, clean=True, verbose=False):
-    # if True:
-    import astropy.units as u
-    from tqdm import tqdm
-
     if verbose: print("Scanning input exposure: " + input_name)
     exposure_identity = rs.utils.exposure_inspector(input_name=input_name)
     if verbose: print("Done.")

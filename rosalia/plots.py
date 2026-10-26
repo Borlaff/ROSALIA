@@ -304,38 +304,26 @@ def make_stars_around_plot(catalog,  astropywcs_list, RA_TARG, DEC_TARG, radius 
 
 ###############
 
-def plot_ndi_main_offenders(RA_TARG, DEC_TARG, PA, scaled_main_off, catalog, radius=5, pixscale=30/60/60, figsize=(10,7)):
+def plot_ndi_main_offenders(RA_TARG, DEC_TARG, PA, scaled_main_off, catalog, radius=5, pixscale=30/60/60, figsize=(12,9)):
 
     main_offender_db, multiline_text = rs.plots.main_offender_find_fraction_of_map(scaled_main_off, catalog)
 
-    radius = 1.2*bn.nanmax(main_offender_db["dist"])
+    radius = 1.05*bn.nanmax(main_offender_db["dist"])
     pixscale = 30/60/60/5*radius # Empirical formula to be visually appealing. 
 
     # Plot level NDI 
-    #ndi_name = os.environ["ROSALIACACHE"] + "CORE/NDI/RST/ndi_lvl" + str(ndi_level) + "_mean.fits"
-    #pa_point = PA
-    #ra_point = RA_TARG
-    #dec_point = DEC_TARG
-
     if radius<1:
         ndi_linthresh = 0.05
     elif radius>=1 and radius<=10:
         ndi_linthresh = 0.001
     else:
-        ndi_linthresh = 0.0001
-   
-    # Make the modified header based on the exposure properties.
-    #ndi_fits = fits.open(ndi_name)
-    #w = astropy_wcs.WCS(header=ndi_fits[0].header, fobj=ndi_fits, naxis=2)
-    #w.wcs.crota = -pa_point, -pa_point
-    #w.wcs.crval = ra_point, dec_point
-    #w.wcs.cdelt = -ndi_fits[0].header["CDELT1"], ndi_fits[0].header["CDELT2"]
-    #print(w)
-    #ndi_fits[0].header = w.to_header()
-    
+        ndi_linthresh = 0.00001
+
+    # Get the Combined NDI     
     ndi_map, ndi_wcs, _ = get_combined_NDI_map(SCA=1, ra_point=RA_TARG, dec_point=DEC_TARG, pa=PA, radius=radius, pixscale=pixscale, dummy_name="dummy_ndi_plot.fits")
-    # ndi_header = ndi_wcs.to_header()
+
     fig, ax = plt.subplots(1, 1, figsize=figsize, subplot_kw=dict(projection=ndi_wcs))
+
     # The transfer NDI maps units of 1/(superpixel size in mm2). 
     # We need to correct by that factor. 
     superpixel_mm2_area = (rs.telescopes.Roman.get_physical_pixelsize("WFI").to("mm").value * 512)**2
@@ -350,18 +338,7 @@ def plot_ndi_main_offenders(RA_TARG, DEC_TARG, PA, scaled_main_off, catalog, rad
     for i in range(np.min([len(main_offender_db["ra"]), 3])):
         # CAR 1 A
         x_stars, y_stars = ndi_wcs.wcs_world2pix(main_offender_db["ra"].iloc[i], main_offender_db["dec"].iloc[i], 0)
-        #ax.scatter(main_offender_db["ra"].iloc[i], main_offender_db["dec"].iloc[i], marker="h", edgecolor="black", color=cm.hot(i/3), alpha=alpha, s=150/(i+1), label=main_offender_db["source_name"].iloc[i])
         ax.scatter(x_stars, y_stars, marker="h", edgecolor="black", color=cm.hot(i/3), alpha=alpha, s=150/(i+1), label=main_offender_db["source_name"].iloc[i])
-
-
-    # max_extent_ndi = np.abs(ndi_header["CDELT2"]) * ndi_map.shape[0]/2# This is the radial extent of the NDI map
-    # print(max_extent_ndi)
-    # angle_ticks = np.round(np.linspace(-max_extent_ndi, max_extent_ndi, 5),1)
-    # print(angle_ticks)
-    # pixel_ticks = angle_ticks/np.abs(ndi_header["CDELT2"])  + ndi_map.shape[0]/2
-    # print(pixel_ticks)
-    #ax.set_xticks(pixel_ticks, angle_ticks, size=12)
-    #ax.set_yticks(pixel_ticks, angle_ticks, size=12)
 
     ax.set_xlabel("RA (degrees)", size=15)
     ax.set_ylabel("Dec (degrees)", size=15)
@@ -411,20 +388,12 @@ def plot_stars_around(ax, catalog, max_plot_size=50, min_plot_size=5, alpha=0.2)
                         u'$\u2640$', u'$\u2642$',u'$\u2643$', u'$\u2644$',
                         u'$\u26E2$', u'$\u2646$',  u'$\u2647$']
 
-    #print(bn.nanmin(ra_stars))
-    #print(bn.nanmax(ra_stars))
-    #print(bn.nanmin(dec_stars))
-    #print(bn.nanmax(dec_stars))
 
     for i, SSO_list_plain_i in zip(range(len(SSO_list_plain)), SSO_list_plain):
 
         try:
             planet_i = np.where(catalog["source_id"]==SSO_list_plain_i)[0][0]
-            #plt.text(ra_stars[planet_i], dec_stars[planet_i], s=SSO_list_symbols[i])
             plt.scatter(ra_stars[planet_i], dec_stars[planet_i], marker=SSO_list_symbols[i], label= SSO_list_symbols[i] + " - " + SSO_list_plain[i], s=200)
-            #flux_for_plot[planet_i] = np.nan
-            #ra_stars[planet_i] = np.nan
-            #dec_stars[planet_i] = np.nan
 
         except:
             print("SSO body: " + SSO_list_plain_i + " not found. Skipping")
@@ -453,9 +422,6 @@ def plot_stars_around(ax, catalog, max_plot_size=50, min_plot_size=5, alpha=0.2)
 ################################################################################
 
 def plot_stray_and_ndi_map(stray_name, star_catalog, ra_point, dec_point, pa_point, ndi_name, stray_scale_factor, vmin, vmax, ndi_linthresh, marker="*", edgecolor="black", color="red", s=100):
-# if True:
-    # Axis 1
-    # stray_name = stray_image_list[i]
 
     # Open the Stray-light map
     stray_fits = fits.open(stray_name)
@@ -477,9 +443,6 @@ def plot_stray_and_ndi_map(stray_name, star_catalog, ra_point, dec_point, pa_poi
 
     # Axis 2 - Showing the NDI map
     axs[1] = plt.subplot(122)
-    #ndi_name = ndi_image_list[i]
-    #ndi_header = fits.open(ndi_name)[0].header
-
 
     # Make the modified header based on the exposure properties.
     ndi_fits = fits.open(ndi_name)
@@ -696,17 +659,20 @@ def print_ascii_focal_plane(x, y, SCA):
 
 
 def plot_rosalia_logo():
-    ascii = np.array(list(style.YELLOW + "\n\n"+\
-"   ___  ____  _______   __   _______         \n"+\
-"  / _ \/ __ \/ __/ _ | / /  /  _/ _ | " + style.BLUE + " + " + style.YELLOW +"\n"+\
-" / , _/ /_/ /\ \/ __ |/ /___/ // __ |__      \n"+\
-"/_/|_|\____/___/_/ |_/____/___/_/ |____\     \n"+\
-"ROman Sky Analyst for Low surface brightness Imaging & Astronomy \n"+\
-style.RED + "NASA" + style.RESET + " Ames Research Center - " + style.RESET + " Roman Wide Field Science\n"+\
-style.RESET + "Contact: Alex S. Borlaff (NASA Ames/STA) -  "+style.BLUE+"a.s.borlaff@nasa.gov \n\n\n"+style.RESET))
+    logo = rf"""{style.YELLOW}
+
+    ___  ____  _______   __   _______         
+    / _ \/ __ \/ __/ _ | / /  /  _/ _ | {style.BLUE} + {style.YELLOW}
+    / , _/ /_/ /\ \/ __ |/ /___/ // __ |__      
+    /_/|_|\____/___/_/ |_/____/___/_/ |____\     
+    ROman Sky Analyst for Low surface brightness Imaging & Astronomy 
+    {style.RED}NASA{style.RESET} Ames Research Center - {style.RESET} Roman Wide Field Science
+    {style.RESET}Contact: Alex S. Borlaff (NASA Ames/STA) -  {style.BLUE}a.s.borlaff@nasa.gov 
+
+    {style.RESET}"""
+    
+    ascii = np.array(list(logo))
     print(''.join(list(ascii)), flush=True)
-
-
 
 
 
@@ -721,12 +687,9 @@ def get_combined_NDI_map(SCA, ra_point, dec_point, pa, radius=5, pixscale=30/60/
     ra_dec_constraints = rs.gaia.find_ra_dec_constraints(ra_point, dec_point, radius/2, verbose=False)
 
     # Assimilating catalog.
-    #ra_array  = np.linspace(ra_dec_constraints['ra_min'],  ra_dec_constraints['ra_max'],  1800)
-    #dec_array = np.linspace(ra_dec_constraints['dec_min'], ra_dec_constraints['dec_max'], 1800)
-    rs.utils.create_dummy_image_with_wcs(ra_cen=ra_point, dec_cen=dec_point, ra_size=radius, dec_size=radius, pixscale=pixscale, outname=dummy_name)
+    rs.utils.create_dummy_image_with_wcs(ra_cen=ra_point, dec_cen=dec_point, pa=pa, ra_size=radius, dec_size=radius, pixscale=pixscale, outname=dummy_name)
     ra_grid, dec_grid = rs.utils.get_ra_dec_arrays(fits_file=dummy_name, ext=0)
 
-    #ra_grid, dec_grid = np.meshgrid(ra_array, dec_array)
     # Identify those at distances > 1 degrees (~100 times the size of the subarray).
     # For stars at those distances, we will only estimate one NDI and assume the straylight is flat across
     # the subarray (we will still have gradients!).
