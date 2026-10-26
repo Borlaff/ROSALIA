@@ -70,8 +70,10 @@
 <li class="toctree-l3"><a class="reference internal" href="rosalia.gnu.html">rosalia.gnu</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.horizons.html">rosalia.horizons</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.hst.html">rosalia.hst</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.inspector.html">rosalia.inspector</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.irsa.html">rosalia.irsa</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.mast.html">rosalia.mast</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.mosaics.html">rosalia.mosaics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.ndi.html">rosalia.ndi</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.plots.html">rosalia.plots</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.psf.html">rosalia.psf</a></li>
@@ -80,6 +82,7 @@
 <li class="toctree-l3"><a class="reference internal" href="rosalia.sky.html">rosalia.sky</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.skywalker.html">rosalia.skywalker</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.sso.html">rosalia.sso</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.superback.html">rosalia.superback</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.telescopes.html">rosalia.telescopes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.tests.html">rosalia.tests</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.thermal.html">rosalia.thermal</a></li>
@@ -133,13 +136,16 @@
 <tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.detectors.get_detector_corners" title="rosalia.detectors.get_detector_corners"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_detector_corners</span></code></a>(wcs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.detectors.make_array_grid" title="rosalia.detectors.make_array_grid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_array_grid</span></code></a>(array, step[, mode, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.detectors.jy2fe" title="rosalia.detectors.jy2fe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jy2fe</span></code></a>(jy, instrument, filter_name, telescope)</p></td>
+<td><p>Convert flux density in Jy per pixel to photo-electrons per second per pixel for a given telescope and filter.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.detectors.make_array_grid" title="rosalia.detectors.make_array_grid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_array_grid</span></code></a>(array, step[, mode, ...])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.detectors.make_detector_grid" title="rosalia.detectors.make_detector_grid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_detector_grid</span></code></a>(w, step[, mode])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.detectors.make_detector_grid" title="rosalia.detectors.make_detector_grid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_detector_grid</span></code></a>(w, step[, mode])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.detectors.mu2fe" title="rosalia.detectors.mu2fe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mu2fe</span></code></a>(mu, instrument, filter_name, telescope)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.detectors.mu2fe" title="rosalia.detectors.mu2fe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mu2fe</span></code></a>(mu, instrument, filter_name, telescope)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>

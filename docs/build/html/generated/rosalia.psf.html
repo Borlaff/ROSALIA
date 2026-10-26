@@ -70,8 +70,10 @@
 <li class="toctree-l3"><a class="reference internal" href="rosalia.gnu.html">rosalia.gnu</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.horizons.html">rosalia.horizons</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.hst.html">rosalia.hst</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.inspector.html">rosalia.inspector</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.irsa.html">rosalia.irsa</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.mast.html">rosalia.mast</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.mosaics.html">rosalia.mosaics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.ndi.html">rosalia.ndi</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.plots.html">rosalia.plots</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">rosalia.psf</a></li>
@@ -80,6 +82,7 @@
 <li class="toctree-l3"><a class="reference internal" href="rosalia.sky.html">rosalia.sky</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.skywalker.html">rosalia.skywalker</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.sso.html">rosalia.sso</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosalia.superback.html">rosalia.superback</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.telescopes.html">rosalia.telescopes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.tests.html">rosalia.tests</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rosalia.thermal.html">rosalia.thermal</a></li>
@@ -133,6 +136,12 @@
 <tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.psf.astscript_radial_profile" title="rosalia.psf.astscript_radial_profile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astscript_radial_profile</span></code></a>(input_name, ra, ...)</p></td>
 <td><p></p></td>
 </tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.psf.build_psf_canvas" title="rosalia.psf.build_psf_canvas"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_psf_canvas</span></code></a>(stars_catalog, shape_out, ...)</p></td>
+<td><p>Build a PSF canvas from a catalog of stars in parallel.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.psf.create_psf_grid" title="rosalia.psf.create_psf_grid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_psf_grid</span></code></a>(size_pixels, scale_arcsec[, ...])</p></td>
+<td><p>Create coordinate grids for PSF calculation.</p></td>
+</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.psf.find_SCA_for_a_target" title="rosalia.psf.find_SCA_for_a_target"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_SCA_for_a_target</span></code></a>(file_name, ra, dec[, ...])</p></td>
 <td><p></p></td>
 </tr>
@@ -142,29 +151,76 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.psf.gaia_find_stars_in_and_out" title="rosalia.psf.gaia_find_stars_in_and_out"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gaia_find_stars_in_and_out</span></code></a>(input_name, ext, ...)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.psf.generate_star_stamps" title="rosalia.psf.generate_star_stamps"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_star_stamps</span></code></a>(hybrid_catalog, ...[, ...])</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.psf.galsim_roman_psf" title="rosalia.psf.galsim_roman_psf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">galsim_roman_psf</span></code></a>(position, SCA, bandpass[, ...])</p></td>
+<td><p>Generate a Roman WFI point-spread function using GalSim.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.psf.generate_star_in_footprint" title="rosalia.psf.generate_star_in_footprint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_star_in_footprint</span></code></a>(hybrid_catalog, ...)</p></td>
+<td><p>Deprecated version of the generate_star_stamps function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.psf.generate_star_stamps_deprecated" title="rosalia.psf.generate_star_stamps_deprecated"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_star_stamps_deprecated</span></code></a>(...[, verbose])</p></td>
+<td><p>Generate individual PSF-based FITS stamps for catalog stars.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.psf.getWCS_galsim_dict_style" title="rosalia.psf.getWCS_galsim_dict_style"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getWCS_galsim_dict_style</span></code></a>(file_name)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.psf.get_hybrid_catalog" title="rosalia.psf.get_hybrid_catalog"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_hybrid_catalog</span></code></a>(ra, dec, radius, ...[, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.psf.get_detector_position_telescope_frame" title="rosalia.psf.get_detector_position_telescope_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_detector_position_telescope_frame</span></code></a>(...[, ...])</p></td>
+<td><p>Convert detector position to telescope frame coordinates.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.psf.get_hybrid_catalog" title="rosalia.psf.get_hybrid_catalog"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_hybrid_catalog</span></code></a>(ra, dec, radius, ...[, ...])</p></td>
 <td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.psf.get_psf_extension_moffat" title="rosalia.psf.get_psf_extension_moffat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_psf_extension_moffat</span></code></a>(mag[, depth, ...])</p></td>
+<td><p>Analytically calculate the PSF extension based on a standard Moffat profile at a given depth.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.psf.get_roman_canvas_geometry" title="rosalia.psf.get_roman_canvas_geometry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_roman_canvas_geometry</span></code></a>([pixscale])</p></td>
+<td><p>Geometry of the full Roman/WFI canvas, computed only from pysiaf.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.psf.get_roman_canvas_wcs" title="rosalia.psf.get_roman_canvas_wcs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_roman_canvas_wcs</span></code></a>(wcs_list[, pixscale])</p></td>
+<td><p>WCS and shape of the full Roman/WFI canvas from the 18 detector WCS, using only pysiaf for the layout (no reproject).</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.psf.identify_stars_in_out_field" title="rosalia.psf.identify_stars_in_out_field"><code class="xref py py-obj docutils literal notranslate"><span class="pre">identify_stars_in_out_field</span></code></a>(data_shape, wcs, ...)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.psf.measure_maxradii" title="rosalia.psf.measure_maxradii"><code class="xref py py-obj docutils literal notranslate"><span class="pre">measure_maxradii</span></code></a>(input_name, ra, dec, rmax)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.psf.make_roman_canvas_from_detectors" title="rosalia.psf.make_roman_canvas_from_detectors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_roman_canvas_from_detectors</span></code></a>(data_list, ...)</p></td>
+<td><p>Function 1.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.psf.measure_maxradii" title="rosalia.psf.measure_maxradii"><code class="xref py py-obj docutils literal notranslate"><span class="pre">measure_maxradii</span></code></a>(input_name, ra, dec, rmax)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.psf.psf_harvester_single_exposure" title="rosalia.psf.psf_harvester_single_exposure"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psf_harvester_single_exposure</span></code></a>(input_name[, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.psf.moffat_2d" title="rosalia.psf.moffat_2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">moffat_2d</span></code></a>(shape, mu0, alpha, beta)</p></td>
+<td><p>Generate a 2D Moffat profile.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.psf.moffat_function_sb" title="rosalia.psf.moffat_function_sb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">moffat_function_sb</span></code></a>(r, mu0, alpha, beta)</p></td>
+<td><p>Moffat surface brightness profile in magnitudes per square arcsecond.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.psf.psf_harvester_single_exposure" title="rosalia.psf.psf_harvester_single_exposure"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psf_harvester_single_exposure</span></code></a>(input_name[, ...])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.psf.scale_and_subtract_stars" title="rosalia.psf.scale_and_subtract_stars"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scale_and_subtract_stars</span></code></a>(input_name, ext, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.psf.recover_detector_frames" title="rosalia.psf.recover_detector_frames"><code class="xref py py-obj docutils literal notranslate"><span class="pre">recover_detector_frames</span></code></a>(canvas, optimal_wcs, ...)</p></td>
+<td><p>Reproject a mosaic canvas into the pixel grid of each detector.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.psf.recover_roman_detectors_from_canvas" title="rosalia.psf.recover_roman_detectors_from_canvas"><code class="xref py py-obj docutils literal notranslate"><span class="pre">recover_roman_detectors_from_canvas</span></code></a>(canvas, ...)</p></td>
+<td><p>Function 2.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.psf.scale_and_subtract_stars" title="rosalia.psf.scale_and_subtract_stars"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scale_and_subtract_stars</span></code></a>(input_name, ext, ...)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.psf.scale_and_subtract_stars_single_image" title="rosalia.psf.scale_and_subtract_stars_single_image"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scale_and_subtract_stars_single_image</span></code></a>(...[, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.psf.scale_and_subtract_stars_single_image" title="rosalia.psf.scale_and_subtract_stars_single_image"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scale_and_subtract_stars_single_image</span></code></a>(...[, ...])</p></td>
 <td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.psf.stpsf_roman_psf" title="rosalia.psf.stpsf_roman_psf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stpsf_roman_psf</span></code></a>(position, SCA, bandpass[, ...])</p></td>
+<td><p>Render a flux-calibrated, chromatic Roman/WFI PSF with STPSF.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../rosalia.html#rosalia.psf.superback_roman_psf" title="rosalia.psf.superback_roman_psf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">superback_roman_psf</span></code></a>(position, SCA, bandpass)</p></td>
+<td><p>Render a flux-calibrated, chromatic Roman/WFI PSF with SUPERBACK analytical model.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Classes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="../rosalia.html#rosalia.psf.Star" title="rosalia.psf.Star"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Star</span></code></a>(row)</p></td>
+<td><p>Represent a catalog star with broadband photometry and an interpolated SED.</p></td>
 </tr>
 </tbody>
 </table>

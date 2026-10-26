@@ -13,6 +13,8 @@ rosalia.utils
       check_file_integrity
       check_fits_integrity
       check_number_of_extensions
+      check_numeric_type
+      check_sources_in_footprint
       circle_around_position
       circular_hist
       convert_ASDF_to_FITS
@@ -24,12 +26,14 @@ rosalia.utils
       delta_angular_separation
       detect_sci_extensions
       distance_to_galactic_plane
+      distribute_indices_numpy
       divide_array_in_chunks
       download_file
       ds9tomask
       erwinspacing
       execute_cmd
       find_SCA_EXTNAME
+      find_closest_detector
       find_max_angular_size_of_image
       find_nearest_index
       find_subposition_EXTNAME
@@ -37,13 +41,13 @@ rosalia.utils
       flambda_to_fnu
       fnu_to_flambda
       generate_image_interpolator
-      generate_mosaic
       generate_scaled_drz
       get_astropywcs_info_from_sciexts
       get_data_and_wcs
       get_keys_from_header
       get_parameters_list
       get_pixscale
+      get_ra_dec_arrays
       great_circle_ra_dec_shift
       hp_resol2nside
       interpolate_location_in_fits
@@ -57,7 +61,6 @@ rosalia.utils
       position_angle
       radec_to_xy
       read_ds9reg
-      reproject_roman_wfi_fits
       run_basic_astrodrizzle
       run_basic_noisechisel
       run_swarp

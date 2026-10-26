@@ -25,6 +25,7 @@
    inspector
    irsa
    mast
+   mosaics
    ndi
    plots
    psf
@@ -33,6 +34,7 @@
    sky
    skywalker
    sso
+   superback
    telescopes
    tests
    thermal

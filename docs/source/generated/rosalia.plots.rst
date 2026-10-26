@@ -8,6 +8,7 @@ rosalia.plots
 
    .. autosummary::
    
+      get_combined_NDI_map
       main_offender_find_fraction_of_map
       make_stars_around_plot
       make_stray_plot

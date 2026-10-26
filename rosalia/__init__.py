@@ -7,13 +7,11 @@ a.s.borlaff@nasa.gov
 """
 
 from importlib.metadata import version, PackageNotFoundError
-from pathlib import Path
-import re
 
 try:
     __version__ = version("rosalia-wfi")
 except PackageNotFoundError:
-   __version__ = "1.3.9.dev0"
+   __version__ = "1.4.0"
 
 
 __author__ = "Alejandro S. Borlaff"

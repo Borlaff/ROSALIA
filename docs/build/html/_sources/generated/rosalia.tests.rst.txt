@@ -11,4 +11,5 @@ rosalia.tests
       test_fe2mu_mu2fe
       test_magnitude_conversion_gaia
       test_photometry_superstars
+      test_recover_detector_frames_from_canvas
    

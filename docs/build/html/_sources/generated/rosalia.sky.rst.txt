@@ -8,7 +8,6 @@ rosalia.sky
 
    .. autosummary::
    
-      correct_flat_sky
       get_healpix
       get_zodiacal_background
       gunagala_zody

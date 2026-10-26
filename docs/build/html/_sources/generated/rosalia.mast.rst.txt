@@ -4,11 +4,10 @@ rosalia.mast
 .. automodule:: rosalia.mast
 
    
-   .. rubric:: Functions
+   .. rubric:: Classes
 
    .. autosummary::
    
-      pack_exposures
-      roman_query
-      stream_roman_mast
+      APT
+      query
    

@@ -100,7 +100,7 @@ of the sky-background for user-defined observational conditions.</p>
 <p><em>ROSALIA</em> is funded through a NASA Grant (D.14 Roman 2022), <em>ROSES/Nancy Grace
 Roman Space Telescope Research and Support Participation Opportunities.</em></p>
 <p>Check out the <a class="reference internal" href="usage.html"><span class="doc">How to use</span></a> section for further information how to use ROSALIA to analyze your images. In
-<span class="xref std std-ref">install</span> we describe how to set up ROSALIA in your machine.</p>
+<a class="reference internal" href="installation.html"><span class="doc">Installation</span></a> we describe how to set up ROSALIA in your machine.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Space is hard, and this project is under active development. The predicted sky background levels by ROSALIA might not be exact and it is not recommended to use it blindly. But we keep pushing everyday to make it better, and our team is happy to assist with your particular project. We will be including more functions and tutorials in the very near future. <strong>ROSALIA</strong> is a Roman Wide Field Science project that needs your help to improve! If you find a useful capability that could be added, a problem to be resolved, or any other idea, <a class="reference internal" href="whoarewe.html"><span class="doc">contact us</span></a>.</p>
@@ -121,18 +121,31 @@ Roman Space Telescope Research and Support Participation Opportunities.</em></p>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="measuringstray.html">Stray Light</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="measuringstray.html#basics">Basics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="measuringstray.html#overview">Overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="measuringstray.html#in-field-vs-out-field-stray-light">In-field vs. out-field stray-light</a></li>
-<li class="toctree-l2"><a class="reference internal" href="measuringstray.html#quickstart-out-of-field-stray-light-analysis-example-with-rosalia">Quickstart: Out-of-field Stray Light Analysis Example with ROSALIA</a></li>
-<li class="toctree-l2"><a class="reference internal" href="measuringstray.html#case-study-calibrating-stray-light-with-a-bright-star">Case study: Calibrating stray-light with a bright star</a></li>
+<li class="toctree-l2"><a class="reference internal" href="measuringstray.html#workflow">Workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="measuringstray.html#creating-an-exposure-from-observer-metadata">Creating an exposure from observer metadata</a></li>
+<li class="toctree-l2"><a class="reference internal" href="measuringstray.html#creating-an-exposure-from-a-real-observation-file">Creating an exposure from a real observation file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="measuringstray.html#quickstart-out-of-field-stray-light-example">Quickstart: Out-of-field stray-light example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="measuringstray.html#notes-for-scientific-usage">Notes for scientific usage</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="zodiacal.html">Zodiacal Light</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="zodiacal.html#modeling-the-zodiacal-light-background-with-rosalia">Modeling the Zodiacal light background with ROSALIA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zodiacal.html#quickstart-example">Quickstart example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zodiacal.html#zodiacal-model-options">Zodiacal model options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zodiacal.html#method-behavior">Method behavior</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zodiacal.html#outputs-produced">Outputs produced</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zodiacal.html#scientific-context">Scientific context</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="PSF.html">In-field Stars</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="PSF.html#modelling-scattered-emission-psf-from-stars-inside-roman-field-of-view">Modelling scattered emission (PSF) from stars inside Roman Field of View</a></li>
+<li class="toctree-l2"><a class="reference internal" href="PSF.html#modelling-scattered-emission-psf-from-stars-inside-the-roman-field-of-view">Modelling scattered emission (PSF) from stars inside the Roman field of view</a></li>
+<li class="toctree-l2"><a class="reference internal" href="PSF.html#quickstart-example">Quickstart example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="PSF.html#generating-a-mosaic-from-the-model">Generating a mosaic from the model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="PSF.html#method-behaviour">Method behaviour</a></li>
+<li class="toctree-l2"><a class="reference internal" href="PSF.html#supported-modeling-approach">Supported modeling approach</a></li>
+<li class="toctree-l2"><a class="reference internal" href="PSF.html#notes-for-use">Notes for use</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="SSOs.html">Solar System Objects</a><ul>
@@ -155,6 +168,7 @@ Roman Space Telescope Research and Support Participation Opportunities.</em></p>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="nexus.html">Roman Research Nexus</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="nexus.html#installation-of-rosalia-in-the-roman-research-nexus">Installation of ROSALIA in the Roman Research Nexus</a></li>
 <li class="toctree-l2"><a class="reference internal" href="nexus.html#how-to-use-rosalia-in-the-roman-research-nexus">How to use ROSALIA in the Roman Research Nexus</a></li>
 </ul>
 </li>
@@ -169,7 +183,7 @@ Roman Space Telescope Research and Support Participation Opportunities.</em></p>
 <li class="toctree-l2"><a class="reference internal" href="rosalia.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rosalia.html#module-rosalia.albedo">rosalia.albedo module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rosalia.html#module-rosalia.astrometry">rosalia.astrometry module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="rosalia.html#rosalia-attitude-module">rosalia.attitude module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rosalia.html#module-rosalia.attitude">rosalia.attitude module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rosalia.html#module-rosalia.constants">rosalia.constants module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rosalia.html#module-rosalia.correct">rosalia.correct module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rosalia.html#module-rosalia.detectors">rosalia.detectors module</a></li>

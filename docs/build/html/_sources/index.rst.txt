@@ -22,7 +22,7 @@ of the sky-background for user-defined observational conditions.
 Roman Space Telescope Research and Support Participation Opportunities.*
 
 Check out the :doc:`usage` section for further information how to use ROSALIA to analyze your images. In
-:ref:`install <installation>` we describe how to set up ROSALIA in your machine.
+:doc:`installation` we describe how to set up ROSALIA in your machine.
 
 .. note::
 

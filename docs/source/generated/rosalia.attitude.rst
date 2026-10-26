@@ -16,6 +16,7 @@ rosalia.attitude
       load_targets
       main
       plot_targets_by_magnitude
+      quaternion_to_WFICEN
    
    .. rubric:: Classes
 

@@ -12,6 +12,7 @@ rosalia.detectors
       HST_ACS_jy_to_counts
       fe2mu
       get_detector_corners
+      jy2fe
       make_array_grid
       make_detector_grid
       mu2fe

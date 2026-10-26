@@ -73,7 +73,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.astrometry.source_extractor"><code class="docutils literal notranslate"><span class="pre">source_extractor()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#rosalia-attitude-module">rosalia.attitude module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-rosalia.attitude">rosalia.attitude module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.attitude.RomanPointing"><code class="docutils literal notranslate"><span class="pre">RomanPointing</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#rosalia.attitude.RomanPointing.delta_pitch_roll"><code class="docutils literal notranslate"><span class="pre">RomanPointing.delta_pitch_roll()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#rosalia.attitude.RomanPointing.get_attitude_euler"><code class="docutils literal notranslate"><span class="pre">RomanPointing.get_attitude_euler()</span></code></a></li>
@@ -98,6 +98,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.attitude.load_targets"><code class="docutils literal notranslate"><span class="pre">load_targets()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.attitude.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.attitude.plot_targets_by_magnitude"><code class="docutils literal notranslate"><span class="pre">plot_targets_by_magnitude()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rosalia.attitude.quaternion_to_WFICEN"><code class="docutils literal notranslate"><span class="pre">quaternion_to_WFICEN()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-rosalia.constants">rosalia.constants module</a></li>
@@ -117,6 +118,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.detectors.HST_ACS_jy_to_counts"><code class="docutils literal notranslate"><span class="pre">HST_ACS_jy_to_counts()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.detectors.fe2mu"><code class="docutils literal notranslate"><span class="pre">fe2mu()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.detectors.get_detector_corners"><code class="docutils literal notranslate"><span class="pre">get_detector_corners()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rosalia.detectors.jy2fe"><code class="docutils literal notranslate"><span class="pre">jy2fe()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.detectors.make_array_grid"><code class="docutils literal notranslate"><span class="pre">make_array_grid()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.detectors.make_detector_grid"><code class="docutils literal notranslate"><span class="pre">make_detector_grid()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.detectors.mu2fe"><code class="docutils literal notranslate"><span class="pre">mu2fe()</span></code></a></li>
@@ -171,6 +173,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#rosalia.ndi.ndi_euclid.thetawd2"><code class="docutils literal notranslate"><span class="pre">ndi_euclid.thetawd2</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="#rosalia.ndi.save_aligned_ndi_map"><code class="docutils literal notranslate"><span class="pre">save_aligned_ndi_map()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.ndi.straylight_flux"><code class="docutils literal notranslate"><span class="pre">straylight_flux()</span></code></a></li>
 </ul>
 </li>
@@ -191,6 +194,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#rosalia.plots.ascii_progress_focal_plane.y_range"><code class="docutils literal notranslate"><span class="pre">ascii_progress_focal_plane.y_range</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="#rosalia.plots.get_combined_NDI_map"><code class="docutils literal notranslate"><span class="pre">get_combined_NDI_map()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.plots.main_offender_find_fraction_of_map"><code class="docutils literal notranslate"><span class="pre">main_offender_find_fraction_of_map()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.plots.make_stars_around_plot"><code class="docutils literal notranslate"><span class="pre">make_stars_around_plot()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.plots.make_stray_plot"><code class="docutils literal notranslate"><span class="pre">make_stray_plot()</span></code></a></li>
@@ -216,21 +220,47 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-rosalia.psf">rosalia.psf module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#rosalia.psf.Star"><code class="docutils literal notranslate"><span class="pre">Star</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#rosalia.psf.Star.get_galsim_sed"><code class="docutils literal notranslate"><span class="pre">Star.get_galsim_sed()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rosalia.psf.Star.get_linear_weights"><code class="docutils literal notranslate"><span class="pre">Star.get_linear_weights()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rosalia.psf.Star.get_magnitude_weights"><code class="docutils literal notranslate"><span class="pre">Star.get_magnitude_weights()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rosalia.psf.Star.get_magnitudes"><code class="docutils literal notranslate"><span class="pre">Star.get_magnitudes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rosalia.psf.Star.make_interpolator"><code class="docutils literal notranslate"><span class="pre">Star.make_interpolator()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rosalia.psf.Star.plot_spectrum"><code class="docutils literal notranslate"><span class="pre">Star.plot_spectrum()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rosalia.psf.Star.sed"><code class="docutils literal notranslate"><span class="pre">Star.sed()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rosalia.psf.Star.set_magnitudes"><code class="docutils literal notranslate"><span class="pre">Star.set_magnitudes()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.psf.append_empty_rows"><code class="docutils literal notranslate"><span class="pre">append_empty_rows()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.psf.astscript_psf_scale_factor"><code class="docutils literal notranslate"><span class="pre">astscript_psf_scale_factor()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.psf.astscript_psf_subtract"><code class="docutils literal notranslate"><span class="pre">astscript_psf_subtract()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.psf.astscript_radial_profile"><code class="docutils literal notranslate"><span class="pre">astscript_radial_profile()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rosalia.psf.build_psf_canvas"><code class="docutils literal notranslate"><span class="pre">build_psf_canvas()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rosalia.psf.create_psf_grid"><code class="docutils literal notranslate"><span class="pre">create_psf_grid()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.psf.find_SCA_for_a_target"><code class="docutils literal notranslate"><span class="pre">find_SCA_for_a_target()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.psf.find_stars_inside_detector"><code class="docutils literal notranslate"><span class="pre">find_stars_inside_detector()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.psf.gaia_find_stars_in_and_out"><code class="docutils literal notranslate"><span class="pre">gaia_find_stars_in_and_out()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#rosalia.psf.generate_star_stamps"><code class="docutils literal notranslate"><span class="pre">generate_star_stamps()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rosalia.psf.galsim_roman_psf"><code class="docutils literal notranslate"><span class="pre">galsim_roman_psf()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rosalia.psf.generate_star_in_footprint"><code class="docutils literal notranslate"><span class="pre">generate_star_in_footprint()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rosalia.psf.generate_star_stamps_deprecated"><code class="docutils literal notranslate"><span class="pre">generate_star_stamps_deprecated()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.psf.getWCS_galsim_dict_style"><code class="docutils literal notranslate"><span class="pre">getWCS_galsim_dict_style()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rosalia.psf.get_detector_position_telescope_frame"><code class="docutils literal notranslate"><span class="pre">get_detector_position_telescope_frame()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.psf.get_hybrid_catalog"><code class="docutils literal notranslate"><span class="pre">get_hybrid_catalog()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rosalia.psf.get_psf_extension_moffat"><code class="docutils literal notranslate"><span class="pre">get_psf_extension_moffat()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rosalia.psf.get_roman_canvas_geometry"><code class="docutils literal notranslate"><span class="pre">get_roman_canvas_geometry()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rosalia.psf.get_roman_canvas_wcs"><code class="docutils literal notranslate"><span class="pre">get_roman_canvas_wcs()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.psf.identify_stars_in_out_field"><code class="docutils literal notranslate"><span class="pre">identify_stars_in_out_field()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rosalia.psf.make_roman_canvas_from_detectors"><code class="docutils literal notranslate"><span class="pre">make_roman_canvas_from_detectors()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.psf.measure_maxradii"><code class="docutils literal notranslate"><span class="pre">measure_maxradii()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rosalia.psf.moffat_2d"><code class="docutils literal notranslate"><span class="pre">moffat_2d()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rosalia.psf.moffat_function_sb"><code class="docutils literal notranslate"><span class="pre">moffat_function_sb()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.psf.psf_harvester_single_exposure"><code class="docutils literal notranslate"><span class="pre">psf_harvester_single_exposure()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rosalia.psf.recover_detector_frames"><code class="docutils literal notranslate"><span class="pre">recover_detector_frames()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rosalia.psf.recover_roman_detectors_from_canvas"><code class="docutils literal notranslate"><span class="pre">recover_roman_detectors_from_canvas()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.psf.scale_and_subtract_stars"><code class="docutils literal notranslate"><span class="pre">scale_and_subtract_stars()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.psf.scale_and_subtract_stars_single_image"><code class="docutils literal notranslate"><span class="pre">scale_and_subtract_stars_single_image()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rosalia.psf.stpsf_roman_psf"><code class="docutils literal notranslate"><span class="pre">stpsf_roman_psf()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rosalia.psf.superback_roman_psf"><code class="docutils literal notranslate"><span class="pre">superback_roman_psf()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-rosalia.render">rosalia.render module</a><ul>
@@ -251,6 +281,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-rosalia.sky">rosalia.sky module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.sky.background"><code class="docutils literal notranslate"><span class="pre">background</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#rosalia.sky.background.copy"><code class="docutils literal notranslate"><span class="pre">background.copy</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#rosalia.sky.background.interpolate_spec"><code class="docutils literal notranslate"><span class="pre">background.interpolate_spec()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#rosalia.sky.background.modify_background"><code class="docutils literal notranslate"><span class="pre">background.modify_background()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#rosalia.sky.background.myfile_from_healpix"><code class="docutils literal notranslate"><span class="pre">background.myfile_from_healpix()</span></code></a></li>
@@ -260,12 +291,12 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.sky.compute_visibility"><code class="docutils literal notranslate"><span class="pre">compute_visibility</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#rosalia.sky.compute_visibility.format_time"><code class="docutils literal notranslate"><span class="pre">compute_visibility.format_time()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rosalia.sky.compute_visibility.get_body"><code class="docutils literal notranslate"><span class="pre">compute_visibility.get_body()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#rosalia.sky.compute_visibility.get_good_angles"><code class="docutils literal notranslate"><span class="pre">compute_visibility.get_good_angles()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#rosalia.sky.compute_visibility.initialize_dataframe"><code class="docutils literal notranslate"><span class="pre">compute_visibility.initialize_dataframe()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#rosalia.sky.compute_visibility.set_sampled_times"><code class="docutils literal notranslate"><span class="pre">compute_visibility.set_sampled_times()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#rosalia.sky.correct_flat_sky"><code class="docutils literal notranslate"><span class="pre">correct_flat_sky()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.sky.get_healpix"><code class="docutils literal notranslate"><span class="pre">get_healpix()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.sky.get_zodiacal_background"><code class="docutils literal notranslate"><span class="pre">get_zodiacal_background()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.sky.gunagala_zody"><code class="docutils literal notranslate"><span class="pre">gunagala_zody()</span></code></a></li>
@@ -412,6 +443,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.tests.test_fe2mu_mu2fe"><code class="docutils literal notranslate"><span class="pre">test_fe2mu_mu2fe()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.tests.test_magnitude_conversion_gaia"><code class="docutils literal notranslate"><span class="pre">test_magnitude_conversion_gaia()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.tests.test_photometry_superstars"><code class="docutils literal notranslate"><span class="pre">test_photometry_superstars()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rosalia.tests.test_recover_detector_frames_from_canvas"><code class="docutils literal notranslate"><span class="pre">test_recover_detector_frames_from_canvas()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-rosalia.utils">rosalia.utils module</a><ul>
@@ -420,6 +452,8 @@
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.check_file_integrity"><code class="docutils literal notranslate"><span class="pre">check_file_integrity()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.check_fits_integrity"><code class="docutils literal notranslate"><span class="pre">check_fits_integrity()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.check_number_of_extensions"><code class="docutils literal notranslate"><span class="pre">check_number_of_extensions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.check_numeric_type"><code class="docutils literal notranslate"><span class="pre">check_numeric_type()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.check_sources_in_footprint"><code class="docutils literal notranslate"><span class="pre">check_sources_in_footprint()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.circle_around_position"><code class="docutils literal notranslate"><span class="pre">circle_around_position()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.circular_hist"><code class="docutils literal notranslate"><span class="pre">circular_hist()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.convert_ASDF_to_FITS"><code class="docutils literal notranslate"><span class="pre">convert_ASDF_to_FITS()</span></code></a></li>
@@ -431,12 +465,14 @@
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.delta_angular_separation"><code class="docutils literal notranslate"><span class="pre">delta_angular_separation()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.detect_sci_extensions"><code class="docutils literal notranslate"><span class="pre">detect_sci_extensions()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.distance_to_galactic_plane"><code class="docutils literal notranslate"><span class="pre">distance_to_galactic_plane()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.distribute_indices_numpy"><code class="docutils literal notranslate"><span class="pre">distribute_indices_numpy()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.divide_array_in_chunks"><code class="docutils literal notranslate"><span class="pre">divide_array_in_chunks()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.download_file"><code class="docutils literal notranslate"><span class="pre">download_file()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.ds9tomask"><code class="docutils literal notranslate"><span class="pre">ds9tomask()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.erwinspacing"><code class="docutils literal notranslate"><span class="pre">erwinspacing()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.execute_cmd"><code class="docutils literal notranslate"><span class="pre">execute_cmd()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.find_SCA_EXTNAME"><code class="docutils literal notranslate"><span class="pre">find_SCA_EXTNAME()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.find_closest_detector"><code class="docutils literal notranslate"><span class="pre">find_closest_detector()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.find_max_angular_size_of_image"><code class="docutils literal notranslate"><span class="pre">find_max_angular_size_of_image()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.find_nearest_index"><code class="docutils literal notranslate"><span class="pre">find_nearest_index()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.find_subposition_EXTNAME"><code class="docutils literal notranslate"><span class="pre">find_subposition_EXTNAME()</span></code></a></li>
@@ -444,13 +480,13 @@
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.flambda_to_fnu"><code class="docutils literal notranslate"><span class="pre">flambda_to_fnu()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.fnu_to_flambda"><code class="docutils literal notranslate"><span class="pre">fnu_to_flambda()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.generate_image_interpolator"><code class="docutils literal notranslate"><span class="pre">generate_image_interpolator()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.generate_mosaic"><code class="docutils literal notranslate"><span class="pre">generate_mosaic()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.generate_scaled_drz"><code class="docutils literal notranslate"><span class="pre">generate_scaled_drz()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.get_astropywcs_info_from_sciexts"><code class="docutils literal notranslate"><span class="pre">get_astropywcs_info_from_sciexts()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.get_data_and_wcs"><code class="docutils literal notranslate"><span class="pre">get_data_and_wcs()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.get_keys_from_header"><code class="docutils literal notranslate"><span class="pre">get_keys_from_header()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.get_parameters_list"><code class="docutils literal notranslate"><span class="pre">get_parameters_list()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.get_pixscale"><code class="docutils literal notranslate"><span class="pre">get_pixscale()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.get_ra_dec_arrays"><code class="docutils literal notranslate"><span class="pre">get_ra_dec_arrays()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.great_circle_ra_dec_shift"><code class="docutils literal notranslate"><span class="pre">great_circle_ra_dec_shift()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.hp_resol2nside"><code class="docutils literal notranslate"><span class="pre">hp_resol2nside()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.interpolate_location_in_fits"><code class="docutils literal notranslate"><span class="pre">interpolate_location_in_fits()</span></code></a></li>
@@ -464,7 +500,6 @@
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.position_angle"><code class="docutils literal notranslate"><span class="pre">position_angle()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.radec_to_xy"><code class="docutils literal notranslate"><span class="pre">radec_to_xy()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.read_ds9reg"><code class="docutils literal notranslate"><span class="pre">read_ds9reg()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.reproject_roman_wfi_fits"><code class="docutils literal notranslate"><span class="pre">reproject_roman_wfi_fits()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.run_basic_astrodrizzle"><code class="docutils literal notranslate"><span class="pre">run_basic_astrodrizzle()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.run_basic_noisechisel"><code class="docutils literal notranslate"><span class="pre">run_basic_noisechisel()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rosalia.utils.run_swarp"><code class="docutils literal notranslate"><span class="pre">run_swarp()</span></code></a></li>
@@ -568,9 +603,9 @@
 <dd></dd></dl>
 
 </section>
-<section id="rosalia-attitude-module">
-<h2>rosalia.attitude module<a class="headerlink" href="#rosalia-attitude-module" title="Link to this heading"></a></h2>
-<p id="module-rosalia.attitude">File: Roman_Attitude.py
+<section id="module-rosalia.attitude">
+<span id="rosalia-attitude-module"></span><h2>rosalia.attitude module<a class="headerlink" href="#module-rosalia.attitude" title="Link to this heading"></a></h2>
+<p>File: Roman_Attitude.py
 Author: Maxime J Rizzo
 Email: <a class="reference external" href="mailto:maxime&#46;j&#46;rizzo&#37;&#52;&#48;nasa&#46;gov">maxime<span>&#46;</span>j<span>&#46;</span>rizzo<span>&#64;</span>nasa<span>&#46;</span>gov</a>
 Date: 2025-11-18</p>
@@ -928,6 +963,11 @@ ax: the axis object used for plotting
 scatter: the scatter plot object (useful for external colorbar creation)</p>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="rosalia.attitude.quaternion_to_WFICEN">
+<span class="sig-prename descclassname"><span class="pre">rosalia.attitude.</span></span><span class="sig-name descname"><span class="pre">quaternion_to_WFICEN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quaternion</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.attitude.quaternion_to_WFICEN" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 </section>
 <section id="module-rosalia.constants">
 <span id="rosalia-constants-module"></span><h2>rosalia.constants module<a class="headerlink" href="#module-rosalia.constants" title="Link to this heading"></a></h2>
@@ -1066,6 +1106,34 @@ If provided, skips querying Gaia/2MASS/WISE catalogs. Default is None.</p>
 <dd></dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="rosalia.detectors.jy2fe">
+<span class="sig-prename descclassname"><span class="pre">rosalia.detectors.</span></span><span class="sig-name descname"><span class="pre">jy2fe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">jy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instrument</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">telescope</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.detectors.jy2fe" title="Link to this definition"></a></dt>
+<dd><p>Convert flux density in Jy per pixel to photo-electrons per second per pixel for a given telescope and filter.</p>
+<section id="id24">
+<h3>Parameters<a class="headerlink" href="#id24" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>jy<span class="classifier">float or astropy.units.Quantity</span></dt><dd><p>Flux density in Jy per pixel.</p>
+</dd>
+<dt>instrument<span class="classifier">str</span></dt><dd><p>Instrument name.</p>
+</dd>
+<dt>filter_name<span class="classifier">str</span></dt><dd><p>Filter name.</p>
+</dd>
+<dt>telescope<span class="classifier">str</span></dt><dd><p>Telescope name.</p>
+</dd>
+<dt>verbose<span class="classifier">bool, optional</span></dt><dd><p>If True, print additional information. Default is False.</p>
+</dd>
+</dl>
+</section>
+<section id="id25">
+<h3>Returns<a class="headerlink" href="#id25" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>astropy.units.Quantity</dt><dd><p>Photo-electrons per second per pixel.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="rosalia.detectors.make_array_grid">
 <span class="sig-prename descclassname"><span class="pre">rosalia.detectors.</span></span><span class="sig-name descname"><span class="pre">make_array_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'random'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nborder_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">64</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.detectors.make_array_grid" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -1086,7 +1154,29 @@ If provided, skips querying Gaia/2MASS/WISE catalogs. Default is None.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.gaia.find_ra_dec_constraints">
 <span class="sig-prename descclassname"><span class="pre">rosalia.gaia.</span></span><span class="sig-name descname"><span class="pre">find_ra_dec_constraints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.gaia.find_ra_dec_constraints" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Computes analytical RA/Dec bounding limits and SQL WHERE clauses for a cone search.</p>
+<section id="id26">
+<h3>Parameters<a class="headerlink" href="#id26" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ra<span class="classifier">float</span></dt><dd><p>Target Right Ascension in degrees [0, 360).</p>
+</dd>
+<dt>dec<span class="classifier">float</span></dt><dd><p>Target Declination in degrees [-90, 90].</p>
+</dd>
+<dt>radius<span class="classifier">float</span></dt><dd><p>Cone search radius in degrees.</p>
+</dd>
+<dt>verbose<span class="classifier">bool, optional</span></dt><dd><p>Whether to print diagnostic messages (default is False).</p>
+</dd>
+</dl>
+</section>
+<section id="id27">
+<h3>Returns<a class="headerlink" href="#id27" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>dict</dt><dd><p>Dictionary containing ‘sql_search_string’, ‘ra_min’, ‘ra_max’, ‘dec_min’, ‘dec_max’,
+and a boolean flag ‘wraps_ra’ indicating whether RA wraps across 0 deg.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.gaia.query_gaia_2mass_wise">
@@ -1143,8 +1233,8 @@ heliocentric: Heliocentric position of the body in AU (astropy.coordinates.Carte
 <span class="sig-prename descclassname"><span class="pre">rosalia.horizons.</span></span><span class="sig-name descname"><span class="pre">interpolate_Roman_state_vectors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mjd</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.horizons.interpolate_Roman_state_vectors" title="Link to this definition"></a></dt>
 <dd><p>Interpolates X, Y, Z, VX, VY, VZ from the OEM DataFrame
 for the given astropy Time object.</p>
-<section id="id24">
-<h3>Parameters<a class="headerlink" href="#id24" title="Link to this heading"></a></h3>
+<section id="id28">
+<h3>Parameters<a class="headerlink" href="#id28" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>df<span class="classifier">pandas.DataFrame</span></dt><dd><p>Must contain columns: DATE, X, Y, Z, VX, VY, VZ
 DATE must be parseable by astropy.time.Time</p>
@@ -1153,8 +1243,8 @@ DATE must be parseable by astropy.time.Time</p>
 </dd>
 </dl>
 </section>
-<section id="id25">
-<h3>Returns<a class="headerlink" href="#id25" title="Link to this heading"></a></h3>
+<section id="id29">
+<h3>Returns<a class="headerlink" href="#id29" title="Link to this heading"></a></h3>
 <dl>
 <dt>dict</dt><dd><p>Interpolated values:
 {</p>
@@ -1269,7 +1359,7 @@ DATE, X, Y, Z, VX, VY, VZ</p>
 <dd><p>This method calculates a as a function the position on the detector x,y
 the theta = distance from the straylight source and the n_lambda (wavelength in nm)
 Required by the method ndi_envelope to calculate the NDI profile
-A(θ_DEG, λ_nm ) = A(0, 550) <a href="#id26"><span class="problematic" id="id27">*</span></a>([λ_nm/550)]^(n(θ_DEG))</p>
+A(θ_DEG, λ_nm ) = A(0, 550) <a href="#id30"><span class="problematic" id="id31">*</span></a>([λ_nm/550)]^(n(θ_DEG))</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -1329,6 +1419,11 @@ NDI (θ_DEG,λ_nm) = A(θ_DEG,λ_nm)*1/((1+[(θ_DEG/θ_1s )]^2))*((1+[(θ_DEG/θ
 <dd></dd></dl>
 
 </dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosalia.ndi.save_aligned_ndi_map">
+<span class="sig-prename descclassname"><span class="pre">rosalia.ndi.</span></span><span class="sig-name descname"><span class="pre">save_aligned_ndi_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SCA</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ra_point</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec_point</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pa_point</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subarray</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.ndi.save_aligned_ndi_map" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.ndi.straylight_flux">
@@ -1401,13 +1496,18 @@ NDI (θ_DEG,λ_nm) = A(θ_DEG,λ_nm)*1/((1+[(θ_DEG/θ_1s )]^2))*((1+[(θ_DEG/θ
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="rosalia.plots.get_combined_NDI_map">
+<span class="sig-prename descclassname"><span class="pre">rosalia.plots.</span></span><span class="sig-name descname"><span class="pre">get_combined_NDI_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">SCA</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ra_point</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec_point</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pixscale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.008333333333333333</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ndi_label_i</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dummy_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dummy_ndi_plot.fits'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.plots.get_combined_NDI_map" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="rosalia.plots.main_offender_find_fraction_of_map">
 <span class="sig-prename descclassname"><span class="pre">rosalia.plots.</span></span><span class="sig-name descname"><span class="pre">main_offender_find_fraction_of_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mainoff_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalog</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.plots.main_offender_find_fraction_of_map" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.plots.make_stars_around_plot">
-<span class="sig-prename descclassname"><span class="pre">rosalia.plots.</span></span><span class="sig-name descname"><span class="pre">make_stars_around_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flt_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalog</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">astropywcs_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">RA_TARG</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">DEC_TARG</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(10,</span> <span class="pre">7)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.plots.make_stars_around_plot" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">rosalia.plots.</span></span><span class="sig-name descname"><span class="pre">make_stars_around_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">catalog</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">astropywcs_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">RA_TARG</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">DEC_TARG</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(10,</span> <span class="pre">7)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.plots.make_stars_around_plot" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -1422,7 +1522,7 @@ NDI (θ_DEG,λ_nm) = A(θ_DEG,λ_nm)*1/((1+[(θ_DEG/θ_1s )]^2))*((1+[(θ_DEG/θ
 
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.plots.plot_ndi_main_offenders">
-<span class="sig-prename descclassname"><span class="pre">rosalia.plots.</span></span><span class="sig-name descname"><span class="pre">plot_ndi_main_offenders</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">RA_TARG</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">DEC_TARG</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PA</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaled_main_off</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalog</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ndi_level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(10,</span> <span class="pre">7)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.plots.plot_ndi_main_offenders" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">rosalia.plots.</span></span><span class="sig-name descname"><span class="pre">plot_ndi_main_offenders</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">RA_TARG</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">DEC_TARG</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PA</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaled_main_off</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalog</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pixscale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.008333333333333333</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(12,</span> <span class="pre">9)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.plots.plot_ndi_main_offenders" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -1504,6 +1604,207 @@ NDI (θ_DEG,λ_nm) = A(θ_DEG,λ_nm)*1/((1+[(θ_DEG/θ_1s )]^2))*((1+[(θ_DEG/θ
 </section>
 <section id="module-rosalia.psf">
 <span id="rosalia-psf-module"></span><h2>rosalia.psf module<a class="headerlink" href="#module-rosalia.psf" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="rosalia.psf.Star">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">rosalia.psf.</span></span><span class="sig-name descname"><span class="pre">Star</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">row</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.psf.Star" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Represent a catalog star with broadband photometry and an interpolated SED.</p>
+<p>The input catalog row is expected to contain <code class="docutils literal notranslate"><span class="pre">ra</span></code>, <code class="docutils literal notranslate"><span class="pre">dec</span></code>, <code class="docutils literal notranslate"><span class="pre">source_id</span></code>,
+and the AB-magnitude columns consumed by <a class="reference internal" href="#rosalia.psf.Star.set_magnitudes" title="rosalia.psf.Star.set_magnitudes"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_magnitudes()</span></code></a> for Gaia,
+2MASS, and WISE. If <code class="docutils literal notranslate"><span class="pre">detector_id</span></code> is present, it is also stored as
+<code class="docutils literal notranslate"><span class="pre">WFI</span></code>. Photometry is associated with fixed representative wavelengths;
+<a class="reference internal" href="#rosalia.psf.Star.sed" title="rosalia.psf.Star.sed"><code class="xref py py-meth docutils literal notranslate"><span class="pre">sed()</span></code></a> linearly interpolates (and extrapolates beyond) those samples
+in AB magnitude as a function of wavelength.</p>
+<p>This interpolation is a convenient approximate stellar SED, not a
+spectrophotometric model. In particular, <a class="reference internal" href="#rosalia.psf.Star.get_magnitudes" title="rosalia.psf.Star.get_magnitudes"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_magnitudes()</span></code></a> returns a
+transmission-weighted average of interpolated magnitudes; it does not
+perform a flux-space synthetic-photometry integration.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="rosalia.psf.Star.get_galsim_sed">
+<span class="sig-name descname"><span class="pre">get_galsim_sed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.psf.Star.get_galsim_sed" title="Link to this definition"></a></dt>
+<dd><p>Build and store a GalSim SED from the catalog photometry.</p>
+<p>Converts the stored AB magnitudes to flux densities and constructs a
+linearly interpolated GalSim spectrum. The resulting objects are
+stored on <code class="docutils literal notranslate"><span class="pre">self</span></code> as <code class="docutils literal notranslate"><span class="pre">fnu</span></code>, <code class="docutils literal notranslate"><span class="pre">spectrum_table</span></code>, <code class="docutils literal notranslate"><span class="pre">galsim_sed</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">profile</span></code>; the latter is a delta-function point source multiplied
+by the SED.</p>
+<section id="id32">
+<h3>Returns<a class="headerlink" href="#id32" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>None</dt><dd><p>The GalSim objects are assigned to instance attributes.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosalia.psf.Star.get_linear_weights">
+<span class="sig-name descname"><span class="pre">get_linear_weights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bandpass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instrument</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'WFI'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">23.9</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.psf.Star.get_linear_weights" title="Link to this definition"></a></dt>
+<dd><p>Return filter wavelengths and spectral flux contributions in nJy/pixel.</p>
+<section id="id33">
+<h3>Parameters<a class="headerlink" href="#id33" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>bandpass<span class="classifier">str</span></dt><dd><p>Roman/WFI filter name, such as <code class="docutils literal notranslate"><span class="pre">&quot;F158&quot;</span></code>.</p>
+</dd>
+<dt>instrument<span class="classifier">str, optional</span></dt><dd><p>Instrument containing the filter. Defaults to <code class="docutils literal notranslate"><span class="pre">&quot;WFI&quot;</span></code>.</p>
+</dd>
+<dt>zp<span class="classifier">float, optional</span></dt><dd><p>AB zero point in the nJy convention. Defaults to 23.9, for which
+<code class="docutils literal notranslate"><span class="pre">f_nJy</span> <span class="pre">=</span> <span class="pre">10**((zp</span> <span class="pre">-</span> <span class="pre">magnitude)</span> <span class="pre">/</span> <span class="pre">2.5)</span></code>.</p>
+</dd>
+</dl>
+</section>
+<section id="id34">
+<h3>Returns<a class="headerlink" href="#id34" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>tuple[numpy.ndarray, numpy.ndarray]</dt><dd><p><code class="docutils literal notranslate"><span class="pre">(wavelength_nm,</span> <span class="pre">flux_contributions_nJy_per_pixel)</span></code>. The flux
+contributions sum to the flux corresponding to
+<a class="reference internal" href="#rosalia.psf.Star.get_magnitudes" title="rosalia.psf.Star.get_magnitudes"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_magnitudes()</span></code></a> multiplied by the pixel area.</p>
+</dd>
+</dl>
+</section>
+<section id="id35">
+<h3>Notes<a class="headerlink" href="#id35" title="Link to this heading"></a></h3>
+<p>The target total is kept consistent with the class’s approximate
+magnitude-space filter average. The distribution across wavelength
+follows the interpolated SED, filter transmission, and wavelength-bin
+widths; it is intended for weighting monochromatic PSFs.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosalia.psf.Star.get_magnitude_weights">
+<span class="sig-name descname"><span class="pre">get_magnitude_weights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bandpass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instrument</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'WFI'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.psf.Star.get_magnitude_weights" title="Link to this definition"></a></dt>
+<dd><p>Return each wavelength sample’s contribution to the approximate magnitude.</p>
+<section id="id36">
+<h3>Parameters<a class="headerlink" href="#id36" title="Link to this heading"></a></h3>
+<blockquote>
+<div><dl class="simple">
+<dt>bandpass<span class="classifier">str</span></dt><dd><p>Roman/WFI filter name, such as <code class="docutils literal notranslate"><span class="pre">&quot;F158&quot;</span></code>.</p>
+</dd>
+<dt>instrument<span class="classifier">str, optional</span></dt><dd><p>Name of the instrument containing the specified filterband. Default is ‘WFI’.</p>
+</dd>
+</dl>
+</div></blockquote>
+</section>
+<section id="id37">
+<h3>Returns<a class="headerlink" href="#id37" title="Link to this heading"></a></h3>
+<blockquote>
+<div><dl class="simple">
+<dt>numpy.ndarray</dt><dd><p>Values <code class="docutils literal notranslate"><span class="pre">magnitude(wavelength)</span> <span class="pre">*</span> <span class="pre">transmission</span> <span class="pre">/</span> <span class="pre">sum(transmission)</span></code>
+at the filter’s sampled wavelengths. Their sum equals the value
+returned by <a class="reference internal" href="#rosalia.psf.Star.get_magnitudes" title="rosalia.psf.Star.get_magnitudes"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_magnitudes()</span></code></a> (up to floating-point error).</p>
+</dd>
+</dl>
+</div></blockquote>
+</section>
+<section id="id38">
+<h3>Notes<a class="headerlink" href="#id38" title="Link to this heading"></a></h3>
+<p>Despite the method name, these are magnitude contributions, not
+dimensionless SED weights. They use the same approximate magnitude-
+space averaging as <a class="reference internal" href="#rosalia.psf.Star.get_magnitudes" title="rosalia.psf.Star.get_magnitudes"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_magnitudes()</span></code></a>.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosalia.psf.Star.get_magnitudes">
+<span class="sig-name descname"><span class="pre">get_magnitudes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bandpass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instrument</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'WFI'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.psf.Star.get_magnitudes" title="Link to this definition"></a></dt>
+<dd><p>Estimate an AB magnitude for a Roman/WFI filter.</p>
+<section id="id39">
+<h3>Parameters<a class="headerlink" href="#id39" title="Link to this heading"></a></h3>
+<blockquote>
+<div><dl class="simple">
+<dt>bandpass<span class="classifier">str</span></dt><dd><p>Roman/WFI filter name, such as <code class="docutils literal notranslate"><span class="pre">&quot;F158&quot;</span></code>.</p>
+</dd>
+<dt>instrument<span class="classifier">str, optional</span></dt><dd><p>Name of the instrument containing the specified filterband. Default is ‘WFI’.</p>
+</dd>
+</dl>
+</div></blockquote>
+</section>
+<section id="id40">
+<h3>Returns<a class="headerlink" href="#id40" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Transmission-weighted mean of the interpolated AB magnitudes at
+the filter’s sampled wavelengths.</p>
+</dd>
+</dl>
+</section>
+<section id="id41">
+<h3>Notes<a class="headerlink" href="#id41" title="Link to this heading"></a></h3>
+<p>This is an approximate average in magnitude space, calculated as
+<code class="docutils literal notranslate"><span class="pre">sum(magnitude</span> <span class="pre">*</span> <span class="pre">transmission)</span> <span class="pre">/</span> <span class="pre">sum(transmission)</span></code>. It is not the
+standard flux-space synthetic AB magnitude. The filter curve is
+retrieved through <a class="reference internal" href="#rosalia.telescopes.Roman.get_filter" title="rosalia.telescopes.Roman.get_filter"><code class="xref py py-meth docutils literal notranslate"><span class="pre">rosalia.telescopes.Roman.get_filter()</span></code></a>.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosalia.psf.Star.make_interpolator">
+<span class="sig-name descname"><span class="pre">make_interpolator</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.psf.Star.make_interpolator" title="Link to this definition"></a></dt>
+<dd><p>Create a linear AB-magnitude interpolator over the stored samples.</p>
+<p>The interpolator allows extrapolation outside the sampled wavelength
+range. It is stored as <code class="docutils literal notranslate"><span class="pre">self._interpolator</span></code> and used by <a class="reference internal" href="#rosalia.psf.Star.sed" title="rosalia.psf.Star.sed"><code class="xref py py-meth docutils literal notranslate"><span class="pre">sed()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosalia.psf.Star.plot_spectrum">
+<span class="sig-name descname"><span class="pre">plot_spectrum</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.psf.Star.plot_spectrum" title="Link to this definition"></a></dt>
+<dd><p>Plot the interpolated AB-magnitude SED and its catalog samples.</p>
+<section id="id42">
+<h3>Returns<a class="headerlink" href="#id42" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>tuple[matplotlib.figure.Figure, matplotlib.axes.Axes]</dt><dd><p>Figure and axes containing the spectrum. The magnitude axis is
+inverted, as is conventional for plotting magnitudes.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosalia.psf.Star.sed">
+<span class="sig-name descname"><span class="pre">sed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wave</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.psf.Star.sed" title="Link to this definition"></a></dt>
+<dd><p>Evaluate the interpolated SED in AB magnitudes.</p>
+<section id="id43">
+<h3>Parameters<a class="headerlink" href="#id43" title="Link to this heading"></a></h3>
+<blockquote>
+<div><dl class="simple">
+<dt>wave<span class="classifier">astropy.units.Quantity or array-like</span></dt><dd><p>Wavelength(s) at which to evaluate the SED. Any length unit
+supported by Astropy is accepted. Unitless inputs are assumed
+to be in <code class="docutils literal notranslate"><span class="pre">self.wave_units</span></code>.</p>
+</dd>
+</dl>
+</div></blockquote>
+</section>
+<section id="id44">
+<h3>Returns<a class="headerlink" href="#id44" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>numpy.ndarray or numpy scalar</dt><dd><p>Interpolated AB magnitudes. The returned values are plain numeric
+magnitudes, not an Astropy <code class="docutils literal notranslate"><span class="pre">Quantity</span></code>. Values outside the
+photometric wavelength range are linearly extrapolated.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosalia.psf.Star.set_magnitudes">
+<span class="sig-name descname"><span class="pre">set_magnitudes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">row</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.psf.Star.set_magnitudes" title="Link to this definition"></a></dt>
+<dd><p>Load the catalog’s AB magnitudes and their representative wavelengths.</p>
+<p>The wavelengths are fixed reference values in Angstroms for the Gaia,
+2MASS, and WISE bands. This method populates the per-band attributes
+(for example, <code class="docutils literal notranslate"><span class="pre">bp</span></code> and <code class="docutils literal notranslate"><span class="pre">bp_wave</span></code>), plus the <code class="docutils literal notranslate"><span class="pre">mag</span></code> and <code class="docutils literal notranslate"><span class="pre">wave</span></code>
+arrays used to construct the interpolated SED.</p>
+<section id="id45">
+<h3>Parameters<a class="headerlink" href="#id45" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>row<span class="classifier">pandas.Series</span></dt><dd><p>Catalog record containing the photometry columns listed in
+<a class="reference internal" href="#rosalia.psf.Star" title="rosalia.psf.Star"><code class="xref py py-class docutils literal notranslate"><span class="pre">Star</span></code></a>’s constructor documentation.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.psf.append_empty_rows">
 <span class="sig-prename descclassname"><span class="pre">rosalia.psf.</span></span><span class="sig-name descname"><span class="pre">append_empty_rows</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.psf.append_empty_rows" title="Link to this definition"></a></dt>
@@ -1525,6 +1826,76 @@ NDI (θ_DEG,λ_nm) = A(θ_DEG,λ_nm)*1/((1+[(θ_DEG/θ_1s )]^2))*((1+[(θ_DEG/θ
 <dd></dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="rosalia.psf.build_psf_canvas">
+<span class="sig-prename descclassname"><span class="pre">rosalia.psf.</span></span><span class="sig-name descname"><span class="pre">build_psf_canvas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stars_catalog</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape_out</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bandpass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">31</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'superback'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.psf.build_psf_canvas" title="Link to this definition"></a></dt>
+<dd><p>Build a PSF canvas from a catalog of stars in parallel.</p>
+<section id="id46">
+<h3>Parameters<a class="headerlink" href="#id46" title="Link to this heading"></a></h3>
+<blockquote>
+<div><dl class="simple">
+<dt>stars_catalog: pandas.DataFrame</dt><dd><dl class="simple">
+<dt>Catalog of stars containing at least columns:</dt><dd><p><cite>ra</cite>, <cite>dec</cite>, <cite>x</cite>, <cite>y</cite>, <cite>detector_id</cite>, <cite>x_det</cite>, <cite>y_det</cite></p>
+</dd>
+</dl>
+</dd>
+<dt>shape_out: tuple</dt><dd><p>Shape of the output PSF canvas (ny, nx).</p>
+</dd>
+<dt>bandpass: str</dt><dd><p>Bandpass of the observation in Roman WFI filter names (e.g., F062, F087, F106, F129, F158, F184, F213).</p>
+</dd>
+<dt>depth: float, optional</dt><dd><p>Depth at which to build the PSF in mag arcsecond^-2. Default is 31.</p>
+</dd>
+<dt>n_workers: int, optional</dt><dd><p>Maximum number of parallel workers. Defaults to at most two to limit
+the memory used by concurrently generated PSF models.</p>
+</dd>
+<dt>method: str, optional</dt><dd><p>PSF model to use. Defaults to <code class="docutils literal notranslate"><span class="pre">&quot;superback&quot;</span></code>.</p>
+</dd>
+</dl>
+</div></blockquote>
+</section>
+<section id="id47">
+<h3>Returns<a class="headerlink" href="#id47" title="Link to this heading"></a></h3>
+<blockquote>
+<div><dl class="simple">
+<dt>np.ndarray</dt><dd><p>PSF canvas of shape <cite>shape_out</cite>.</p>
+</dd>
+</dl>
+</div></blockquote>
+</section>
+<section id="id48">
+<h3>Notes<a class="headerlink" href="#id48" title="Link to this heading"></a></h3>
+<blockquote>
+<div><p>The positions of each detector follow the SIAF convention in pixel coordinates.</p>
+</div></blockquote>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosalia.psf.create_psf_grid">
+<span class="sig-prename descclassname"><span class="pre">rosalia.psf.</span></span><span class="sig-name descname"><span class="pre">create_psf_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size_pixels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_arcsec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oversample_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.psf.create_psf_grid" title="Link to this definition"></a></dt>
+<dd><p>Create coordinate grids for PSF calculation.</p>
+<section id="id49">
+<h3>Parameters<a class="headerlink" href="#id49" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>size_pixels<span class="classifier">int</span></dt><dd><p>PSF array size (will be size_pixels x size_pixels)</p>
+</dd>
+<dt>scale_arcsec<span class="classifier">float</span></dt><dd><p>Pixel scale in arcsec/pixel</p>
+</dd>
+<dt>oversample_factor<span class="classifier">float</span></dt><dd><p>Sub-pixel sampling factor</p>
+</dd>
+</dl>
+</section>
+<section id="id50">
+<h3>Returns<a class="headerlink" href="#id50" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>x<span class="classifier">ndarray</span></dt><dd><p>X coordinate grid in arcsec</p>
+</dd>
+<dt>y<span class="classifier">ndarray</span></dt><dd><p>Y coordinate grid in arcsec</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="rosalia.psf.find_SCA_for_a_target">
 <span class="sig-prename descclassname"><span class="pre">rosalia.psf.</span></span><span class="sig-name descname"><span class="pre">find_SCA_for_a_target</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_border</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.psf.find_SCA_for_a_target" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -1540,9 +1911,89 @@ NDI (θ_DEG,λ_nm) = A(θ_DEG,λ_nm)*1/((1+[(θ_DEG/θ_1s )]^2))*((1+[(θ_DEG/θ
 <dd></dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="rosalia.psf.generate_star_stamps">
-<span class="sig-prename descclassname"><span class="pre">rosalia.psf.</span></span><span class="sig-name descname"><span class="pre">generate_star_stamps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hybrid_catalog</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">telescope</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sciexts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">astropywcs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.psf.generate_star_stamps" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="rosalia.psf.galsim_roman_psf">
+<span class="sig-prename descclassname"><span class="pre">rosalia.psf.</span></span><span class="sig-name descname"><span class="pre">galsim_roman_psf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">position</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SCA</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bandpass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SED</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.psf.galsim_roman_psf" title="Link to this definition"></a></dt>
+<dd><p>Generate a Roman WFI point-spread function using GalSim.</p>
+<section id="id51">
+<h3>Parameters<a class="headerlink" href="#id51" title="Link to this heading"></a></h3>
+<blockquote>
+<div><dl class="simple">
+<dt>position<span class="classifier">sequence of float</span></dt><dd><p>Two-dimensional detector coordinates <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y)</span></code> in pixels.</p>
+</dd>
+<dt>SCA<span class="classifier">int</span></dt><dd><p>Roman WFI SCA number, from 1 through 18.</p>
+</dd>
+<dt>bandpass<span class="classifier">str</span></dt><dd><p>Roman WFI filter name, for example <code class="docutils literal notranslate"><span class="pre">&quot;F158&quot;</span></code>.</p>
+</dd>
+<dt>shape<span class="classifier">tuple of int, optional</span></dt><dd><p>The shape of the output PSF image in pixels, as <code class="docutils literal notranslate"><span class="pre">(ny,</span> <span class="pre">nx)</span></code>. If
+<code class="docutils literal notranslate"><span class="pre">None</span></code>, the default size used by GalSim’s <code class="docutils literal notranslate"><span class="pre">drawImage</span></code> is used.</p>
+</dd>
+<dt>SED<span class="classifier">galsim.SED or None, optional</span></dt><dd><p>The spectral energy distribution to use for the PSF. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, a plane SED is used.</p>
+</dd>
+<dt>method<span class="classifier">str, optional</span></dt><dd><p>The method to use for PSF generation. Default is <code class="docutils literal notranslate"><span class="pre">'stpsf'</span></code>.</p>
+</dd>
+<dt>kwargs<span class="classifier">dict, optional</span></dt><dd><p>Additional keyword arguments to pass to the galsim.GSParams.</p>
+</dd>
+</dl>
+</div></blockquote>
+</section>
+<section id="id52">
+<h3>Returns<a class="headerlink" href="#id52" title="Link to this heading"></a></h3>
+<blockquote>
+<div><dl class="simple">
+<dt>astropy.io.fits.PrimaryHDU</dt><dd><p>The rendered PSF image in the primary HDU.</p>
+</dd>
+</dl>
+</div></blockquote>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosalia.psf.generate_star_in_footprint">
+<span class="sig-prename descclassname"><span class="pre">rosalia.psf.</span></span><span class="sig-name descname"><span class="pre">generate_star_in_footprint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hybrid_catalog</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sciexts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">astropywcs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">telescope</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Roman'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'F129'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.psf.generate_star_in_footprint" title="Link to this definition"></a></dt>
+<dd><p>Deprecated version of the generate_star_stamps function.
+This function generates star stamps for each SCIEXT in the input catalog.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosalia.psf.generate_star_stamps_deprecated">
+<span class="sig-prename descclassname"><span class="pre">rosalia.psf.</span></span><span class="sig-name descname"><span class="pre">generate_star_stamps_deprecated</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hybrid_catalog</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">telescope</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sciexts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">astropywcs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.psf.generate_star_stamps_deprecated" title="Link to this definition"></a></dt>
+<dd><p>Generate individual PSF-based FITS stamps for catalog stars.</p>
+<section id="id53">
+<h3>Parameters<a class="headerlink" href="#id53" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>hybrid_catalog<span class="classifier">pandas.DataFrame</span></dt><dd><p>Catalog containing at least <code class="docutils literal notranslate"><span class="pre">ra</span></code>, <code class="docutils literal notranslate"><span class="pre">dec</span></code>, and <code class="docutils literal notranslate"><span class="pre">mag_lambda</span></code> columns.</p>
+</dd>
+<dt>telescope<span class="classifier">str</span></dt><dd><p>Telescope name used to select the telescope-specific PSF implementation.</p>
+</dd>
+<dt>filename<span class="classifier">str</span></dt><dd><p>Input FITS exposure used to determine each star’s detector/SCA.</p>
+</dd>
+<dt>sciexts<span class="classifier">iterable of int</span></dt><dd><p>Science-extension or detector identifiers to process.</p>
+</dd>
+<dt>astropywcs<span class="classifier">sequence of astropy.wcs.WCS</span></dt><dd><p>WCS objects corresponding to the science extensions.</p>
+</dd>
+<dt>filter<span class="classifier">str</span></dt><dd><p>Roman filter name used to generate the PSF and calculate stellar flux.</p>
+</dd>
+<dt>pa<span class="classifier">float</span></dt><dd><p>Position angle in degrees written to each generated stamp’s WCS.</p>
+</dd>
+<dt>verbose<span class="classifier">bool or int, optional</span></dt><dd><p>Controls progress and diagnostic output. Values greater than 1 enable
+more detailed progress reporting.</p>
+</dd>
+</dl>
+</section>
+<section id="id54">
+<h3>Returns<a class="headerlink" href="#id54" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>list of list of str</dt><dd><p>Output FITS filenames grouped by science extension.</p>
+</dd>
+</dl>
+</section>
+<section id="id55">
+<h3>Notes<a class="headerlink" href="#id55" title="Link to this heading"></a></h3>
+<p>This function is deprecated. It creates a directory named
+<code class="docutils literal notranslate"><span class="pre">&lt;filename</span> <span class="pre">without</span> <span class="pre">.fits&gt;_star_stamps</span></code> and generates one FITS PSF stamp
+per catalog star. Existing stamp files are reused.</p>
+</section>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.psf.getWCS_galsim_dict_style">
@@ -1550,9 +2001,80 @@ NDI (θ_DEG,λ_nm) = A(θ_DEG,λ_nm)*1/((1+[(θ_DEG/θ_1s )]^2))*((1+[(θ_DEG/θ
 <dd></dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="rosalia.psf.get_detector_position_telescope_frame">
+<span class="sig-prename descclassname"><span class="pre">rosalia.psf.</span></span><span class="sig-name descname"><span class="pre">get_detector_position_telescope_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">detector_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idl_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idl_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.psf.get_detector_position_telescope_frame" title="Link to this definition"></a></dt>
+<dd><p>Convert detector position to telescope frame coordinates.</p>
+<section id="id56">
+<h3>Parameters<a class="headerlink" href="#id56" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>detector_id<span class="classifier">str</span></dt><dd><p>Detector identifier (e.g., ‘WFI01’)</p>
+</dd>
+<dt>idl_x<span class="classifier">float</span></dt><dd><p>X position in detector ideal frame (pixels)</p>
+</dd>
+<dt>idl_y<span class="classifier">float</span></dt><dd><p>Y position in detector ideal frame (pixels)</p>
+</dd>
+</dl>
+</section>
+<section id="id57">
+<h3>Returns<a class="headerlink" href="#id57" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>thetax<span class="classifier">float</span></dt><dd><p>V2 position in telescope frame (radians)</p>
+</dd>
+<dt>thetay<span class="classifier">float</span></dt><dd><p>V3 position in telescope frame (radians)</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="rosalia.psf.get_hybrid_catalog">
 <span class="sig-prename descclassname"><span class="pre">rosalia.psf.</span></span><span class="sig-name descname"><span class="pre">get_hybrid_catalog</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_ref</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MJD</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g_mag_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default_query.dat'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.psf.get_hybrid_catalog" title="Link to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosalia.psf.get_psf_extension_moffat">
+<span class="sig-prename descclassname"><span class="pre">rosalia.psf.</span></span><span class="sig-name descname"><span class="pre">get_psf_extension_moffat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.52</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.psf.get_psf_extension_moffat" title="Link to this definition"></a></dt>
+<dd><p>Analytically calculate the PSF extension based on a standard Moffat profile at a given depth.</p>
+<section id="id58">
+<h3>Parameters<a class="headerlink" href="#id58" title="Link to this heading"></a></h3>
+<blockquote>
+<div><dl class="simple">
+<dt>mag: float or array-like</dt><dd><p>Magnitude(s) of the star.</p>
+</dd>
+<dt>depth: float, optional</dt><dd><p>Depth at the extension in mag arcsecond^-2. Default is 30.</p>
+</dd>
+<dt>alpha<span class="classifier">float, optional</span></dt><dd><p>Scale parameter of the Moffat profile. Default is 0.08.</p>
+</dd>
+<dt>beta<span class="classifier">float, optional</span></dt><dd><p>Shape parameter of the Moffat profile. Default is 1.52.</p>
+</dd>
+</dl>
+</div></blockquote>
+</section>
+<section id="id59">
+<h3>Returns<a class="headerlink" href="#id59" title="Link to this heading"></a></h3>
+<blockquote>
+<div><dl class="simple">
+<dt>float or np.ndarray</dt><dd><p>Exact PSF extension in arcseconds.</p>
+</dd>
+</dl>
+</div></blockquote>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosalia.psf.get_roman_canvas_geometry">
+<span class="sig-prename descclassname"><span class="pre">rosalia.psf.</span></span><span class="sig-name descname"><span class="pre">get_roman_canvas_geometry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pixscale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.11</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.psf.get_roman_canvas_geometry" title="Link to this definition"></a></dt>
+<dd><p>Geometry of the full Roman/WFI canvas, computed only from pysiaf.
+The canvas lives in the ideal frame of WFI_CEN, with pixel size pixscale (arcsec).
+Returns the (x, y) ideal-frame origin of the canvas edge and its (ny, nx) shape.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosalia.psf.get_roman_canvas_wcs">
+<span class="sig-prename descclassname"><span class="pre">rosalia.psf.</span></span><span class="sig-name descname"><span class="pre">get_roman_canvas_wcs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wcs_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pixscale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.11</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.psf.get_roman_canvas_wcs" title="Link to this definition"></a></dt>
+<dd><p>WCS and shape of the full Roman/WFI canvas from the 18 detector WCS, using only pysiaf
+for the layout (no reproject). Returns (canvas_wcs, shape) with shape = (ny, nx).</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.psf.identify_stars_in_out_field">
@@ -1560,14 +2082,104 @@ NDI (θ_DEG,λ_nm) = A(θ_DEG,λ_nm)*1/((1+[(θ_DEG/θ_1s )]^2))*((1+[(θ_DEG/θ
 <dd></dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="rosalia.psf.make_roman_canvas_from_detectors">
+<span class="sig-prename descclassname"><span class="pre">rosalia.psf.</span></span><span class="sig-name descname"><span class="pre">make_roman_canvas_from_detectors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wcs_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pixscale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.11</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.psf.make_roman_canvas_from_detectors" title="Link to this definition"></a></dt>
+<dd><p>Function 1. Combine the 18 Roman/WFI detector arrays (4088x4088, ordered WFI01 to WFI18)
+and their astropy WCS into a mosaic of the full field of view, using only pysiaf for the
+detector layout (no reproject). Gaps between detectors are NaN.</p>
+<p>Returns (canvas, canvas_wcs).</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="rosalia.psf.measure_maxradii">
 <span class="sig-prename descclassname"><span class="pre">rosalia.psf.</span></span><span class="sig-name descname"><span class="pre">measure_maxradii</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rmax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">saturation_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clean_profile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.psf.measure_maxradii" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="rosalia.psf.moffat_2d">
+<span class="sig-prename descclassname"><span class="pre">rosalia.psf.</span></span><span class="sig-name descname"><span class="pre">moffat_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.psf.moffat_2d" title="Link to this definition"></a></dt>
+<dd><p>Generate a 2D Moffat profile.</p>
+<section id="id60">
+<h3>Parameters<a class="headerlink" href="#id60" title="Link to this heading"></a></h3>
+<blockquote>
+<div><dl class="simple">
+<dt>shape<span class="classifier">tuple of int</span></dt><dd><p>Shape of the 2D array to generate.</p>
+</dd>
+<dt>mu0<span class="classifier">float</span></dt><dd><p>Central surface brightness.</p>
+</dd>
+<dt>alpha<span class="classifier">float</span></dt><dd><p>Scale parameter.</p>
+</dd>
+<dt>beta<span class="classifier">float</span></dt><dd><p>Shape parameter.</p>
+</dd>
+</dl>
+</div></blockquote>
+</section>
+<section id="id61">
+<h3>Returns<a class="headerlink" href="#id61" title="Link to this heading"></a></h3>
+<blockquote>
+<div><dl class="simple">
+<dt>np.ndarray</dt><dd><p>2D array representing the surface brightness at each point.</p>
+</dd>
+</dl>
+</div></blockquote>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosalia.psf.moffat_function_sb">
+<span class="sig-prename descclassname"><span class="pre">rosalia.psf.</span></span><span class="sig-name descname"><span class="pre">moffat_function_sb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.psf.moffat_function_sb" title="Link to this definition"></a></dt>
+<dd><p>Moffat surface brightness profile in magnitudes per square arcsecond.</p>
+<section id="id62">
+<h3>Parameters<a class="headerlink" href="#id62" title="Link to this heading"></a></h3>
+<blockquote>
+<div><dl class="simple">
+<dt>r<span class="classifier">float or np.ndarray</span></dt><dd><p>Radial distance from the center.</p>
+</dd>
+<dt>mu0<span class="classifier">float</span></dt><dd><p>Central surface brightness.</p>
+</dd>
+<dt>alpha<span class="classifier">float</span></dt><dd><p>Scale parameter.</p>
+</dd>
+<dt>beta<span class="classifier">float</span></dt><dd><p>Shape parameter.</p>
+</dd>
+</dl>
+</div></blockquote>
+</section>
+<section id="id63">
+<h3>Returns<a class="headerlink" href="#id63" title="Link to this heading"></a></h3>
+<blockquote>
+<div><dl class="simple">
+<dt>float or np.ndarray: </dt><dd><p>Surface brightness at radius r.</p>
+</dd>
+</dl>
+</div></blockquote>
+</section>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="rosalia.psf.psf_harvester_single_exposure">
 <span class="sig-prename descclassname"><span class="pre">rosalia.psf.</span></span><span class="sig-name descname"><span class="pre">psf_harvester_single_exposure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.psf.psf_harvester_single_exposure" title="Link to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosalia.psf.recover_detector_frames">
+<span class="sig-prename descclassname"><span class="pre">rosalia.psf.</span></span><span class="sig-name descname"><span class="pre">recover_detector_frames</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">canvas</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimal_wcs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_wcs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_shapes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.psf.recover_detector_frames" title="Link to this definition"></a></dt>
+<dd><p>Reproject a mosaic canvas into the pixel grid of each detector.</p>
+<p>The returned list follows the same ordering as <code class="docutils literal notranslate"><span class="pre">detector_wcs</span></code> and can be
+used like an exposure’s <code class="docutils literal notranslate"><span class="pre">DATA</span></code> list.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosalia.psf.recover_roman_detectors_from_canvas">
+<span class="sig-prename descclassname"><span class="pre">rosalia.psf.</span></span><span class="sig-name descname"><span class="pre">recover_roman_detectors_from_canvas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">canvas</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">canvas_wcs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pixscale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.11</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sip_degree</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_wcs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.psf.recover_roman_detectors_from_canvas" title="Link to this definition"></a></dt>
+<dd><p>Function 2. Inverse of make_roman_canvas_from_detectors. Extract the 18 Roman/WFI detector
+arrays (4088x4088, WFI01 to WFI18) from a canvas built with the same pixscale, using pysiaf
+for the detector layout and the canvas WCS for the sky positions.</p>
+<p>Returns (data_list, wcs_list). Each detector WCS is a TAN fit with SIP distortion terms
+(sip_degree) to the canvas WCS evaluated at the detector pixels.</p>
+<p>If detector_wcs (18 astropy WCS) is given, the canvas can be on any grid (e.g. a swarp
+mosaic): each detector pixel is mapped to the sky with its WCS and then to the canvas with
+canvas_wcs. Those WCS are returned unchanged.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.psf.scale_and_subtract_stars">
@@ -1578,6 +2190,124 @@ NDI (θ_DEG,λ_nm) = A(θ_DEG,λ_nm)*1/((1+[(θ_DEG/θ_1s )]^2))*((1+[(θ_DEG/θ
 <dt class="sig sig-object py" id="rosalia.psf.scale_and_subtract_stars_single_image">
 <span class="sig-prename descclassname"><span class="pre">rosalia.psf.</span></span><span class="sig-name descname"><span class="pre">scale_and_subtract_stars_single_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psf_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extrapolate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.psf.scale_and_subtract_stars_single_image" title="Link to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosalia.psf.stpsf_roman_psf">
+<span class="sig-prename descclassname"><span class="pre">rosalia.psf.</span></span><span class="sig-name descname"><span class="pre">stpsf_roman_psf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">position</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SCA</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bandpass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SED</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">magnitude_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wave_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oversample_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">23.9</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pixel_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.11</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.psf.stpsf_roman_psf" title="Link to this definition"></a></dt>
+<dd><p>Render a flux-calibrated, chromatic Roman/WFI PSF with STPSF.</p>
+<p>Monochromatic STPSF PSFs are interpolated over the requested filter and
+combined using the supplied spectrum. Each image pixel is in nJy/pixel;
+the image sum is conserved to the requested integrated flux, including
+when a rectangular output is cropped.</p>
+<section id="id64">
+<h3>Parameters<a class="headerlink" href="#id64" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>position<span class="classifier">sequence of float</span></dt><dd><p>Detector position <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y)</span></code> in pixels.</p>
+</dd>
+<dt>SCA<span class="classifier">int</span></dt><dd><p>Roman WFI SCA number (1–18).</p>
+</dd>
+<dt>bandpass<span class="classifier">str</span></dt><dd><p>Roman WFI filter name, for example <code class="docutils literal notranslate"><span class="pre">&quot;F158&quot;</span></code>.</p>
+</dd>
+<dt>shape<span class="classifier">tuple of int, optional</span></dt><dd><p>Output shape <code class="docutils literal notranslate"><span class="pre">(ny,</span> <span class="pre">nx)</span></code>. Defaults to 91 by 91 pixels.</p>
+</dd>
+<dt>SED<span class="classifier">galsim.SED, optional</span></dt><dd><p>Optional SED whose values are interpreted as spectral <code class="docutils literal notranslate"><span class="pre">f_nu</span></code> in
+cgs units. If supplied without explicit weights, its band-averaged
+flux is converted to nJy and distributed across the filter.</p>
+</dd>
+<dt>magnitude_weights<span class="classifier">array-like, optional</span></dt><dd><p>AB magnitudes at each wavelength in <code class="docutils literal notranslate"><span class="pre">wave_weights</span></code>. These are
+converted to nJy/pixel using <code class="docutils literal notranslate"><span class="pre">zp</span></code> and <code class="docutils literal notranslate"><span class="pre">pixel_scale</span></code>. Prefer
+<code class="docutils literal notranslate"><span class="pre">flux_weights</span></code> when flux contributions are already available.</p>
+</dd>
+<dt>wave_weights<span class="classifier">array-like or astropy.units.Quantity, optional</span></dt><dd><p>Wavelengths corresponding to <code class="docutils literal notranslate"><span class="pre">magnitude_weights</span></code> or
+<code class="docutils literal notranslate"><span class="pre">flux_weights</span></code>. Unitless values are interpreted as nanometers.</p>
+</dd>
+<dt>flux_weights<span class="classifier">array-like, optional</span></dt><dd><p>Per-wavelength flux contributions in nJy/pixel. They are summed
+directly and should pair with <code class="docutils literal notranslate"><span class="pre">wave_weights</span></code>. This is the preferred
+input for <a class="reference internal" href="#rosalia.psf.Star.get_linear_weights" title="rosalia.psf.Star.get_linear_weights"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Star.get_linear_weights()</span></code></a> output.</p>
+</dd>
+<dt>zp<span class="classifier">float, optional</span></dt><dd><p>AB zero point for converting magnitudes to nJy. Defaults to 23.9.</p>
+</dd>
+<dt>pixel_scale<span class="classifier">float, optional</span></dt><dd><p>Pixel scale in arcsec/pixel, used to convert surface flux density to
+nJy/pixel for magnitude and SED inputs. Defaults to 0.11.</p>
+</dd>
+<dt><a href="#id65"><span class="problematic" id="id66">**</span></a>kwargs</dt><dd><p>Parameters passed to <code class="docutils literal notranslate"><span class="pre">galsim.GSParams</span></code> for PSF interpolation setup.</p>
+</dd>
+</dl>
+</section>
+<section id="id67">
+<h3>Returns<a class="headerlink" href="#id67" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>astropy.io.fits.PrimaryHDU</dt><dd><p>Chromatic PSF in nJy/pixel. Header includes <code class="docutils literal notranslate"><span class="pre">BUNIT</span></code>, <code class="docutils literal notranslate"><span class="pre">MAGZP</span></code>,
+<code class="docutils literal notranslate"><span class="pre">PIXSCALE</span></code>, and <code class="docutils literal notranslate"><span class="pre">ABMAG</span></code> (the integrated surface-brightness
+magnitude corresponding to the pixel sum).</p>
+</dd>
+</dl>
+</section>
+<section id="id68">
+<h3>Notes<a class="headerlink" href="#id68" title="Link to this heading"></a></h3>
+<p>STPSF expects monochromatic wavelengths in meters; filter curves and
+<code class="docutils literal notranslate"><span class="pre">wave_weights</span></code> are handled in nanometers internally.</p>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosalia.psf.superback_roman_psf">
+<span class="sig-prename descclassname"><span class="pre">rosalia.psf.</span></span><span class="sig-name descname"><span class="pre">superback_roman_psf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">position</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SCA</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bandpass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SED</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">magnitude_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wave_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oversample_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">23.9</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pixel_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.11</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.psf.superback_roman_psf" title="Link to this definition"></a></dt>
+<dd><p>Render a flux-calibrated, chromatic Roman/WFI PSF with SUPERBACK analytical model.</p>
+<p>Monochromatic STPSF PSFs are interpolated over the requested filter and
+combined using the supplied spectrum. Each image pixel is in nJy/pixel;
+the image sum is conserved to the requested integrated flux, including
+when a rectangular output is cropped.</p>
+<section id="id69">
+<h3>Parameters<a class="headerlink" href="#id69" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>position<span class="classifier">sequence of float</span></dt><dd><p>Detector position <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y)</span></code> in pixels.</p>
+</dd>
+<dt>SCA<span class="classifier">int</span></dt><dd><p>Roman WFI SCA number (1–18).</p>
+</dd>
+<dt>bandpass<span class="classifier">str</span></dt><dd><p>Roman WFI filter name, for example <code class="docutils literal notranslate"><span class="pre">&quot;F158&quot;</span></code>.</p>
+</dd>
+<dt>shape<span class="classifier">tuple of int, optional</span></dt><dd><p>Output shape <code class="docutils literal notranslate"><span class="pre">(ny,</span> <span class="pre">nx)</span></code>. Defaults to 91 by 91 pixels.</p>
+</dd>
+<dt>SED<span class="classifier">galsim.SED, optional</span></dt><dd><p>Optional SED whose values are interpreted as spectral <code class="docutils literal notranslate"><span class="pre">f_nu</span></code> in
+cgs units. If supplied without explicit weights, its band-averaged
+flux is converted to nJy and distributed across the filter.</p>
+</dd>
+<dt>magnitude_weights<span class="classifier">array-like, optional</span></dt><dd><p>AB magnitudes at each wavelength in <code class="docutils literal notranslate"><span class="pre">wave_weights</span></code>. These are
+converted to nJy/pixel using <code class="docutils literal notranslate"><span class="pre">zp</span></code> and <code class="docutils literal notranslate"><span class="pre">pixel_scale</span></code>. Prefer
+<code class="docutils literal notranslate"><span class="pre">flux_weights</span></code> when flux contributions are already available.</p>
+</dd>
+<dt>wave_weights<span class="classifier">array-like or astropy.units.Quantity, optional</span></dt><dd><p>Wavelengths corresponding to <code class="docutils literal notranslate"><span class="pre">magnitude_weights</span></code> or
+<code class="docutils literal notranslate"><span class="pre">flux_weights</span></code>. Unitless values are interpreted as nanometers.</p>
+</dd>
+<dt>flux_weights<span class="classifier">array-like, optional</span></dt><dd><p>Per-wavelength flux contributions in nJy/pixel. They are summed
+directly and should pair with <code class="docutils literal notranslate"><span class="pre">wave_weights</span></code>. This is the preferred
+input for <a class="reference internal" href="#rosalia.psf.Star.get_linear_weights" title="rosalia.psf.Star.get_linear_weights"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Star.get_linear_weights()</span></code></a> output.</p>
+</dd>
+<dt>zp<span class="classifier">float, optional</span></dt><dd><p>AB zero point for converting magnitudes to nJy. Defaults to 23.9.</p>
+</dd>
+<dt>pixel_scale<span class="classifier">float, optional</span></dt><dd><p>Pixel scale in arcsec/pixel, used to convert surface flux density to
+nJy/pixel for magnitude and SED inputs. Defaults to 0.11.</p>
+</dd>
+<dt><a href="#id70"><span class="problematic" id="id71">**</span></a>kwargs</dt><dd><p>Parameters passed to <code class="docutils literal notranslate"><span class="pre">galsim.GSParams</span></code> for PSF interpolation setup.</p>
+</dd>
+</dl>
+</section>
+<section id="id72">
+<h3>Returns<a class="headerlink" href="#id72" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>astropy.io.fits.PrimaryHDU</dt><dd><p>Chromatic PSF in nJy/pixel. Header includes <code class="docutils literal notranslate"><span class="pre">BUNIT</span></code>, <code class="docutils literal notranslate"><span class="pre">MAGZP</span></code>,
+<code class="docutils literal notranslate"><span class="pre">PIXSCALE</span></code>, and <code class="docutils literal notranslate"><span class="pre">ABMAG</span></code> (the integrated surface-brightness
+magnitude corresponding to the pixel sum).</p>
+</dd>
+</dl>
+</section>
+<section id="id73">
+<h3>Notes<a class="headerlink" href="#id73" title="Link to this heading"></a></h3>
+<p>STPSF expects monochromatic wavelengths in meters; filter curves and
+<code class="docutils literal notranslate"><span class="pre">wave_weights</span></code> are handled in nanometers internally.</p>
+</section>
+</dd></dl>
 
 </section>
 <section id="module-rosalia.render">
@@ -1647,8 +2377,8 @@ it case by case.</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Main background class. Loads background data for a specific (RA, DEC)
 directly from the online cache at STScI.</p>
-<section id="id28">
-<h3>Parameters<a class="headerlink" href="#id28" title="Link to this heading"></a></h3>
+<section id="id74">
+<h3>Parameters<a class="headerlink" href="#id74" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>ra<span class="classifier">float</span></dt><dd><p>Right ascension in decimal degrees</p>
 </dd>
@@ -1657,6 +2387,11 @@ directly from the online cache at STScI.</p>
 <dt>wavelength<span class="classifier">float</span></dt><dd><p>Wavelength (micron)</p>
 </dd>
 </dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosalia.sky.background.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;module</span> <span class="pre">'copy'</span> <span class="pre">from</span> <span class="pre">'/Users/aborlaff/miniforge3/envs/rosalia/lib/python3.12/copy.py'&gt;</span></span><a class="headerlink" href="#rosalia.sky.background.copy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="rosalia.sky.background.interpolate_spec">
 <span class="sig-name descname"><span class="pre">interpolate_spec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wave</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">specin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_wave</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">nan</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.sky.background.interpolate_spec" title="Link to this definition"></a></dt>
@@ -1703,6 +2438,60 @@ parse it into arrays, and return the structured dict.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="rosalia.sky.compute_visibility.get_body">
+<span class="sig-name descname"><span class="pre">get_body</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ephemeris</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.sky.compute_visibility.get_body" title="Link to this definition"></a></dt>
+<dd><p>Get a <cite>~astropy.coordinates.SkyCoord</cite> for a solar system body as observed
+from a location on Earth in the <cite>~astropy.coordinates.GCRS</cite> reference
+system.</p>
+<section id="id75">
+<h3>Parameters<a class="headerlink" href="#id75" title="Link to this heading"></a></h3>
+<dl>
+<dt>body<span class="classifier">str or list of tuple</span></dt><dd><p>The solar system body for which to calculate positions.  Can also be a
+kernel specifier (list of 2-tuples) if the <code class="docutils literal notranslate"><span class="pre">ephemeris</span></code> is a JPL
+kernel.</p>
+</dd>
+<dt>time<span class="classifier"><cite>~astropy.time.Time</cite></span></dt><dd><p>Time of observation.</p>
+</dd>
+<dt>location<span class="classifier"><cite>~astropy.coordinates.EarthLocation</cite>, optional</span></dt><dd><p>Location of observer on the Earth.  If not given, will be taken from
+<code class="docutils literal notranslate"><span class="pre">time</span></code> (if not present, a geocentric observer will be assumed).</p>
+</dd>
+<dt>ephemeris<span class="classifier">str, optional</span></dt><dd><p>Ephemeris to use.  If not given, use the one set with
+<code class="docutils literal notranslate"><span class="pre">astropy.coordinates.solar_system_ephemeris.set</span></code> (which is
+set to ‘builtin’ by default).</p>
+</dd>
+</dl>
+</section>
+<section id="id76">
+<h3>Returns<a class="headerlink" href="#id76" title="Link to this heading"></a></h3>
+<dl>
+<dt>skycoord<span class="classifier"><cite>~astropy.coordinates.SkyCoord</cite></span></dt><dd><p>GCRS Coordinate for the body</p>
+</dd>
+</dl>
+</section>
+<section id="id77">
+<h3>Notes<a class="headerlink" href="#id77" title="Link to this heading"></a></h3>
+<p>The coordinate returned is the apparent position, which is the position of
+the body at time <em>t</em> minus the light travel time from the <em>body</em> to the
+observing <em>location</em>.</p>
+<p>You can either give an explicit ephemeris or use a default, which is normally
+a built-in ephemeris that does not require ephemeris files.  To change
+the default to be the JPL ephemeris:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astropy.coordinates</span><span class="w"> </span><span class="kn">import</span> <span class="n">solar_system_ephemeris</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">solar_system_ephemeris</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">'jpl'</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Use of any JPL ephemeris requires the jplephem package
+(<a class="reference external" href="https://pypi.org/project/jplephem/">https://pypi.org/project/jplephem/</a>).
+If needed, the ephemeris file will be downloaded (and cached).</p>
+<p>One can check which bodies are covered by a given ephemeris using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">solar_system_ephemeris</span><span class="o">.</span><span class="n">bodies</span>
+<span class="go">('earth', 'sun', 'moon', 'mercury', 'venus', 'earth-moon-barycenter', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune')</span>
+</pre></div>
+</div>
+</section>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="rosalia.sky.compute_visibility.get_good_angles">
 <span class="sig-name descname"><span class="pre">get_good_angles</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.sky.compute_visibility.get_good_angles" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -1722,11 +2511,6 @@ the results will still be valid</p>
 </dd></dl>
 
 </dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="rosalia.sky.correct_flat_sky">
-<span class="sig-prename descclassname"><span class="pre">rosalia.sky.</span></span><span class="sig-name descname"><span class="pre">correct_flat_sky</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.sky.correct_flat_sky" title="Link to this definition"></a></dt>
-<dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.sky.get_healpix">
@@ -2472,8 +3256,51 @@ M890    800.0 890.0 980.0</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="rosalia.telescopes.Roman.get_psf">
-<span class="sig-name descname"><span class="pre">get_psf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">detector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.telescopes.Roman.get_psf" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">get_psf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">SCA</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bandpass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SED</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'stpsf'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.telescopes.Roman.get_psf" title="Link to this definition"></a></dt>
+<dd><p>Generate a Roman WFI point-spread function for one detector position.</p>
+<section id="id78">
+<h3>Parameters<a class="headerlink" href="#id78" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>position<span class="classifier">sequence of float</span></dt><dd><p>Two-dimensional detector coordinates <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y)</span></code> in pixels. These
+coordinates are passed to GalSim as the SCA position at which the
+PSF should be evaluated.</p>
+</dd>
+<dt>SCA<span class="classifier">int</span></dt><dd><p>Roman WFI SCA number, from 1 through 18.</p>
+</dd>
+<dt>bandpass<span class="classifier">str</span></dt><dd><p>Roman WFI filter name, for example <code class="docutils literal notranslate"><span class="pre">&quot;F158&quot;</span></code>. The filter must be
+available in <code class="docutils literal notranslate"><span class="pre">romanisim.bandpass.roman2galsim_bandpass</span></code> and in
+the SVO filter data used by <a class="reference internal" href="#rosalia.telescopes.find_filter_in_svo" title="rosalia.telescopes.find_filter_in_svo"><code class="xref py py-func docutils literal notranslate"><span class="pre">find_filter_in_svo()</span></code></a>.</p>
+</dd>
+<dt>shape<span class="classifier">tuple of int, optional</span></dt><dd><p>The shape of the output PSF image in pixels, as <code class="docutils literal notranslate"><span class="pre">(ny,</span> <span class="pre">nx)</span></code>. If
+<code class="docutils literal notranslate"><span class="pre">None</span></code>, the default size used by GalSim’s <code class="docutils literal notranslate"><span class="pre">drawImage</span></code> is used.</p>
+</dd>
+<dt>SED<span class="classifier">galsim.SED or None, optional</span></dt><dd><p>The spectral energy distribution to use for the PSF. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, a plane SED is used.</p>
+</dd>
+<dt>method<span class="classifier">str, optional</span></dt><dd><p>The method to use for PSF generation. Default is <code class="docutils literal notranslate"><span class="pre">'stpsf'</span></code>.
+Currently supports:
+- <code class="docutils literal notranslate"><span class="pre">'stpsf'</span></code>: Using STScI’s stpsf Roman PSF model.
+- <code class="docutils literal notranslate"><span class="pre">'galsim'</span></code>: Using GalSim’s Roman PSF model directly.
+- <code class="docutils literal notranslate"><span class="pre">'superback'</span></code>: Using analytical model from SUPERBACK.</p>
+</dd>
+<dt>kwargs<span class="classifier">dict, optional</span></dt><dd><p>Additional keyword arguments to pass to the galsim.GSParams.</p>
+</dd>
+</dl>
+</section>
+<section id="id79">
+<h3>Returns<a class="headerlink" href="#id79" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>astropy.io.fits.PrimaryHDU</dt><dd><p>The rendered PSF image in the primary HDU. The image is produced
+with GalSim’s Roman PSF model and has the default output image
+size used by <code class="docutils literal notranslate"><span class="pre">drawImage</span></code>.</p>
+</dd>
+</dl>
+</section>
+<section id="id80">
+<h3>Notes<a class="headerlink" href="#id80" title="Link to this heading"></a></h3>
+<p>A point source Delta function is used to convert the given 
+SED to a profile suitable for convolution with the PSF.</p>
+</section>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="rosalia.telescopes.Roman.mirror_radius">
@@ -2634,6 +3461,11 @@ Input parameters:</p>
 <span class="sig-prename descclassname"><span class="pre">rosalia.tests.</span></span><span class="sig-name descname"><span class="pre">test_photometry_superstars</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.tests.test_photometry_superstars" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="rosalia.tests.test_recover_detector_frames_from_canvas">
+<span class="sig-prename descclassname"><span class="pre">rosalia.tests.</span></span><span class="sig-name descname"><span class="pre">test_recover_detector_frames_from_canvas</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.tests.test_recover_detector_frames_from_canvas" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 </section>
 <section id="module-rosalia.utils">
 <span id="rosalia-utils-module"></span><h2>rosalia.utils module<a class="headerlink" href="#module-rosalia.utils" title="Link to this heading"></a></h2>
@@ -2665,6 +3497,48 @@ v1: October 17, 2024 - Fastest version compared against numba, or astropy.</p>
 <dd></dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="rosalia.utils.check_numeric_type">
+<span class="sig-prename descclassname"><span class="pre">rosalia.utils.</span></span><span class="sig-name descname"><span class="pre">check_numeric_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.utils.check_numeric_type" title="Link to this definition"></a></dt>
+<dd><p>Checks if an object is an Astropy Quantity, a standard number, or neither.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>obj: The object to inspect.</p>
+</dd>
+<dt>Returns:</dt><dd><p>str: Description of the object’s numeric type.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosalia.utils.check_sources_in_footprint">
+<span class="sig-prename descclassname"><span class="pre">rosalia.utils.</span></span><span class="sig-name descname"><span class="pre">check_sources_in_footprint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">detector_wcs_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_shapes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.utils.check_sources_in_footprint" title="Link to this definition"></a></dt>
+<dd><p>Checks if given RA/Dec source(s) fall inside the unrotated mosaic footprint,
+automatically aligning the orientation angle with the first detector chip.</p>
+<section id="id81">
+<h3>Parameters:<a class="headerlink" href="#id81" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>detector_wcs_list<span class="classifier">list of astropy.wcs.WCS</span></dt><dd><p>The WCS objects for each detector chip. The first item ([0]) is used
+as the reference for the physical observation rotation angle.</p>
+</dd>
+<dt>detector_shapes<span class="classifier">list of tuples</span></dt><dd><p>The (ny, nx) shapes of each detector chip matching the order of detector_wcs_list.</p>
+</dd>
+<dt>ra<span class="classifier">float, list, or numpy.ndarray</span></dt><dd><p>Right Ascension of the source(s) in degrees.</p>
+</dd>
+<dt>dec<span class="classifier">float, list, or numpy.ndarray</span></dt><dd><p>Declination of the source(s) in degrees.</p>
+</dd>
+<dt>width<span class="classifier">int or float, optional</span></dt><dd><p>Pixel padding to extend (or shrink, if negative) the footprint border. Default is 0.</p>
+</dd>
+</dl>
+</section>
+<section id="id82">
+<h3>Returns:<a class="headerlink" href="#id82" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>inside<span class="classifier">bool or numpy.ndarray of bool</span></dt><dd><p>A boolean (or array of booleans) indicating if each source falls within the boundary.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="rosalia.utils.circle_around_position">
 <span class="sig-prename descclassname"><span class="pre">rosalia.utils.</span></span><span class="sig-name descname"><span class="pre">circle_around_position</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npoints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.utils.circle_around_position" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -2673,8 +3547,8 @@ v1: October 17, 2024 - Fastest version compared against numba, or astropy.</p>
 <dt class="sig sig-object py" id="rosalia.utils.circular_hist">
 <span class="sig-prename descclassname"><span class="pre">rosalia.utils.</span></span><span class="sig-name descname"><span class="pre">circular_hist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">density</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gaps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dodgerblue'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edgecolor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'C0'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.utils.circular_hist" title="Link to this definition"></a></dt>
 <dd><p>Produce a circular histogram of angles on ax.</p>
-<section id="id29">
-<h3>Parameters<a class="headerlink" href="#id29" title="Link to this heading"></a></h3>
+<section id="id83">
+<h3>Parameters<a class="headerlink" href="#id83" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>ax<span class="classifier">matplotlib.axes._subplots.PolarAxesSubplot</span></dt><dd><p>axis instance created with subplot_kw=dict(projection=’polar’).</p>
 </dd>
@@ -2693,8 +3567,8 @@ forced to partition the entire [-pi, pi] range. The default is True.</p>
 </dd>
 </dl>
 </section>
-<section id="id30">
-<h3>Returns<a class="headerlink" href="#id30" title="Link to this heading"></a></h3>
+<section id="id84">
+<h3>Returns<a class="headerlink" href="#id84" title="Link to this heading"></a></h3>
 <dl>
 <dt>n<span class="classifier">array or list of arrays</span></dt><dd><p>The number of values in each bin.</p>
 </dd>
@@ -2729,7 +3603,7 @@ or list of such containers if there are multiple input datasets.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.utils.create_dummy_image_with_wcs">
-<span class="sig-prename descclassname"><span class="pre">rosalia.utils.</span></span><span class="sig-name descname"><span class="pre">create_dummy_image_with_wcs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ra_cen</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec_cen</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ra_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pixscale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default_dummy.fits'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.utils.create_dummy_image_with_wcs" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">rosalia.utils.</span></span><span class="sig-name descname"><span class="pre">create_dummy_image_with_wcs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ra_cen</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec_cen</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ra_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pixscale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default_dummy.fits'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.utils.create_dummy_image_with_wcs" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -2751,8 +3625,8 @@ or list of such containers if there are multiple input datasets.</p>
 <dt class="sig sig-object py" id="rosalia.utils.distance_to_galactic_plane">
 <span class="sig-prename descclassname"><span class="pre">rosalia.utils.</span></span><span class="sig-name descname"><span class="pre">distance_to_galactic_plane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.utils.distance_to_galactic_plane" title="Link to this definition"></a></dt>
 <dd><p>Calculate the angular distance from a sky position to the galactic plane.</p>
-<section id="id31">
-<h3>Parameters:<a class="headerlink" href="#id31" title="Link to this heading"></a></h3>
+<section id="id85">
+<h3>Parameters:<a class="headerlink" href="#id85" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>ra<span class="classifier">float</span></dt><dd><p>Right Ascension</p>
 </dd>
@@ -2764,8 +3638,8 @@ or list of such containers if there are multiple input datasets.</p>
 </dd>
 </dl>
 </section>
-<section id="id32">
-<h3>Returns:<a class="headerlink" href="#id32" title="Link to this heading"></a></h3>
+<section id="id86">
+<h3>Returns:<a class="headerlink" href="#id86" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>distance<span class="classifier">float</span></dt><dd><p>Angular distance to the galactic plane in degrees</p>
 </dd>
@@ -2774,6 +3648,32 @@ or list of such containers if there are multiple input datasets.</p>
 <dt>galactic_lon<span class="classifier">float</span></dt><dd><p>Galactic longitude in degrees</p>
 </dd>
 </dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosalia.utils.distribute_indices_numpy">
+<span class="sig-prename descclassname"><span class="pre">rosalia.utils.</span></span><span class="sig-name descname"><span class="pre">distribute_indices_numpy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.utils.distribute_indices_numpy" title="Link to this definition"></a></dt>
+<dd><p>Distribute indices of an array into N roughly equal parts in a balanced manner.</p>
+<section id="id87">
+<h3>Parameters<a class="headerlink" href="#id87" title="Link to this heading"></a></h3>
+<blockquote>
+<div><dl class="simple">
+<dt>nums: array-like</dt><dd><p>Array of numbers to distribute.</p>
+</dd>
+<dt>N: int</dt><dd><p>Number of parts to distribute into.</p>
+</dd>
+</dl>
+</div></blockquote>
+</section>
+<section id="id88">
+<h3>Returns<a class="headerlink" href="#id88" title="Link to this heading"></a></h3>
+<blockquote>
+<div><dl class="simple">
+<dt>list of lists</dt><dd><p>Each sublist contains the indices of <cite>nums</cite> assigned to that part.</p>
+</dd>
+</dl>
+</div></blockquote>
 </section>
 </dd></dl>
 
@@ -2827,6 +3727,29 @@ or list of such containers if there are multiple input datasets.</p>
 <dd></dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="rosalia.utils.find_closest_detector">
+<span class="sig-prename descclassname"><span class="pre">rosalia.utils.</span></span><span class="sig-name descname"><span class="pre">find_closest_detector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">detector_wcs_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.utils.find_closest_detector" title="Link to this definition"></a></dt>
+<dd><p>Finds the closest detector for target sources using vectorized math.</p>
+<section id="id89">
+<h3>Parameters:<a class="headerlink" href="#id89" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ra<span class="classifier">float or numpy.ndarray</span></dt><dd><p>RA coordinate(s) in degrees.</p>
+</dd>
+<dt>dec<span class="classifier">float or numpy.ndarray</span></dt><dd><p>Dec coordinate(s) in degrees.</p>
+</dd>
+</dl>
+</section>
+<section id="id90">
+<h3>Returns:<a class="headerlink" href="#id90" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>closest_indices<span class="classifier">numpy.ndarray or int</span></dt><dd><p>The index (or array of indices) of the closest WCS in <cite>wcs_list</cite>.
+Returns a scalar integer if single floats were passed.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="rosalia.utils.find_max_angular_size_of_image">
 <span class="sig-prename descclassname"><span class="pre">rosalia.utils.</span></span><span class="sig-name descname"><span class="pre">find_max_angular_size_of_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wcs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ra_cen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec_cen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.utils.find_max_angular_size_of_image" title="Link to this definition"></a></dt>
 <dd><p>Returns the maximum angular extension of an image.</p>
@@ -2861,7 +3784,22 @@ or list of such containers if there are multiple input datasets.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.utils.fix_custom_catalog">
 <span class="sig-prename descclassname"><span class="pre">rosalia.utils.</span></span><span class="sig-name descname"><span class="pre">fix_custom_catalog</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">catalog</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.utils.fix_custom_catalog" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Fix a custom catalog by adding a dummy entry if it contains only one row.</p>
+<section id="id91">
+<h3>PARAMETERS<a class="headerlink" href="#id91" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>catalog<span class="classifier">dict or pandas.DataFrame</span></dt><dd><p>Custom catalog to be fixed.</p>
+</dd>
+</dl>
+</section>
+<section id="id92">
+<h3>RETURNS<a class="headerlink" href="#id92" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>pandas.DataFrame</dt><dd><p>Fixed catalog with a dummy entry if it originally contained only one row.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.utils.flambda_to_fnu">
@@ -2876,11 +3814,6 @@ or list of such containers if there are multiple input datasets.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.utils.generate_image_interpolator">
 <span class="sig-prename descclassname"><span class="pre">rosalia.utils.</span></span><span class="sig-name descname"><span class="pre">generate_image_interpolator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.utils.generate_image_interpolator" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="rosalia.utils.generate_mosaic">
-<span class="sig-prename descclassname"><span class="pre">rosalia.utils.</span></span><span class="sig-name descname"><span class="pre">generate_mosaic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">astropywcs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.utils.generate_mosaic" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -2929,6 +3862,28 @@ or list of such containers if there are multiple input datasets.</p>
 <dt class="sig sig-object py" id="rosalia.utils.get_pixscale">
 <span class="sig-prename descclassname"><span class="pre">rosalia.utils.</span></span><span class="sig-name descname"><span class="pre">get_pixscale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fits_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.utils.get_pixscale" title="Link to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosalia.utils.get_ra_dec_arrays">
+<span class="sig-prename descclassname"><span class="pre">rosalia.utils.</span></span><span class="sig-name descname"><span class="pre">get_ra_dec_arrays</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fits_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.utils.get_ra_dec_arrays" title="Link to this definition"></a></dt>
+<dd><p>Analyze a FITS file with WCS and return RA and Dec arrays for each pixel.</p>
+<section id="id93">
+<h3>Parameters:<a class="headerlink" href="#id93" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>fits_file<span class="classifier">str</span></dt><dd><p>Path to the FITS file</p>
+</dd>
+</dl>
+</section>
+<section id="id94">
+<h3>Returns:<a class="headerlink" href="#id94" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ra_array<span class="classifier">numpy.ndarray</span></dt><dd><p>2D array containing Right Ascension (in degrees) for each pixel</p>
+</dd>
+<dt>dec_array<span class="classifier">numpy.ndarray</span></dt><dd><p>2D array containing Declination (in degrees) for each pixel</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.utils.great_circle_ra_dec_shift">
@@ -3015,7 +3970,7 @@ using scipy.interpolate.RBFInterpolator (supports extrapolation).</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="rosalia.utils.make_profile">
-<span class="sig-prename descclassname"><span class="pre">rosalia.utils.</span></span><span class="sig-name descname"><span class="pre">make_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radial_mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ra_cen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec_cen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xcen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ycen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rbins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pixscale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nsimul</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.utils.make_profile" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">rosalia.utils.</span></span><span class="sig-name descname"><span class="pre">make_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radial_mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ra_cen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec_cen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xcen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ycen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rbins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pixscale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nsimul</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.utils.make_profile" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -3028,8 +3983,8 @@ using scipy.interpolate.RBFInterpolator (supports extrapolation).</p>
 <span class="sig-prename descclassname"><span class="pre">rosalia.utils.</span></span><span class="sig-name descname"><span class="pre">measure_maglim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mu_sky</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instrument</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">telescope</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exptime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.utils.measure_maglim" title="Link to this definition"></a></dt>
 <dd><p>Measure the limiting magnitude of an image given the sky background level, the instrument, 
 filter, telescope and exposure time.</p>
-<section id="id33">
-<h3>Parameters<a class="headerlink" href="#id33" title="Link to this heading"></a></h3>
+<section id="id95">
+<h3>Parameters<a class="headerlink" href="#id95" title="Link to this heading"></a></h3>
 <blockquote>
 <div><dl class="simple">
 <dt>mu_sky<span class="classifier">float</span></dt><dd><p>Sky background level in AB magnitudes per square arcsecond.</p>
@@ -3051,8 +4006,8 @@ filter, telescope and exposure time.</p>
 </dl>
 </div></blockquote>
 </section>
-<section id="id34">
-<h3>Returns<a class="headerlink" href="#id34" title="Link to this heading"></a></h3>
+<section id="id96">
+<h3>Returns<a class="headerlink" href="#id96" title="Link to this heading"></a></h3>
 <blockquote>
 <div><dl class="simple">
 <dt>mu_lim<span class="classifier">float</span></dt><dd><p>Limiting surface brightness in AB magnitudes per square arcsecond for the 
@@ -3086,11 +4041,6 @@ v1: October 17, 2024</p>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="rosalia.utils.reproject_roman_wfi_fits">
-<span class="sig-prename descclassname"><span class="pre">rosalia.utils.</span></span><span class="sig-name descname"><span class="pre">reproject_roman_wfi_fits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wcs_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mosaic_wcs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.utils.reproject_roman_wfi_fits" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="rosalia.utils.run_basic_astrodrizzle">
 <span class="sig-prename descclassname"><span class="pre">rosalia.utils.</span></span><span class="sig-name descname"><span class="pre">run_basic_astrodrizzle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.utils.run_basic_astrodrizzle" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -3104,11 +4054,11 @@ v1: October 17, 2024</p>
 <dt class="sig sig-object py" id="rosalia.utils.run_swarp">
 <span class="sig-prename descclassname"><span class="pre">rosalia.utils.</span></span><span class="sig-name descname"><span class="pre">run_swarp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coveredfrac</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">celestial_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'NATIVE'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rosalia.utils.run_swarp" title="Link to this definition"></a></dt>
 <dd><p>run_swarp:
-This program runs SWARP on the input pattern of files, and generates a mosaic with the output name specified in outname. The pattern can be a string with the name of the file, a list of files, or a pattern with <a href="#id35"><span class="problematic" id="id36">*</span></a>. The output mosaic will be saved as outname, and if scale is different from 1, a scaled version of the mosaic will be saved as outname with the suffix “_scaled.fits”.</p>
+This program runs SWARP on the input pattern of files, and generates a mosaic with the output name specified in outname. The pattern can be a string with the name of the file, a list of files, or a pattern with <a href="#id97"><span class="problematic" id="id98">*</span></a>. The output mosaic will be saved as outname, and if scale is different from 1, a scaled version of the mosaic will be saved as outname with the suffix “_scaled.fits”.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>pattern</strong> (<em>str</em><em>, </em><em>list</em>) – Pattern of files to be mosaicked. It can be a string with the name of the file, a list of files, or a pattern with <a href="#id37"><span class="problematic" id="id38">*</span></a>.</p></li>
+<li><p><strong>pattern</strong> (<em>str</em><em>, </em><em>list</em>) – Pattern of files to be mosaicked. It can be a string with the name of the file, a list of files, or a pattern with <a href="#id99"><span class="problematic" id="id100">*</span></a>.</p></li>
 <li><p><strong>outname</strong> (<em>str</em>) – Name of the output mosaic file. It should end with .fits</p></li>
 <li><p><strong>scale</strong> (<em>float</em>) – Scale factor for the output mosaic. If scale is different from 1, a scaled version of the mosaic will be saved as outname with the suffix “_scaled.fits”. The scale factor is applied to the pixel scale of the mosaic, so that the output mosaic will have a pixel scale that is scale times the original pixel scale. For example, if scale=0.1, the output mosaic will have a pixel scale that is 10 times the original pixel scale, and the output mosaic will be 10 times smaller in size than the original mosaic. The default value is 1 (no scaling).</p></li>
 <li><p><strong>coveredfrac</strong> (<em>float</em>) – Fraction of the mosaic that must be covered by input images. The default value is 1 (all pixels must be covered).</p></li>
@@ -3198,6 +4148,9 @@ of 2 to 3.</p>
 <section id="module-rosalia">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-rosalia" title="Link to this heading"></a></h2>
 <p>ROSALIA: ROman Sky Analyst for Low surface brightness Imaging &amp; Astronomy</p>
+<p>Alejandro S. Borlaff
+NASA Ames Research Center, Moffett Field, 94035, California, USA.
+<a class="reference external" href="mailto:a&#46;s&#46;borlaff&#37;&#52;&#48;nasa&#46;gov">a<span>&#46;</span>s<span>&#46;</span>borlaff<span>&#64;</span>nasa<span>&#46;</span>gov</a></p>
 </section>
 </section>
 

@@ -3,6 +3,16 @@ Changelog
 =========
 
 
+v1.4.0
+======
+
+Added or Changed
+----------------
+- New rosalia.core.exposure.zodiacal added to ROSALIA
+- New rosalia.core.exposure.psf added to ROSALIA
+- Corrected a bug on the direction of the NDI maps. Needs to be redownloaded from Zenodo. 
+
+
 v1.3.2
 ======
 

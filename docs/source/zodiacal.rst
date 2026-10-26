@@ -1,34 +1,163 @@
 Zodiacal Light
-=========
+==============
 
 Modeling the Zodiacal light background with ROSALIA
------------------------------
+---------------------------------------------------
 
-*This is a work in progress section. We are currently (April 16, 2026) implementing a new Zodiacal light model from STScI team in place. However, the currently in place model is usable an it will provide reasonable solutions for most uses*.
+The Zodiacal light is the dominant source of background for most Roman observations, except at the reddest filters where the thermal background can become comparable. It arises from sunlight scattered by interplanetary dust in the Solar System. Its intensity depends on the sky position, observation time, filter bandpass, and the observer geometry.
 
-The Zodiacal light is the dominant source of background for most of the observations with the Roman Space Telescope, with exception of the thermal background at the reddest filters. It is produced by the scattering of sunlight by interplanetary dust particles in the Solar System. The intensity of the Zodiacal light depends on the line of sight through the Solar System, and therefore on the position of the target in the sky, the time of the observation, and the wavelength. 
+ROSALIA models the Zodiacal light background through the ``rosalia.core.exposure.zodiacal()`` method. This method uses the exposure geometry and computes the expected background for each detector, then writes out a FITS product and a drizzled summary image.
 
-There are several models to estimate the Zodiacal light background, with different levels of complexity and accuracy. ROSALIA implements the model by  `COSMOGLOBE / Zodipy <https://cosmoglobe.github.io/zodipy/usage/>`_. If you use this model, please cite the following papers: `(San et al. 2022) <https://arxiv.org/abs/2205.12962>`_  and  `(San 2024) <https://joss.theoj.org/papers/10.21105/joss.06648#>`_.
+The implementation supports three available backends:
 
-The following code block shows a quick example to easily model the Zodiacal light with ROSALIA. 
+- ``zody_mode="stsci"``
+- ``zody_mode="zodipy"``
+- ``zody_mode="irsa"``
+
+The notebook tutorial ``notebooks/tutorials/R2_Rosalia_zody_example.ipynb`` demonstrates the standard usage for all three options.
+
+
+Quickstart example
+------------------
+
+The simplest workflow is to build a mock Roman/WFI exposure and then call the ``zodiacal`` method on it.
 
 .. code-block:: python
 
-    # This notebook demonstrates how to use ROSALIA to measure the expected zodiacal background in a simple image. 
     import rosalia as rs
     from astropy.time import Time
-    ra = 123 # Right ascension, in degrees. 
-    dec = 45 # Declination, in degrees.
-    PA = 32 # Position angle, in degrees.
-    date = Time("2026-10-01T00:00:00") # Date of the observation, in Astropy Time YYYY-MM-DDTHH:MM:SS format.
+    from astropy.coordinates import SkyCoord
+
+    target = 'alpha Centauri'
+    tgt = SkyCoord.from_name(target)
+    ra = 219.92041
+    dec = -50.835148
+    PA = 9
+    date = Time("2027-10-10T00:00:00")
     bandpass = "F129"
-    exptime = 600 # Exposure time, in seconds.
+    exptime = 600
 
-    rosalia_zody = rs.correct.rosalia_zody(ra=ra, dec=dec, PA=PA, date=date, 
-                                     bandpass=bandpass, exptime=exptime,
-                                     verbose=False)
+    observer = {
+        "TELESCOP": "Roman/WFI",
+        "pointing": [ra, dec],
+        "FILTER": bandpass,
+        "PA_Y": PA,
+        "EXPSTART": date.mjd,
+        "EXPTIME": exptime,
+    }
+
+    prefix = "Pleiades"
+    custom_roman_exposure = rs.core.exposure(observer=observer, prefix=prefix)
+    custom_roman_exposure.plot_footprint()
+
+Once the exposure object has been generated, call the Zodiacal method:
+
+.. code-block:: python
+
+    zodi_out = custom_roman_exposure.zodiacal(zody_mode="stsci")
+
+This computes the Zodiacal background model and writes FITS products in the working directory or next to the input product.
 
 
-.. image:: ../../notebooks/tutorials/WFI_F129_RA_123.000_DEC_045.000_MJD_61314.00000_PA_067.00_zody_drz_scaled_fe2mu.png
-  :alt: ROSALIA example of Zodiacal light model.
+Zodiacal model options
+----------------------
+
+The tutorial covers all three supported options for the Zodiacal background model.
+
+STScI model
+~~~~~~~~~~
+
+.. code-block:: python
+
+    zodi_out = custom_roman_exposure.zodiacal(zody_mode="stsci")
+
+This uses the STScI background model for Roman/WFI and is the direct workflow shown in the tutorial.
+
+Zodipy model
+~~~~~~~~~~~~
+
+.. code-block:: python
+
+    zodipy_zodi_out = custom_roman_exposure.zodiacal(zody_mode="zodipy")
+
+This is the fastest option in the tutorial and is based on the COSMOGLOBE/Zodipy model.
+
+IRSA model
+~~~~~~~~~
+
+.. code-block:: python
+
+    irsa_zodi_out = custom_roman_exposure.zodiacal(zody_mode="irsa")
+
+This uses the IRSA/IPAC Zodiacal light model and is typically the slowest option, but it can be useful for comparisons with external reference models.
+
+
+Method behavior
+---------------
+
+The method is implemented in ``rosalia.core.exposure`` as:
+
+.. code-block:: python
+
+    def zodiacal(self, zody_mode="zodipy", verbose=False, output_name=None,
+                 output_units="e/s", resolution=1, grid_method="random"):
+
+The main arguments are:
+
+- ``zody_mode``: model backend. Supported values include ``"stsci"``, ``"zodipy"``, and ``"irsa"``.
+- ``verbose``: enable more detailed progress output.
+- ``output_name``: optional name for the output FITS file.
+- ``output_units``: output units for the model, default is ``"e/s"``.
+- ``resolution``: drizzled output resolution.
+- ``grid_method``: sampling strategy used to evaluate the background field.
+
+Internally, the method:
+
+1. checks the number of science extensions in the exposure,
+2. computes the background for each detector using ``rs.sky.get_zodiacal_background()``,
+3. stores the detector-level arrays in a list,
+4. writes a FITS file named using the exposure root name plus ``_zody.fits``,
+5. creates a drizzled product named with ``_drz.fits``,
+6. generates summary plots in the requested units.
+
+If ``output_units == "e/s"``, it creates:
+
+- an electron-per-second image plot,
+- a surface-brightness plot in mag arcsec\ :sup:`-2`.
+
+If another unit is selected, it generates a MJy/sr-style plot instead.
+
+The method returns a dictionary of the form:
+
+.. code-block:: python
+
+    {
+        "zodi_list": zodiacal_background_list,
+        "output_name": output_name,
+    }
+
+
+Outputs produced
+----------------
+
+The method writes output products in the same directory as the exposure or the local working directory when using a synthetic observer-only setup. In the tutorial workflow, this includes:
+
+- a Zodiacal light FITS file with a ``_zody.fits`` suffix
+- a drizzled product with a ``_drz.fits`` suffix
+- generated diagnostic plots
+
+These products are designed to be used as background model components for science analysis, correction, or comparison with measured sky levels.
+
+
+Scientific context
+------------------
+
+The Zodiacal light background is one of the dominant sky components in Roman/WFI observations. Accurately modeling it is critical for:
+
+- background subtraction,
+- low-surface-brightness analysis,
+- detector-level calibration,
+- comparison of exposure geometry across observing conditions.
+
+ROSALIA makes this model available in a consistent exposure-based workflow so that the same pointing, date, and filter setup can be evaluated across different Zodiacal-light backends and compared directly.
 

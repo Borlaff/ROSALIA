@@ -1,8 +1,8 @@
 ROSALIA package
-===============
+==================
 
 Submodules
-----------
+-------------
 
 rosalia.albedo module
 ---------------------
@@ -13,7 +13,7 @@ rosalia.albedo module
    :undoc-members:
 
 rosalia.astrometry module
--------------------------
+---------------------------
 
 .. automodule:: rosalia.astrometry
    :members:
@@ -21,7 +21,7 @@ rosalia.astrometry module
    :undoc-members:
 
 rosalia.attitude module
----------------------
+-------------------------
 
 .. automodule:: rosalia.attitude
    :members:

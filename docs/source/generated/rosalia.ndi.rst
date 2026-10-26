@@ -9,6 +9,7 @@ rosalia.ndi
    .. autosummary::
    
       make_ndi_polar_radial_profile
+      save_aligned_ndi_map
       straylight_flux
    
    .. rubric:: Classes
