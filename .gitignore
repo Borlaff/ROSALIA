@@ -30,6 +30,7 @@ notebooks/*/*.pdf
 notebooks/DEVEL
 
 .DS_Store
+**/.DS_Store
  
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -246,4 +247,8 @@ cython_debug/
 .vscode/
 *.swp
  
+
+ # Agents
+MEMORY.md
+REPORT.md
  
