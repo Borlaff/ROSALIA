@@ -62,6 +62,7 @@ dependencies = [
     "psutil",
     "pysiaf",
     "stpsf",
+    "urllib3",
     "ephessos",
     "asdf-astropy>=0.11.0"
 ]

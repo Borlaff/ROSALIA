@@ -114,6 +114,8 @@ def find_filter_in_svo(wavelength, telescope, instrument, detector, verbose=Fals
             instrument = "ACS"
         if telescope.lower() == "rst" or telescope.lower() == "roman" or telescope.lower() == "roman/wfi":
             telescope = "Roman"
+            if wavelength == "GRISM": wavelength = "Grism"
+            if wavelength == "PRISM": wavelength = "Prism"
 
         #if True:
         try:
