@@ -15,6 +15,7 @@ from astropy import units as u
 import datetime
 import pandas as pd
 import pysiaf
+import rosalia as rs
 
 siaf = pysiaf.Siaf('Roman', basepath=os.path.join(os.path.dirname(rs.core.__file__), "CORE", "detector/"),filename='roman_siaf_inflight_20261013.xml')
 
