@@ -17,8 +17,7 @@ import pandas as pd
 import pysiaf
 import rosalia as rs
 
-siaf = pysiaf.Siaf('Roman', basepath=os.path.join(os.path.dirname(rs.core.__file__), "CORE", "detector/"),filename='roman_siaf_inflight_20261013.xml')
-
+siaf = pysiaf.Siaf('Roman', basepath=os.path.join(os.path.dirname(rs.__file__), "CORE", "detector/"),filename='roman_siaf_inflight_20261013.xml')
 
 def get_radec(attitude_matrix):
     """
