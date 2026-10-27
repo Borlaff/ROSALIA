@@ -28,6 +28,7 @@ import matplotlib.pyplot as plt
 # import gunagala.sky as skies # Gunagala is not maintained. It requires to detach from astropy_helpers. https://github.com/astropy/astropy-helpers
 from scipy.interpolate import interp1d, griddata
 
+import copy
 import urllib
 import warnings
 from astropy.utils.exceptions import AstropyWarning
