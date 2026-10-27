@@ -15,7 +15,8 @@ from astropy import units as u
 import datetime
 import pandas as pd
 import pysiaf
-import rosalia as rs
+
+siaf = pysiaf.Siaf('Roman', basepath=os.path.join(os.path.dirname(rs.core.__file__), "CORE", "detector/"),filename='roman_siaf_inflight_20261013.xml')
 
 
 def get_radec(attitude_matrix):
@@ -1390,16 +1391,10 @@ def main():
     print('Matrix math was successfully checked against pysiaf')
 
 
-
-if __name__ == "__main__":
-    exit = main()
-
-
-
 #############
 
 def quaternion_to_WFICEN(quaternion):
-    siaf = pysiaf.Siaf('Roman', basepath=os.path.join(os.path.dirname(rs.core.__file__), "CORE", "detector/"),filename='roman_siaf_inflight_20261013.xml')
+    
     attitude = R.from_quat(quaternion).as_matrix()
     
     ra_wficen, dec_wficen = pysiaf.utils.rotations.pointing(attitude, siaf['WFI_CEN'].V2Ref, siaf['WFI_CEN'].V3Ref)
