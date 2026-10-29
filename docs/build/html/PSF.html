@@ -1,0 +1,211 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>In-field Stars &mdash; ROSALIA 0.9.5 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=61b282d3"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Solar System Objects" href="SSOs.html" />
+    <link rel="prev" title="Zodiacal Light" href="zodiacal.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            ROSALIA
+              <img src="_static/rosalia_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="mission.html">What is ROSALIA?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="measuringstray.html">Stray Light</a></li>
+<li class="toctree-l1"><a class="reference internal" href="zodiacal.html">Zodiacal Light</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">In-field Stars</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#modelling-scattered-emission-psf-from-stars-inside-the-roman-field-of-view">Modelling scattered emission (PSF) from stars inside the Roman field of view</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#quickstart-example">Quickstart example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#generating-a-mosaic-from-the-model">Generating a mosaic from the model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#method-behaviour">Method behaviour</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#supported-modeling-approach">Supported modeling approach</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#notes-for-use">Notes for use</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="SSOs.html">Solar System Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Additional Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">How to use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nexus.html">Roman Research Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="commissioning.html">Roman Commissioning Stray-light Activities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="whoarewe.html">Who is ROSALIA?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rosalia.html">ROSALIA package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ROSALIA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">In-field Stars</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/PSF.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="in-field-stars">
+<h1>In-field Stars<a class="headerlink" href="#in-field-stars" title="Link to this heading"></a></h1>
+<section id="modelling-scattered-emission-psf-from-stars-inside-the-roman-field-of-view">
+<h2>Modelling scattered emission (PSF) from stars inside the Roman field of view<a class="headerlink" href="#modelling-scattered-emission-psf-from-stars-inside-the-roman-field-of-view" title="Link to this heading"></a></h2>
+<p>ROSALIA can model the contribution from stars inside the Roman/WFI field of view using the <code class="docutils literal notranslate"><span class="pre">rosalia.core.exposure.psf()</span></code> method. This is useful when you want to estimate the stellar PSF contribution across the detector footprint, either for science analysis or for subtracting in-field stellar contamination from an exposure.</p>
+<p>The method constructs a PSF model for stars around the FOV using a source catalog and a selected PSF-generation method. By default, the method uses the <a class="reference external" href="https://science.nasa.gov/mission/roman-space-telescope/superback-building-an-empirically-motivated-background-model-to-optimize-roman-observations/">superback</a> model, and it returns the detector-by-detector PSF arrays, their WCS information, and the combined canvas model.</p>
+</section>
+<section id="quickstart-example">
+<h2>Quickstart example<a class="headerlink" href="#quickstart-example" title="Link to this heading"></a></h2>
+<p>The notebook tutorial <code class="docutils literal notranslate"><span class="pre">notebooks/tutorials/R3_Rosalia_psf_example.ipynb</span></code> demonstrates the simplest workflow.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">rosalia</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">rs</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">astropy.time</span><span class="w"> </span><span class="kn">import</span> <span class="n">Time</span>
+
+<span class="c1"># Define the target</span>
+<span class="n">target</span> <span class="o">=</span> <span class="s1">&#39;alpha Centauri&#39;</span>
+<span class="n">ra</span> <span class="o">=</span> <span class="mf">239.92041</span>
+<span class="n">dec</span> <span class="o">=</span> <span class="o">-</span><span class="mf">60.835148</span>
+<span class="n">PA</span> <span class="o">=</span> <span class="mi">30</span>
+<span class="n">date</span> <span class="o">=</span> <span class="n">Time</span><span class="p">(</span><span class="s2">&quot;2027-01-01T00:00:00&quot;</span><span class="p">)</span>
+<span class="n">bandpass</span> <span class="o">=</span> <span class="s2">&quot;F129&quot;</span>
+<span class="n">exptime</span> <span class="o">=</span> <span class="mi">600</span>
+
+<span class="n">observer</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;TELESCOP&quot;</span><span class="p">:</span> <span class="s2">&quot;Roman/WFI&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;pointing&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">ra</span><span class="p">,</span> <span class="n">dec</span><span class="p">],</span>
+    <span class="s2">&quot;FILTER&quot;</span><span class="p">:</span> <span class="n">bandpass</span><span class="p">,</span>
+    <span class="s2">&quot;PA_Y&quot;</span><span class="p">:</span> <span class="n">PA</span><span class="p">,</span>
+    <span class="s2">&quot;EXPSTART&quot;</span><span class="p">:</span> <span class="n">date</span><span class="o">.</span><span class="n">mjd</span><span class="p">,</span>
+    <span class="s2">&quot;EXPTIME&quot;</span><span class="p">:</span> <span class="n">exptime</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;alphacen&quot;</span>
+<span class="n">custom_roman_exposure</span> <span class="o">=</span> <span class="n">rs</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">exposure</span><span class="p">(</span><span class="n">observer</span><span class="o">=</span><span class="n">observer</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">)</span>
+<span class="n">psf_out</span> <span class="o">=</span> <span class="n">custom_roman_exposure</span><span class="o">.</span><span class="n">psf</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This produces a PSF model for the exposure. The returned object is a tuple of the form:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">detectors</span><span class="p">,</span> <span class="n">wcs_list</span><span class="p">,</span> <span class="n">canvas</span> <span class="o">=</span> <span class="n">custom_roman_exposure</span><span class="o">.</span><span class="n">psf</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The first item contains the 18 detector-level PSF arrays, the second item contains their WCS metadata, and the third item is the global PSF canvas for the full WFI footprint.</p>
+</section>
+<section id="generating-a-mosaic-from-the-model">
+<h2>Generating a mosaic from the model<a class="headerlink" href="#generating-a-mosaic-from-the-model" title="Link to this heading"></a></h2>
+<p>Once the PSF model is generated, it can be assembled into a mosaic for inspection or output.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mos_data</span><span class="p">,</span> <span class="n">mos_wcs</span> <span class="o">=</span> <span class="n">rs</span><span class="o">.</span><span class="n">mosaics</span><span class="o">.</span><span class="n">generate_mosaic</span><span class="p">(</span><span class="n">psf_out</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">psf_out</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">rs</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">save_fits</span><span class="p">(</span><span class="n">mos_data</span><span class="p">,</span> <span class="s2">&quot;test_psf.fits&quot;</span><span class="p">,</span> <span class="n">mos_wcs</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This is the pattern shown in the tutorial notebook, and it is useful for validating the PSF model or writing a combined FITS product for further analysis.</p>
+</section>
+<section id="method-behaviour">
+<h2>Method behaviour<a class="headerlink" href="#method-behaviour" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">rosalia.core.exposure.psf()</span></code> method is defined as:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">psf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">g_mag_max</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">31</span><span class="p">,</span> <span class="n">catalog</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;superback&#39;</span><span class="p">,</span> <span class="n">n_stars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_workers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+</pre></div>
+</div>
+<p>The main parameters are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">g_mag_max</span></code>: maximum Gaia magnitude used to select stars in the simulation.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">depth</span></code>: depth of the PSF model, expressed in a model-specific way by the underlying PSF implementation.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">catalog</span></code>: optional user-supplied catalog of stars. If not supplied, the method builds one automatically.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">method</span></code>: PSF modeling method. The default is <code class="docutils literal notranslate"><span class="pre">'superback'</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">n_stars</span></code>: optional limit on the number of stars included.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">n_workers</span></code>: number of worker processes used for parallel evaluation.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">verbose</span></code>: enable additional progress output.</p></li>
+</ul>
+<p>The method selects stars that fall within the Roman/WFI footprint, maps them onto detector coordinates, and builds a PSF model across the full focal plane. It then reconstructs detector-level PSF arrays and their WCS objects.</p>
+</section>
+<section id="supported-modeling-approach">
+<h2>Supported modeling approach<a class="headerlink" href="#supported-modeling-approach" title="Link to this heading"></a></h2>
+<p>The code path used by the method currently supports a PSF model built around the <code class="docutils literal notranslate"><span class="pre">superback</span></code> implementation, with other options available in the lower-level PSF tooling. In the project’s current implementation, the higher-level exposure method defaults to <code class="docutils literal notranslate"><span class="pre">method='superback'</span></code>.</p>
+<p>This is appropriate when the goal is to model in-field stellar contamination across the Roman detector array in a compact and reproducible way.</p>
+</section>
+<section id="notes-for-use">
+<h2>Notes for use<a class="headerlink" href="#notes-for-use" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>This workflow is intended for Roman/WFI exposures.</p></li>
+<li><p>The method uses source catalog information over the field of view.</p></li>
+<li><p>The output is not a single image product by itself; it is a model object built from the detector-level PSF arrays and WCS metadata.</p></li>
+<li><p>For downstream work, the reconstructed PSF canvas or detector mosaics can be saved to FITS for inspection.</p></li>
+</ul>
+<p>In short, the feature is designed to turn a Roman exposure into a modeled stellar PSF field that can then be inspected, converted into a mosaic, or used as input for subsequent calibration and contamination analysis.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="zodiacal.html" class="btn btn-neutral float-left" title="Zodiacal Light" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="SSOs.html" class="btn btn-neutral float-right" title="Solar System Objects" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, NASA Ames Research Center / Code S / Alejandro S. Borlaff.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

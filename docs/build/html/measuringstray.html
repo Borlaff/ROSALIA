@@ -125,20 +125,20 @@
 <span class="n">ra</span> <span class="o">=</span> <span class="mf">56.6583333</span>
 <span class="n">dec</span> <span class="o">=</span> <span class="mf">24.1780556</span>
 <span class="n">PA</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="n">date</span> <span class="o">=</span> <span class="n">Time</span><span class="p">(</span><span class="s2">"2026-10-01T00:00:00"</span><span class="p">)</span>
-<span class="n">bandpass</span> <span class="o">=</span> <span class="s2">"F129"</span>
+<span class="n">date</span> <span class="o">=</span> <span class="n">Time</span><span class="p">(</span><span class="s2">&quot;2026-10-01T00:00:00&quot;</span><span class="p">)</span>
+<span class="n">bandpass</span> <span class="o">=</span> <span class="s2">&quot;F129&quot;</span>
 <span class="n">exptime</span> <span class="o">=</span> <span class="mi">600</span>
 
 <span class="n">observer</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">"TELESCOP"</span><span class="p">:</span> <span class="s2">"Roman/WFI"</span><span class="p">,</span>
-    <span class="s2">"pointing"</span><span class="p">:</span> <span class="p">[</span><span class="n">ra</span><span class="p">,</span> <span class="n">dec</span><span class="p">],</span>
-    <span class="s2">"FILTER"</span><span class="p">:</span> <span class="n">bandpass</span><span class="p">,</span>
-    <span class="s2">"PA_Y"</span><span class="p">:</span> <span class="n">PA</span><span class="p">,</span>
-    <span class="s2">"EXPSTART"</span><span class="p">:</span> <span class="n">date</span><span class="o">.</span><span class="n">mjd</span><span class="p">,</span>
-    <span class="s2">"EXPTIME"</span><span class="p">:</span> <span class="n">exptime</span><span class="p">,</span>
+    <span class="s2">&quot;TELESCOP&quot;</span><span class="p">:</span> <span class="s2">&quot;Roman/WFI&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;pointing&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">ra</span><span class="p">,</span> <span class="n">dec</span><span class="p">],</span>
+    <span class="s2">&quot;FILTER&quot;</span><span class="p">:</span> <span class="n">bandpass</span><span class="p">,</span>
+    <span class="s2">&quot;PA_Y&quot;</span><span class="p">:</span> <span class="n">PA</span><span class="p">,</span>
+    <span class="s2">&quot;EXPSTART&quot;</span><span class="p">:</span> <span class="n">date</span><span class="o">.</span><span class="n">mjd</span><span class="p">,</span>
+    <span class="s2">&quot;EXPTIME&quot;</span><span class="p">:</span> <span class="n">exptime</span><span class="p">,</span>
 <span class="p">}</span>
 
-<span class="n">prefix</span> <span class="o">=</span> <span class="s2">"Pleiades"</span>
+<span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;Pleiades&quot;</span>
 <span class="n">custom_roman_exposure</span> <span class="o">=</span> <span class="n">rs</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">exposure</span><span class="p">(</span><span class="n">observer</span><span class="o">=</span><span class="n">observer</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">)</span>
 <span class="n">straylight_out</span> <span class="o">=</span> <span class="n">custom_roman_exposure</span><span class="o">.</span><span class="n">straylight</span><span class="p">()</span>
 </pre></div>
@@ -152,7 +152,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">rosalia</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">rs</span>
 
 <span class="n">input_flc</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
-    <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"/path/to/Roman/*_f158_cal.asdf"</span><span class="p">)</span>
+    <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;/path/to/Roman/*_f158_cal.asdf&quot;</span><span class="p">)</span>
 <span class="p">)</span>
 <span class="n">roman_exposure</span> <span class="o">=</span> <span class="n">rs</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">exposure</span><span class="p">(</span><span class="n">input_flc</span><span class="p">)</span>
 </pre></div>
@@ -171,20 +171,20 @@
 <span class="n">ra</span> <span class="o">=</span> <span class="mf">56.6583333</span>
 <span class="n">dec</span> <span class="o">=</span> <span class="o">+</span><span class="mf">24.1780556</span>
 <span class="n">PA</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="n">date</span> <span class="o">=</span> <span class="n">Time</span><span class="p">(</span><span class="s2">"2026-10-01T00:00:00"</span><span class="p">)</span>
-<span class="n">bandpass</span> <span class="o">=</span> <span class="s2">"F129"</span>
+<span class="n">date</span> <span class="o">=</span> <span class="n">Time</span><span class="p">(</span><span class="s2">&quot;2026-10-01T00:00:00&quot;</span><span class="p">)</span>
+<span class="n">bandpass</span> <span class="o">=</span> <span class="s2">&quot;F129&quot;</span>
 <span class="n">exptime</span> <span class="o">=</span> <span class="mi">600</span>
 
 <span class="n">observer</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">"TELESCOP"</span><span class="p">:</span> <span class="s2">"Roman/WFI"</span><span class="p">,</span>
-    <span class="s2">"pointing"</span><span class="p">:</span> <span class="p">[</span><span class="n">ra</span><span class="p">,</span> <span class="n">dec</span><span class="p">],</span>
-    <span class="s2">"FILTER"</span><span class="p">:</span> <span class="n">bandpass</span><span class="p">,</span>
-    <span class="s2">"PA_Y"</span><span class="p">:</span> <span class="n">PA</span><span class="p">,</span>
-    <span class="s2">"EXPSTART"</span><span class="p">:</span> <span class="n">date</span><span class="o">.</span><span class="n">mjd</span><span class="p">,</span>
-    <span class="s2">"EXPTIME"</span><span class="p">:</span> <span class="n">exptime</span><span class="p">,</span>
+    <span class="s2">&quot;TELESCOP&quot;</span><span class="p">:</span> <span class="s2">&quot;Roman/WFI&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;pointing&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">ra</span><span class="p">,</span> <span class="n">dec</span><span class="p">],</span>
+    <span class="s2">&quot;FILTER&quot;</span><span class="p">:</span> <span class="n">bandpass</span><span class="p">,</span>
+    <span class="s2">&quot;PA_Y&quot;</span><span class="p">:</span> <span class="n">PA</span><span class="p">,</span>
+    <span class="s2">&quot;EXPSTART&quot;</span><span class="p">:</span> <span class="n">date</span><span class="o">.</span><span class="n">mjd</span><span class="p">,</span>
+    <span class="s2">&quot;EXPTIME&quot;</span><span class="p">:</span> <span class="n">exptime</span><span class="p">,</span>
 <span class="p">}</span>
 
-<span class="n">prefix</span> <span class="o">=</span> <span class="s2">"Pleiades"</span>
+<span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;Pleiades&quot;</span>
 <span class="n">custom_roman_exposure</span> <span class="o">=</span> <span class="n">rs</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">exposure</span><span class="p">(</span><span class="n">observer</span><span class="o">=</span><span class="n">observer</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">)</span>
 <span class="n">straylight_out</span> <span class="o">=</span> <span class="n">custom_roman_exposure</span><span class="o">.</span><span class="n">straylight</span><span class="p">()</span>
 </pre></div>

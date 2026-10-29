@@ -1,0 +1,158 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Roman Commissioning Stray-light Activities &mdash; ROSALIA 0.9.5 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=61b282d3"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Who is ROSALIA?" href="whoarewe.html" />
+    <link rel="prev" title="Roman Research Nexus" href="nexus.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            ROSALIA
+              <img src="_static/rosalia_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="mission.html">What is ROSALIA?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="measuringstray.html">Stray Light</a></li>
+<li class="toctree-l1"><a class="reference internal" href="zodiacal.html">Zodiacal Light</a></li>
+<li class="toctree-l1"><a class="reference internal" href="PSF.html">In-field Stars</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SSOs.html">Solar System Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Additional Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">How to use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nexus.html">Roman Research Nexus</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Roman Commissioning Stray-light Activities</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#selecting-the-stray-light-regions">Selecting the stray-light regions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#selecting-the-calibration-sources-and-sky-pointings">Selecting the calibration sources and sky pointings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#updating-the-astronomer-proposal-tool-submission-file">Updating the Astronomer Proposal Tool submission file</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="whoarewe.html">Who is ROSALIA?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rosalia.html">ROSALIA package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ROSALIA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Roman Commissioning Stray-light Activities</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/commissioning.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="roman-commissioning-stray-light-activities">
+<h1>Roman Commissioning Stray-light Activities<a class="headerlink" href="#roman-commissioning-stray-light-activities" title="Link to this heading"></a></h1>
+<p>This section is dedicated to the Roman Commissioning Activity Request CAR171, where we focus on the calibration of the stray-light rejection efficiency of the Roman Space Telescope Wide Field Instrument. To do that, we will illuminate specific regions of the telescope using very bright stars. Some of the selected regions are highly sensitive to stray-light, and are predicted to produce characteristic patterns of background stray-light in the WFI images.</p>
+<section id="selecting-the-stray-light-regions">
+<h2>Selecting the stray-light regions<a class="headerlink" href="#selecting-the-stray-light-regions" title="Link to this heading"></a></h2>
+<p>The following Jupyter-notebook details the selection of the main stray-light sensitive regions along with the scanning dithering patterns defined to observationally determine the location and shape of the Normalized Detector Irradiance in those orientations.</p>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="_downloads/8e83951ee955afa97c6c79a4ec10a671/R1_CAR171_targets.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">R1_CAR171_targets.ipynb</span></code></a></p></li>
+</ul>
+<img alt="Selection of stray-light sensitive locations near the focal plane." src="https://raw.githubusercontent.com/Borlaff/ROSALIA/main/notebooks/CAR171/ndi_2deg_CARs_with_points.png" />
+<p><strong>Figure 1</strong>: Selection of stray-light sensitive locations near the focal plane.</p>
+<img alt="Selection of stray-light sensitive locations outside the focal plane." src="https://raw.githubusercontent.com/Borlaff/ROSALIA/main/notebooks/CAR171/ndi_20deg_CARs_with_points.png" />
+<p><strong>Figure 2</strong>: Selection of stray-light sensitive locations outside the focal plane.</p>
+<img alt="Selection of the dithering pattern for the &quot;Rogue Path&quot; area (WFIV3+ positive orientation)." src="https://raw.githubusercontent.com/Borlaff/ROSALIA/main/notebooks/CAR171/ndi_20deg_CAR171_RoguePath_dithering.png" />
+<p><strong>Figure 3</strong>: Selection of the dithering pattern for the “Rogue Path” area (WFIV3+ positive orientation).</p>
+<img alt="Selection of the dithering pattern for the &quot;Roman Channel&quot; area (secondary leg scattering)." src="https://raw.githubusercontent.com/Borlaff/ROSALIA/main/notebooks/CAR171/ndi_20deg_CAR171_OUT_1_dithering.png" />
+<p><strong>Figure 4</strong>: Selection of the dithering pattern for the “Roman Channel” area (secondary leg scattering).</p>
+<img alt="Selection of the dithering pattern for the &quot;Roman Dragon's Breath&quot; region (SCA lightshields)." src="https://raw.githubusercontent.com/Borlaff/ROSALIA/main/notebooks/CAR171/ndi_20deg_CAR171_IN_4_5_Dragon_dithering.png" />
+<p><strong>Figure 5</strong>: Selection of the dithering pattern for the “Roman Dragon’s Breath” region (SCA lightshields).</p>
+</section>
+<section id="selecting-the-calibration-sources-and-sky-pointings">
+<h2>Selecting the calibration sources and sky pointings<a class="headerlink" href="#selecting-the-calibration-sources-and-sky-pointings" title="Link to this heading"></a></h2>
+<p>Once the telescope orientations have been selected, the next step is to define a set of realistic sky observations that can illuminate the required region of the observatory with a source. We selected three stars are calibration sources, Canopus, Eta Uma, and HD128998. The observatory has to orient itself with a certain position angle and angular distance from the center of the WFI focal plane to illuminate the required regions, while complying with the Sun-avoidance orientation angle requirements for Roman Space Telescope. Estimating a valid pointing to position Roman at a certain position angle and distance from a source can be done easily with <strong>ROSALIA</strong> (see Additional Tools / Planning Offset Observations). The estimation for all the Commissioning Activity Request 171 (targets above) is performed in the following Jupyter-notebook.</p>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="_downloads/b37d45199536d4f5e5f031f954c5dc72/R2_CAR171_simulations.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">R2_CAR171_simulations.ipynb</span></code></a></p></li>
+</ul>
+</section>
+<section id="updating-the-astronomer-proposal-tool-submission-file">
+<h2>Updating the Astronomer Proposal Tool submission file<a class="headerlink" href="#updating-the-astronomer-proposal-tool-submission-file" title="Link to this heading"></a></h2>
+<p>Since the orientation with the Sun changes with time, so does the optimal position angle of Roman Space Telescope. That imposes a limit for any observation to be valid. This is particularly critical in our observations because they need to have an exact orientation angle with respect to the source. To keep scheduling as flexible as possible, we generated a new notebook that automatically updates a template APT file with the pointings estimated in <em>R2_CAR171_simulations.ipynb</em>.</p>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="_downloads/4ce54cd210564bcd0709d71195dfc820/R3_CAR171_apt_generator.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">R3_CAR171_apt_generator.ipynb</span></code></a></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="nexus.html" class="btn btn-neutral float-left" title="Roman Research Nexus" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="whoarewe.html" class="btn btn-neutral float-right" title="Who is ROSALIA?" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, NASA Ames Research Center / Code S / Alejandro S. Borlaff.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,267 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zodiacal Light &mdash; ROSALIA 0.9.5 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=61b282d3"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="In-field Stars" href="PSF.html" />
+    <link rel="prev" title="Stray Light" href="measuringstray.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            ROSALIA
+              <img src="_static/rosalia_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="mission.html">What is ROSALIA?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="measuringstray.html">Stray Light</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Zodiacal Light</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#modeling-the-zodiacal-light-background-with-rosalia">Modeling the Zodiacal light background with ROSALIA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#quickstart-example">Quickstart example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#zodiacal-model-options">Zodiacal model options</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#stsci-model">STScI model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#zodipy-model">Zodipy model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#irsa-model">IRSA model</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#method-behavior">Method behavior</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#outputs-produced">Outputs produced</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scientific-context">Scientific context</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="PSF.html">In-field Stars</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SSOs.html">Solar System Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Additional Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">How to use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nexus.html">Roman Research Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="commissioning.html">Roman Commissioning Stray-light Activities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="whoarewe.html">Who is ROSALIA?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rosalia.html">ROSALIA package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ROSALIA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Zodiacal Light</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/zodiacal.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="zodiacal-light">
+<h1>Zodiacal Light<a class="headerlink" href="#zodiacal-light" title="Link to this heading"></a></h1>
+<section id="modeling-the-zodiacal-light-background-with-rosalia">
+<h2>Modeling the Zodiacal light background with ROSALIA<a class="headerlink" href="#modeling-the-zodiacal-light-background-with-rosalia" title="Link to this heading"></a></h2>
+<p>The Zodiacal light is the dominant source of background for most Roman observations, except at the reddest filters where the thermal background can become comparable. It arises from sunlight scattered by interplanetary dust in the Solar System. Its intensity depends on the sky position, observation time, filter bandpass, and the observer geometry.</p>
+<p>ROSALIA models the Zodiacal light background through the <code class="docutils literal notranslate"><span class="pre">rosalia.core.exposure.zodiacal()</span></code> method. This method uses the exposure geometry and computes the expected background for each detector, then writes out a FITS product and a drizzled summary image.</p>
+<p>The implementation supports three available backends:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">zody_mode=&quot;stsci&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">zody_mode=&quot;zodipy&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">zody_mode=&quot;irsa&quot;</span></code></p></li>
+</ul>
+<p>The notebook tutorial <code class="docutils literal notranslate"><span class="pre">notebooks/tutorials/R2_Rosalia_zody_example.ipynb</span></code> demonstrates the standard usage for all three options.</p>
+</section>
+<section id="quickstart-example">
+<h2>Quickstart example<a class="headerlink" href="#quickstart-example" title="Link to this heading"></a></h2>
+<p>The simplest workflow is to build a mock Roman/WFI exposure and then call the <code class="docutils literal notranslate"><span class="pre">zodiacal</span></code> method on it.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">rosalia</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">rs</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">astropy.time</span><span class="w"> </span><span class="kn">import</span> <span class="n">Time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">astropy.coordinates</span><span class="w"> </span><span class="kn">import</span> <span class="n">SkyCoord</span>
+
+<span class="n">target</span> <span class="o">=</span> <span class="s1">&#39;alpha Centauri&#39;</span>
+<span class="n">tgt</span> <span class="o">=</span> <span class="n">SkyCoord</span><span class="o">.</span><span class="n">from_name</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+<span class="n">ra</span> <span class="o">=</span> <span class="mf">219.92041</span>
+<span class="n">dec</span> <span class="o">=</span> <span class="o">-</span><span class="mf">50.835148</span>
+<span class="n">PA</span> <span class="o">=</span> <span class="mi">9</span>
+<span class="n">date</span> <span class="o">=</span> <span class="n">Time</span><span class="p">(</span><span class="s2">&quot;2027-10-10T00:00:00&quot;</span><span class="p">)</span>
+<span class="n">bandpass</span> <span class="o">=</span> <span class="s2">&quot;F129&quot;</span>
+<span class="n">exptime</span> <span class="o">=</span> <span class="mi">600</span>
+
+<span class="n">observer</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;TELESCOP&quot;</span><span class="p">:</span> <span class="s2">&quot;Roman/WFI&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;pointing&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">ra</span><span class="p">,</span> <span class="n">dec</span><span class="p">],</span>
+    <span class="s2">&quot;FILTER&quot;</span><span class="p">:</span> <span class="n">bandpass</span><span class="p">,</span>
+    <span class="s2">&quot;PA_Y&quot;</span><span class="p">:</span> <span class="n">PA</span><span class="p">,</span>
+    <span class="s2">&quot;EXPSTART&quot;</span><span class="p">:</span> <span class="n">date</span><span class="o">.</span><span class="n">mjd</span><span class="p">,</span>
+    <span class="s2">&quot;EXPTIME&quot;</span><span class="p">:</span> <span class="n">exptime</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;Pleiades&quot;</span>
+<span class="n">custom_roman_exposure</span> <span class="o">=</span> <span class="n">rs</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">exposure</span><span class="p">(</span><span class="n">observer</span><span class="o">=</span><span class="n">observer</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">)</span>
+<span class="n">custom_roman_exposure</span><span class="o">.</span><span class="n">plot_footprint</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Once the exposure object has been generated, call the Zodiacal method:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">zodi_out</span> <span class="o">=</span> <span class="n">custom_roman_exposure</span><span class="o">.</span><span class="n">zodiacal</span><span class="p">(</span><span class="n">zody_mode</span><span class="o">=</span><span class="s2">&quot;stsci&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This computes the Zodiacal background model and writes FITS products in the working directory or next to the input product.</p>
+</section>
+<section id="zodiacal-model-options">
+<h2>Zodiacal model options<a class="headerlink" href="#zodiacal-model-options" title="Link to this heading"></a></h2>
+<p>The tutorial covers all three supported options for the Zodiacal background model.</p>
+<section id="stsci-model">
+<h3>STScI model<a class="headerlink" href="#stsci-model" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">zodi_out</span> <span class="o">=</span> <span class="n">custom_roman_exposure</span><span class="o">.</span><span class="n">zodiacal</span><span class="p">(</span><span class="n">zody_mode</span><span class="o">=</span><span class="s2">&quot;stsci&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This uses the STScI background model for Roman/WFI and is the direct workflow shown in the tutorial.</p>
+</section>
+<section id="zodipy-model">
+<h3>Zodipy model<a class="headerlink" href="#zodipy-model" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">zodipy_zodi_out</span> <span class="o">=</span> <span class="n">custom_roman_exposure</span><span class="o">.</span><span class="n">zodiacal</span><span class="p">(</span><span class="n">zody_mode</span><span class="o">=</span><span class="s2">&quot;zodipy&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This is the fastest option in the tutorial and is based on the COSMOGLOBE/Zodipy model.</p>
+</section>
+<section id="irsa-model">
+<h3>IRSA model<a class="headerlink" href="#irsa-model" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">irsa_zodi_out</span> <span class="o">=</span> <span class="n">custom_roman_exposure</span><span class="o">.</span><span class="n">zodiacal</span><span class="p">(</span><span class="n">zody_mode</span><span class="o">=</span><span class="s2">&quot;irsa&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This uses the IRSA/IPAC Zodiacal light model and is typically the slowest option, but it can be useful for comparisons with external reference models.</p>
+</section>
+</section>
+<section id="method-behavior">
+<h2>Method behavior<a class="headerlink" href="#method-behavior" title="Link to this heading"></a></h2>
+<p>The method is implemented in <code class="docutils literal notranslate"><span class="pre">rosalia.core.exposure</span></code> as:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">zodiacal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zody_mode</span><span class="o">=</span><span class="s2">&quot;zodipy&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">output_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+             <span class="n">output_units</span><span class="o">=</span><span class="s2">&quot;e/s&quot;</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">grid_method</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">):</span>
+</pre></div>
+</div>
+<p>The main arguments are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">zody_mode</span></code>: model backend. Supported values include <code class="docutils literal notranslate"><span class="pre">&quot;stsci&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;zodipy&quot;</span></code>, and <code class="docutils literal notranslate"><span class="pre">&quot;irsa&quot;</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">verbose</span></code>: enable more detailed progress output.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">output_name</span></code>: optional name for the output FITS file.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">output_units</span></code>: output units for the model, default is <code class="docutils literal notranslate"><span class="pre">&quot;e/s&quot;</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">resolution</span></code>: drizzled output resolution.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">grid_method</span></code>: sampling strategy used to evaluate the background field.</p></li>
+</ul>
+<p>Internally, the method:</p>
+<ol class="arabic simple">
+<li><p>checks the number of science extensions in the exposure,</p></li>
+<li><p>computes the background for each detector using <code class="docutils literal notranslate"><span class="pre">rs.sky.get_zodiacal_background()</span></code>,</p></li>
+<li><p>stores the detector-level arrays in a list,</p></li>
+<li><p>writes a FITS file named using the exposure root name plus <code class="docutils literal notranslate"><span class="pre">_zody.fits</span></code>,</p></li>
+<li><p>creates a drizzled product named with <code class="docutils literal notranslate"><span class="pre">_drz.fits</span></code>,</p></li>
+<li><p>generates summary plots in the requested units.</p></li>
+</ol>
+<p>If <code class="docutils literal notranslate"><span class="pre">output_units</span> <span class="pre">==</span> <span class="pre">&quot;e/s&quot;</span></code>, it creates:</p>
+<ul class="simple">
+<li><p>an electron-per-second image plot,</p></li>
+<li><p>a surface-brightness plot in mag arcsec<sup>-2</sup>.</p></li>
+</ul>
+<p>If another unit is selected, it generates a MJy/sr-style plot instead.</p>
+<p>The method returns a dictionary of the form:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;zodi_list&quot;</span><span class="p">:</span> <span class="n">zodiacal_background_list</span><span class="p">,</span>
+    <span class="s2">&quot;output_name&quot;</span><span class="p">:</span> <span class="n">output_name</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="outputs-produced">
+<h2>Outputs produced<a class="headerlink" href="#outputs-produced" title="Link to this heading"></a></h2>
+<p>The method writes output products in the same directory as the exposure or the local working directory when using a synthetic observer-only setup. In the tutorial workflow, this includes:</p>
+<ul class="simple">
+<li><p>a Zodiacal light FITS file with a <code class="docutils literal notranslate"><span class="pre">_zody.fits</span></code> suffix</p></li>
+<li><p>a drizzled product with a <code class="docutils literal notranslate"><span class="pre">_drz.fits</span></code> suffix</p></li>
+<li><p>generated diagnostic plots</p></li>
+</ul>
+<p>These products are designed to be used as background model components for science analysis, correction, or comparison with measured sky levels.</p>
+</section>
+<section id="scientific-context">
+<h2>Scientific context<a class="headerlink" href="#scientific-context" title="Link to this heading"></a></h2>
+<p>The Zodiacal light background is one of the dominant sky components in Roman/WFI observations. Accurately modeling it is critical for:</p>
+<ul class="simple">
+<li><p>background subtraction,</p></li>
+<li><p>low-surface-brightness analysis,</p></li>
+<li><p>detector-level calibration,</p></li>
+<li><p>comparison of exposure geometry across observing conditions.</p></li>
+</ul>
+<p>ROSALIA makes this model available in a consistent exposure-based workflow so that the same pointing, date, and filter setup can be evaluated across different Zodiacal-light backends and compared directly.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="measuringstray.html" class="btn btn-neutral float-left" title="Stray Light" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="PSF.html" class="btn btn-neutral float-right" title="In-field Stars" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, NASA Ames Research Center / Code S / Alejandro S. Borlaff.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
