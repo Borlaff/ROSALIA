@@ -122,14 +122,14 @@ def rebin_transmission_curve(wavelength_bins,transmission_bins, nbins, verbose=F
         plt.scatter(rebinned_wavelength, rebinned_transmission, marker="o", s=20, color="black")
 
         # And the dlambda sizes
-        plt.plot(0, 0, linewidth=2, color="black", label = "Pseudo-spectra for background model")
+        plt.plot(0, 0, linewidth=2, color="black", label = "Pseudo-spectra for background model" if "Pseudo-spectra for background model" not in plt.gca().get_legend_handles_labels()[1] else '')
         for i in range(len(rebinned_wavelength)):
-             plt.plot(np.array([rebinned_wavelength[i]-dlambda/2., rebinned_wavelength[i]+dlambda/2.]),
+             plt.plot(np.array([rebinned_wavelength[i].value-dlambda.value/2., rebinned_wavelength.value[i]+dlambda.value/2.]),
              np.array([rebinned_transmission[i], rebinned_transmission[i]]), linewidth=2,
              color="black")
-        plt.xlim(0.99*np.min(wavelength), 1.01*np.max(wavelength))
+        plt.xlim(0.99*np.min(wavelength.value), 1.01*np.max(wavelength.value))
         plt.legend(frameon=False)
-        plt.show()
+        plt.savefig('rebinned_transmission_curve.png', dpi=300)
 
     return({"wavelength": wavelength, "transmission": transmission,
             "rebinned_wavelength": rebinned_wavelength, "rebinned_transmission": rebinned_transmission,
@@ -137,9 +137,9 @@ def rebin_transmission_curve(wavelength_bins,transmission_bins, nbins, verbose=F
 
 
 
-#accepted zody_mode: zodipy and stsci; if something else is entered, defaults to stsci
+#accepted zodi_mode: irsa, zodipy, and stsci (default); if something else is entered, defaults to stsci
 def get_zodiacal_background(astropywcs, wavelength=None,
-                            expstart=None, step=1000, zody_mode="stsci",
+                            expstart=None, step=1000, zodi_mode="stsci",
                             obspos = None,
                             nbins_wavelength=20, obslocin=3, grid_method="random",
                             output_units=None, verbose=False, dointerpolate=True):    
@@ -197,18 +197,16 @@ def get_zodiacal_background(astropywcs, wavelength=None,
         print("RA: " + str(np.median(detector_grid["grid_world"][0])))
         print("DEC: " + str(np.median(detector_grid["grid_world"][1])))
 
-
-
     # For each wavelength bin, we do this query
-    if zody_mode.lower() == "irsa":
+    if zodi_mode.lower() == "irsa":
+        if verbose: print("Zodiacal light model: IRSA")
         zody_MJysr = irsa_zody(ra=detector_grid["grid_world"][0],
                                dec=detector_grid["grid_world"][1],
                                wavelength=rebinned_wavelength,
                                weights=rebinned_transmission,
                                expstart=expstart, obslocin=obslocin)
 
-
-    if zody_mode.lower() == "zodipy":
+    elif zodi_mode.lower() == "zodipy":
         if verbose: print("Zodiacal light model: Zodipy")
         zody_MJysr = zodipy_zody(ra=detector_grid["grid_world"][0],
                          dec=detector_grid["grid_world"][1],
@@ -217,7 +215,9 @@ def get_zodiacal_background(astropywcs, wavelength=None,
                          expstart=expstart,
                          obspos=obspos)
 
-    if zody_mode.lower() == "stsci":
+    else:
+        if zodi_mode != 'stsci':
+            print('Unknown zodiacal light model. Using STSci by default.')
         if verbose: print("Zodiacal light model: STScI")
         zody_MJysr = stsci_zody(ra=detector_grid["grid_world"][0],
                                  dec=detector_grid["grid_world"][1],
@@ -269,6 +269,9 @@ def get_zodiacal_background(astropywcs, wavelength=None,
         if verbose: print("Output units: e/s")
 
     else:
+        if output_units != "MJy/Sr":
+            print('Unknown output units. Using MJy/Sr by default.')
+
         if verbose: print("Output units: MJy/Sr")
 
     return(zody_interp.T)
@@ -483,7 +486,7 @@ def stsci_zody(ra, dec, wavelength, weights, expstart,verbose=False):
         if cache_check not in cache_record:
 
             #Call the background class lifted from StSci's rbt.py module
-            bkg = background(r, d)
+            bkg = background(r, d, verbose)
 
             #return the wavelength array and matching zodiacal light array if
             # day is in the available calendary days, otherwise return nans
@@ -555,7 +558,7 @@ class background:
     import copy
 
 
-    def __init__(self, ra, dec):
+    def __init__(self, ra, dec,verbose):
         # Remote source (no local caching)
         # self.remote_dir = _CACHE["cache_dir"] #sln
         # self.cache_version = str(_CACHE["cache_version"])
@@ -596,7 +599,7 @@ class background:
         self.cache_file = self.myfile_from_healpix(ra, dec)
 
         # Load and prepare all per-position data
-        self.bkg_data = self.read_bkg_data_from_url(self.cache_file)
+        self.bkg_data = self.read_bkg_data_from_url(self.cache_file,verbose=verbose)
 
     # ---------- File / data loading ----------
 
@@ -608,8 +611,16 @@ class background:
 
     def read_static_data(self):
         """Load static wavelength grid and thermal curve from refdata."""
-        abs_wave_array = np.loadtxt(self.local_path + '/' + self.wave_file)
-        thermal = np.transpose(np.genfromtxt(self.local_path + '/' + self.thermal_file, delimiter=","))
+        # abs_wave_array = np.loadtxt(self.local_path + '/' + self.wave_file)
+        # thermal = np.transpose(np.genfromtxt(self.local_path + '/' + self.thermal_file, delimiter=","))
+        #
+        #sln
+        ds = np.lib.npyio.DataSource(None)  # temporary directory
+        with ds.open(self.local_path+'/'+self.wave_file) as f:
+            abs_wave_array = np.loadtxt(f)
+
+        with ds.open(self.local_path+'/'+self.thermal_file) as f:
+            thermal = np.transpose(np.genfromtxt(f, delimiter=","))
 
         thermal_wave_array = thermal[0]
         thermal_flux = thermal[1]
@@ -743,94 +754,3 @@ class background:
         return f(new_wave)
 
 #########################################
-
-class compute_visibility():
-
-    def __init__(self,targets_coordinates,fileout=None,report=False,interval_sampling_days=None,interval_start_time=None,interval_duration_days=None):
-
-        if isinstance(targets_coordinates, list):
-            self.targets_coordinates = targets_coordinates
-        else:
-            self.targets_coordinates = [targets_coordinates]
-
-        self.fileout = fileout
-        self.report = report
-        self.interval = {'sampling_days':interval_sampling_days,
-                         'start_time':interval_start_time,
-                         'duration_days':interval_duration_days}
-        self.sampled_times = self.set_sampled_times(self.interval)
-        self.sun_coord = get_body('Sun',self.sampled_times)   # get coordinate object for the Sun for each day of the year
-        self.min_sun_angle = (90. - 36.) * u.deg
-        self.max_sun_angle = (90. + 36.) * u.deg
-        self.df_results = self.initialize_dataframe()
-
-
-    def initialize_dataframe(self):
-        radec_string = ['({}, {})'.format(coords.ra.to_string(u.hour), coords.dec.to_string(u.degree, alwayssign=True)) for coords in self.targets_coordinates]
-        time_string  = [self.format_time(time) for time in self.sampled_times]
-        index_levels = [radec_string,time_string]
-        index_names  = ['(RA, Dec)', 'DOY']
-        multi_index  = pd.MultiIndex.from_product(index_levels, names=index_names)
-        column_names = ['Sun_RA','Sun_Dec','separation','good_angles','nominal_roll','pa_obs_y','pa_fpa_local_x','pa_fpa_local_y','sunang_x','sunang_y','sunang_z']
-
-        # The reindexing of dataframe below is necessary due to this pandas bug:
-        # https://stackoverflow.com/questions/71837659/trying-to-sort-multiindex-index-using-categorical-index/73766126#73766126
-
-        return (pd.DataFrame(index=multi_index,columns=column_names)).reindex(radec_string,level=0)
-
-    def format_time(self,time_object):
-        """Converts a datetime object's time to DOY.ddddd """
-        datetime = time_object.datetime
-        decimal_hours = datetime.hour + datetime.minute/ 60. + datetime.second/3600
-        return datetime.strftime("%Y")+'-'+datetime.strftime("%j")+'.'+'{:7.5f}'.format(decimal_hours/24)[2:]
-
-
-    def set_sampled_times(self,interval):
-
-        '''
-        define the array of Time object at which the visitbility will be sampled.
-        If a date is in the future, this will generate a 'dubious date' warning message
-        the reason is that it is unknown how many leap seconds will be needed in the future.
-        the results will still be valid
-        '''
-
-        if interval['start_time'] is None:
-            t_start_str = ['2024-01-01T00:00:00.0']
-            t_start = Time(t_start_str,format='isot', scale='utc')
-        elif isinstance(interval['start_time'], Time) == False:
-            if isinstance(interval['start_time'], str):
-                t_start = Time(interval['start_time'],format='isot', scale='utc')
-            else:
-                print('Start time needs to be a astropy.Time object or a string')
-                assert False
-        else:
-            t_start = interval['start_time']
-
-        if interval['duration_days'] is None:
-            t_end = 365.
-        else:
-            t_end = interval['duration_days']
-
-        if interval['sampling_days'] is None:
-            t_step = 1.
-        else:
-            t_step = interval['sampling_days']
-
-        if t_step > t_end:
-            print('sampling interval cannot exceeed total duration')
-            assert False
-
-        return t_start+np.arange(0.,t_end,t_step)*u.d
-
-
-    def get_good_angles(self):
-        for i,target_coordinates in enumerate(self.targets_coordinates):
-
-            with warnings.catch_warnings():
-                warnings.simplefilter('ignore', AstropyWarning)
-                sun_angle = self.sun_coord.separation(target_coordinates)
-                good_angles = (sun_angle >= self.min_sun_angle) & (sun_angle <= self.max_sun_angle)
-            self.df_results.loc[pd.IndexSlice[self.df_results.index.levels[0][i],:],'good_angles'] = good_angles
-            self.df_results.loc[pd.IndexSlice[self.df_results.index.levels[0][i],:],'separation'] = sun_angle
-            self.df_results.loc[pd.IndexSlice[self.df_results.index.levels[0][i],:],'Sun_RA'] = self.sun_coord.ra
-            self.df_results.loc[pd.IndexSlice[self.df_results.index.levels[0][i],:],'Sun_Dec'] = self.sun_coord.dec

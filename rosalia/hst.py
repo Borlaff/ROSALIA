@@ -83,7 +83,7 @@ def measure_sky_level_HST_ACS(exposure_name, verbose=False):
                                                           instrument="ACS",
                                                           detector="WFC",
                                                           expstart=EXPSTART,
-                                                          step=4000, zody_mode="zodipy",
+                                                          step=4000, zodi_mode="zodipy",
                                                           nbins_wavelength=20, obslocin=3,
                                                           grid_method="random", verbose=False, interpolate=False)
     import bottleneck as bn

@@ -1038,7 +1038,7 @@ class exposure():
         
         return detectors, wcs_list, canvas 
 
-    def zodiacal(self, zody_mode="zodipy", verbose=False, output_name=None, output_units="e/s", resolution=1,
+    def zodiacal(self, zodi_mode="zodipy", verbose=False, output_name=None, output_units="e/s", resolution=1,
                  grid_method="random"):
 
 
@@ -1057,7 +1057,7 @@ class exposure():
             zodiacal_background = rs.sky.get_zodiacal_background(astropywcs=self.ASTROPYWCS[i],
                                                                  wavelength=self.FILTER_IDENTITY,
                                                                  expstart=self.EXPSTART,
-                                                                 step=1000, zody_mode=zody_mode,
+                                                                 step=1000, zodi_mode=zodi_mode,
                                                                  nbins_wavelength=10, obslocin=0,
                                                                  grid_method=grid_method,
                                                                  obspos = self.XYZ_HELIO_POS,

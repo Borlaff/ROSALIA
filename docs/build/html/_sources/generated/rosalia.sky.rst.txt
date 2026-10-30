@@ -1,4 +1,4 @@
-rosalia.sky
+﻿rosalia.sky
 ===========
 
 .. automodule:: rosalia.sky
@@ -23,5 +23,4 @@ rosalia.sky
    .. autosummary::
    
       background
-      compute_visibility
    

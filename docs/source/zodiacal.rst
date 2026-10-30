@@ -4,15 +4,15 @@ Zodiacal Light
 Modeling the Zodiacal light background with ROSALIA
 ---------------------------------------------------
 
-The Zodiacal light is the dominant source of background for most Roman observations, except at the reddest filters where the thermal background can become comparable. It arises from sunlight scattered by interplanetary dust in the Solar System. Its intensity depends on the sky position, observation time, filter bandpass, and the observer geometry.
+The Zodiacal light is the dominant source of background for most Roman observations, except at the reddest filters (greater than about 2 micron) where the thermal background can become comparable. It arises from sunlight scattered by interplanetary dust in the Solar System. Its intensity depends on the sky position, observation time, filter bandpass, and the observer geometry.
 
 ROSALIA models the Zodiacal light background through the ``rosalia.core.exposure.zodiacal()`` method. This method uses the exposure geometry and computes the expected background for each detector, then writes out a FITS product and a drizzled summary image.
 
 The implementation supports three available backends:
 
-- ``zody_mode="stsci"``
-- ``zody_mode="zodipy"``
-- ``zody_mode="irsa"``
+- ``zodi_mode="stsci"``
+- ``zodi_mode="zodipy"``
+- ``zodi_mode="irsa"``
 
 The notebook tutorial ``notebooks/tutorials/R2_Rosalia_zody_example.ipynb`` demonstrates the standard usage for all three options.
 
@@ -26,14 +26,11 @@ The simplest workflow is to build a mock Roman/WFI exposure and then call the ``
 
     import rosalia as rs
     from astropy.time import Time
-    from astropy.coordinates import SkyCoord
 
-    target = 'alpha Centauri'
-    tgt = SkyCoord.from_name(target)
-    ra = 219.92041
-    dec = -50.835148
+    ra = 180
+    dec = 0
     PA = 9
-    date = Time("2027-10-10T00:00:00")
+    date = Time("2026-12-01T00:00:00")
     bandpass = "F129"
     exptime = 600
 
@@ -46,15 +43,10 @@ The simplest workflow is to build a mock Roman/WFI exposure and then call the ``
         "EXPTIME": exptime,
     }
 
-    prefix = "Pleiades"
+    prefix = "zodi_test"
     custom_roman_exposure = rs.core.exposure(observer=observer, prefix=prefix)
     custom_roman_exposure.plot_footprint()
-
-Once the exposure object has been generated, call the Zodiacal method:
-
-.. code-block:: python
-
-    zodi_out = custom_roman_exposure.zodiacal(zody_mode="stsci")
+    zodi_out = custom_roman_exposure.zodiacal(zodi_mode="stsci")
 
 This computes the Zodiacal background model and writes FITS products in the working directory or next to the input product.
 
@@ -69,25 +61,25 @@ STScI model
 
 .. code-block:: python
 
-    zodi_out = custom_roman_exposure.zodiacal(zody_mode="stsci")
+    zodi_out = custom_roman_exposure.zodiacal(zodi_mode="stsci")
 
-This uses the STScI background model for Roman/WFI and is the direct workflow shown in the tutorial.
+This uses the STScI background model for Roman/WFI and is the direct workflow shown in the tutorial. This is the default option if an uknown string is entered for zodi_mode.
 
 Zodipy model
 ~~~~~~~~~~~~
 
 .. code-block:: python
 
-    zodipy_zodi_out = custom_roman_exposure.zodiacal(zody_mode="zodipy")
+    zodipy_zodi_out = custom_roman_exposure.zodiacal(zodi_mode="zodipy")
 
-This is the fastest option in the tutorial and is based on the COSMOGLOBE/Zodipy model.
+This is the fastest option in the tutorial and is based on the COSMOGLOBE/Zodipy package. This uses the extrapolate option and the 'dirbe' model, the only configuration that works at Roman's wavelength coverage.
 
 IRSA model
 ~~~~~~~~~
 
 .. code-block:: python
 
-    irsa_zodi_out = custom_roman_exposure.zodiacal(zody_mode="irsa")
+    irsa_zodi_out = custom_roman_exposure.zodiacal(zodi_mode="irsa")
 
 This uses the IRSA/IPAC Zodiacal light model and is typically the slowest option, but it can be useful for comparisons with external reference models.
 
@@ -99,12 +91,12 @@ The method is implemented in ``rosalia.core.exposure`` as:
 
 .. code-block:: python
 
-    def zodiacal(self, zody_mode="zodipy", verbose=False, output_name=None,
+    def zodiacal(self, zodi_mode="zodipy", verbose=False, output_name=None,
                  output_units="e/s", resolution=1, grid_method="random"):
 
 The main arguments are:
 
-- ``zody_mode``: model backend. Supported values include ``"stsci"``, ``"zodipy"``, and ``"irsa"``.
+- ``zodi_mode``: model backend. Supported values are ``"stsci"``, ``"zodipy"``, and ``"irsa"``.
 - ``verbose``: enable more detailed progress output.
 - ``output_name``: optional name for the output FITS file.
 - ``output_units``: output units for the model, default is ``"e/s"``.
@@ -125,7 +117,7 @@ If ``output_units == "e/s"``, it creates:
 - an electron-per-second image plot,
 - a surface-brightness plot in mag arcsec\ :sup:`-2`.
 
-If another unit is selected, it generates a MJy/sr-style plot instead.
+If another unit is entered, it generates a plot in MJy/sr instead.
 
 The method returns a dictionary of the form:
 

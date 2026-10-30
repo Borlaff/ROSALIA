@@ -100,13 +100,13 @@
 <h1>Zodiacal Light<a class="headerlink" href="#zodiacal-light" title="Link to this heading"></a></h1>
 <section id="modeling-the-zodiacal-light-background-with-rosalia">
 <h2>Modeling the Zodiacal light background with ROSALIA<a class="headerlink" href="#modeling-the-zodiacal-light-background-with-rosalia" title="Link to this heading"></a></h2>
-<p>The Zodiacal light is the dominant source of background for most Roman observations, except at the reddest filters where the thermal background can become comparable. It arises from sunlight scattered by interplanetary dust in the Solar System. Its intensity depends on the sky position, observation time, filter bandpass, and the observer geometry.</p>
+<p>The Zodiacal light is the dominant source of background for most Roman observations, except at the reddest filters (greater than about 2 micron) where the thermal background can become comparable. It arises from sunlight scattered by interplanetary dust in the Solar System. Its intensity depends on the sky position, observation time, filter bandpass, and the observer geometry.</p>
 <p>ROSALIA models the Zodiacal light background through the <code class="docutils literal notranslate"><span class="pre">rosalia.core.exposure.zodiacal()</span></code> method. This method uses the exposure geometry and computes the expected background for each detector, then writes out a FITS product and a drizzled summary image.</p>
 <p>The implementation supports three available backends:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">zody_mode=&quot;stsci&quot;</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">zody_mode=&quot;zodipy&quot;</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">zody_mode=&quot;irsa&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">zodi_mode=&quot;stsci&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">zodi_mode=&quot;zodipy&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">zodi_mode=&quot;irsa&quot;</span></code></p></li>
 </ul>
 <p>The notebook tutorial <code class="docutils literal notranslate"><span class="pre">notebooks/tutorials/R2_Rosalia_zody_example.ipynb</span></code> demonstrates the standard usage for all three options.</p>
 </section>
@@ -115,14 +115,11 @@
 <p>The simplest workflow is to build a mock Roman/WFI exposure and then call the <code class="docutils literal notranslate"><span class="pre">zodiacal</span></code> method on it.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">rosalia</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">rs</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">astropy.time</span><span class="w"> </span><span class="kn">import</span> <span class="n">Time</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">astropy.coordinates</span><span class="w"> </span><span class="kn">import</span> <span class="n">SkyCoord</span>
 
-<span class="n">target</span> <span class="o">=</span> <span class="s1">&#39;alpha Centauri&#39;</span>
-<span class="n">tgt</span> <span class="o">=</span> <span class="n">SkyCoord</span><span class="o">.</span><span class="n">from_name</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-<span class="n">ra</span> <span class="o">=</span> <span class="mf">219.92041</span>
-<span class="n">dec</span> <span class="o">=</span> <span class="o">-</span><span class="mf">50.835148</span>
+<span class="n">ra</span> <span class="o">=</span> <span class="mi">180</span>
+<span class="n">dec</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="n">PA</span> <span class="o">=</span> <span class="mi">9</span>
-<span class="n">date</span> <span class="o">=</span> <span class="n">Time</span><span class="p">(</span><span class="s2">&quot;2027-10-10T00:00:00&quot;</span><span class="p">)</span>
+<span class="n">date</span> <span class="o">=</span> <span class="n">Time</span><span class="p">(</span><span class="s2">&quot;2026-12-01T00:00:00&quot;</span><span class="p">)</span>
 <span class="n">bandpass</span> <span class="o">=</span> <span class="s2">&quot;F129&quot;</span>
 <span class="n">exptime</span> <span class="o">=</span> <span class="mi">600</span>
 
@@ -135,13 +132,10 @@
     <span class="s2">&quot;EXPTIME&quot;</span><span class="p">:</span> <span class="n">exptime</span><span class="p">,</span>
 <span class="p">}</span>
 
-<span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;Pleiades&quot;</span>
+<span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;zodi_test&quot;</span>
 <span class="n">custom_roman_exposure</span> <span class="o">=</span> <span class="n">rs</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">exposure</span><span class="p">(</span><span class="n">observer</span><span class="o">=</span><span class="n">observer</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">)</span>
 <span class="n">custom_roman_exposure</span><span class="o">.</span><span class="n">plot_footprint</span><span class="p">()</span>
-</pre></div>
-</div>
-<p>Once the exposure object has been generated, call the Zodiacal method:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">zodi_out</span> <span class="o">=</span> <span class="n">custom_roman_exposure</span><span class="o">.</span><span class="n">zodiacal</span><span class="p">(</span><span class="n">zody_mode</span><span class="o">=</span><span class="s2">&quot;stsci&quot;</span><span class="p">)</span>
+<span class="n">zodi_out</span> <span class="o">=</span> <span class="n">custom_roman_exposure</span><span class="o">.</span><span class="n">zodiacal</span><span class="p">(</span><span class="n">zodi_mode</span><span class="o">=</span><span class="s2">&quot;stsci&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>This computes the Zodiacal background model and writes FITS products in the working directory or next to the input product.</p>
@@ -151,21 +145,21 @@
 <p>The tutorial covers all three supported options for the Zodiacal background model.</p>
 <section id="stsci-model">
 <h3>STScI model<a class="headerlink" href="#stsci-model" title="Link to this heading"></a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">zodi_out</span> <span class="o">=</span> <span class="n">custom_roman_exposure</span><span class="o">.</span><span class="n">zodiacal</span><span class="p">(</span><span class="n">zody_mode</span><span class="o">=</span><span class="s2">&quot;stsci&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">zodi_out</span> <span class="o">=</span> <span class="n">custom_roman_exposure</span><span class="o">.</span><span class="n">zodiacal</span><span class="p">(</span><span class="n">zodi_mode</span><span class="o">=</span><span class="s2">&quot;stsci&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>This uses the STScI background model for Roman/WFI and is the direct workflow shown in the tutorial.</p>
+<p>This uses the STScI background model for Roman/WFI and is the direct workflow shown in the tutorial. This is the default option if an uknown string is entered for zodi_mode.</p>
 </section>
 <section id="zodipy-model">
 <h3>Zodipy model<a class="headerlink" href="#zodipy-model" title="Link to this heading"></a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">zodipy_zodi_out</span> <span class="o">=</span> <span class="n">custom_roman_exposure</span><span class="o">.</span><span class="n">zodiacal</span><span class="p">(</span><span class="n">zody_mode</span><span class="o">=</span><span class="s2">&quot;zodipy&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">zodipy_zodi_out</span> <span class="o">=</span> <span class="n">custom_roman_exposure</span><span class="o">.</span><span class="n">zodiacal</span><span class="p">(</span><span class="n">zodi_mode</span><span class="o">=</span><span class="s2">&quot;zodipy&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>This is the fastest option in the tutorial and is based on the COSMOGLOBE/Zodipy model.</p>
+<p>This is the fastest option in the tutorial and is based on the COSMOGLOBE/Zodipy package. This uses the extrapolate option and the ‘dirbe’ model, the only configuration that works at Roman’s wavelength coverage.</p>
 </section>
 <section id="irsa-model">
 <h3>IRSA model<a class="headerlink" href="#irsa-model" title="Link to this heading"></a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">irsa_zodi_out</span> <span class="o">=</span> <span class="n">custom_roman_exposure</span><span class="o">.</span><span class="n">zodiacal</span><span class="p">(</span><span class="n">zody_mode</span><span class="o">=</span><span class="s2">&quot;irsa&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">irsa_zodi_out</span> <span class="o">=</span> <span class="n">custom_roman_exposure</span><span class="o">.</span><span class="n">zodiacal</span><span class="p">(</span><span class="n">zodi_mode</span><span class="o">=</span><span class="s2">&quot;irsa&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>This uses the IRSA/IPAC Zodiacal light model and is typically the slowest option, but it can be useful for comparisons with external reference models.</p>
@@ -174,13 +168,13 @@
 <section id="method-behavior">
 <h2>Method behavior<a class="headerlink" href="#method-behavior" title="Link to this heading"></a></h2>
 <p>The method is implemented in <code class="docutils literal notranslate"><span class="pre">rosalia.core.exposure</span></code> as:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">zodiacal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zody_mode</span><span class="o">=</span><span class="s2">&quot;zodipy&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">output_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">zodiacal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zodi_mode</span><span class="o">=</span><span class="s2">&quot;zodipy&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">output_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
              <span class="n">output_units</span><span class="o">=</span><span class="s2">&quot;e/s&quot;</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">grid_method</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">):</span>
 </pre></div>
 </div>
 <p>The main arguments are:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">zody_mode</span></code>: model backend. Supported values include <code class="docutils literal notranslate"><span class="pre">&quot;stsci&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;zodipy&quot;</span></code>, and <code class="docutils literal notranslate"><span class="pre">&quot;irsa&quot;</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">zodi_mode</span></code>: model backend. Supported values are <code class="docutils literal notranslate"><span class="pre">&quot;stsci&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;zodipy&quot;</span></code>, and <code class="docutils literal notranslate"><span class="pre">&quot;irsa&quot;</span></code>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">verbose</span></code>: enable more detailed progress output.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">output_name</span></code>: optional name for the output FITS file.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">output_units</span></code>: output units for the model, default is <code class="docutils literal notranslate"><span class="pre">&quot;e/s&quot;</span></code>.</p></li>
@@ -201,7 +195,7 @@
 <li><p>an electron-per-second image plot,</p></li>
 <li><p>a surface-brightness plot in mag arcsec<sup>-2</sup>.</p></li>
 </ul>
-<p>If another unit is selected, it generates a MJy/sr-style plot instead.</p>
+<p>If another unit is entered, it generates a plot in MJy/sr instead.</p>
 <p>The method returns a dictionary of the form:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;zodi_list&quot;</span><span class="p">:</span> <span class="n">zodiacal_background_list</span><span class="p">,</span>
