@@ -1817,7 +1817,7 @@ def distribute_indices_numpy(nums, N):
 
 
 
-def get_ra_dec_arrays(fits_file, ext):
+def _get_ra_dec_arrays(fits_file, ext):
     """
     Analyze a FITS file with WCS and return RA and Dec arrays for each pixel.
     
@@ -1857,5 +1857,45 @@ def get_ra_dec_arrays(fits_file, ext):
     # Convert pixel coordinates to world coordinates (RA, Dec)
     # wcs.all_pix2world expects (x, y) coordinates
     ra_array, dec_array = wcs.all_pix2world(x_grid, y_grid, 0)
+    
+    return ra_array, dec_array
+
+
+def get_ra_dec_arrays(fits_file, ext):
+    """
+    Analyze a FITS file with WCS and return RA and Dec arrays for each pixel.
+    
+    Parameters:
+    -----------
+    fits_file : str
+        Path to the FITS file
+    ext : int
+        FITS extension number
+    
+    Returns:
+    --------
+    ra_array : numpy.ndarray
+        2D array containing Right Ascension (in degrees) for each pixel
+    dec_array : numpy.ndarray
+        2D array containing Declination (in degrees) for each pixel
+    """
+    
+    # Open the FITS file and read the header
+    with fits.open(fits_file) as hdul:
+        header = hdul[ext].header
+        
+        # Create WCS object from the header
+        wcs = astropy_wcs.WCS(header)
+        
+        # Get the image dimensions directly from WCS object (faster than header lookup)
+        naxis2, naxis1 = wcs.array_shape  # Returns (height, width)
+    
+    # Use wcs.array_index_to_world_values for vectorized conversion
+    # This is optimized for converting entire arrays at once
+    y_indices, x_indices = np.indices((naxis2, naxis1))
+    
+    # Use the faster array_index_to_world_values method
+    # This avoids the overhead of all_pix2world for large arrays
+    ra_array, dec_array = wcs.array_index_to_world_values(y_indices, x_indices)
     
     return ra_array, dec_array

@@ -440,7 +440,7 @@ def stsci_zody(ra, dec, wavelength, weights, expstart,verbose=False):
     expstart = Modified Julian Day of the observation (MJD)
 
     Output:
-    emisison = surface brightness in MJy/sr
+    emission = surface brightness in MJy/sr
     """
 
     import pandas as pd
