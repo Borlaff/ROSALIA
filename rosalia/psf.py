@@ -1148,8 +1148,6 @@ def identify_stars_in_out_field(data_shape, wcs, catalog, ra=None, dec=None, ver
 ############################
 
 def get_hybrid_catalog(ra, dec, radius, lambda_ref, MJD, observer, g_mag_max=False, verbose=False, query_filename="default_query.dat"):
-    from scipy import interpolate
-
 
     # C is the central coordinates of the pointing.
     c = SkyCoord(ra, dec, frame='icrs', unit="deg")
@@ -1310,7 +1308,7 @@ def get_hybrid_catalog(ra, dec, radius, lambda_ref, MJD, observer, g_mag_max=Fal
     for i in tqdm(range(len(high_resolution_catalog)), disable=not verbose, position=0, leave=True):
         good = np.where(np.isfinite(magnitude_array[:,i]))
         #print(magnitude_array[:,i])
-        magnitude_interpolator = interpolate.interp1d(x=filters_list_lambda[good], y=magnitude_array[good,i], kind="linear", fill_value="extrapolate")
+        magnitude_interpolator = interp1d(x=filters_list_lambda[good], y=magnitude_array[good,i], kind="linear", fill_value="extrapolate")
         mag_lambda[i] = magnitude_interpolator(lambda_ref.to("AA").value)[0]
 
     high_resolution_catalog["mag_lambda"] = mag_lambda

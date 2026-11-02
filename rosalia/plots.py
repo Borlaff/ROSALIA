@@ -687,7 +687,10 @@ def get_combined_NDI_map(SCA, ra_point, dec_point, pa, radius=5, pixscale=30/60/
     ra_dec_constraints = rs.gaia.find_ra_dec_constraints(ra_point, dec_point, radius/2, verbose=False)
 
     # Assimilating catalog.
-    rs.utils.create_dummy_image_with_wcs(ra_cen=ra_point, dec_cen=dec_point, pa=pa, ra_size=radius, dec_size=radius, pixscale=pixscale, outname=dummy_name)
+    rs.utils.create_dummy_image_with_wcs(ra_cen=ra_point, dec_cen=dec_point, pa=pa,
+                                         ra_size=radius, dec_size=radius, 
+                                         pixscale=pixscale, outname=dummy_name)
+    
     ra_grid, dec_grid = rs.utils.get_ra_dec_arrays(fits_file=dummy_name, ext=0)
 
     # Identify those at distances > 1 degrees (~100 times the size of the subarray).
@@ -712,7 +715,7 @@ def get_combined_NDI_map(SCA, ra_point, dec_point, pa, radius=5, pixscale=30/60/
     canvas_level[bool_is_the_star_level_1.reshape(dec_grid.shape)] = 1
 
     # Load the NDIs and raster the map 
-    i = 0
+    # i = 0
     NDI_canvas = np.zeros(dec_grid.shape)
 
     # Level 1

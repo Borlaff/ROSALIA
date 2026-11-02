@@ -812,7 +812,7 @@ class exposure():
             ###########
             # Reconstruct the stray-light maps and main offender maps from the straylevel_all_SCAS database. 
             ###########
-            NSCAs = len(self.SCIEXTS)# NSCAs 
+            # NSCAs = len(self.SCIEXTS)# NSCAs 
             print(" > Reconstructing the Stray-light / Main offender map: ")
             straylevel_list = [] 
             main_offender_list = [] 
