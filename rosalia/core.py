@@ -115,8 +115,7 @@ class exposure():
                 self.EXPMID = (Time(self.EXPSTART, format="mjd") + self.EXPTIME*u.s/2).mjd
                 self.EXPEND = (Time(self.EXPSTART, format="mjd") + self.EXPTIME*u.s).mjd
                 # self.PHYSPIX = telescope['PHYSPIX']
-                self.PIXSCALE = telescope['PIXSCALE']
-                # self.EXPSTART_ISOT = 
+                #self.PIXSCALE = telescope['PIXSCALE']
                 self.MPC_OBSLOC = self.get_mpc_observer_location()
                 self.JPL_OBSLOC = self.get_jpl_observer_location()
                 self.FILTER = telescope["FILTER"]
@@ -268,7 +267,8 @@ class exposure():
         self.EXPMID = (Time(self.EXPSTART, format="mjd") + self.EXPTIME*u.s/2).mjd
         self.EXPEND = (Time(self.EXPSTART, format="mjd") + self.EXPTIME*u.s).mjd
         self.PHYSPIX = rs.telescopes.Roman.get_physical_pixelsize(instrument=observer['INSTRUME'])
-        self.PIXSCALE = rs.telescopes.Roman.get_pixscale(instrument=observer['INSTRUME'])
+        #print("HEEY!")
+        #self.PIXSCALE = 18*[rs.telescopes.Roman.get_pixscale(instrument=observer['INSTRUME'])]
         self.EXPSTART_ASTROPY = Time(self.EXPSTART, format="mjd")
         self.EXPSTART_ISOT = self.EXPSTART_ASTROPY.isot
         self.MPC_OBSLOC = rs.horizons.get_mpc_observer_name(observer['TELESCOP'])
@@ -658,17 +658,17 @@ class exposure():
     from concurrent.futures import ProcessPoolExecutor
     @staticmethod
     def _parallel_roman_estimate_straylight_SCA(args):
-        data_shape, wcs, SCIEXT_i, filter_identity, ra_stars_outside, dec_stars_outside, cat_id_outside, source_id_outside, irradiance_stars, ra_point, dec_point, pa_point, verbose = args
+        wcs, SCIEXT_i, PIXSCALE_i, filter_identity, ra_stars_outside, dec_stars_outside, cat_id_outside, source_id_outside, fnu_stars, ra_point, dec_point, pa_point, verbose = args
         return rs.roman.roman_estimate_straylight_SCA(
-            data_shape=data_shape,
             wcs=wcs,
             SCA=SCIEXT_i,
+            pixscale=PIXSCALE_i,
             filter_identity=filter_identity,
             ra_stars=ra_stars_outside,
             dec_stars=dec_stars_outside,
             cat_id=cat_id_outside,
             source_id=source_id_outside,
-            irradiance_stars=irradiance_stars,
+            fnu_stars=fnu_stars,
             ra_point=ra_point,
             dec_point=dec_point,
             pa_point=pa_point,
@@ -739,7 +739,7 @@ class exposure():
             lambda_max = self.FILTER_IDENTITY["lambda_max"]
             lambda_min = self.FILTER_IDENTITY["lambda_min"]
             lambda_ref = self.FILTER_IDENTITY["lambda_ref"]
-            irradiance_stars = const.c*(lambda_max-lambda_min)/(lambda_ref**2)*((10**(-0.4*(synthetic_mag_outside+56.1)))*u.W/u.meter**2/u.Hz)
+            fnu_stars = 10**(-0.4*(synthetic_mag_outside+8.9))*u.Jy # Fnu of the stars in Jy. 
 
             ##########################################
             # Define the output tables and filenames #
@@ -779,21 +779,21 @@ class exposure():
             with ProcessPoolExecutor() as executor:
                 inputs = [
                     (
-                        DATA_SHAPE_i,
                         ASTROPYWCS_i,
                         SCIEXT_i,
+                        PIXSCALE_i,
                         self.FILTER_IDENTITY,
                         ra_stars_outside,
                         dec_stars_outside,
                         cat_id_outside,
                         source_id_outside,
-                        irradiance_stars,
+                        fnu_stars,
                         self.RA_TARG,
                         self.DEC_TARG,
                         self.PA,
                         verbose,
                     )
-                    for SCIEXT_i, DATA_SHAPE_i, ASTROPYWCS_i in zip(self.SCIEXTS, self.DATA_SHAPE, self.ASTROPYWCS)
+                    for SCIEXT_i, PIXSCALE_i, ASTROPYWCS_i in zip(self.SCIEXTS, self.PIXSCALE, self.ASTROPYWCS)
                 ]
 
                 parallel = True

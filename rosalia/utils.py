@@ -1687,7 +1687,8 @@ def get_astropywcs_info_from_sciexts(filename, sciexts):
     data_shape = []
     astropywcs = []
     header_list = []
-    
+    pixscale_list = []    
+
     input_fits = fits.open(filename)
     # If LITE, fill this anyways.
     for sci_ext_i in sciexts:
@@ -1698,11 +1699,12 @@ def get_astropywcs_info_from_sciexts(filename, sciexts):
         header_list.append(input_fits[sci_ext_i].header)
         astropywcs_i = astropy_wcs.WCS(header=input_fits[sci_ext_i], fobj=input_fits, naxis=2)
         astropywcs.append(astropywcs_i)
+        pixscale_list.append(np.abs(astropywcs[0].proj_plane_pixel_scales()[0]))
     
     return({"HEADERS": header_list,
             "DATA_SHAPE": data_shape,
             "ASTROPYWCS": astropywcs,
-            "PIXSCALE": np.abs(astropywcs[0].proj_plane_pixel_scales()[0])})
+            "PIXSCALE": pixscale_list})
 
 
 

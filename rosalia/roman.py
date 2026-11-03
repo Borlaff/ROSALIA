@@ -12,6 +12,7 @@ import healpy as hp
 import pickle
 from romanisim.ris_make_utils import set_metadata
 from romanisim.models import wcs as ris_wcs
+import astropy.wcs as astropy_wcs
 
 import logging
 
@@ -109,6 +110,8 @@ def create_roman_dummy(point, date, band, PA=None, exptime=500, output="default_
         os.remove(out_sca_filename)
 
         ### ADD THE HEADER KEYWORDS THAT DRIZZLEPAC NEEDS HERE ###
+        sca_wcs = astropy_wcs.WCS(header=temp_sca[0], fobj=temp_sca, naxis=2)
+        temp_sca[0].header["PIXSCALE"] = np.abs(sca_wcs.proj_plane_pixel_scales()[0]).to("degree").value  # arcsec/pixel
         temp_sca[0].header["TELESCOP"] = "RST"
         temp_sca[0].header["INSTRUME"] = 'WFI   '
         temp_sca[0].header["DETECTOR"] = 'WFI'
@@ -240,9 +243,9 @@ def _test_run_rosalia_asdf(catalog, exposure_name_list, outname="TEST_rosalia_",
 
         # Reset the Roman / WFI loading bar:
         rs.plots.ascii_progress_focal_plane.canvas = rs.plots.ascii_progress_focal_plane.canvas_zero
-        test_stray = roman_estimate_straylight_SCA(data=exposure_identity["DATA"][0],
-                                                   wcs=exposure_identity["ASTROPYWCS"][0],
+        test_stray = roman_estimate_straylight_SCA(wcs=exposure_identity["ASTROPYWCS"][0],
                                                    SCA=exposure_identity["SCA"],
+                                                   pixscale=exposure_identity["PIXSCALE"],
                                                    filter_identity=exposure_identity["FILTER_IDENTITY"],
                                                    ra_point=exposure_identity["RA_TARG"],
                                                    dec_point=exposure_identity["DEC_TARG"],
@@ -338,21 +341,22 @@ def roman_WFI_NDI_estimator_direct(ra_stars, dec_stars, ra_point, dec_point, pa_
 #################################################
 #################################################
 
-def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_stars,
-                                  dec_stars, irradiance_stars, cat_id,
+def roman_estimate_straylight_SCA(wcs, SCA, pixscale, filter_identity, ra_stars,
+                                  dec_stars, fnu_stars, cat_id,
                                   source_id, ra_point, dec_point, pa_point,
                                   verbose=False, loadingbar=False):
 
     import bottleneck as bn
     from IPython.display import clear_output
 
+    print("PIXSCALE: " + str(pixscale))
     # Level 1 stars are the closest. R to the center of the SCA of 1 degree.
     # Level 2 stars have a distance between 1 degree and 10 degrees to the center of the SCA.
     # Level 3 stars have a distance of 10 degrees or more to the SCA.
     level_1_critical_distance_to_star = 0.5 # degree
     level_2_critical_distance_to_star = 10 # degree
 
-    pixsize = rs.telescopes.Roman.get_physical_pixelsize(instrument="WFI") # Physical pixel size, in meters
+    #pixsize = rs.telescopes.Roman.get_physical_pixelsize(instrument="WFI") # Physical pixel size, in meters
 
     # Assimilating catalog.
     radec_stars =  SkyCoord(ra_stars, dec_stars, frame="icrs", unit="deg")
@@ -373,7 +377,7 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
 
     if verbose > 1:
         print("Stars - RA: " + str(radec_stars.ra) + " - DEC: " + str(radec_stars.dec))
-        print("Irradiance: " + str(irradiance_stars))
+        print("Fnu stars: " + str(fnu_stars))
         print("SCA - RA: " + str(ra_point) + " - DEC: " + str(dec_point))
     ##############################################################################
 
@@ -401,15 +405,15 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
     dec_level_3_stars  = radec_level_3_stars.dec.value
 
     # Level 1
-    irradiance_level_1_stars = irradiance_stars[bool_is_the_star_level_1]
+    fnu_level_1_stars = fnu_stars[bool_is_the_star_level_1]
     source_id_level_1 = source_id[bool_is_the_star_level_1]
     id_level_1_stars = id_stars[bool_is_the_star_level_1]
     # Level 2
-    irradiance_level_2_stars = irradiance_stars[bool_is_the_star_level_2]
+    fnu_level_2_stars = fnu_stars[bool_is_the_star_level_2]
     source_id_level_2 = source_id[bool_is_the_star_level_2]
     id_level_2_stars = id_stars[bool_is_the_star_level_2]
     # Level 3
-    irradiance_level_3_stars = irradiance_stars[bool_is_the_star_level_3]
+    fnu_level_3_stars = fnu_stars[bool_is_the_star_level_3]
     source_id_level_3 = source_id[bool_is_the_star_level_3]
     id_level_3_stars = id_stars[bool_is_the_star_level_3]
 
@@ -430,7 +434,7 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
 
     # The transfer NDI maps units of 1/(superpixel size in mm2). 
     # We need to correct by that factor. 
-    superpixel_mm2_area = (rs.telescopes.Roman.get_physical_pixelsize("WFI").to("mm").value * 512)**2
+    #superpixel_mm2_area = (rs.telescopes.Roman.get_physical_pixelsize("WFI").to("mm").value * 512)**2
 
     # Get the locations of the subarrays in the selected SCA.
     subarray_locations_db = rs.roman.get_subarray_locations(SCA=SCA, verbose=False)
@@ -480,11 +484,13 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
     ###############################################
     # Precalculate constant factors for straylight estimation                                            
     ###############################################
-    NDI_conversion_factor   = ((pixsize**2)*filter_identity["transmission_ref"]*filter_identity["lambda_ref"]/superpixel_mm2_area/const.c/const.h)
-    NDI_conversion_factor_1 = (NDI_conversion_factor*irradiance_level_1_stars).decompose()
-    NDI_conversion_factor_2 = (NDI_conversion_factor*irradiance_level_2_stars).decompose()
-    NDI_conversion_factor_3 = (NDI_conversion_factor*irradiance_level_3_stars).decompose()
-
+    #NDI_conversion_factor   = ((pixsize**2)*filter_identity["transmission_ref"]*filter_identity["lambda_ref"]/superpixel_mm2_area/const.c/const.h)
+    #NDI_conversion_factor_1 = (NDI_conversion_factor*irradiance_level_1_stars).decompose()
+    #NDI_conversion_factor_2 = (NDI_conversion_factor*irradiance_level_2_stars).decompose()
+    #NDI_conversion_factor_3 = (NDI_conversion_factor*irradiance_level_3_stars).decompose()
+    A_superpixel = (5.12*5.12*u.mm**2)
+    Lc = 1*u.W/u.mm**2/u.sr
+    # pixscale = pixscale*u.degree
     ##############################################################################
     # Here we go subarray per subarray.
     # First - We measure the average Straylight at the center of the SCA for stars at large distances
@@ -510,8 +516,14 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
                                                               ndi_grid_interpolator=ndi_lvl1["ndi_interpolator"][i],
                                                               level=level, verbose=True)
 
-            straylight_level_1 = transfer_level_1*NDI_conversion_factor_1  # (NDI_level_1*(pixsize**2)*filter_identity["filter_transmission_ref"]*filter_identity["filter_lambda_ref"]*irradiance_level_1_stars/const.c/const.h).decompose()
             
+            print("Transfer level 1: " + str(transfer_level_1*u.W/u.sr))
+            print("Fnu level 1: " + str(fnu_level_1_stars))
+            print("Lc: " + str(Lc))
+            print("A_superpixel: " + str(A_superpixel))
+            print("pixscale: " + str(pixscale))
+            straylight_level_1 = fnu_level_1_stars*(transfer_level_1*u.W/u.sr)/Lc/A_superpixel/(pixscale)**2  # *NDI_conversion_factor_1  # (NDI_level_1*(pixsize**2)*filter_identity["filter_transmission_ref"]*filter_identity["filter_lambda_ref"]*irradiance_level_1_stars/const.c/const.h).decompose()
+            print("Straylight level 1: " + str(straylight_level_1))
             # Once we have the straylight level, we can estimate: 
             # What is the star that produces the maximum straylight level on its own?
             # A.K.A. the main offender.
@@ -544,8 +556,8 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
             #NDI_level_2 = transfer_level_2/superpixel_mm2_area
 
             #straylight_level_2 = (NDI_level_2*(pixsize**2)*filter_identity["filter_transmission_ref"]*filter_identity["filter_lambda_ref"]*irradiance_level_2_stars/const.c/const.h).decompose()  #
-            straylight_level_2 = transfer_level_2*NDI_conversion_factor_2
-
+            # straylight_level_2 = # transfer_level_2*NDI_conversion_factor_2
+            straylight_level_2 = fnu_level_2_stars*(transfer_level_2*u.W/u.sr)/Lc/A_superpixel/(pixscale)**2
             where_max_stray = np.where(straylight_level_2.value == bn.nanmax(straylight_level_2))[0][0]
             id_main_offender_level_2 = id_level_2_stars[where_max_stray]
             source_id_main_offender_level_2 = source_id_level_2[where_max_stray]
@@ -574,7 +586,8 @@ def roman_estimate_straylight_SCA(data_shape, wcs, SCA, filter_identity, ra_star
                                                                 ra_point=ra_point, dec_point=dec_point, pa_point=pa_point, 
                                                                 ndi_name=ndi_name_3, level=level, rot_custom=rot_custom, verbose=True)
             
-            straylight_level_3 = transfer_level_3*NDI_conversion_factor_3
+            # straylight_level_3 = transfer_level_3*NDI_conversion_factor_3
+            straylight_level_3 = fnu_level_3_stars*(transfer_level_3*u.W/u.sr)/Lc/A_superpixel/(pixscale)**2
             where_max_stray = np.where(straylight_level_3.value == bn.nanmax(straylight_level_3))[0][0]
             id_main_offender_level_3 = id_level_3_stars[where_max_stray]
             source_id_main_offender_level_3 = source_id_level_3[where_max_stray]

@@ -21,7 +21,8 @@ notebooks/SUN/*/
 *apt
 *.part
 *aptbackup
-
+__pycache__
+*.pyc
 variables.env
 
 PAPER_I/
