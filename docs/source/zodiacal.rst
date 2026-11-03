@@ -27,12 +27,14 @@ The simplest workflow is to build a mock Roman/WFI exposure and then call the ``
     import rosalia as rs
     from astropy.time import Time
 
-    ra = 180
-    dec = 0
-    PA = 9
-    date = Time("2026-12-01T00:00:00")
+    target = "Pleiades"
+    tgt = SkyCoord("03h46m38.0s","+24d10m41s")
+    ra =  tgt.ra.value  # Right ascension, in degrees. 
+    dec = tgt.dec.value # Declination, in degrees.
+    PA = 9 # Position angle, in degrees.
+    date = Time("2027-02-01T00:00:00") # Date of the observation, in Astropy Time YYYY-MM-DDTHH:MM:SS format.
     bandpass = "F129"
-    exptime = 600
+    exptime = 600 # Exposure time, in seconds.
 
     observer = {
         "TELESCOP": "Roman/WFI",
@@ -43,13 +45,14 @@ The simplest workflow is to build a mock Roman/WFI exposure and then call the ``
         "EXPTIME": exptime,
     }
 
-    prefix = "zodi_test"
-    custom_roman_exposure = rs.core.exposure(observer=observer, prefix=prefix)
-    custom_roman_exposure.plot_footprint()
+    custom_roman_exposure = rs.core.exposure(observer=observer, prefix=target)
     zodi_out = custom_roman_exposure.zodiacal(zodi_mode="stsci")
 
 This computes the Zodiacal background model and writes FITS products in the working directory or next to the input product.
 
+.. image:: https://raw.githubusercontent.com/Borlaff/ROSALIA/main/images/Pleiades_Roman_RA_056.658_DEC_024.178_MJD_61437.00000_PA_009.00_zodi_drz_fe2mu.png
+  :alt: Zodiacal light background model for a Roman/WFI exposure of the Pleiades cluster using the model from STSci.
+**Figure 1**: Zodiacal light background model for a Roman/WFI exposure of the Pleiades cluster using the model from STSci. 
 
 Zodiacal model options
 ----------------------

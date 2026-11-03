@@ -233,7 +233,7 @@ def make_stray_plot(input_name, ext, mode="normal", catalog=None,
     print(vmin)
     print(vmax)
     im=ax.imshow(data, vmin=vmin, vmax=vmax, origin='lower', cmap=cmap)
-    ax.set(xlabel='Right ascension (degrees)', ylabel='Declination (degrees)')
+    ax.set(xlabel='Right ascension (J2000)', ylabel='Declination (J2000)')
     cbar = plt.colorbar(im, ax=ax, location='right', fraction=0.046, pad=0.04)
     cbar.set_label(label=color_label,weight='bold')
 

@@ -170,8 +170,8 @@ class query():
         missions = MastMissions(mission='roman')
         token = os.getenv("MAST_API_TOKEN")    
         missions.login(token=token)
-        af = missions.read_product(products[row]['filename'])
-        dm = rdm.open(af)
+        af = missions.download_products(products[row])
+        dm = rdm.open(af["Local Path"][0])
         return(dm)
 
     ####################

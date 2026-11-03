@@ -340,10 +340,13 @@ class exposure():
         for i in range(len(self.SCIEXTS)):
             x = np.array(exp_corners[i]["corners_world"][:,0].tolist() + [exp_corners[i]["corners_world"][0,0]])
             y = np.array(exp_corners[i]["corners_world"][:,1].tolist() + [exp_corners[i]["corners_world"][0,1]])
+            # x = np.flip(np.array(exp_corners[i]["corners_world"][:,0].tolist() + [exp_corners[i]["corners_world"][0,0]]))
+            # y = np.flip(np.array(exp_corners[i]["corners_world"][:,1].tolist() + [exp_corners[i]["corners_world"][0,1]]))
             ax.plot(x, y, color=color, label=label)
-            ax.set_xlabel("Right Ascension (degree)")
-            ax.set_ylabel("Declination (degree)")
+            ax.set_xlabel("Right Ascension (degrees)")
+            ax.set_ylabel("Declination (degrees)")
 
+        ax.invert_xaxis()
         return(ax)
     
 
@@ -1038,7 +1041,7 @@ class exposure():
         
         return detectors, wcs_list, canvas 
 
-    def zodiacal(self, zodi_mode="zodipy", verbose=False, output_name=None, output_units="e/s", resolution=1,
+    def zodiacal(self, zodi_mode="stsci", verbose=False, output_name=None, output_units="e/s", resolution=1,
                  grid_method="random"):
 
 
@@ -1047,7 +1050,7 @@ class exposure():
         roman_dummy_name = self.FILENAME 
         if output_name is None:
             # output_name = self.FILENAME.replace(".fits", "_zody.fits").replace(".asdf", "_zody.fits")
-            output_name = self.ROOTNAME + "_zody.fits" 
+            output_name = self.ROOTNAME + "_zodi.fits"
 
         zodiacal_background_list = []
         zodiacal_background_unit_list = []

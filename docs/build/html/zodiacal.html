@@ -116,12 +116,14 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">rosalia</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">rs</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">astropy.time</span><span class="w"> </span><span class="kn">import</span> <span class="n">Time</span>
 
-<span class="n">ra</span> <span class="o">=</span> <span class="mi">180</span>
-<span class="n">dec</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="n">PA</span> <span class="o">=</span> <span class="mi">9</span>
-<span class="n">date</span> <span class="o">=</span> <span class="n">Time</span><span class="p">(</span><span class="s2">&quot;2026-12-01T00:00:00&quot;</span><span class="p">)</span>
+<span class="n">target</span> <span class="o">=</span> <span class="s2">&quot;Pleiades&quot;</span>
+<span class="n">tgt</span> <span class="o">=</span> <span class="n">SkyCoord</span><span class="p">(</span><span class="s2">&quot;03h46m38.0s&quot;</span><span class="p">,</span><span class="s2">&quot;+24d10m41s&quot;</span><span class="p">)</span>
+<span class="n">ra</span> <span class="o">=</span>  <span class="n">tgt</span><span class="o">.</span><span class="n">ra</span><span class="o">.</span><span class="n">value</span>  <span class="c1"># Right ascension, in degrees.</span>
+<span class="n">dec</span> <span class="o">=</span> <span class="n">tgt</span><span class="o">.</span><span class="n">dec</span><span class="o">.</span><span class="n">value</span> <span class="c1"># Declination, in degrees.</span>
+<span class="n">PA</span> <span class="o">=</span> <span class="mi">9</span> <span class="c1"># Position angle, in degrees.</span>
+<span class="n">date</span> <span class="o">=</span> <span class="n">Time</span><span class="p">(</span><span class="s2">&quot;2027-02-01T00:00:00&quot;</span><span class="p">)</span> <span class="c1"># Date of the observation, in Astropy Time YYYY-MM-DDTHH:MM:SS format.</span>
 <span class="n">bandpass</span> <span class="o">=</span> <span class="s2">&quot;F129&quot;</span>
-<span class="n">exptime</span> <span class="o">=</span> <span class="mi">600</span>
+<span class="n">exptime</span> <span class="o">=</span> <span class="mi">600</span> <span class="c1"># Exposure time, in seconds.</span>
 
 <span class="n">observer</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;TELESCOP&quot;</span><span class="p">:</span> <span class="s2">&quot;Roman/WFI&quot;</span><span class="p">,</span>
@@ -132,13 +134,13 @@
     <span class="s2">&quot;EXPTIME&quot;</span><span class="p">:</span> <span class="n">exptime</span><span class="p">,</span>
 <span class="p">}</span>
 
-<span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;zodi_test&quot;</span>
-<span class="n">custom_roman_exposure</span> <span class="o">=</span> <span class="n">rs</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">exposure</span><span class="p">(</span><span class="n">observer</span><span class="o">=</span><span class="n">observer</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">)</span>
-<span class="n">custom_roman_exposure</span><span class="o">.</span><span class="n">plot_footprint</span><span class="p">()</span>
+<span class="n">custom_roman_exposure</span> <span class="o">=</span> <span class="n">rs</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">exposure</span><span class="p">(</span><span class="n">observer</span><span class="o">=</span><span class="n">observer</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">target</span><span class="p">)</span>
 <span class="n">zodi_out</span> <span class="o">=</span> <span class="n">custom_roman_exposure</span><span class="o">.</span><span class="n">zodiacal</span><span class="p">(</span><span class="n">zodi_mode</span><span class="o">=</span><span class="s2">&quot;stsci&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>This computes the Zodiacal background model and writes FITS products in the working directory or next to the input product.</p>
+<img alt="Zodiacal light background model for a Roman/WFI exposure of the Pleiades cluster using the model from STSci." src="https://raw.githubusercontent.com/Borlaff/ROSALIA/main/images/Pleiades_Roman_RA_056.658_DEC_024.178_MJD_61437.00000_PA_009.00_zodi_drz_fe2mu.png" />
+<p><strong>Figure 1</strong>: Zodiacal light background model for a Roman/WFI exposure of the Pleiades cluster using the model from STSci.</p>
 </section>
 <section id="zodiacal-model-options">
 <h2>Zodiacal model options<a class="headerlink" href="#zodiacal-model-options" title="Link to this heading"></a></h2>
