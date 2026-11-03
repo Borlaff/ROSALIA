@@ -340,8 +340,6 @@ class exposure():
         for i in range(len(self.SCIEXTS)):
             x = np.array(exp_corners[i]["corners_world"][:,0].tolist() + [exp_corners[i]["corners_world"][0,0]])
             y = np.array(exp_corners[i]["corners_world"][:,1].tolist() + [exp_corners[i]["corners_world"][0,1]])
-            # x = np.flip(np.array(exp_corners[i]["corners_world"][:,0].tolist() + [exp_corners[i]["corners_world"][0,0]]))
-            # y = np.flip(np.array(exp_corners[i]["corners_world"][:,1].tolist() + [exp_corners[i]["corners_world"][0,1]]))
             ax.plot(x, y, color=color, label=label)
             ax.set_xlabel("Right Ascension (degrees)")
             ax.set_ylabel("Declination (degrees)")
