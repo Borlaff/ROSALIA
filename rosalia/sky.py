@@ -142,7 +142,7 @@ def get_zodiacal_background(astropywcs, wavelength=None,
                             expstart=None, step=1000, zodi_mode="stsci",
                             obspos = None,
                             nbins_wavelength=20, obslocin=3, grid_method="random",
-                            output_units=None, verbose=False, dointerpolate=True):    
+                            output_units=None, verbose=False, dointerpolate=True,docenteronly=False):
 
     # Keywords for IRSA background query:
     # Check: https://irsa.ipac.caltech.edu/applications/BackgroundModel/docs/dustProgramInterface.html
@@ -155,6 +155,8 @@ def get_zodiacal_background(astropywcs, wavelength=None,
     # obslocin 	char 	0 or 3 	Observing location. 0 is Earth-Sun L2 region; 3 is Earth (defaults to 0).
     # obsverin 	char 	1 or 4 	Code version (optional, defaults to 4).
     # ido_viewin 	char 	0 or 1 	0 = find zodiacal on Day; 1 = find median zodiacal over a likely viewing range (defaults to 1, see Help).
+    # docenteronly: set True, if want ever single gridpoint to be the value of zodiacal background at the center of the
+    #   detector: this sets a uniform value so reduce artifacts when subtracted
 
     # Step zero: Check the wavelength variable.
     # If it is string, it might be a filter name.
@@ -190,6 +192,23 @@ def get_zodiacal_background(astropywcs, wavelength=None,
     # First we get the detector grid for interpolating the zodiacal measurements
     detector_grid = rs.detectors.make_detector_grid(w=astropywcs, step=step, mode=grid_method)
 
+    if not docenteronly:
+        rain = detector_grid["grid_world"][0]
+        decin = detector_grid["grid_world"][1]
+    else:
+        w=astropywcs
+        data_shape = w.array_shape
+        x_min = 0
+        x_max = data_shape[1]  # input_fits[ext].data.shape[1]
+        y_min = 0
+        y_max = data_shape[0]
+
+        x_mid = np.array([int((x_max - x_min) / 2)]*len(detector_grid["grid_world"][0]))
+        y_mid = np.array([int((y_max - y_min) / 2)]*len(detector_grid["grid_world"][1]))
+        gridworldin = w.all_pix2world(x_mid,y_mid, 0)
+        rain=gridworldin[0]
+        decin=gridworldin[1]
+
     # Then we query IRSA to get the Zody surface brightness at those positions and time
     if verbose:
         print("Year: " + str(year))
@@ -200,16 +219,16 @@ def get_zodiacal_background(astropywcs, wavelength=None,
     # For each wavelength bin, we do this query
     if zodi_mode.lower() == "irsa":
         if verbose: print("Zodiacal light model: IRSA")
-        zody_MJysr = irsa_zody(ra=detector_grid["grid_world"][0],
-                               dec=detector_grid["grid_world"][1],
+        zody_MJysr = irsa_zody(ra=rain,
+                               dec=decin,
                                wavelength=rebinned_wavelength,
                                weights=rebinned_transmission,
                                expstart=expstart, obslocin=obslocin)
 
     elif zodi_mode.lower() == "zodipy":
         if verbose: print("Zodiacal light model: Zodipy")
-        zody_MJysr = zodipy_zody(ra=detector_grid["grid_world"][0],
-                         dec=detector_grid["grid_world"][1],
+        zody_MJysr = zodipy_zody(ra=rain,
+                         dec=decin,
                          wavelength=rebinned_wavelength.to("um").value,
                          weights=rebinned_transmission,
                          expstart=expstart,
@@ -219,8 +238,8 @@ def get_zodiacal_background(astropywcs, wavelength=None,
         if zodi_mode != 'stsci':
             print('Unknown zodiacal light model. Using STSci by default.')
         if verbose: print("Zodiacal light model: STScI")
-        zody_MJysr = stsci_zody(ra=detector_grid["grid_world"][0],
-                                 dec=detector_grid["grid_world"][1],
+        zody_MJysr = stsci_zody(ra=rain,
+                                 dec=decin,
                                  wavelength=rebinned_wavelength.to("um").value,
                                  weights=rebinned_transmission,
                                  expstart=expstart,verbose=verbose)

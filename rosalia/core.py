@@ -149,7 +149,7 @@ class exposure():
 
         if filename is not None:
             exposure_identity = rs.inspector.exposure_inspector(filename, lite=False)
-            
+
             self.DATA = exposure_identity['DATA']
             self.FILENAME = exposure_identity['FILENAME']
             self.TELESCOP = exposure_identity['TELESCOP']
@@ -227,7 +227,6 @@ class exposure():
             self.MPC_OBSLOC = rs.horizons.get_mpc_observer_name(self.TELESCOP)
             self.JPL_OBSLOC = rs.horizons.get_jpl_observer_name(self.TELESCOP)
             # state_vectors = rs.horizons.get_heliocoords(self.EXPSTART, body=self.TELESCOP) # rs.horizons.interpolate_Roman_state_vectors(self.EXPSTART)
-
 
 
         self.fits_keywords = {"TELESCOP": self.TELESCOP, "INSTRUME": self.INSTRUME, "DETECTOR": self.DETECTOR, 
@@ -1040,7 +1039,7 @@ class exposure():
         return detectors, wcs_list, canvas 
 
     def zodiacal(self, zodi_mode="stsci", verbose=False, output_name=None, output_units="e/s", resolution=1,
-                 grid_method="random"):
+                 grid_method="random",step=1000,dointerpolate=True,docenteronly=False):
 
 
         nSCIEXTS = len(self.SCIEXTS)
@@ -1058,11 +1057,13 @@ class exposure():
             zodiacal_background = rs.sky.get_zodiacal_background(astropywcs=self.ASTROPYWCS[i],
                                                                  wavelength=self.FILTER_IDENTITY,
                                                                  expstart=self.EXPSTART,
-                                                                 step=1000, zodi_mode=zodi_mode,
+                                                                 step=step, zodi_mode=zodi_mode,
                                                                  nbins_wavelength=10, obslocin=0,
                                                                  grid_method=grid_method,
                                                                  obspos = self.XYZ_HELIO_POS,
                                                                  output_units=output_units,
+                                                                 dointerpolate=dointerpolate,
+                                                                 docenteronly=docenteronly,
                                                                  verbose=verbose)
 
             zodiacal_background_list.append(zodiacal_background.value)
