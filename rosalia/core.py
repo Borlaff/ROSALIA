@@ -149,7 +149,7 @@ class exposure():
 
         if filename is not None:
             exposure_identity = rs.inspector.exposure_inspector(filename, lite=False)
-            
+
             self.DATA = exposure_identity['DATA']
             self.FILENAME = exposure_identity['FILENAME']
             self.TELESCOP = exposure_identity['TELESCOP']
@@ -225,7 +225,6 @@ class exposure():
             self.MPC_OBSLOC = rs.horizons.get_mpc_observer_name(self.TELESCOP)
             self.JPL_OBSLOC = rs.horizons.get_jpl_observer_name(self.TELESCOP)
             # state_vectors = rs.horizons.get_heliocoords(self.EXPSTART, body=self.TELESCOP) # rs.horizons.interpolate_Roman_state_vectors(self.EXPSTART)
-
 
 
         self.fits_keywords = {"TELESCOP": self.TELESCOP, "INSTRUME": self.INSTRUME, "DETECTOR": self.DETECTOR, 
@@ -1042,7 +1041,8 @@ class exposure():
         return detectors, wcs_list, canvas 
 
     def zodiacal(self, zodi_mode="stsci", verbose=False, output_name=None, output_units="e/s", resolution=1,
-                 grid_method="random"):
+                 grid_method="random",step=1000,dointerpolate=True,docenteronly=False,doshow=True,
+                 dofits=True,doplots=True):
 
 
         nSCIEXTS = len(self.SCIEXTS)
@@ -1060,11 +1060,13 @@ class exposure():
             zodiacal_background = rs.sky.get_zodiacal_background(astropywcs=self.ASTROPYWCS[i],
                                                                  wavelength=self.FILTER_IDENTITY,
                                                                  expstart=self.EXPSTART,
-                                                                 step=1000, zodi_mode=zodi_mode,
+                                                                 step=step, zodi_mode=zodi_mode,
                                                                  nbins_wavelength=10, obslocin=0,
                                                                  grid_method=grid_method,
                                                                  obspos = self.XYZ_HELIO_POS,
                                                                  output_units=output_units,
+                                                                 dointerpolate=dointerpolate,
+                                                                 docenteronly=docenteronly,
                                                                  verbose=verbose)
 
             zodiacal_background_list.append(zodiacal_background.value)
@@ -1074,26 +1076,27 @@ class exposure():
         # Save the Zodiacal light FLC file
         ########################################
         self.drz_zody_name = output_name.replace(".fits","_drz.fits")
-        self.save_flc(outname=output_name, data_list=zodiacal_background_list, wcs_list=self.ASTROPYWCS)
+        if dofits:
+            self.save_flc(outname=output_name, data_list=zodiacal_background_list, wcs_list=self.ASTROPYWCS)
+            print("Output saved in: " + output_name)
 
-        # Save the Zodiacal light DRZ file 
-        self.save_drz(outname=self.drz_zody_name, data_list=zodiacal_background_list, wcs_list=self.ASTROPYWCS, resolution=resolution)
+        if doplots:
+            # Save the Zodiacal light DRZ file
+            self.save_drz(outname=self.drz_zody_name, data_list=zodiacal_background_list, wcs_list=self.ASTROPYWCS, resolution=resolution)
 
-        if output_units == "e/s":
-            rs.plots.make_stray_plot(input_name=self.drz_zody_name, ext=0, mode="fe",
-                                     color_label = "Flux (e/s/px)", cmap="RdYlBu_r", figsize=(10,7))
+            if output_units == "e/s":
+                rs.plots.make_stray_plot(input_name=self.drz_zody_name, ext=0, mode="fe",
+                                         color_label = "Flux (e/s/px)", cmap="RdYlBu_r", figsize=(10,7),doshow=doshow)
 
-            rs.plots.make_stray_plot(input_name=self.drz_zody_name, ext=0, mode="fe2mu",
-                                     vmin=None, vmax=None,
-                                     color_label = 'Surface brightness (mag arcsec$^{-2}$)',
-                                     cmap="RdYlBu", output_name=None, figsize=(10,7), mu_vmin=None, mu_vmax=None)
-        #otherwise rs.sky.get_zodiacal_background returns in units of MJy/Sr
-        # as is a standard unit to measure zodiacal light
-        else:
-            rs.plots.make_stray_plot(input_name=self.drz_zody_name, ext=0, mode="mjysr",
-                                     color_label = "Flux (MJy/Sr)", cmap="RdYlBu_r", figsize=(10,7))
-
-        print("Output saved in: " + output_name)
+                rs.plots.make_stray_plot(input_name=self.drz_zody_name, ext=0, mode="fe2mu",
+                                         vmin=None, vmax=None,
+                                         color_label = 'Surface brightness (mag arcsec$^{-2}$)',
+                                         cmap="RdYlBu", output_name=None, figsize=(10,7), mu_vmin=None, mu_vmax=None,doshow=doshow)
+            #otherwise rs.sky.get_zodiacal_background returns in units of MJy/Sr
+            # as is a standard unit to measure zodiacal light
+            else:
+                rs.plots.make_stray_plot(input_name=self.drz_zody_name, ext=0, mode="mjysr",
+                                         color_label = "Flux (MJy/Sr)", cmap="RdYlBu_r", figsize=(10,7),doshow=doshow)
 
         return({"zodi_list": zodiacal_background_list,
                 "output_name": output_name})

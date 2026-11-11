@@ -200,11 +200,12 @@ def main_offender_find_fraction_of_map(mainoff_name, catalog):
 
     return(main_offender_db, multiline_text)
 
-
-def make_stray_plot(input_name, ext, filter_name, mode="normal", catalog=None, 
-                    vmin=None, vmax=None,
+#doshow: True to show plot
+def make_stray_plot(input_name, ext, mode="normal", catalog=None, 
+                    vmin=None, vmax=None, 
                     color_label = 'Surface brightness (mag arcsec$^{-2}$)',
-                    cmap="RdYlBu", output_name=None, figsize=(10,7), mu_vmin=None, mu_vmax=None):
+                    cmap="RdYlBu", output_name=None, figsize=(10,7), mu_vmin=None, mu_vmax=None,
+                    doshow=True):
 
     if output_name is None:
         output_name = input_name.replace(".fits", "_" + mode + ".png")
@@ -248,7 +249,8 @@ def make_stray_plot(input_name, ext, filter_name, mode="normal", catalog=None,
             bbox=dict(facecolor='white', alpha=0.5))
     fig.tight_layout()
     plt.savefig(output_name, dpi=300)
-    plt.show()
+    if doshow:
+        plt.show()
     return(output_name)
 
 
