@@ -46,6 +46,7 @@ from . import (
     sso as sso,
     telescopes as telescopes,
     tests as tests,
+    thermal as thermal,
     utils as utils,
 )
 
@@ -71,6 +72,7 @@ __all__ = [
     "superback",
     "skywalker",
     "telescopes",
+    "thermal",
     "tests",
     "constants",
     "plots",
