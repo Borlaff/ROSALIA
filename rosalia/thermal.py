@@ -63,7 +63,7 @@ def get_thermal_background(bandpass, SCA):
     # Example usage:
 
     if bandpass is "F146" or bandpass is "F213" or bandpass is "F184":
-        filename = os.environ["ROSALIACACHE"] + "CORE/THERMAL/"+bandpass+"_thermal.txt"   # your text file
+        filename = os.environ["ROSALIACACHE"] + "/CORE/THERMAL/"+bandpass+"_thermal.txt"   # your text file
         sca_tables = read_sca_tables(filename)
         target_size = 4088
         SCAi = str(SCA).zfill(2)
