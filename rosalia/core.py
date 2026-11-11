@@ -1073,8 +1073,8 @@ class exposure():
         ########################################
         # Save the Zodiacal light FLC file
         ########################################
+        self.drz_zody_name = output_name.replace(".fits","_drz.fits")
         if dofits:
-            self.drz_zody_name = output_name.replace(".fits","_drz.fits")
             self.save_flc(outname=output_name, data_list=zodiacal_background_list, wcs_list=self.ASTROPYWCS)
             print("Output saved in: " + output_name)
 
