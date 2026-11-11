@@ -163,13 +163,16 @@ def exposure_inspector_single(input_name, verbose=False, lite=False):
         exposure_identity = exposure_inspector_asdf(input_name, verbose=verbose, lite=lite)
 
     # Add the position of the telescope to the identity.
-    try:
-        telescope = rs.telescopes.telescope_class_finder(exposure_identity["TELESCOP"])
-        exposure_identity["XYZ_HELIO_POS"] = telescope.get_location(mjd=exposure_identity["EXPSTART"])
-    except:
-        telescope = None
-        print("Telescope " + exposure_identity["TELESCOP"] + " Class not found!")
-        print("Some functions might not work")
+    #print(exposure_identity["EXPSTART"])
+    #if True:
+    #try:
+    #    telescope = rs.telescopes.telescope_class_finder(exposure_identity["TELESCOP"])
+    #    exposure_identity["XYZ_HELIO_POS"] = telescope.get_location(mjd=exposure_identity["EXPSTART"])
+    #if False:
+    #except:
+    #    telescope = None
+    #    print("Telescope " + exposure_identity["TELESCOP"] + " Class not found!")
+    #    print("Some functions might not work")
 
     return(exposure_identity)
 

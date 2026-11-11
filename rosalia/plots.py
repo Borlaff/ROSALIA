@@ -107,11 +107,11 @@ def main_offender_find_fraction_of_map(mainoff_name, catalog):
     data_flat = data_flat[~np.isnan(data_flat)] 
 
     unique_ids, unique_counts = np.unique(data_flat.astype("int64"), return_counts=True)
-    print("Unique IDs:")
-    print(unique_ids)
+    #print("Unique IDs:")
+    #print(unique_ids)
     unique_ids = unique_ids[unique_counts>1]
-    print("Unique IDs with counts > 1:")
-    print(unique_ids)
+    #print("Unique IDs with counts > 1:")
+    #print(unique_ids)
     fraction_by_offender = [] 
 
 
@@ -147,17 +147,24 @@ def main_offender_find_fraction_of_map(mainoff_name, catalog):
 
 
         # Try to find the name of the main_offender
-        simbad_query = Simbad.query_region(SkyCoord(ra, dec, unit=(u.deg, u.deg), frame='icrs'), radius=1 * u.arcsec)
-        if len(simbad_query)==0:
-            print("Simbad cannot find the name of the offender at " + str(ra) + " - " + str(dec)) 
+        if False: # Bypassing Simbad outage on November 2026
+        # try: # Adding SIMBAD query outage error handling. 
+            simbad_query = Simbad.query_region(SkyCoord(ra, dec, unit=(u.deg, u.deg), frame='icrs'), radius=1 * u.arcsec)
+            if len(simbad_query)==0:
+                print("Simbad cannot find the name of the offender at " + str(ra) + " - " + str(dec)) 
+                source_name = "CAT_ID_" + str(unique_id)
+            if len(simbad_query)==1:
+                # print(simbad_query["main_id"][0])
+                source_name = simbad_query["main_id"][0]
+            if len(simbad_query)>1:
+                print("Simbad has multiple offending sources at  " + str(ra) + " - " + str(dec)) 
+                source_name = simbad_query["main_id"][0] + "_" + str(unique_id)
+                # source_name = 
+        if True: 
+        #except:
+            print("TEMP FIX: Bypassing Simbad outage on November 2026")
+            print("Simbad query failed for " + str(ra) + " - " + str(dec) + ". Skipping")
             source_name = "CAT_ID_" + str(unique_id)
-        if len(simbad_query)==1:
-            print(simbad_query["main_id"][0])
-            source_name = simbad_query["main_id"][0]
-        if len(simbad_query)>1:
-            print("Simbad has multiple offending sources at  " + str(ra) + " - " + str(dec)) 
-            source_name = simbad_query["main_id"][0] + "_" + str(unique_id)
-            # source_name = 
             
         ra_list.append(ra)
         dec_list.append(dec)
@@ -188,14 +195,14 @@ def main_offender_find_fraction_of_map(mainoff_name, catalog):
         source_id = main_offender_db["source_id"].iloc[i]
         lines.append("" + str("{:.2f}".format(percen)) + "% - ("  + str("{:.2f}".format(ra)) + ", " + str("{:.2f}".format(dec)) +  "), m="  + str("{:.2f}".format(mag_lambda)) + ' - ' + str(name))
     multiline_text = "\n".join(lines)
-    print(multiline_text)
+    # print(multiline_text)
 
 
     return(main_offender_db, multiline_text)
 
 
-def make_stray_plot(input_name, ext, mode="normal", catalog=None, 
-                    vmin=None, vmax=None, 
+def make_stray_plot(input_name, ext, filter_name, mode="normal", catalog=None, 
+                    vmin=None, vmax=None,
                     color_label = 'Surface brightness (mag arcsec$^{-2}$)',
                     cmap="RdYlBu", output_name=None, figsize=(10,7), mu_vmin=None, mu_vmax=None):
 
@@ -207,17 +214,11 @@ def make_stray_plot(input_name, ext, mode="normal", catalog=None,
     data = hdu[ext].data.copy()
     wcs = astropy_wcs.WCS(hdu[ext].header)
 
-    
-    #if mode == "main_offender":
-    #    data, header = rs.utils.reproject_roman_wfi_fits(input_name, input_ext=ext,
-    #                                            reference_name=flt_name, 
-    #                                            reference_ext=np.linspace(1,18,18, dtype="int"))
-    
+    # Plot zone
     fig, ax = plt.subplots(figsize=figsize, subplot_kw=dict(projection=wcs))
-
     if mode == "fe2mu":
-        print("DEMO WARNING: make_stray_plot is Assuming F129.")
-        data = rs.detectors.fe2mu(data, telescope="Roman", instrument="WFI", filter_name="F129")
+        # print("DEMO WARNING: make_stray_plot is Assuming F129.")
+        data = rs.detectors.fe2mu(data, telescope="Roman", instrument="WFI", filter_name=filter_name)
 
 
     data[np.isinf(data)] = np.nan
@@ -230,8 +231,6 @@ def make_stray_plot(input_name, ext, mode="normal", catalog=None,
         vmin = mu_vmin
         vmax = mu_vmax
 
-    print(vmin)
-    print(vmax)
     im=ax.imshow(data, vmin=vmin, vmax=vmax, origin='lower', cmap=cmap)
     ax.set(xlabel='Right ascension (J2000)', ylabel='Declination (J2000)')
     cbar = plt.colorbar(im, ax=ax, location='right', fraction=0.046, pad=0.04)
@@ -275,8 +274,6 @@ def make_stars_around_plot(catalog,  astropywcs_list, RA_TARG, DEC_TARG, radius 
         hybrid_catalog_close = catalog
         radius = 1.1*np.nanmax(separation.value)/2
 
-    print(radius)
-
     # Plot Zone # 
     fig, ax = plt.subplots(figsize=figsize)
     
@@ -311,6 +308,8 @@ def plot_ndi_main_offenders(RA_TARG, DEC_TARG, PA, scaled_main_off, catalog, rad
     radius = 1.05*bn.nanmax(main_offender_db["dist"])
     pixscale = 30/60/60/5*radius # Empirical formula to be visually appealing. 
 
+    print(main_offender_db["dist"])
+    print(radius)
     # Plot level NDI 
     if radius<1:
         ndi_linthresh = 0.05
@@ -320,7 +319,8 @@ def plot_ndi_main_offenders(RA_TARG, DEC_TARG, PA, scaled_main_off, catalog, rad
         ndi_linthresh = 0.00001
 
     # Get the Combined NDI     
-    ndi_map, ndi_wcs, _ = get_combined_NDI_map(SCA=1, ra_point=RA_TARG, dec_point=DEC_TARG, pa=PA, radius=radius, pixscale=pixscale, dummy_name="dummy_ndi_plot.fits")
+    ndi_map, ndi_wcs, _ = get_combined_NDI_map(SCA=1, ra_point=RA_TARG, dec_point=DEC_TARG, pa=PA,
+                                               radius=radius, pixscale=pixscale, dummy_name="dummy_ndi_plot.fits")
 
     fig, ax = plt.subplots(1, 1, figsize=figsize, subplot_kw=dict(projection=ndi_wcs))
 
@@ -393,7 +393,7 @@ def plot_stars_around(ax, catalog, max_plot_size=50, min_plot_size=5, alpha=0.2)
 
         try:
             planet_i = np.where(catalog["source_id"]==SSO_list_plain_i)[0][0]
-            plt.scatter(ra_stars[planet_i], dec_stars[planet_i], marker=SSO_list_symbols[i], label= SSO_list_symbols[i] + " - " + SSO_list_plain[i], s=200)
+            ax.scatter(ra_stars[planet_i], dec_stars[planet_i], marker=SSO_list_symbols[i], label= SSO_list_symbols[i] + " - " + SSO_list_plain[i], s=200)
 
         except:
             print("SSO body: " + SSO_list_plain_i + " not found. Skipping")
@@ -489,21 +489,22 @@ def plot_stray_and_ndi_map(stray_name, star_catalog, ra_point, dec_point, pa_poi
 
 
 
-def make_straylight_plots(RA_TARG, DEC_TARG, PA, source_catalog, ASTROPYWCS, stray_flc_name, scaled_stray_drz_name, scaled_main_off_name, figsize=(10,7), mu_vmin = 25, mu_vmax = 35, verbose=1): 
+def make_straylight_plots(RA_TARG, DEC_TARG, PA, source_catalog, ASTROPYWCS, stray_flc_name, scaled_stray_drz_name,
+                          scaled_main_off_name, filter_name, figsize=(10,7), mu_vmin = None, mu_vmax = None, verbose=1): 
     # Make the plots. 
     if verbose > 0: print("Plot: Stray-light surface brightness magnitude.")
     fe2mu_png = rs.plots.make_stray_plot(input_name=scaled_stray_drz_name,
-                                         ext=0, mode="fe2mu",
+                                         ext=0, filter_name=filter_name, mode="fe2mu",
                                          color_label = "Surface brightness (mag arcsec$^{-2}$)",
                                          figsize=figsize, mu_vmin=mu_vmin, mu_vmax=mu_vmax)
 
     if verbose > 0: print("Plot: Stray-light surface brightness flux.")
-    fe_png = rs.plots.make_stray_plot(input_name=scaled_stray_drz_name, ext=0, mode="fe", 
+    fe_png = rs.plots.make_stray_plot(input_name=scaled_stray_drz_name, ext=0, filter_name=filter_name, mode="fe", 
                                       color_label = "Flux (e/s/px)", cmap="RdYlBu_r", figsize=figsize)
 
     if verbose > 0: print("Plot: Main offender map.")
     main_offender_png = rs.plots.make_stray_plot(input_name=scaled_main_off_name, 
-                                                 ext=0, 
+                                                 ext=0, filter_name=filter_name, 
                                                  mode="main_offender", 
                                                  catalog=source_catalog, 
                                                  color_label = "Main offending source (ID)", 
@@ -688,7 +689,7 @@ def get_combined_NDI_map(SCA, ra_point, dec_point, pa, radius=5, pixscale=30/60/
 
     # Assimilating catalog.
     rs.utils.create_dummy_image_with_wcs(ra_cen=ra_point, dec_cen=dec_point, pa=pa,
-                                         ra_size=radius, dec_size=radius, 
+                                         ra_size=2*radius, dec_size=2*radius, 
                                          pixscale=pixscale, outname=dummy_name)
     
     ra_grid, dec_grid = rs.utils.get_ra_dec_arrays(fits_file=dummy_name, ext=0)

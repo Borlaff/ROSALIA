@@ -194,13 +194,6 @@ def get_filter(telescope, instrument, detector, filter_name, verbose=False):
     # Now the median would be:
     average_wave_filter = np.sum(wavelength_bins*transmission_bins)/np.sum(transmission_bins)
 
-    if verbose:
-        import matplotlib.pyplot as plt
-        plt.plot(wavelength_bins, transmission_bins, label=instrument +","+ filter_name)
-        plt.axvline(average_wave_filter, color="black", linestyle = ":", linewidth=3, label="Median wavelength")
-        plt.legend()
-        plt.show()
-
     telescope_class = rs.telescopes.telescope_class_finder(telescope)
     telescope_area = telescope_class.mirror_radius**2 * np.pi
 

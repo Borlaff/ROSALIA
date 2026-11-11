@@ -165,8 +165,6 @@ class exposure():
             self.conversion_megajanskys = exposure_identity['conversion_megajanskys']
             self.conversion_megajanskys_uncertainty = exposure_identity['conversion_megajanskys_uncertainty']
             
-            #self.helio_x = exposure_identity['spatial_x']
-            #self.spatial_x = exposure_identity['spatial_x']
             self.pixel_area = exposure_identity['pixel_area']
             self.EXPSTART_ISOT = exposure_identity['EXPSTART_ISOT']
             self.PA = exposure_identity['PA']
@@ -615,7 +613,8 @@ class exposure():
 
         return(outname)
         
-    def save_drz(self, outname, data_list=None, wcs_list=None, keywords=None, resolution=1, extname=None, overwrite=True):
+    def save_drz(self, outname=None, data_list=None, wcs_list=None, keywords=None, resolution=1, extname=None, overwrite=True):
+        if outname is None: outname = self.ROOTNAME + "_drz.fits"
         if data_list is None: data_list = self.DATA
         if wcs_list is None: wcs_list = self.ASTROPYWCS
         if keywords is None: keywords = self.fits_keywords
@@ -626,18 +625,21 @@ class exposure():
         lvl3_data, lvl3_header = rs.mosaics.generate_mosaic(data=data_list, astropywcs=wcs_list, resolution=resolution)
 
         lvl3_header["EXTNAME"] = "DRZ"
-        lvl3_header["RA_TARG"] = self.RA_TARG
-        lvl3_header["DEC_TARG"] = self.DEC_TARG
+        lvl3_header["RA_TARG"] = self.RA_TARG[0] if isinstance(self.RA_TARG, (list,)) else self.RA_TARG
+        lvl3_header["DEC_TARG"] = self.DEC_TARG[0] if isinstance(self.DEC_TARG, (list,)) else self.DEC_TARG
         lvl3_header["EXPSTART"] = self.EXPSTART
         lvl3_header["EXPEND"] = self.EXPEND
-        lvl3_header["PA"] = self.PA
+        lvl3_header["PA"] = self.PA[0] if isinstance(self.PA, (list,)) else self.PA
         lvl3_header["TELESCOP"] = self.TELESCOP
         lvl3_header["INSTRUME"] = self.INSTRUME
         lvl3_header["BUNIT"] = "MJy sr-1"
         keywords["DETECTOR"] = rs.inspector.longest_common_substring(self.DETECTOR)
         
         for key in keywords.keys():
-            lvl3_header[key] = keywords[key]
+            try:
+                lvl3_header[key] = keywords[key]
+            except:
+                print("Warning: Could not write keyword " + key + " to header.")
 
         rs.utils.save_fits(array=np.float32(lvl3_data), name=outname, header=lvl3_header,
                            extname=extname, 
@@ -901,8 +903,8 @@ class exposure():
                                         stray_flc_name=self.output_name, 
                                         scaled_stray_drz_name=self.stray_drz_name, 
                                         scaled_main_off_name=self.mainoff_drz_name, 
-                                        figsize=(10,7), mu_vmin = 25, 
-                                        mu_vmax = 35, verbose=1) 
+                                        filter_name=self.FILTER_IDENTITY["filter_name"],
+                                        figsize=(10,7), verbose=1) 
               
             print(datetime.now().isoformat() + " > Done")
 
