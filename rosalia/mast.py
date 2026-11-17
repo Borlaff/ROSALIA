@@ -191,7 +191,7 @@ class query():
         return(products, unique_roots)
 
 
-    def roman_query(criteria=None, coordinates=None, radius=None, filter=None,
+    def roman_query(criteria=None, coordinates=None, radius=None, filter=None, 
                     mindate=None, detector=None, file_suffix=None, exposure_id=None,
                     download_products=False, pack_exposures=True, limit=10000, verbose=False):
 
@@ -206,6 +206,18 @@ class query():
                 'detector': 'WFI06',
                 'optical_element': 'F158',
                 'exposure_type': "WFI_IMAGE"}
+
+
+        TODO: 
+
+        1. Add pid as input 
+        2. -
+
+        mast.query_criteria(program=1020, detector="wfi01", select_cols=["fileSetName"])     # 280 rows;   48.8 s
+        mast.query_criteria(fileSetName="r01020*wfi01*", select_cols=["fileSetName"])        # 280 rows;    4.1 s
+        mast.query_criteria(program=1020, select_cols=["fileSetName"], limit=50000)          # 10829 rows; 28.3 s
+        mast.query_criteria(fileSetName="r01020*", select_cols=["fileSetName"], limit=50000) # 10829 rows; 11.3 s
+                
         """
 
         # Create MastMissions object and assign mission to 'roman'

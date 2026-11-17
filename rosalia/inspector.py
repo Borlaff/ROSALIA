@@ -1,5 +1,6 @@
 import os
 import glob
+import token
 import asdf
 import s3fs
 from tqdm import tqdm
@@ -10,6 +11,9 @@ import roman_datamodels.datamodels._datamodels
 import astropy.table.table
 import os
 import astropy.units as u
+from astroquery.mast import MastMissions
+
+
 ############################
 def exposure_inspector(input_name, verbose=False, lite=False):
     """
@@ -77,9 +81,15 @@ def exposure_inspector(input_name, verbose=False, lite=False):
                 exposure_identity = rs.inspector.exposure_inspector(input_name[i], lite=lite)
                 
             elif isinstance(input_name, (astropy.table.table.Table,)): 
-                data_stream = rs.mast.query.stream_roman_mast(products=input_name, row=i)
-                exposure_identity = rs.inspector.exposure_inspector(data_stream, lite=lite)
-                
+                #data_stream = rs.mast.query.stream_roman_mast(products=input_name, row=i)
+                #exposure_identity = rs.inspector.exposure_inspector(data_stream, lite=lite)
+                if input_name["instrument_name"][0] == "WFI":
+                    missions = MastMissions(mission='roman')
+                    token = os.getenv("MAST_API_TOKEN")    
+                    missions.login(token=token)
+                    #print(dir(missions))
+                    asdf_stream = missions.get_product(uri=input_name["uri"][i])
+                    exposure_identity = rs.inspector.exposure_inspector_asdf(asdf_stream, lite=lite)
             exposure_identities.append(exposure_identity)
 
         exposure_identities = combine_dicts(exposure_identities)
