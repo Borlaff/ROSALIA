@@ -180,13 +180,15 @@ def exposure_inspector_single(input_name, verbose=False, lite=False):
 def exposure_inspector_asdf(input_name, telescope="roman", verbose=False, lite=False):
     # print(input_name)
     import roman_datamodels.datamodels._datamodels
-    if isinstance(input_name, roman_datamodels.datamodels._datamodels.ImageModel):
+    if isinstance(input_name, (asdf._asdf.AsdfFile,)):
+        input_asdf = input_name[telescope]
+
+    elif isinstance(input_name, roman_datamodels.datamodels._datamodels.ImageModel):
         input_asdf = input_name
 
-    if isinstance(input_name, str):
+    elif isinstance(input_name, str):
         if "s3://" in input_name: 
             if verbose: print("Nexus S3 bucket file detected")
-
             fs = s3fs.S3FileSystem(anon=True)
             input_asdf = asdf.open(fs.open(input_name, 'rb'))[telescope]
 

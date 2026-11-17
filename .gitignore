@@ -23,7 +23,7 @@ notebooks/SUN/*/
 *aptbackup
 __pycache__
 variables.env
-
+*.pyc
 PAPER_I/
 notebooks/MOCK/*/
 notebooks/*.xml
