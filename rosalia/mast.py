@@ -7,6 +7,7 @@ import logging
 from astropy.time import Time
 import rosalia as rs
 from tqdm import tqdm 
+from astropy.table import join
 
 # Supress info from MAST
 logger = logging.getLogger()
@@ -190,7 +191,9 @@ class query():
         return(products, unique_roots)
 
 
-    def roman_query(criteria=None, coordinates=None, radius=None, filter=None, mindate=None, detector=None, file_suffix=None, exposure_id=None, download_products=False, verbose=False):
+    def roman_query(criteria=None, coordinates=None, radius=None, filter=None,
+                    mindate=None, detector=None, file_suffix=None, exposure_id=None,
+                    download_products=False, pack_exposures=True, limit=10000, verbose=False):
 
         """
         # Create a dictionary of search criteria
@@ -225,7 +228,7 @@ class query():
                     'product_type', 'exposure_time', 'exposure_start_time', 'exposure_end_time', 'fileSetName']
 
         if criteria is not None:  # Query with column criteria
-            results = missions.query_criteria(**criteria, select_cols=col_list)
+            results = missions.query_criteria(**criteria, select_cols=col_list, limit=limit)
             if verbose: print(results)
 
         if coordinates is not None:
@@ -259,11 +262,18 @@ class query():
 
         products, unique_roots = rs.mast.query.pack_exposures(products)
 
-        if download_products:
-            downloaded_files = rs.mast.query.download_results(products=products, exposures=unique_roots)
-            return(results, products, unique_roots, downloaded_files)
-        else:
-            return(results, products, unique_roots, None)
+        #if download_products:
+        #    downloaded_files = rs.mast.query.download_results(products=products, exposures=unique_roots)
+
+        if pack_exposures: 
+            list_of_products = []
+            for exp_i in unique_roots:
+                list_of_products.append(products[products["exposure_id"] == exp_i])
+            products = list_of_products
+
+         #   return(results, products, downloaded_files)
+        # else:
+        return(results, products)
 
 
     def download_results(products, exposures, verbose=False):

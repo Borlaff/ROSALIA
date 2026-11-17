@@ -66,54 +66,8 @@ def exposure_inspector(input_name, verbose=False, lite=False):
         exposure_identity = combine_dicts([exposure_identity])
         return(exposure_identity)
 
-
     # isinstance("Hello", (float, int, str, list, dict, tuple))     
     if isinstance(input_name, (list, astropy.table.Table)):
-        """
-        DATA = []
-        ASTROPYWCS = []
-        DATA_SHAPE = []
-        SCIEXTS = []
-        SCAS = []
-        # PHOTOMETRY = []
-        conversion_megajanskys = []
-        conversion_megajanskys_uncertainty = []
-        pixel_area = []
-        # {'conversion_megajanskys': 0.6901055870968528,
-        # 'conversion_megajanskys_uncertainty': 0.02684817117080749,
-        # 'pixel_area': 2.6492509187216547e-13}
-
-
-        for i in tqdm(range(len(input_name))):
-            if isinstance(input_name, (list,)): 
-                exposure_identity = rs.inspector.exposure_inspector(input_name[i], lite=lite)
-            elif isinstance(input_name, (astropy.table.table.Table,)): 
-                data_stream = rs.mast.stream_roman_mast(products=input_name, row=i)
-                exposure_identity = rs.inspector.exposure_inspector(data_stream, lite=lite)
-            # exposure_identities.append(exposure_identity)
-            DATA.append(exposure_identity["DATA"][0])
-            DATA_SHAPE.append(exposure_identity["DATA_SHAPE"][0])
-            ASTROPYWCS.append(exposure_identity["ASTROPYWCS"][0])
-            SCIEXTS.append(exposure_identity["SCIEXTS"][0])
-            SCAS.append(exposure_identity["SCA"])
-            conversion_megajanskys.append(exposure_identity["photometry"]["conversion_megajanskys"])
-            conversion_megajanskys_uncertainty.append(exposure_identity["photometry"]["conversion_megajanskys_uncertainty"])
-            pixel_area.append(exposure_identity["photometry"]["pixel_area"])
-            # print()
-            #PHOTOMETRY.append(exposure_identity["photometry"])
-
-
-        exposure_identity["DATA"] = DATA
-        exposure_identity["DATA_SHAPE"] = DATA_SHAPE
-        exposure_identity["ASTROPYWCS"] = ASTROPYWCS
-        exposure_identity["SCIEXTS"] = SCIEXTS
-        exposure_identity["SCAS"] = SCAS
-        #exposure_identity["PHOTOMETRY"] = PHOTOMETRY
-        exposure_identity["conversion_megajanskys"] = conversion_megajanskys
-        exposure_identity["conversion_megajanskys_uncertainty"] = conversion_megajanskys_uncertainty
-        exposure_identity["pixel_area"] = pixel_area
-
-        """
         exposure_identities = []
         pbar = tqdm(range(len(input_name)))
 
@@ -145,14 +99,13 @@ def exposure_inspector_single(input_name, verbose=False, lite=False):
 
     # If the input is a MAST stream, bypass the following. 
     import roman_datamodels.datamodels._datamodels
+
     if isinstance(input_name, roman_datamodels.datamodels._datamodels.ImageModel):
         exposure_identity = exposure_inspector_asdf(input_name, verbose=verbose, lite=lite)
         return(exposure_identity)
     
     # Extract input file extension
     filename, file_extension = os.path.splitext(input_name)
-
-
 
     # If the input image is a FITS file, then use astropy.io.fits.open
     if file_extension == ".fits":
@@ -162,19 +115,8 @@ def exposure_inspector_single(input_name, verbose=False, lite=False):
     if file_extension == ".asdf":
         exposure_identity = exposure_inspector_asdf(input_name, verbose=verbose, lite=lite)
 
-    # Add the position of the telescope to the identity.
-    #print(exposure_identity["EXPSTART"])
-    #if True:
-    #try:
-    #    telescope = rs.telescopes.telescope_class_finder(exposure_identity["TELESCOP"])
-    #    exposure_identity["XYZ_HELIO_POS"] = telescope.get_location(mjd=exposure_identity["EXPSTART"])
-    #if False:
-    #except:
-    #    telescope = None
-    #    print("Telescope " + exposure_identity["TELESCOP"] + " Class not found!")
-    #    print("Some functions might not work")
-
     return(exposure_identity)
+
 
 
 def exposure_inspector_asdf(input_name, telescope="roman", verbose=False, lite=False):
@@ -262,7 +204,6 @@ def exposure_inspector_asdf(input_name, telescope="roman", verbose=False, lite=F
     gwcs = []
     astropywcs = []
     from astropy.wcs import WCS as astropy_wcs
-    #  nSCAs = 1 # Right now (October 2024) exposure inspector only accepts Roman/WFI images with one SCA per ASDF file.
     data.append(np.array(input_asdf["data"]))
     gwcs.append(input_asdf["meta"]["wcs"])
     astropywcs.append(astropy_wcs(input_asdf["meta"]["wcs"].to_fits()[0]))
@@ -271,10 +212,8 @@ def exposure_inspector_asdf(input_name, telescope="roman", verbose=False, lite=F
     exposure_identity['DATA_SHAPE'] = data[0].shape
     exposure_identity["GWCS"] = gwcs[0]
     exposure_identity["ASTROPYWCS"] = astropywcs[0]
-
     exposure_identity["RA_PNT"] =  input_asdf["meta"]['pointing']['ra_v1']
     exposure_identity["DEC_PNT"] =  input_asdf["meta"]['pointing']['dec_v1']
-    # exposure_identity["PA"] =  # input_asdf["roman"]["meta"]['pointing']["pa_v3"] - 60  # input_asdf["roman"]["meta"]['pointing']["pa_aperture"] # input_asdf["roman"]["meta"]['pointing']['pa_v3']
     exposure_identity["PA"] = input_asdf["meta"]['pointing']["pa_aperture"] - 60
     exposure_identity["FILETYPE"] = "ASDF"
     exposure_identity["SCIEXTS"] = int(input_asdf["meta"]["instrument"]["detector"].replace("WFI",""))
