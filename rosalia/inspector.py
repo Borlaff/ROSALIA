@@ -72,6 +72,12 @@ def exposure_inspector(input_name, verbose=False, lite=False):
 
     # isinstance("Hello", (float, int, str, list, dict, tuple))     
     if isinstance(input_name, (list, astropy.table.Table)):
+
+        roman_mast_mission = MastMissions(mission='roman')
+        token = os.getenv("MAST_API_TOKEN")    
+        roman_mast_mission.login(token=token)
+
+
         exposure_identities = []
         pbar = tqdm(range(len(input_name)))
 
@@ -84,11 +90,8 @@ def exposure_inspector(input_name, verbose=False, lite=False):
                 #data_stream = rs.mast.query.stream_roman_mast(products=input_name, row=i)
                 #exposure_identity = rs.inspector.exposure_inspector(data_stream, lite=lite)
                 if input_name["instrument_name"][0] == "WFI":
-                    missions = MastMissions(mission='roman')
-                    token = os.getenv("MAST_API_TOKEN")    
-                    missions.login(token=token)
-                    #print(dir(missions))
-                    asdf_stream = missions.get_product(uri=input_name["uri"][i])
+
+                    asdf_stream = roman_mast_mission.get_product(uri=input_name["uri"][i])
                     exposure_identity = rs.inspector.exposure_inspector_asdf(asdf_stream, lite=lite)
             exposure_identities.append(exposure_identity)
 
@@ -108,7 +111,6 @@ def exposure_inspector_single(input_name, verbose=False, lite=False):
     """
 
     # If the input is a MAST stream, bypass the following. 
-    import roman_datamodels.datamodels._datamodels
 
     if isinstance(input_name, roman_datamodels.datamodels._datamodels.ImageModel):
         exposure_identity = exposure_inspector_asdf(input_name, verbose=verbose, lite=lite)
@@ -130,8 +132,7 @@ def exposure_inspector_single(input_name, verbose=False, lite=False):
 
 
 def exposure_inspector_asdf(input_name, telescope="roman", verbose=False, lite=False):
-    # print(input_name)
-    import roman_datamodels.datamodels._datamodels
+
     if isinstance(input_name, (asdf._asdf.AsdfFile,)):
         input_asdf = input_name[telescope]
 
