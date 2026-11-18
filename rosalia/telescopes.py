@@ -180,7 +180,7 @@ def get_filter(telescope, instrument, detector, filter_name, verbose=False):
     svo_filter_identity = rs.telescopes.find_filter_in_svo(wavelength=filter_name, 
                                                            telescope=telescope, 
                                                            instrument=instrument, 
-                                                           detector=detector, verbose=False)
+                                                           detector=detector, verfbose=False)
     if verbose: print(svo_filter_identity)
     wavelength_bins = np.array(svo_filter_identity["filter_transmission_curve"]["Wavelength"])*u.AA
     transmission_bins = svo_filter_identity["filter_transmission_curve"]["Transmission"]
@@ -903,7 +903,6 @@ class SPHEREx:
 
 
     def get_PSF():
-        # /Users/aborlaff/NASA/ROSALIA/rosalia/CORE/PSF_ARCHIVE/SPHEREx_psf.fits
         psf = fits.open(os.environ["ROSALIACACHE"] + "/CORE/PSF_ARCHIVE/SPHEREx_psf.fits")
         return(psf[0].data)
 

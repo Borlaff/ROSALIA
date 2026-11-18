@@ -206,7 +206,6 @@ def query_gaia_2mass_wise(ra, dec, radius, g_mag_max=False, verbose=False, query
     list_of_healpix_cells_queried = list(set(final_query_table["healpix_lvl"]))
 
     # If the directory does not exist, create it.
-    import os
     cache_gaia_path =  os.environ["ROSALIACACHE"]  + '/cache/gaia_queries/'
     if not os.path.isdir(os.environ["ROSALIACACHE"]  + '/cache'): os.system('mkdir ' + os.environ["ROSALIACACHE"] + '/cache')
     if not os.path.isdir(cache_gaia_path): os.system('mkdir ' + cache_gaia_path)
