@@ -201,7 +201,8 @@ def exposure_inspector_asdf(input_name, telescope="roman", verbose=False, lite=F
                                                                                 detector=detector_svo,
                                                                                 verbose=verbose)
         
-    except:
+    except Exception as e:
+        print(f"An error occurred while looking for the filter {exposure_identity['FILTER']}: {e}")
         print("The filter " + exposure_identity["FILTER"] + "/" + exposure_identity["TELESCOP"] +  "/" +  exposure_identity["INSTRUME"] + "/" + detector_svo + " was not found. Photometric calculations can be compromised.")
         print("Check FILTER keyword in the Science Headers and / or proceed with caution.")
         exposure_identity["FILTER_IDENTITY"] = None
