@@ -17,7 +17,7 @@ from tqdm import tqdm
 import bottleneck as bn
 import matplotlib.pyplot as plt
 import astropy.units as u
-from astropy.coordinates import ICRS, Angle, SkyCoord
+from astropy.coordinates import ICRS, SkyCoord
 import astropy_healpix as astro_hp
 from rosalia.plots import style
 import rosalia.constants as rs_constants
@@ -33,6 +33,15 @@ def query_gaia_2mass_wise(ra, dec, radius, g_mag_max=False, verbose=False, query
     # C is the central coordinates of the pointing.
     c = SkyCoord(ra, dec, frame='icrs', unit="deg")
     from astroquery.gaia import Gaia
+
+    try: 
+        Gaia.login(user=os.environ["GAIA_USER"], password=os.environ["GAIA_PASSWORD"])
+    except Exception as e:
+        print(f"An error occurred while logging into Gaia: {e}")
+        print("Check if GAIA_USER and GAIA_PASSWORD are defined in your environment variables.")
+        print("Unregistred useres can still query the Gaia database, but with limited timeout.")
+        print("If you do not have a Gaia account, please register at https://gea.esac.esa.int/archive/ and set the GAIA_USER and GAIA_PASSWORD environment variables.")
+        
 
     # Initialize the tables
     if verbose: print("Loading Gaia databases...")
@@ -167,44 +176,18 @@ def query_gaia_2mass_wise(ra, dec, radius, g_mag_max=False, verbose=False, query
 
     final_query_table = pd.DataFrame({"healpix_lvl": filtered_table["healpix_lvl"],
                                      "source_id": filtered_table["source_id"],
-                                     #"source_id_2":  filtered_table["source_id_2"],
-                                  "ra": filtered_table["ra"],
-                                  "dec": filtered_table["dec"],
-                                  #"wise_ra": filtered_table["wise_ra"],
-                                  #"wise_dec": filtered_table["wise_dec"],
-                                  #"tmass_ra": filtered_table["tmass_ra"],
-                                  #"tmass_dec": filtered_table["tmass_dec"],
-                                  #"phot_bp_mean_mag": filtered_table["phot_bp_mean_mag_AB"],
-                                  #"phot_g_mean_mag":  filtered_table["phot_g_mean_mag_AB"],
-                                  #"phot_rp_mean_mag":  filtered_table["phot_rp_mean_mag_AB"],
-                                  #"parallax": filtered_table["parallax"],
-                                  #"w1": 10**(0.4*(8.9 - filtered_table["phot_w1_mean_mag_AB"])),
-                                  #"w1_error": np.zeros(len(filtered_table)),
-                                  #"w2": 10**(0.4*(8.9 - filtered_table["phot_w2_mean_mag_AB"])),
-                                  #"w2_error": np.zeros(len(filtered_table)),
-                                  #"w3": 10**(0.4*(8.9 - filtered_table["phot_w3_mean_mag_AB"])),
-                                  #"w3_error": np.zeros(len(filtered_table)),
-                                  #"w4": 10**(0.4*(8.9 - filtered_table["phot_w4_mean_mag_AB"])),
-                                  #"w4_error": np.zeros(len(filtered_table)),
-                                  #"j":  10**(0.4*(8.9 - filtered_table["phot_j_mean_mag_AB"])),
-                                  #"j_error": np.zeros(len(filtered_table)),
-                                  #"h":  10**(0.4*(8.9 - filtered_table["phot_h_mean_mag_AB"])),
-                                  #"h_error": np.zeros(len(filtered_table)),
-                                  #"ks":  10**(0.4*(8.9 - filtered_table["phot_ks_mean_mag_AB"])),
-                                  #"ks_error": np.zeros(len(filtered_table)),
-                                  #"g": 10**(0.4*(8.9 - filtered_table["phot_g_mean_mag_AB"])),
-                                  #"bp": 10**(0.4*(8.9 - filtered_table["phot_bp_mean_mag_AB"])),
-                                  #"rp": 10**(0.4*(8.9 - filtered_table["phot_rp_mean_mag_AB"])),
-                                  "phot_g_mean_mag_AB":   filtered_table["phot_g_mean_mag_AB"],
-                                  "phot_bp_mean_mag_AB":  filtered_table["phot_bp_mean_mag_AB"],
-                                  "phot_rp_mean_mag_AB":  filtered_table["phot_rp_mean_mag_AB"],
-                                  "phot_j_mean_mag_AB":   filtered_table["phot_j_mean_mag_AB"],
-                                  "phot_h_mean_mag_AB":   filtered_table["phot_h_mean_mag_AB"],
-                                  "phot_ks_mean_mag_AB":  filtered_table["phot_ks_mean_mag_AB"],
-                                  "phot_w1_mean_mag_AB":  filtered_table["phot_w1_mean_mag_AB"],
-                                  "phot_w2_mean_mag_AB":  filtered_table["phot_w2_mean_mag_AB"],
-                                  "phot_w3_mean_mag_AB":  filtered_table["phot_w3_mean_mag_AB"],
-                                  "phot_w4_mean_mag_AB":  filtered_table["phot_w4_mean_mag_AB"]})
+                                     "ra": filtered_table["ra"],
+                                     "dec": filtered_table["dec"],
+                                     "phot_g_mean_mag_AB":   filtered_table["phot_g_mean_mag_AB"],
+                                     "phot_bp_mean_mag_AB":  filtered_table["phot_bp_mean_mag_AB"],
+                                     "phot_rp_mean_mag_AB":  filtered_table["phot_rp_mean_mag_AB"],
+                                     "phot_j_mean_mag_AB":   filtered_table["phot_j_mean_mag_AB"],
+                                     "phot_h_mean_mag_AB":   filtered_table["phot_h_mean_mag_AB"],
+                                     "phot_ks_mean_mag_AB":  filtered_table["phot_ks_mean_mag_AB"],
+                                     "phot_w1_mean_mag_AB":  filtered_table["phot_w1_mean_mag_AB"],
+                                     "phot_w2_mean_mag_AB":  filtered_table["phot_w2_mean_mag_AB"],
+                                     "phot_w3_mean_mag_AB":  filtered_table["phot_w3_mean_mag_AB"],
+                                     "phot_w4_mean_mag_AB":  filtered_table["phot_w4_mean_mag_AB"]})
 
 
 
