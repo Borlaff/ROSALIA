@@ -201,7 +201,7 @@ def main_offender_find_fraction_of_map(mainoff_name, catalog):
     return(main_offender_db, multiline_text)
 
 #doshow: True to show plot
-def make_stray_plot(input_name, ext, mode="normal", catalog=None, 
+def make_stray_plot(input_name, ext, filter_name=None, mode="normal", catalog=None, 
                     vmin=None, vmax=None, 
                     color_label = 'Surface brightness (mag arcsec$^{-2}$)',
                     cmap="RdYlBu", output_name=None, figsize=(10,7), mu_vmin=None, mu_vmax=None,
