@@ -151,7 +151,7 @@ def exposure_inspector_asdf(input_name, telescope="roman", verbose=False, lite=F
 
     # Setting up keywords to store the info from the file
     exposure_identity = {}
-    exposure_identity["FILENAME"] = input_name
+    exposure_identity["FILENAME"] = input_asdf["meta"]["filename"] # input_name
 
     #keywords = ["TELESCOP", "INSTRUME", "DETECTOR", "RA_TARG", "DEC_TARG", "SUNANGLE", "BUNIT",
     #            "EXPSTART", "EXPEND", "EXPTIME", "MOONANGL", "DRIZCORR",
@@ -205,6 +205,7 @@ def exposure_inspector_asdf(input_name, telescope="roman", verbose=False, lite=F
         print(f"An error occurred while looking for the filter {exposure_identity['FILTER']}: {e}")
         print("The filter " + exposure_identity["FILTER"] + "/" + exposure_identity["TELESCOP"] +  "/" +  exposure_identity["INSTRUME"] + "/" + detector_svo + " was not found. Photometric calculations can be compromised.")
         print("Check FILTER keyword in the Science Headers and / or proceed with caution.")
+        print("Check if ROSALIACACHE is defined in your environment variables.")
         exposure_identity["FILTER_IDENTITY"] = None
     ##############################################################
 
