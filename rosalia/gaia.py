@@ -54,7 +54,6 @@ def query_gaia_2mass_wise(ra, dec, radius, g_mag_max=False, verbose=False, query
 
 
     # Check if the healpix cells have already been queried.
-    import os
     cache_gaia_path = os.environ["ROSALIACACHE"]  + '/cache/gaia_queries/'
 
     healpix_ids_query = []
