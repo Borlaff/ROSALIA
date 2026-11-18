@@ -180,7 +180,7 @@ def get_filter(telescope, instrument, detector, filter_name, verbose=False):
     svo_filter_identity = rs.telescopes.find_filter_in_svo(wavelength=filter_name, 
                                                            telescope=telescope, 
                                                            instrument=instrument, 
-                                                           detector=detector, verfbose=False)
+                                                           detector=detector, verbose=False)
     if verbose: print(svo_filter_identity)
     wavelength_bins = np.array(svo_filter_identity["filter_transmission_curve"]["Wavelength"])*u.AA
     transmission_bins = svo_filter_identity["filter_transmission_curve"]["Transmission"]
