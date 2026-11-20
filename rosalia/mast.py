@@ -191,7 +191,7 @@ class query():
         return(products, unique_roots)
 
 
-    def roman_query(criteria=None, coordinates=None, radius=None, filter=None, 
+    def roman_query(fileSetName=None, criteria=None, coordinates=None, radius=None, filter=None,  
                     mindate=None, detector=None, file_suffix=None, exposure_id=None,
                     download_products=False, pack_exposures=True, limit=10000, verbose=False):
 
@@ -242,6 +242,11 @@ class query():
         if criteria is not None:  # Query with column criteria
             results = missions.query_criteria(**criteria, select_cols=col_list, limit=limit)
             if verbose: print(results)
+
+        if fileSetName is not None:  # Query with column criteria mast.query_criteria()
+            results = missions.query_criteria(fileSetName=fileSetName, select_cols=col_list, limit=limit)
+            if verbose: print(results)
+
 
         if coordinates is not None:
             results = missions.query_region(coordinates=coordinates, radius=radius)
