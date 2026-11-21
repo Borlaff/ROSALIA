@@ -17,8 +17,18 @@ from tqdm import tqdm
 
 # ROSALIA imports 
 from rosalia.telescopes import get_filter
-from rosalia.utils import create_custom_wcs
-from rosalia.inspector import exposure_inspector
+from rosalia.utils import create_custom_wcs, save_fits, get_astropywcs_info_from_sciexts, interpolate_skypoints_to_image, make_ds9_region, find_max_angular_size_of_image, fix_custom_catalog, find_closest_detector, check_sources_in_footprint
+from rosalia.inspector import exposure_inspector, longest_common_substring, are_all_dicts_equal
+from rosalia.detectors import get_detector_corners
+from rosalia.psf import get_hybrid_catalog, identify_stars_in_out_field, build_psf_canvas, recover_roman_detectors_from_canvas
+from rosalia.horizons import get_mpc_observer_name, get_jpl_observer_name, get_heliocoords
+from rosalia.roman import create_roman_dummy, roman_estimate_straylight_SCA
+from rosalia.hst import hst_estimate_straylight_SCA
+from rosalia.mosaics import generate_mosaic, find_mosaic_wcs
+from rosalia.plots import Loader, make_straylight_plots, make_stray_plot
+from rosalia.sky import get_zodiacal_background
+from rosalia.attitude import quaternion_to_WFICEN
+from rosalia.telescopes import Roman
 
 import logging
 logger = logging.getLogger()
@@ -190,7 +200,7 @@ class exposure():
                 if len(list(set(self.DEC_TARG))) == 1: self.DEC_TARG = self.DEC_TARG[0]
                 if len(list(set(self.FILTER))) == 1: self.FILTER = self.FILTER[0]
                 # Check if all dictionaries in the list are identical copies
-                are_all_FILTERS_same = not self.FILTER_IDENTITY or rs.inspector.are_all_dicts_equal(self.FILTER_IDENTITY)
+                are_all_FILTERS_same = not self.FILTER_IDENTITY or are_all_dicts_equal(self.FILTER_IDENTITY)
                 if are_all_FILTERS_same: self.FILTER_IDENTITY = self.FILTER_IDENTITY[0] 
                 if len(list(set(self.EXPSTART_ISOT))) == 1: self.EXPSTART_ISOT = self.EXPSTART_ISOT[0] 
                 if len(list(set(self.EXPSTART))) == 1: self.EXPSTART = self.EXPSTART[0] 
@@ -202,7 +212,7 @@ class exposure():
                 if self.TELESCOP.lower() == "roman":
                     print("Currently estimated through pysiaf and quaternion. This is a temporary fix until MAST fixes the RA_TARG, DEC_TARG, PA keywords in the Roman/WFI fits files.")
                     self.quaternion = exposure_identity['quaternion']
-                    self.attitude = rs.attitude.quaternion_to_WFICEN(self.quaternion[0])
+                    self.attitude = quaternion_to_WFICEN(self.quaternion[0])
                     self.RA_TARG = self.attitude["ra_wficen"]
                     self.DEC_TARG = self.attitude["dec_wficen"]
                     self.PA = self.attitude["pa_wficen"] - 60
@@ -215,17 +225,16 @@ class exposure():
                     self.RA_TARG = exposure_identity["RA_TARG"]
                     self.DEC_TARG = exposure_identity["DEC_TARG"]
                     self.PA = exposure_identity["PA"]
-                    state_vectors = rs.horizons.get_heliocoords(self.EXPSTART, body=self.TELESCOP) # rs.horizons.interpolate_Roman_state_vectors(self.EXPSTART)
+                    state_vectors = get_heliocoords(self.EXPSTART, body=self.TELESCOP)
                     self.XYZ_HELIO_POS = [state_vectors["x"][0]*u.AU, 
                                           state_vectors["y"][0]*u.AU, 
                                           state_vectors["z"][0]*u.AU] # in AU.
                     self.FPA_NEAR_RADIUS = self.get_max_angular_size() # 
 
             # --------------------------------------------------------- #
-            self.ROOTNAME = rs.inspector.longest_common_substring(self.FILENAME)
-            self.MPC_OBSLOC = rs.horizons.get_mpc_observer_name(self.TELESCOP)
-            self.JPL_OBSLOC = rs.horizons.get_jpl_observer_name(self.TELESCOP)
-            # state_vectors = rs.horizons.get_heliocoords(self.EXPSTART, body=self.TELESCOP) # rs.horizons.interpolate_Roman_state_vectors(self.EXPSTART)
+            self.ROOTNAME = longest_common_substring(self.FILENAME)
+            self.MPC_OBSLOC = get_mpc_observer_name(self.TELESCOP)
+            self.JPL_OBSLOC = get_jpl_observer_name(self.TELESCOP)
 
 
         self.fits_keywords = {"TELESCOP": self.TELESCOP, "INSTRUME": self.INSTRUME, "DETECTOR": self.DETECTOR, 
@@ -249,7 +258,7 @@ class exposure():
         observer['DETECTOR'] = "WFI"
         observer['DATA_SHAPE'] = [4088, 4088]
         observer['DATA'] = 18*[np.zeros(observer['DATA_SHAPE'])]
-        observer['PIXSCALE'] = rs.telescopes.Roman.get_pixscale(instrument=observer['INSTRUME']).to("degree").value
+        observer['PIXSCALE'] = Roman.get_pixscale(instrument=observer['INSTRUME']).to("degree").value
         observer['FILTER_PARAMS'] = {"NAME": observer["FILTER"], "TELESCOPE": "RST", "INSTRUMENT": "WFI", "DETECTOR": "WFI"}
         
         # Generic derived definitions. 
@@ -265,19 +274,19 @@ class exposure():
         self.EXPTIME = observer['EXPTIME']
         self.EXPMID = (Time(self.EXPSTART, format="mjd") + self.EXPTIME*u.s/2).mjd
         self.EXPEND = (Time(self.EXPSTART, format="mjd") + self.EXPTIME*u.s).mjd
-        self.PHYSPIX = rs.telescopes.Roman.get_physical_pixelsize(instrument=observer['INSTRUME'])
-        self.PIXSCALE = rs.telescopes.Roman.get_pixscale(instrument=observer['INSTRUME'])
+        self.PHYSPIX = Roman.get_physical_pixelsize(instrument=observer['INSTRUME'])
+        self.PIXSCALE = Roman.get_pixscale(instrument=observer['INSTRUME'])
         self.EXPSTART_ASTROPY = Time(self.EXPSTART, format="mjd")
         self.EXPSTART_ISOT = self.EXPSTART_ASTROPY.isot
-        self.MPC_OBSLOC = rs.horizons.get_mpc_observer_name(observer['TELESCOP'])
-        self.JPL_OBSLOC = rs.horizons.get_jpl_observer_name(observer['TELESCOP'])
-        self.SCA = rs.telescopes.Roman.WFI_SCAs
+        self.MPC_OBSLOC = get_mpc_observer_name(observer['TELESCOP'])
+        self.JPL_OBSLOC = get_jpl_observer_name(observer['TELESCOP'])
+        self.SCA = Roman.WFI_SCAs
         self.FILTER = observer["FILTER"]
-        self.FILTER_IDENTITY = rs.telescopes.get_filter(filter_name=observer["FILTER_PARAMS"]["NAME"],
+        self.FILTER_IDENTITY = get_filter(filter_name=observer["FILTER_PARAMS"]["NAME"],
                                                                 telescope=observer["FILTER_PARAMS"]["TELESCOPE"],
                                                                 instrument=observer["FILTER_PARAMS"]["INSTRUMENT"],
                                                                 detector=observer["FILTER_PARAMS"]["DETECTOR"], verbose=verbose)
-        state_vectors = rs.horizons.get_heliocoords(self.EXPSTART, body=self.TELESCOP) # rs.horizons.interpolate_Roman_state_vectors(self.EXPSTART)
+        state_vectors = get_heliocoords(self.EXPSTART, body=self.TELESCOP)
         self.XYZ_HELIO_POS = [state_vectors["x"].to("AU").value[0], state_vectors["y"].to("AU").value[0], state_vectors["z"].to("AU").value[0]]*u.AU # in AU. 
 
         if "FILENAME" not in observer:
@@ -298,13 +307,13 @@ class exposure():
 
         central_coords = SkyCoord(self.RA_TARG, self.DEC_TARG, frame="icrs", unit="deg")
 
-        observer["FILENAME"] = rs.roman.create_roman_dummy(point=central_coords, date=self.EXPSTART_ASTROPY,
+        observer["FILENAME"] = create_roman_dummy(point=central_coords, date=self.EXPSTART_ASTROPY,
                                                             band=observer["FILTER_PARAMS"]["NAME"],
                                                             PA=self.PA, exptime=self.EXPTIME,
                                                             output=observer["FILENAME"])
         
         self.SCIEXTS = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]
-        astropywcs_info = rs.utils.get_astropywcs_info_from_sciexts(filename=self.FILENAME, sciexts=self.SCIEXTS)
+        astropywcs_info = get_astropywcs_info_from_sciexts(filename=self.FILENAME, sciexts=self.SCIEXTS)
         self.ASTROPYWCS = astropywcs_info["ASTROPYWCS"]
         self.DATA_SHAPE = astropywcs_info["DATA_SHAPE"]
         self.PIXSCALE = astropywcs_info["PIXSCALE"]
@@ -316,13 +325,13 @@ class exposure():
     def get_detector_corners(self):
         detector_corners = []
         for i in range(len(self.SCIEXTS)):
-            detector_corners.append(rs.detectors.get_detector_corners(self.ASTROPYWCS[i]))
+            detector_corners.append(get_detector_corners(self.ASTROPYWCS[i]))
         return(detector_corners)
     
 
     def get_max_angular_size(self):
         # print(self.ASTROPYWCS)
-        return(rs.utils.find_max_angular_size_of_image(wcs=self.ASTROPYWCS, ra_cen=self.RA_TARG, dec_cen=self.DEC_TARG))
+        return(find_max_angular_size_of_image(wcs=self.ASTROPYWCS, ra_cen=self.RA_TARG, dec_cen=self.DEC_TARG))
     
 
     def plot_footprint(self, figsize=(10,10), verbose=True, ax=None, color='red', label=None):
@@ -352,7 +361,7 @@ class exposure():
 
 
     def get_nearby_sources(self, g_mag_max=15, verbose=False):
-        hybrid_catalog = rs.psf.get_hybrid_catalog(ra=self.RA_TARG, dec=self.DEC_TARG,
+        hybrid_catalog = get_hybrid_catalog(ra=self.RA_TARG, dec=self.DEC_TARG,
                                                    radius=1,
                                                    lambda_ref=self.FILTER_IDENTITY["lambda_ref"],
                                                    MJD=self.EXPSTART,
@@ -382,10 +391,10 @@ class exposure():
 
             # Find the stars around the central coordinate of the scene.
             # Save the stellar catalog into a catalog object, and run main_offender as if input_catalog was set by the User.
-            loader = rs.plots.Loader("Querying Gaia/2MASS/WISE/JPL Horizons databases. This might take a few minutes...",
+            loader = Loader("Querying Gaia/2MASS/WISE/JPL Horizons databases. This might take a few minutes...",
                                     "All-sky source map constructed.", 0.05).start()
 
-            hybrid_catalog = rs.psf.get_hybrid_catalog(ra=self.RA_TARG, dec=self.DEC_TARG,
+            hybrid_catalog = get_hybrid_catalog(ra=self.RA_TARG, dec=self.DEC_TARG,
                                                     radius=search_radius,
                                                     lambda_ref=self.FILTER_IDENTITY["lambda_ref"],
                                                     MJD=self.EXPMID,
@@ -414,7 +423,7 @@ class exposure():
             The index (or array of indices) of the closest WCS in `wcs_list`.
             Returns a scalar integer if single floats were passed.
         """
-        closest_indices = rs.utils.find_closest_detector(detector_wcs_list=self.ASTROPYWCS,
+        closest_indices = find_closest_detector(detector_wcs_list=self.ASTROPYWCS,
                                                         ra=ra,
                                                         dec=dec)     
         return closest_indices
@@ -438,7 +447,7 @@ class exposure():
         inside : bool or numpy.ndarray of bool
             A boolean (or array of booleans) indicating if each source falls within the boundary.
         """
-        inside = rs.utils.check_sources_in_footprint(detector_wcs_list=self.ASTROPYWCS,
+        inside = check_sources_in_footprint(detector_wcs_list=self.ASTROPYWCS,
                                                      detector_shapes=self.DATA_SHAPE,
                                                      ra=ra,
                                                      dec=dec,
@@ -463,7 +472,7 @@ class exposure():
         fpa_detector_corners = self.get_detector_corners()
         for SCIEXT_i, ASTROPYWCS_i, detector_corners in tqdm(zip(self.SCIEXTS, self.ASTROPYWCS, fpa_detector_corners)):
             if verbose: print("> Identifying which stars are inside the FOV and which are outside...")
-            infield_stars = rs.psf.identify_stars_in_out_field(data_shape=self.DATA_SHAPE,
+            infield_stars = identify_stars_in_out_field(data_shape=self.DATA_SHAPE,
                                                             wcs=ASTROPYWCS_i,
                                                             catalog=self.source_catalog,
                                                             verbose=verbose)
@@ -530,7 +539,7 @@ class exposure():
             data.append(image_data)
             headers.append(header)
         
-        rs.utils.save_fits(data, self.FILENAME, headers)
+        save_fits(data, self.FILENAME, headers)
         return(self.FILENAME)
 
     
@@ -542,7 +551,7 @@ class exposure():
         straylight_images = []
 
         for i in range(len(self.SCIEXTS)):
-            ra_detector, dec_detector, straylight_lvl  = rs.hst.hst_estimate_straylight_SCA(
+            ra_detector, dec_detector, straylight_lvl  = hst_estimate_straylight_SCA(
                                                                 wcs=self.ASTROPYWCS[i],
                                                                 filter=self.FILTER_IDENTITY,
                                                                 catalog=source_catalog,
@@ -552,7 +561,7 @@ class exposure():
             # Now interpolate the skypoints to the original image
 
             target_ext = self.SCIEXTS[i]
-            straylight_image = rs.utils.interpolate_skypoints_to_image(target_name, target_ext, 
+            straylight_image = interpolate_skypoints_to_image(target_name, target_ext, 
                                                                     ra=ra_detector, dec=dec_detector, 
                                                                     z=straylight_lvl,
                                                                     mask_original_nan=True,
@@ -567,7 +576,7 @@ class exposure():
         pointing_coords = SkyCoord(ra=self.RA_TARG*u.deg, dec=self.DEC_TARG*u.deg, frame="icrs")
         sep = source_coords.separation(pointing_coords)
         close_catalog = self.source_catalog[sep < radius*u.deg]
-        rs.utils.make_ds9_region(ra=np.array(close_catalog["ra"]), dec=np.array(close_catalog["dec"]), 
+        make_ds9_region(ra=np.array(close_catalog["ra"]), dec=np.array(close_catalog["dec"]), 
                                  radius=np.array([1]), label=np.array(close_catalog["source_id"]), output=output)
         print(output)
 
@@ -587,7 +596,7 @@ class exposure():
             header = ASTROPYWCS_i.to_header()
 
             if isinstance(keywords["DETECTOR"], (list,)):
-                keywords["DETECTOR"] = rs.inspector.longest_common_substring(self.DETECTOR)
+                keywords["DETECTOR"] = longest_common_substring(self.DETECTOR)
 
             for key in keywords.keys():
                 header[key] = keywords[key]
@@ -604,7 +613,7 @@ class exposure():
 
             headers_output.append(header)
 
-        rs.utils.save_fits(array=data_list, 
+        save_fits(array=data_list, 
                            name=outname, 
                            header=headers_output,
                            extname=extname, 
@@ -620,9 +629,9 @@ class exposure():
         if keywords is None: keywords = self.fits_keywords
 
         if isinstance(keywords["DETECTOR"], (list,)):
-            keywords["DETECTOR"] = rs.inspector.longest_common_substring(self.DETECTOR)
+            keywords["DETECTOR"] = longest_common_substring(self.DETECTOR)
 
-        lvl3_data, lvl3_header = rs.mosaics.generate_mosaic(data=data_list, astropywcs=wcs_list, resolution=resolution)
+        lvl3_data, lvl3_header = generate_mosaic(data=data_list, astropywcs=wcs_list, resolution=resolution)
 
         lvl3_header["EXTNAME"] = "DRZ"
         lvl3_header["RA_TARG"] = self.RA_TARG[0] if isinstance(self.RA_TARG, (list,)) else self.RA_TARG
@@ -633,7 +642,7 @@ class exposure():
         lvl3_header["TELESCOP"] = self.TELESCOP
         lvl3_header["INSTRUME"] = self.INSTRUME
         lvl3_header["BUNIT"] = "MJy sr-1"
-        keywords["DETECTOR"] = rs.inspector.longest_common_substring(self.DETECTOR)
+        keywords["DETECTOR"] = longest_common_substring(self.DETECTOR)
         
         for key in keywords.keys():
             try:
@@ -641,7 +650,7 @@ class exposure():
             except:
                 print("Warning: Could not write keyword " + key + " to header.")
 
-        rs.utils.save_fits(array=np.float32(lvl3_data), name=outname, header=lvl3_header,
+        save_fits(array=np.float32(lvl3_data), name=outname, header=lvl3_header,
                            extname=extname, 
                            overwrite=overwrite, 
                            output_verify='silentfix')
@@ -653,7 +662,7 @@ class exposure():
         resolution = self.PIXSCALE*u.arcsec
         input_data_for_reproject = list(zip(self.DATA, self.ASTROPYWCS))
 
-        optimal_wcs = rs.mosaics.find_mosaic_wcs(input_data=input_data_for_reproject, 
+        optimal_wcs = find_mosaic_wcs(input_data=input_data_for_reproject, 
                                                  resolution=resolution)
 
         return(optimal_wcs[0], optimal_wcs[1])
@@ -662,7 +671,7 @@ class exposure():
     @staticmethod
     def _parallel_roman_estimate_straylight_SCA(args):
         data_shape, wcs, SCIEXT_i, filter_identity, ra_stars_outside, dec_stars_outside, cat_id_outside, source_id_outside, irradiance_stars, ra_point, dec_point, pa_point, verbose = args
-        return rs.roman.roman_estimate_straylight_SCA(
+        return roman_estimate_straylight_SCA(
             data_shape=data_shape,
             wcs=wcs,
             SCA=SCIEXT_i,
@@ -702,9 +711,9 @@ class exposure():
 
         if self.TELESCOP.lower() == "hst":
             straylight_images= self.HST_straylight()
-            mos_data, mos_wcs = rs.mosaics.generate_mosaic(data=straylight_images, astropywcs=self.ASTROPYWCS, resolution=None)
+            mos_data, mos_wcs = generate_mosaic(data=straylight_images, astropywcs=self.ASTROPYWCS, resolution=None)
             self.output_name = self.FILENAME.replace(".fits", "_stray.fits")
-            rs.utils.save_fits(mos_data, self.output_name, mos_wcs)
+            save_fits(mos_data, self.output_name, mos_wcs)
             return(mos_data, mos_wcs)
 
         elif self.TELESCOP.lower() == "roman" or self.TELESCOP.lower() == "rst":
@@ -717,7 +726,7 @@ class exposure():
                     self.source_catalog = self.get_source_catalog(g_mag_max=g_mag_max, verbose=False)
                     print(datetime.now().isoformat() + " > Done.")
                 else:
-                    self.source_catalog = rs.utils.fix_custom_catalog(catalog)
+                    self.source_catalog = fix_custom_catalog(catalog)
 
             self.source_catalog = self.find_which_stars_are_inside_each_detector(verbose=False)
 
@@ -895,7 +904,7 @@ class exposure():
 
             print(datetime.now().isoformat() + " > Summary plots... ")
 
-            self.pdf_report_name = rs.plots.make_straylight_plots(RA_TARG=self.RA_TARG, 
+            self.pdf_report_name = make_straylight_plots(RA_TARG=self.RA_TARG, 
                                         DEC_TARG=self.DEC_TARG, 
                                         PA=self.PA, 
                                         source_catalog=self.source_catalog, 
@@ -990,7 +999,7 @@ class exposure():
             if catalog is None:
                 self.source_catalog = self.get_source_catalog(g_mag_max=g_mag_max, verbose=False)
             else:
-                self.source_catalog = rs.utils.fix_custom_catalog(catalog)
+                self.source_catalog = fix_custom_catalog(catalog)
 
         # Get the optimal wcs
         if not hasattr(self, 'optimal_wcs') or not hasattr(self, 'shape_out'):
@@ -1028,7 +1037,7 @@ class exposure():
         )
 
         # Build the PSF canvas for the stars in the catalog
-        canvas = rs.psf.build_psf_canvas(
+        canvas = build_psf_canvas(
             stars_catalog,
             shape_out=self.shape_out,
             bandpass=self.FILTER,
@@ -1037,7 +1046,7 @@ class exposure():
             method=method,
         )
 
-        detectors, wcs_list = rs.psf.recover_roman_detectors_from_canvas(canvas, self.optimal_wcs, detector_wcs=self.ASTROPYWCS, pixscale=0.11)
+        detectors, wcs_list = recover_roman_detectors_from_canvas(canvas, self.optimal_wcs, detector_wcs=self.ASTROPYWCS, pixscale=0.11)
         
         return detectors, wcs_list, canvas 
 
@@ -1058,7 +1067,7 @@ class exposure():
 
         print("Computing Zodiacal light...")
         for i in tqdm(range(nSCIEXTS)):
-            zodiacal_background = rs.sky.get_zodiacal_background(astropywcs=self.ASTROPYWCS[i],
+            zodiacal_background = get_zodiacal_background(astropywcs=self.ASTROPYWCS[i],
                                                                  wavelength=self.FILTER_IDENTITY,
                                                                  expstart=self.EXPSTART,
                                                                  step=step, zodi_mode=zodi_mode,
@@ -1086,21 +1095,18 @@ class exposure():
             self.save_drz(outname=self.drz_zody_name, data_list=zodiacal_background_list, wcs_list=self.ASTROPYWCS, resolution=resolution)
 
             if output_units == "e/s":
-                rs.plots.make_stray_plot(input_name=self.drz_zody_name, ext=0, mode="fe",
+                make_stray_plot(input_name=self.drz_zody_name, ext=0, mode="fe",
                                          color_label = "Flux (e/s/px)", cmap="RdYlBu_r", figsize=(10,7),doshow=doshow)
 
-                rs.plots.make_stray_plot(input_name=self.drz_zody_name, ext=0, mode="fe2mu",
+                make_stray_plot(input_name=self.drz_zody_name, ext=0, mode="fe2mu",
                                          vmin=None, vmax=None,
                                          color_label = 'Surface brightness (mag arcsec$^{-2}$)',
                                          cmap="RdYlBu", output_name=None, figsize=(10,7), mu_vmin=None, mu_vmax=None,doshow=doshow)
             #otherwise rs.sky.get_zodiacal_background returns in units of MJy/Sr
             # as is a standard unit to measure zodiacal light
             else:
-                rs.plots.make_stray_plot(input_name=self.drz_zody_name, ext=0, mode="mjysr",
+                make_stray_plot(input_name=self.drz_zody_name, ext=0, mode="mjysr",
                                          color_label = "Flux (MJy/Sr)", cmap="RdYlBu_r", figsize=(10,7),doshow=doshow)
 
         return({"zodi_list": zodiacal_background_list,
                 "output_name": output_name})
-
-
-

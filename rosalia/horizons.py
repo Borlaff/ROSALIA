@@ -13,8 +13,6 @@ from astroquery.jplhorizons import Horizons
 
 
 def get_heliocoords(mjd, body):
-    
-
     jpl_code_body = get_jpl_observer_name(body)
 
     try:
@@ -65,7 +63,7 @@ def get_jpl_observer_name(observer_name):
     if observer_name.lower() == "l2": return("32")
     if observer_name.lower() == "hst" or observer_name.lower() == "hubble": return("500@-48")
     if observer_name.lower() == "jwst": return("500@-170")
-    if observer_name.lower() == "rst" or observer_name.lower() == "roman": return("500@-211")
+    if observer_name.lower() == "rst" or observer_name.lower() == "roman": return("-211")
     if observer_name.lower() == "euclid": return("500@-680")
 
 
