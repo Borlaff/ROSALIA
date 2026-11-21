@@ -1,4 +1,4 @@
-
+import numpy as np
 import astropy.units as u
 
 ############################
@@ -6,6 +6,10 @@ import astropy.units as u
 ############################
 
 MJysr_to_Jyarcsec2 = 2.350443E-5 # 1 MJy sr-1 = 2.350443 × 10-5 Jy arcsec-2.
+
+gain_wfi = np.array([1.953004 , 1.7558289, 1.7456897, 1.819529 , 1.7362331, 1.6065521,
+                     1.9065304, 1.6538942, 1.6493847, 1.8893644, 1.8033291, 1.652869 ,
+                     1.8575425, 1.7607577, 1.7997215, 1.764394 , 1.4383798, 1.4545856]) # Nov 20, 2026. https://github.com/RomanSpaceTelescope/RST_commissioning/tree/main/science_analysis/chirata
 
 mapp_sun_V_AB = -26.77
 mapp_moon_V_AB = -12.74

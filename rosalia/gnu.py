@@ -4,6 +4,7 @@ import numpy as np
 from astropy.io import fits
 import rosalia as rs
 
+
 def make_saturation_mask(input_name, ext, saturation_level=50000):
     output_satmasked = input_name.replace(".fits", "_ext" + str(ext) + "_satmasked.fits")
     rs.utils.execute_cmd("astarithmetic -h" + str(ext) + " " + input_name + " "+\
@@ -11,6 +12,7 @@ def make_saturation_mask(input_name, ext, saturation_level=50000):
                          "2 dilate 2 dilate 2 dilate 2 dilate "+\
                          "nan where --output=" + output_satmasked)
     return(output_satmasked)
+
 
 
 def make_gnuastro_segmentation_map(input_name, ext, saturation_level=50000, clean=True):

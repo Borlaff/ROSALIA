@@ -11,15 +11,11 @@
 # v.1.1 August 2026 integration with StSci zodiacal light calculator by SLN
 ##########################################################
 import io
-
 import healpy as hp
 import numpy as np
 import pandas as pd
 import rosalia as rs
-
 import zodipy
-
-
 import astropy.units as u
 from astropy.io import fits
 from astropy.time import Time
