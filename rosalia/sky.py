@@ -14,7 +14,6 @@ import io
 import healpy as hp
 import numpy as np
 import pandas as pd
-import rosalia as rs
 import zodipy
 import astropy.units as u
 from astropy.io import fits
@@ -23,11 +22,13 @@ from astropy.coordinates import SkyCoord
 import matplotlib.pyplot as plt
 # import gunagala.sky as skies # Gunagala is not maintained. It requires to detach from astropy_helpers. https://github.com/astropy/astropy-helpers
 from scipy.interpolate import interp1d, griddata
-
 import copy
 import urllib
-import warnings
-from astropy.utils.exceptions import AstropyWarning
+
+from rosalia.detectors import make_detector_grid, mu2fe
+from rosalia.constants import MJysr_to_Jyarcsec2
+from rosalia.irsa import irsa_query
+
 
 def remove_zodiacal_light_acs(input_name, verbose=False):
     zody_interp_sci1 = get_zodiacal_background(input_name=input_name, ext=1, verbose=verbose)
@@ -63,8 +64,6 @@ def rebin(a, newshape):
 
 
 def rebin_transmission_curve(wavelength_bins,transmission_bins, nbins, verbose=False):
-    from scipy import interpolate
-
     # This program takes as input a table with two columns
     # 1) lambda_AA: Wavelength in Angstroms
     # 2) Transmission: Transmission (fraction)
@@ -186,7 +185,7 @@ def get_zodiacal_background(astropywcs, wavelength=None,
     ########################################
 
     # First we get the detector grid for interpolating the zodiacal measurements
-    detector_grid = rs.detectors.make_detector_grid(w=astropywcs, step=step, mode=grid_method)
+    detector_grid = make_detector_grid(w=astropywcs, step=step, mode=grid_method)
 
     if not docenteronly:
         rain = detector_grid["grid_world"][0]
@@ -258,23 +257,10 @@ def get_zodiacal_background(astropywcs, wavelength=None,
 
     if output_units == "e/s":
         if verbose: print("Output units:" + output_units)
-        #  HST_ACS_jy_to_counts(flux_ACS, photflam, photplam):
-        #if telescope == "Hubble" or telescope == "HST":
-        #    zody_interp = rs.detectors.HST_ACS_jy_to_counts(flux_jy = zody_interp,
-        #                                   photflam = exposure_identity["PHOTFLAM"],
-        #                                   photplam = exposure_identity["PHOTPLAM"])
-        #
 
-        # if telescope.lower() == "roman" or telescope.lower() == "RST" or telescope.lower() == "roman/wfi":
-        #from romanisim.models import bandpass as ris_bandpass
-        # We need to review why this is so different from fe2mu.
-        #es_to_MJysr = ris_bandpass.etomjysr(bandpass=wavelength["wavelength"], sca=sca)*u.MJy * u.steradian**-1 * u.s # The factor F such that MJy / sr = F * DN/s
-        #zody_interp = zody_interp/es_to_MJysr
-
-
-        zody_interp = rs.constants.MJysr_to_Jyarcsec2*zody_interp # Jy/arcsec2
+        zody_interp = MJysr_to_Jyarcsec2*zody_interp # Jy/arcsec2
         mu = -2.5*np.log10(zody_interp.value)+8.9
-        zody_interp = rs.detectors.mu2fe(mu=mu,
+        zody_interp = mu2fe(mu=mu,
                                          instrument="WFI",
                                          filter_name=wavelength["wavelength"],
                                          telescope="Roman",
@@ -293,71 +279,6 @@ def get_zodiacal_background(astropywcs, wavelength=None,
 
 
 #########################################
-
-def gunagala_zody(ra, dec, wavelength, year, day):
-    """
-    This program makes use of the Gunagala Zodiacal model to estimate the
-    Zodiacal light surface brightness in a given position, at a wavelength,
-    day and year.
-
-    Input:
-    ra = Right ascension (degrees)
-    dec = Declination (degrees)
-    wavelength = wavelength (micron)
-    year = year of the observation
-    day = day of the observation
-
-
-    Output:
-    mu_zody = surface brightness in Jy arcsec-2
-    """
-
-    if not isinstance(ra, (list, pd.core.series.Series, np.ndarray)):
-        ra = np.array([ra])
-    if not isinstance(dec, (list, pd.core.series.Series, np.ndarray)):
-        dec = np.array([dec])
-
-    # If wavelength, year, or day are not in array, copy their values into one
-    # as large as ra, dec
-    if not isinstance(wavelength, (list, pd.core.series.Series, np.ndarray)):
-        wavelength = np.array([wavelength]*len(ra))
-
-    time = Time("" + str(year) + ":" + str(day) + ":00:00:00.000", scale='utc')
-
-    if not isinstance(year, (list, pd.core.series.Series, np.ndarray)):
-        year = np.array([year]*len(ra))
-
-    if not isinstance(day, (list, pd.core.series.Series, np.ndarray)):
-        day = np.array([day]*len(ra))
-
-
-    zodi_gungala = skies.ZodiacalLight()
-
-    skycoord = SkyCoord(ra, dec, unit='deg', frame='icrs')
-    wavelength = wavelength * u.angstrom
-    zodi_relative_to_poles = zodi_gungala.relative_brightness(skycoord, time)
-
-    #print(wavelength)
-    f_zodi_gunagala_at_the_ecliptic_poles = zodi_gungala.surface_brightness()
-    #print(f_zodi_gunagala_at_the_ecliptic_poles(wavelength))
-    zodi_intensity_poles_Mysr = f_zodi_gunagala_at_the_ecliptic_poles(wavelength).to(u.MJy * u.steradian**-1, equivalencies=u.spectral_density(wavelength))
-    #print(zodi_relative_to_poles*zodi_intensity_poles_Mysr)
-    zodi_intensity_poles_jyarcsec2 = f_zodi_gunagala_at_the_ecliptic_poles(wavelength).to(u.Jy * u.arcsec**-2, equivalencies=u.spectral_density(wavelength))
-    #print(zodi_relative_to_poles*zodi_intensity_poles_jyarcsec2)
-    zodi_intensity_pointing =  zodi_relative_to_poles*zodi_intensity_poles_jyarcsec2
-
-    d = {}
-    d['ra'] = ra
-    d['dec'] = dec
-    d['wavelength'] = wavelength
-    d['year'] = year
-    d['day'] = day
-    d['zody'] = zodi_intensity_pointing
-    return(d)
-
-##########################################
-
-
 def irsa_zody(ra, dec, wavelength, weights, expstart, obslocin=3):
     # We calculate the expstart
     t = Time(expstart, format='mjd', scale='utc')
@@ -370,14 +291,14 @@ def irsa_zody(ra, dec, wavelength, weights, expstart, obslocin=3):
     for i in range(nwavebins):
         # print(i)
         # IRSA queries must go in um so we need to multiply by 1E+7 the m above
-        db = rs.irsa.irsa_query(ra=ra, dec=dec,
+        db = irsa_query(ra=ra, dec=dec,
                                 wavelength=wavelength[i].to("um").value, 
                                 year=year, day=day, obslocin=obslocin)*weights[i]
 
         db_irsa[:,i] = db['zody']
 
     zody_Jyarcsec2 = np.nanmean(db_irsa, axis=1)
-    zody_MJysr = zody_Jyarcsec2/rs.constants.MJysr_to_Jyarcsec2
+    zody_MJysr = zody_Jyarcsec2/MJysr_to_Jyarcsec2
     return(zody_MJysr)
 
 

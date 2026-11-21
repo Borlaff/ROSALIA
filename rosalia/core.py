@@ -5,19 +5,20 @@
 import os
 import numpy as np
 import pandas as pd
-import rosalia as rs
+# import rosalia as rs
 import ephessos as ep
-
 from datetime import datetime
 import matplotlib.pyplot as plt
-
 import astropy.units as u
 from astropy.time import Time
 from astropy.coordinates import SkyCoord
 from astropy import constants as const
-
 from tqdm import tqdm
 
+# ROSALIA imports 
+from rosalia.telescopes import get_filter
+from rosalia.utils import create_custom_wcs
+from rosalia.inspector import exposure_inspector
 
 import logging
 logger = logging.getLogger()
@@ -120,7 +121,7 @@ class exposure():
                 self.MPC_OBSLOC = self.get_mpc_observer_location()
                 self.JPL_OBSLOC = self.get_jpl_observer_location()
                 self.FILTER = telescope["FILTER"]
-                self.FILTER_IDENTITY = rs.telescopes.get_filter(filter_name=telescope["FILTER_PARAMS"]["NAME"],
+                self.FILTER_IDENTITY = get_filter(filter_name=telescope["FILTER_PARAMS"]["NAME"],
                                                                         telescope=telescope["FILTER_PARAMS"]["TELESCOPE"],
                                                                         instrument=telescope["FILTER_PARAMS"]["INSTRUMENT"],
                                                                         detector=telescope["FILTER_PARAMS"]["DETECTOR"], verbose=verbose)
@@ -128,7 +129,7 @@ class exposure():
 
 
                 self.SCIEXTS = [0]
-                header = rs.utils.create_custom_wcs(crpix=np.array(self.DATA_SHAPE)/2, 
+                header = create_custom_wcs(crpix=np.array(self.DATA_SHAPE)/2, 
                                                             crval=[self.RA_TARG, self.DEC_TARG], 
                                                             cdelt=[-self.PIXSCALE,self.PIXSCALE], 
                                                             crota=[-self.PA,-self.PA], 
@@ -148,7 +149,7 @@ class exposure():
                                                 "_PA_" + '{:06.2f}'.format(self.PA) + ".fits"
 
         if filename is not None:
-            exposure_identity = rs.inspector.exposure_inspector(filename, lite=False)
+            exposure_identity = exposure_inspector(filename, lite=False)
 
             self.DATA = exposure_identity['DATA']
             self.FILENAME = exposure_identity['FILENAME']
