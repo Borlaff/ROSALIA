@@ -31,6 +31,7 @@ def sso_interpolators(observer="roman", start_epoch='2026-08-31', end_epoch=None
     """
     ori_observer = observer
     observer = get_jpl_observer_name(observer)
+    observer = "500@" + observer
 
     file_path = Path(os.environ["ROSALIACACHE"] + observer + "_ephem_interpolator.pkl")
 
@@ -139,8 +140,7 @@ def get_SS0s_loc_magnitude(observer, MJD, lambda_ref, verbose=False):
     # If the exposure time is > than current, then take the "now" value as proxy.
     # This has to be upgraded in the future.
 
-    observer = rs.horizons.get_jpl_observer_name(observer)
-
+    observer = get_jpl_observer_name(observer)
     # Make the Horizons query
     SSO_ephemeris_db = get_SSOs_ephemeris(observer, MJD)
     #ephem = sso_interpolators(observer=observer)
