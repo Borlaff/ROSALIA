@@ -180,20 +180,24 @@ class query():
     from astropy.time import Time
 
     def pack_exposures(products):
-        # if True:
-        # print(products["filename"])
+        # Step 1: Get the list of root_ids
         root_id = []
-        for i in range(len(products["filename"])):
-            split_filename = products["filename"][i].split("_")
+        for i in range(len(products["fileSetName"])): # r0102301007001002001_0001_wfi01_f062
+            split_filename = products["fileSetName"][i].split("_")
             root_id.append(split_filename[0] + "_" + split_filename[1])
         unique_roots = list(set(root_id))
         products["exposure_id"] = root_id
-        return(products, unique_roots)
 
+        # Step 2: Select the rows in the table whose root_id is equal to each one and pack them into different tables. 
+        list_of_products = []
+        for root_i in unique_roots:
+            list_of_products.append(products[products["exposure_id"] == root_i])
+        products = list_of_products
+        return(products)
 
     def roman_query(fileSetName=None, criteria=None, coordinates=None, radius=None, filter=None,  
-                    mindate=None, detector=None, file_suffix=None, exposure_id=None,
-                    download_products=False, pack_exposures=True, limit=10000, verbose=False):
+                    mindate=None, detector=None, file_suffix="_cal",
+                    pack_exposures=True, limit=10000, verbose=False):
 
         """
         # Create a dictionary of search criteria
@@ -236,6 +240,7 @@ class query():
         # in this order, so we will re-order later. The fileSetName, which we need for retrieval,
         # is not in this list, but will still be returned.
         col_list = ['program', 'execution_plan', 'pass', 'segment', 'visit', 'observation',
+                    'ra', 'dec', 'target_ra', 'target_dec', 'image_median', 'conversion_megajanskys',
                     'optical_element', 'exposure_type', 'instrument_name', 'detector', 'productLevel', 
                     'product_type', 'exposure_time', 'exposure_start_time', 'exposure_end_time', 'fileSetName']
 
@@ -267,30 +272,26 @@ class query():
         # Re-order the column names 
         # results = results[col_list]
         products = missions.get_product_list(results)
-
+        products = join(results, products, keys_left="fileSetName", keys_right="dataset")
         if file_suffix is not None:
             products = missions.filter_products(products, file_suffix='_cal')
 
-        if exposure_id is not None:
-            found_index = []
-            for i in range(len(products["dataset"])):
-                if exposure_id in products["dataset"][i]: found_index.append(i)
-            products = products[found_index]
+        #if exposure_id is not None:
+        #    found_index = []
+        #    for i in range(len(products["dataset"])):
+        #        if exposure_id in products["dataset"][i]: found_index.append(i)
+        #    products = products[found_index]
 
-        products, unique_roots = rs.mast.query.pack_exposures(products)
 
+
+        if pack_exposures:
+            products = rs.mast.query.pack_exposures(products)
+        # 
         #if download_products:
         #    downloaded_files = rs.mast.query.download_results(products=products, exposures=unique_roots)
-
-        if pack_exposures: 
-            list_of_products = []
-            for exp_i in unique_roots:
-                list_of_products.append(products[products["exposure_id"] == exp_i])
-            products = list_of_products
-
          #   return(results, products, downloaded_files)
         # else:
-        return(results, products)
+        return(products)
 
 
     def download_results(products, exposures, verbose=False):

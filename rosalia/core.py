@@ -29,6 +29,7 @@ from rosalia.plots import Loader, make_straylight_plots, make_stray_plot
 from rosalia.sky import get_zodiacal_background
 from rosalia.attitude import quaternion_to_WFICEN
 from rosalia.telescopes import Roman
+from rosalia.sso import sso_interpolators
 
 import logging
 logger = logging.getLogger()
@@ -175,7 +176,6 @@ class exposure():
             self.BUNIT = exposure_identity['BUNIT']
             self.conversion_megajanskys = exposure_identity['conversion_megajanskys']
             self.conversion_megajanskys_uncertainty = exposure_identity['conversion_megajanskys_uncertainty']
-            
             self.pixel_area = exposure_identity['pixel_area']
             self.EXPSTART_ISOT = exposure_identity['EXPSTART_ISOT']
             self.PA = exposure_identity['PA']
@@ -189,6 +189,10 @@ class exposure():
             self.DATA_SHAPE = exposure_identity['DATA_SHAPE']
             self.ASTROPYWCS = exposure_identity['ASTROPYWCS']
             self.FILETYPE = exposure_identity['FILETYPE']
+
+            # Get the coordinates of the Sun, Earth, and Moon
+            # rs.sso.sso_interpolators()
+
 
             # If the number of SCIEXTS is larger than 1: 
             if isinstance(self.SCIEXTS, (list,)): 
