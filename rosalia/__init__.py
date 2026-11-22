@@ -8,6 +8,10 @@ a.s.borlaff@nasa.gov
 
 from importlib.metadata import version, PackageNotFoundError
 
+# Exposing main ROSALIA functions
+
+from .core import exposure
+
 try:
     __version__ = version("rosalia-wfi")
 except PackageNotFoundError:

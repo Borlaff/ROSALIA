@@ -89,8 +89,11 @@ def exposure_inspector(input_name, verbose=False, lite=False):
             elif isinstance(input_name, (astropy.table.table.Table,)): 
                 #data_stream = rs.mast.query.stream_roman_mast(products=input_name, row=i)
                 #exposure_identity = rs.inspector.exposure_inspector(data_stream, lite=lite)
-                if input_name["instrument_name"][0] == "WFI":
 
+                if 'instrument_name_1' in input_name.colnames:
+                    input_name["instrument_name"] = input_name["instrument_name_1"]
+
+                if input_name["instrument_name"][0].lower() == "wfi":
                     asdf_stream = roman_mast_mission.get_product(uri=input_name["uri"][i])
                     exposure_identity = rs.inspector.exposure_inspector_asdf(asdf_stream, lite=lite)
             exposure_identities.append(exposure_identity)

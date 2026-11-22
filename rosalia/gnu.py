@@ -1,8 +1,23 @@
 import os
 import bottleneck as bn
 import numpy as np
+from tqdm import tqdm
 from astropy.io import fits
 from rosalia.utils import execute_cmd
+from noisechisel_torch import noisechisel
+
+def detect_sources(data_list):
+    detections = np.zeros([data_list[0].shape[0], data_list[0].shape[1], len(data_list)])
+    for i in tqdm(range(len(data_list))):
+        try:
+            res = noisechisel(data_list[i], device="cuda")   # or device="cpu", numthreads=8
+        except Exception as e:
+            print(f"Warning: {e}")
+            print("Fallback to CPUs.")
+            res = noisechisel(data_list[i], device="cpu", numthreads=np.max([os.cpu_count()-2,1]))   # or device="cpu", numthreads=8
+        detections[:,:,i] = res.detections 
+    return(detections)
+
 
 def make_saturation_mask(input_name, ext, saturation_level=50000):
     output_satmasked = input_name.replace(".fits", "_ext" + str(ext) + "_satmasked.fits")
@@ -161,4 +176,3 @@ def correct_sky(input_name, ext, flat=False, overwrite=True, clean=True, verbose
         execute_cmd("rm " + detected_name)
 
     return({"skylvl": sky_level, "input_name": input_name, "ext": ext})
-
