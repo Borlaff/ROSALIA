@@ -4,10 +4,13 @@ from astroquery.mast import MastMissions # pip install git+https://github.com/sn
 import xml.etree.ElementTree as ET
 import astropy.units as u
 import logging
+import numpy as np
 from astropy.time import Time
 import rosalia as rs
 from tqdm import tqdm 
 from astropy.table import join
+
+from rosalia.sso import mast_products_find_distance_to_ssos
 
 # Supress info from MAST
 logger = logging.getLogger()
@@ -197,7 +200,7 @@ class query():
 
     def roman_query(fileSetName=None, criteria=None, coordinates=None, radius=None, filter=None,  
                     mindate=None, detector=None, file_suffix="_cal",
-                    pack_exposures=True, limit=10000, verbose=False):
+                    pack_exposures=True, limit=10000, find_ssos=True, verbose=False):
 
         """
         # Create a dictionary of search criteria
@@ -286,6 +289,13 @@ class query():
 
         if pack_exposures:
             products = rs.mast.query.pack_exposures(products)
+            # Battle fix: target_ra and target_dec are the mean of the target_ra and target_decs. 
+            # This is wrong, but they will fix it in the next MAST iteration. 
+            for i in range(len(products)):
+                products[i]["target_ra"] = np.mean(products[i]["target_ra"])    
+                products[i]["target_dec"] = np.mean(products[i]["target_dec"])
+
+            if find_ssos: products = mast_products_find_distance_to_ssos(products)
         # 
         #if download_products:
         #    downloaded_files = rs.mast.query.download_results(products=products, exposures=unique_roots)

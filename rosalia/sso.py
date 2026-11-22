@@ -10,6 +10,8 @@ from rosalia.horizons import get_jpl_observer_name
 from rosalia.utils import save_dict, load_dict
 from scipy.interpolate import interp1d
 from scipy import interpolate
+from astropy.coordinates import SkyCoord
+
 
 # From https://ssd-api.jpl.nasa.gov/doc/horizons.html#encode
 # To successfully transmit such a list via URL to the API,
@@ -165,3 +167,27 @@ def get_SS0s_loc_magnitude(observer, MJD, lambda_ref, verbose=False):
     sun_color = mag_ref - SSO_ephemeris_db[SSO_ephemeris_db["targetname"]=="Sun (10)"]["V_ab"]
     SSO_ephemeris_db["mag_custom"] = sun_color + SSO_ephemeris_db["V_ab"]
     return(SSO_ephemeris_db)
+
+
+################
+
+def mast_products_find_distance_to_ssos(products):
+    sso_interp = sso_interpolators()
+    for i in range(len(products)):
+        wfipoint = products[i]
+        wfipoint["mjd"] = Time(wfipoint["exposure_start_time"], format="isot").mjd
+        sso_names = list(sso_interp.keys())
+        wfi_cen = SkyCoord(wfipoint["target_ra"], wfipoint["target_dec"], frame="icrs", unit="degree")
+
+        for sso in sso_names:
+            # Get the distance to each body from wfi pointing 
+            wfipoint[sso + "_ra"] = sso_interp[sso]["ra_interp"](wfipoint["mjd"])
+            wfipoint[sso + "_dec"] = sso_interp[sso]["dec_interp"](wfipoint["mjd"])
+            wfipoint[sso + "_V"] = sso_interp[sso]["V_interp"](wfipoint["mjd"])
+            wfipoint[sso + "_ang_width"] = sso_interp[sso]["ang_width_interp"](wfipoint["mjd"])
+            sso_skycoord   = SkyCoord(wfipoint[sso + "_ra"],   wfipoint[sso + "_dec"],   frame="icrs", unit="degree")
+            wfipoint[sso + "_dist"]    = wfi_cen.separation(sso_skycoord)
+            wfipoint[sso + "_pa"]    = wfi_cen.position_angle(sso_skycoord)
+
+        products[i] = wfipoint
+    return(products)
