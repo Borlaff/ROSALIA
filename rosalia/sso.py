@@ -39,7 +39,7 @@ def sso_interpolators(observer="roman", start_epoch='2026-08-31', end_epoch=None
     if file_path.exists():
         file_age = time.time() - file_path.stat().st_mtime
         if file_age > 86400: # one day in seconds 
-            print(f"The ephemeris is older than 1 day: {is_older}")
+            print(f"The ephemeris is older than 1 day! Reloading...")
         else:
             return(load_dict(file_path))
 

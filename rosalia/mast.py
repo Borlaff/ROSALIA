@@ -240,7 +240,7 @@ class query():
         # in this order, so we will re-order later. The fileSetName, which we need for retrieval,
         # is not in this list, but will still be returned.
         col_list = ['program', 'execution_plan', 'pass', 'segment', 'visit', 'observation',
-                    'ra', 'dec', 'target_ra', 'target_dec', 'image_median', 'conversion_megajanskys',
+                    'ra', 'dec', 'target_ra', 'target_dec', 'pa_v3', 'image_median', 'conversion_megajanskys',
                     'optical_element', 'exposure_type', 'instrument_name', 'detector', 'productLevel', 
                     'product_type', 'exposure_time', 'exposure_start_time', 'exposure_end_time', 'fileSetName']
 
