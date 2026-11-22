@@ -8,7 +8,7 @@ import rosalia as rs
 import numpy as np
 from astropy.io import fits
 import roman_datamodels.datamodels._datamodels
-import astropy.table.table
+from astropy.table import Table
 import os
 import astropy.units as u
 from astroquery.mast import MastMissions
@@ -86,7 +86,7 @@ def exposure_inspector(input_name, verbose=False, lite=False):
             if isinstance(input_name, (list,)): 
                 exposure_identity = rs.inspector.exposure_inspector(input_name[i], lite=lite)
                 
-            elif isinstance(input_name, (astropy.table.table.Table,)): 
+            elif isinstance(input_name, (Table,)): 
                 #data_stream = rs.mast.query.stream_roman_mast(products=input_name, row=i)
                 #exposure_identity = rs.inspector.exposure_inspector(data_stream, lite=lite)
 
