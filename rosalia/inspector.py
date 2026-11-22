@@ -71,7 +71,7 @@ def exposure_inspector(input_name, verbose=False, lite=False):
         return(exposure_identity)
 
     # isinstance("Hello", (float, int, str, list, dict, tuple))     
-    if isinstance(input_name, (list, astropy.table.Table)):
+    if isinstance(input_name, (list, Table)):
 
         roman_mast_mission = MastMissions(mission='roman')
         token = os.getenv("MAST_API_TOKEN")    
