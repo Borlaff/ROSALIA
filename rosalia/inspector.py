@@ -191,7 +191,15 @@ def exposure_inspector_asdf(input_name, telescope="roman", verbose=False, lite=F
     exposure_identity["spatial_z"]   = input_asdf["meta"]["ephemeris"]["spatial_z"]
     exposure_identity["conversion_megajanskys"] = input_asdf["meta"]["photometry"]["conversion_megajanskys"]
     exposure_identity["conversion_megajanskys_uncertainty"] = input_asdf["meta"]["photometry"]["conversion_megajanskys_uncertainty"]
-    exposure_identity["pixel_area"] = input_asdf["meta"]["photometry"]["pixel_area"]*((180/np.pi)*60*60)**2
+
+    try:
+        exposure_identity["pixel_area"] = input_asdf["meta"]["photometry"]["pixel_area"]*((180/np.pi)*60*60)**2
+    except Exception as e:
+        print("Pixel area not found on header.")
+        if exposure_identity["TELESCOP"].lower() == "roman":
+            print("Assuming 0.11 arcsec for Roman/WFI")
+            exposure_identity["pixel_area"] = 0.11**2
+
     exposure_identity["EXPSTART_ISOT"] = input_asdf["meta"]["exposure"]["start_time"].isot
     exposure_identity["SCA"]        = int(input_asdf["meta"]["instrument"]["detector"].replace("WFI",""))
     exposure_identity["BUNIT"]      = "DN/s" # input_asdf["roman"]["meta"]["photometry"]["flux_unit"]
